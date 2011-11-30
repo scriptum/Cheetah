@@ -1,0 +1,7 @@
+*.o
+*.d
+*.exe
+*.dll
+*.so
+obj*
+luajit
