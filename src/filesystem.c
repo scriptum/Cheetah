@@ -1,3 +1,5 @@
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "cheetah.h"
 
 void myError(char *fmt, ...)
@@ -32,3 +34,22 @@ unsigned char * loadfile(const char * filename, unsigned int * length)
 	fclose(f);
 	return result;
 }
+
+#define filetime(var) int file ## var ## time(const char * filename) {\
+	struct stat buf;\
+	int result = stat( filename, &buf );\
+	if( result != 0 )\
+		myError("can't get information about file %s", filename);\
+	else\
+		return buf.st_ ## var ## time;\
+}
+
+filetime(m)
+filetime(a)
+filetime(c)
+
+#ifdef false
+int fileatime(const char * filename) {
+int filemtime(const char * filename) {
+int filectime(const char * filename) {
+#endif

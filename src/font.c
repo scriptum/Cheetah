@@ -32,8 +32,7 @@ float fontHeight(Font *font) {
 	return font->height * font->scale;
 }
 
-#define ALIGN(width) if(align)\
-    if(align == 0) glTranslatef(floor((maxw - width)/2.0f), 0, 0);\
+#define ALIGN(width) if(align == 0) glTranslatef(floor((maxw - width)/2.0f), 0, 0);\
     else if(align == 1) glTranslatef(floor(maxw - width), 0, 0);
 #ifdef NO_VBO
 #define DRAW_CHAR glCallList(ch->vertex);
@@ -46,13 +45,30 @@ glTexCoordPointer(2, GL_FLOAT, 0, (char *) NULL); \
 glDrawArrays(GL_QUADS, 0, 4); 
 #endif
 
-void fontPrint(register const char * str) {
+float Font_Width(Font *f, register const char *str)
+{
+	float width = 0;
+	if(*str)
+	do {
+		if(*str == '\t')\
+		{
+			width += f->chars[32].w * 8;
+			continue;
+		}
+		else if(*str == '\n')
+			width = 0;
+		width += f->chars[(unsigned char)*str].w;
+	} while(*++str);
+	return width * f->scale;
+}
+
+void fontPrint(register const char * str, int maxw, int align) {
 	float w;
 	unsigned char c;
 	FontChar *ch;
 	if(!currentFont) return myError("Call <yourfont>:select() first!");
 	w = 0;
-	//~ ALIGN(Font_Width(currentFont, str))
+	ALIGN(Font_Width(currentFont, str))
 	
 	glPushMatrix();
 	glScalef(currentFont->scale, currentFont->scale, 0);

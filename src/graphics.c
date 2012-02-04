@@ -1,6 +1,4 @@
 #include <math.h>
-#include <execinfo.h>
-#include <signal.h>
 #include "cheetah.h"
 #include "SOIL/SOIL.h"
 #include "render.h"
@@ -24,45 +22,62 @@
 
 GLuint quadlist;
 
-bool init(const char * appName, int width, int height, int bpp, const char * attr) {
+bool init(const char * appName, unsigned int width, unsigned int height, int bpp, const char * attr) {
 	bool fullscreen = 0;
-	bool resizable = 1;
+	bool resizable = 0;
 	bool vsync = 0;
-	Uint32 flags;
+	bool firstrun = 0;
+	char ch;
+	Uint32 flags = SDL_OPENGL;
 
-	flags = SDL_OPENGL;
+	while(*attr)
+	{
+		ch = *attr;
+		if(ch == 'f') fullscreen = 1;
+		if(ch == 'r') resizable = 1;
+		if(ch == 'v') vsync = 1;
+		//if(ch == 'm') flags |= SDL_WINDOW_MAXIMIZED;
+		attr++;
+	}
 
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
 	} else if (resizable) {
 		flags |= SDL_RESIZABLE;
 	}
+	
+	if(width < 1) width = 1;
+	if(height < 1) height = 1;
+	
 	if (screen == NULL) {
 		if ( SDL_Init ( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) != 0 )
 			return 0;
 		atexit(SDL_Quit);
+		SDL_EnableUNICODE(1);
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		firstrun = 1;
 	}
-	SDL_EnableUNICODE(1);
-	SDL_WM_SetCaption (appName, appName);
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	if(appName) SDL_WM_SetCaption (appName, appName);
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
 	screen = SDL_SetVideoMode(width, height, 32, flags);
 	if (screen == NULL)
 		myError("couldn't set %dx%dx%d video mode: %s",
 								width, height, bpp, SDL_GetError());
 	initRenderer();
-	/* set background color */
-	glClearColor( 0, 0, 0, 1);
-	/* set line antialiasing */
-	glEnable(GL_POINT_SMOOTH);
-	glEnable(GL_LINE_SMOOTH);
-	/* enable blending */
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
-	/* enable backface culling */
-	glDisable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glDisable(GL_DEPTH_TEST);
+	if (firstrun) {
+		/* set background color */
+		glClearColor( 0, 0, 0, 1);
+		/* set line antialiasing */
+		glEnable(GL_POINT_SMOOTH);
+		glEnable(GL_LINE_SMOOTH);
+		/* enable blending */
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		/* enable backface culling */
+		glDisable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glDisable(GL_DEPTH_TEST);
+	}
 
 	glViewport( 0, 0, width, height );
 	glMatrixMode( GL_PROJECTION );
@@ -71,8 +86,7 @@ bool init(const char * appName, int width, int height, int bpp, const char * att
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 	
-	if(!quadlist)
-	{
+	if(firstrun) {
 		quadlist = glGenLists(1);
 		glNewList(quadlist, GL_COMPILE);
 		glBegin(GL_QUADS);
@@ -98,9 +112,12 @@ void swapBuffers() {
 	SDL_GL_SwapBuffers();
 }
 
+void setWindowCaption(const char * text){
+	SDL_WM_SetCaption(text, text);
+}
+
 SDL_Rect ** getModes() {
 	SDL_Rect ** modes = SDL_ListModes(0, SDL_OPENGL | SDL_FULLSCREEN);
-	int i, index = 1;
 	if(modes == (SDL_Rect **)0 || modes == (SDL_Rect **)-1)
 		return 0;
 	return modes;
@@ -134,6 +151,10 @@ unsigned int GetTicks() {
 	return SDL_GetTicks();
 }
 
+void delay(unsigned int ms) {
+	return SDL_Delay(ms);
+}
+
 void translate(double translateX, double translateY) {
 	glTranslated(translateX, translateY, 0);
 }
@@ -150,6 +171,11 @@ void rotate(double rotate) {
 	glRotated(rotate, 0, 0, 1);
 }
 
+void blend(bool blend) {
+	if(blend) glEnable(GL_BLEND);
+	else glDisable(GL_BLEND);
+}
+
 void push() {
 	glPushMatrix();
 	if (glGetError() == GL_STACK_OVERFLOW)
@@ -162,10 +188,13 @@ void pop() {
 		myError("No saved view was found.");
 }
 
-void translateObject(double x, double y, double a, double w, double h, double ox, double oy) {
+void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y) {
 	glTranslated(x, y, 0);
-	glRotated(a,0,0,1);
-	glScalef(w, h, 0);
+	glTranslated(origin_x, origin_y, 0);
+	glRotated(angle, 0, 0, 1);
+	glScalef(width, height, 0);
+	glTranslated(-origin_x/width, -origin_y/height, 0);
+	//glTranslated(ox, oy, 0);
 }
 
 void reset() {
@@ -260,6 +289,8 @@ void setBlendMode(const char * str) {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	else if (strcmp(str, "screen") == 0)
 		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+	else if (strcmp(str, "detail") == 0)
+    glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
   //~ else if (strcmp(str, "mask") == 0)
     //~ glBlendFuncSeparate_(GL_ZERO, GL_ONE, GL_SRC_COLOR, GL_ZERO);
   //~ else if (strcmp(str, "foreground") == 0)
@@ -324,6 +355,7 @@ void imageDraw(Image * image) {
 	glDisable(GL_TEXTURE_2D);
 }
 
+/*todo: Заюзать шейдры для передачи координат, а выводить квад листом. В шрифтах аналогично*/
 void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
 	glBindTexture(GL_TEXTURE_2D, image->id);
 	glEnable(GL_TEXTURE_2D);
@@ -342,6 +374,45 @@ void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
 	glDisable(GL_TEXTURE_2D);
 }
 
+void imageDrawMultitexture2(Image * image0, Image * image1) {
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture_(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, image0->id);
+	glActiveTexture_(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, image1->id);
+	glActiveTexture_(GL_TEXTURE0);
+	glCallList(quadlist);
+	glDisable(GL_TEXTURE_2D);
+}
+
+void imageDrawMultitexture3(Image * image0, Image * image1, Image * image2) {
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture_(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, image0->id);
+	glActiveTexture_(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, image1->id);
+	glActiveTexture_(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, image2->id);
+	glActiveTexture_(GL_TEXTURE0);
+	glCallList(quadlist);
+	glDisable(GL_TEXTURE_2D);
+}
+
+void imageDrawMultitexture4(Image * image0, Image * image1, Image * image2, Image * image3) {
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture_(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, image0->id);
+	glActiveTexture_(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, image1->id);
+	glActiveTexture_(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, image2->id);
+	glActiveTexture_(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, image3->id);
+	glActiveTexture_(GL_TEXTURE0);
+	glCallList(quadlist);
+	glDisable(GL_TEXTURE_2D);
+}
+
 void deleteImage(Image * ptr) {
 	if(ptr)
 		glDeleteTextures(1, &ptr->id);
@@ -354,10 +425,10 @@ int checkFramebufferStatus()
 	status = (GLenum) glCheckFramebufferStatus_(GL_FRAMEBUFFER_EXT);
 	switch(status) {
 		case GL_FRAMEBUFFER_COMPLETE_EXT:
-				return 1;
+			return 1;
 		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-				myError("Framebuffer incomplete, incomplete attachment\n");
-				return 0;
+			myError("Framebuffer incomplete, incomplete attachment\n");
+			return 0;
 		case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
 			myError("Unsupported framebuffer format\n");
 			return 0;
