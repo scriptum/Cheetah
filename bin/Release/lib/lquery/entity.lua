@@ -125,7 +125,7 @@ function Entity:animate(keys, options)
     elseif type(options) == "function" then
       options = {cb = options}
     elseif type(options) == "string" then
-      options = {easing = options}
+      options = {queue = options}
     elseif type(options) == "boolean" then
       options = {loop = options}
     end
@@ -232,12 +232,12 @@ function Entity:draw(callback)
 	return self --so we can chain methods
 end
 
-local drag_start = function(s, x, y)
+lQuery.drag_start = function(s, x, y)
   s._drag_x = x - s.x
   s._drag_y = y - s.y
   _drag_object = s
 end
-local drag_end = function(s)
+lQuery.drag_end = function(s)
   _drag_object = nil
 end
 lQuery.addhook(function()
@@ -259,7 +259,7 @@ function Entity:draggable(options)
   local o = options or {}
   if o.bound then self._drag_bound = o.bound end --[[top, right, bottom, left]]
   if o.callback then self._drag_callback = o.callback end
-  return self:mousepress(drag_start):mouserelease(drag_end)
+  return self:mousepress(lQuery.drag_start):mouserelease(lQuery.drag_end)
 end
 
 
@@ -349,8 +349,7 @@ local function events(v)
     end
     v._key = false
   end
-  if v._bound and v._bound(v, mX, mY) then 
-    
+  if v._bound and v._bound(v, mX, mY) then
     if v._mousemove then 
       v._mousemove(v, mX, mY)
     end 
@@ -368,13 +367,13 @@ local function events(v)
       lQuery.MousePressedOwner = v
     end
     lQuery.hover = v
-  else
-    if lQuery._hover == v then 
-      lQuery._hover = nil
-      lQuery.hover = nil
-      if v._mouseout then v._mouseout(v, mX, mY) end
+  --~ else
+    --~ if lQuery._hover == v then 
+      --~ lQuery._hover = nil
+      --~ lQuery.hover = nil
+      --~ if v._mouseout then v._mouseout(v, mX, mY) end
       --if v == lQuery.MousePressedOwner then lQuery.MousePressedOwner = nil end
-    end
+    --~ end
   end
 end
 
@@ -389,7 +388,7 @@ local function process_entities(ent)
 		if ent._draw then
 			cheetah.setColor(ent.r or 255, ent.g or 255, ent.b or 255, ent.a or 255)
 			cheetah.push()
-			cheetah.translateObject(ent.x, ent.y, ent.angle or 0, ent.w or 1, ent.h or 1, 0, 0)
+			cheetah.translateObject(ent.x, ent.y, ent.angle or 0, ent.w or 1, ent.h or 1, ent.ox or 0, ent.oy or 0)
 			if ent.blendMode then cheetah.setBlendMode(ent.blendMode) end
 			if type(ent._draw) == 'function' then
 				ent._draw(ent)
@@ -448,7 +447,7 @@ end
 
 lQuery.process = function()
   for _, v in pairs(lQuery.hooks) do v() end
-
+	lQuery.hover = nil
   if screen then process_entities(screen) end
   if Console then process_entities(Console) end
   
@@ -460,10 +459,12 @@ lQuery.process = function()
     end
   end
   
-  local v = lQuery.hover
-  if v and not lQuery._hover then
-    if v._mouseover then v._mouseover(v, mX, mY) end
-    lQuery._hover = v
+  local v = lQuery.lasthover
+  if v ~= lQuery.hover then
+    if v and v._mouseout then v._mouseout(v, mX, mY) end --out MUST be before over
+    v = lQuery.hover
+    if v and v._mouseover then v._mouseover(v, mX, mY) end
+    lQuery.lasthover = lQuery.hover
   end
   lQuery._MousePressedOwner = false
 end
