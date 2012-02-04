@@ -4,6 +4,5 @@
 *.dll
 *.so
 obj*
-bin*
 luajit
 *devel_art*
