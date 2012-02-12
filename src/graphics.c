@@ -20,6 +20,12 @@
 	//~ free (strings);
 //~ }
 
+//~ #if 0
+void colorMask(bool r, bool g, bool b, bool a) {
+	glColorMask(r,g,b,a);
+}
+//~ #endif
+
 GLuint quadlist;
 
 bool init(const char * appName, unsigned int width, unsigned int height, int bpp, const char * attr) {
@@ -27,6 +33,8 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 	bool resizable = 0;
 	bool vsync = 0;
 	bool firstrun = 0;
+	bool depth = 0;
+	bool stencil = 0;
 	char ch;
 	Uint32 flags = SDL_OPENGL;
 
@@ -36,6 +44,8 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		if(ch == 'f') fullscreen = 1;
 		if(ch == 'r') resizable = 1;
 		if(ch == 'v') vsync = 1;
+		if(ch == 'd') depth = 1;
+		if(ch == 's') stencil = 1;
 		//if(ch == 'm') flags |= SDL_WINDOW_MAXIMIZED;
 		attr++;
 	}
@@ -55,11 +65,13 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		atexit(SDL_Quit);
 		SDL_EnableUNICODE(1);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		if(depth) SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+		if(stencil) SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 		firstrun = 1;
 	}
 	if(appName) SDL_WM_SetCaption (appName, appName);
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
-	screen = SDL_SetVideoMode(width, height, 32, flags);
+	screen = SDL_SetVideoMode(width, height, bpp, flags);
 	if (screen == NULL)
 		myError("couldn't set %dx%dx%d video mode: %s",
 								width, height, bpp, SDL_GetError());
@@ -85,7 +97,7 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 	glOrtho( 0, width, height, 0, -1, 1 );
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
-	
+	glDepthRange(-10000,10000);
 	if(firstrun) {
 		quadlist = glGenLists(1);
 		glNewList(quadlist, GL_COMPILE);
@@ -135,8 +147,16 @@ void enableDepthTest() {
 	glEnable(GL_DEPTH_TEST);
 }
 
-void disableDepthTest(){
+void disableDepthTest() {
 	glDisable(GL_DEPTH_TEST);
+}
+
+void enableStencilTest() {
+	glEnable(GL_STENCIL_TEST);
+}
+
+void disableStencilTest() {
+	glDisable(GL_STENCIL_TEST);
 }
 
 unsigned int getTicks() {
@@ -171,9 +191,17 @@ void rotate(double rotate) {
 	glRotated(rotate, 0, 0, 1);
 }
 
-void blend(bool blend) {
-	if(blend) glEnable(GL_BLEND);
+void blend(bool bl) {
+	if(bl) glEnable(GL_BLEND);
 	else glDisable(GL_BLEND);
+}
+
+void enableBlend() {
+	glEnable(GL_BLEND);
+}
+
+void disableBlend() {
+	glDisable(GL_BLEND);
 }
 
 void push() {
@@ -274,27 +302,36 @@ void Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
 	glColor4ub(r,g,b,a);
 }
 
-void setBlendMode(const char * str) {
-	if(strcmp(str, "subtractive") == 0) {
+void setClearColor(float r, float g, float b, float a) {
+	glClearColor(r,g,b,a);
+}
+
+void setBlendMode(int mode) {
+	if(mode == blend_substractive) {
 		glBlendEquation_(GL_FUNC_REVERSE_SUBTRACT);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	else
+	{
 		glBlendEquation_(GL_FUNC_ADD);
-	if (strcmp(str, "alpha") == 0)
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	else if (strcmp(str, "multiplicative") == 0)
-		glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-	else if (strcmp(str, "additive") == 0)
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	else if (strcmp(str, "screen") == 0)
-		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
-	else if (strcmp(str, "detail") == 0)
-    glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
-  //~ else if (strcmp(str, "mask") == 0)
-    //~ glBlendFuncSeparate_(GL_ZERO, GL_ONE, GL_SRC_COLOR, GL_ZERO);
-  //~ else if (strcmp(str, "foreground") == 0)
-    //~ glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA);
+		switch(mode) {
+			case blend_alpha:
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				break;
+			case blend_multiplicative:
+				glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+				break;
+			case blend_additive:
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+				break;
+			case blend_screen:
+				glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+				break;
+			case blend_detail:
+				glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
+				break;
+		}
+	}
 }
 
 void setBlendAlpha() {
@@ -310,8 +347,34 @@ void clearColorDepth() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void clearColorStencil() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
+
 void clearDepth() {
 	glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+void clearStencil() {
+	glClear(GL_STENCIL_BUFFER_BIT);
+}
+
+void setStencilFunc() {
+	glStencilFunc (GL_NEVER, 0x1, 0x1);
+}
+
+void setStencilOp() {
+	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
+}
+
+void drawToStencil() {
+	glStencilFunc (GL_NEVER, 0x0, 0x1);
+	glStencilOp(GL_REPLACE,GL_KEEP,GL_REPLACE);
+}
+
+void drawUsingStencil() {
+	glStencilFunc (GL_EQUAL, 0x1, 0x1);
+	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 }
 
 Image *newImage(const char *name) {
@@ -346,6 +409,18 @@ Image *newImage(const char *name) {
 	ptr->w = width;
 	ptr->h = height;
 	return ptr;
+}
+
+void imageBind(Image * image) {
+	glBindTexture(GL_TEXTURE_2D, image->id);
+}
+
+void enableTexture2D() {
+	glEnable(GL_TEXTURE_2D);
+}
+
+void disableTexture2D() {
+	glDisable(GL_TEXTURE_2D);
 }
 
 void imageDraw(Image * image) {
@@ -572,4 +647,107 @@ void deleteFramebuffer(Framebuffer * ptr) {
 		free(ptr->image);
 	}
 	else myError("Trying to free a null-framebuffer. Maybe, you did it manually?");
+}
+
+Vbo * newVbo(Point * data, Point * tex, unsigned int count) {
+	Vbo * ptr = (Vbo*)malloc(sizeof(Vbo));
+	ptr->count = count;
+	glGenBuffers_(1, &ptr->id);
+	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
+	glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*4*count, (void*)data, GL_STATIC_DRAW_ARB);
+	glGenBuffersARB(1, &ptr->tex);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, ptr->tex);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Point)*4*count, (void*)tex, GL_STATIC_DRAW_ARB);
+	return ptr;
+}
+
+void vboDraw(Vbo * ptr) {
+	glEnable(GL_TEXTURE_2D);
+	glEnableClientState(GL_VERTEX_ARRAY); 
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY); 
+	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
+	glVertexPointer(2, GL_FLOAT, 0, (char *) NULL);
+	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->tex);
+	glTexCoordPointer(2, GL_FLOAT, 0, (char *) NULL);
+	glDrawArrays(GL_QUADS, 0, ptr->count*4); 
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisable(GL_TEXTURE_2D);
+}
+
+Vbo * newVboPoints(Point * data, unsigned int count) {
+	Vbo * ptr = (Vbo*)malloc(sizeof(Vbo));
+	ptr->count = count;
+	int i;
+	glGenBuffers_(1, &ptr->id);
+	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
+	glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*count, (void*)data, GL_STATIC_DRAW_ARB);
+	//~ ptr->id = glGenLists(1);
+	//~ glNewList(ptr->id, GL_COMPILE);
+	//~ glBegin(GL_POINTS);
+	//~ for (i = 0; i < count; i++)
+	//~ {
+		//~ glVertex2f(data[i].x, data[i].y);
+	//~ }
+	//~ glEnd();
+	//~ glEndList();
+	return ptr;
+}
+void vboDrawSprites(Vbo * ptr, Image * img, float size) {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, img->id);
+	glPointSize(size);
+	glEnable(GL_POINT_SPRITE);
+	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+	
+	//~ glCallList(ptr->id);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
+	glVertexPointer(2, GL_FLOAT, 0, (char *) NULL);
+	glDrawArrays(GL_POINTS, 0, ptr->count); 
+	glDisableClientState(GL_VERTEX_ARRAY);
+	
+	glDisable(GL_TEXTURE_2D);
+}
+
+Vbo * newVboPoints3(Point3 * data, unsigned int count) {
+	Vbo * ptr = (Vbo*)malloc(sizeof(Vbo));
+	ptr->count = count;
+	int i;
+	glGenBuffers_(1, &ptr->id);
+	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
+	glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point3)*count, (void*)data, GL_STATIC_DRAW_ARB);
+	//~ ptr->id = glGenLists(1);
+	//~ glNewList(ptr->id, GL_COMPILE);
+	//~ glBegin(GL_POINTS);
+	//~ for (i = 0; i < count; i++)
+	//~ {
+		//~ glVertex2f(data[i].x, data[i].y);
+	//~ }
+	//~ glEnd();
+	//~ glEndList();
+	return ptr;
+}
+void vboDrawSprites3(Vbo * ptr, Image * img, float size) {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, img->id);
+	glPointSize(size);
+	glEnable(GL_POINT_SPRITE);
+	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+	
+	//~ glCallList(ptr->id);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
+	glVertexPointer(3, GL_FLOAT, 0, (char *) NULL);
+	glDrawArrays(GL_POINTS, 0, ptr->count); 
+	glDisableClientState(GL_VERTEX_ARRAY);
+	
+	glDisable(GL_TEXTURE_2D);
+}
+
+void deleteVbo(Vbo * ptr) {
+	if(ptr) {
+		glDeleteBuffers_(1, &ptr->id);
+	}
+	else myError("Trying to free a null-VBO. Maybe, you did it manually?");
 }
