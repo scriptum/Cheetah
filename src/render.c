@@ -53,6 +53,16 @@ PFNGLMULTITEXCOORD2FARBPROC     glMultiTexCoord2f_     = NULL;
 PFNGLMULTITEXCOORD3FARBPROC     glMultiTexCoord3f_     = NULL;
 PFNGLMULTITEXCOORD4FARBPROC     glMultiTexCoord4f_     = NULL;
 
+// GL_ARB_vertex_buffer_object, GL_ARB_pixel_buffer_object
+PFNGLGENBUFFERSARBPROC       glGenBuffers_       = NULL;
+PFNGLBINDBUFFERARBPROC       glBindBuffer_       = NULL;
+PFNGLMAPBUFFERARBPROC        glMapBuffer_        = NULL;
+PFNGLUNMAPBUFFERARBPROC      glUnmapBuffer_      = NULL;
+PFNGLBUFFERDATAARBPROC       glBufferData_       = NULL;
+PFNGLBUFFERSUBDATAARBPROC    glBufferSubData_    = NULL;
+PFNGLDELETEBUFFERSARBPROC    glDeleteBuffers_    = NULL;
+PFNGLGETBUFFERSUBDATAARBPROC glGetBufferSubData_ = NULL;
+
 // GL_EXT_framebuffer_blit
 PFNGLBLITFRAMEBUFFEREXTPROC         glBlitFramebuffer_         = NULL;
 
@@ -137,5 +147,18 @@ void initRenderer()
 			glMultiTexCoord3f_     = (PFNGLMULTITEXCOORD3FARBPROC)    SDL_GL_GetProcAddress("glMultiTexCoord3fARB");
 			glMultiTexCoord4f_     = (PFNGLMULTITEXCOORD4FARBPROC)    SDL_GL_GetProcAddress("glMultiTexCoord4fARB");
 			supported.MT = 1;
+	}
+	supported.VBO = 0;
+	if(strstr(exts, "GL_ARB_vertex_buffer_object"))
+	{
+		glGenBuffers_       = (PFNGLGENBUFFERSARBPROC)      SDL_GL_GetProcAddress("glGenBuffersARB");
+		glBindBuffer_       = (PFNGLBINDBUFFERARBPROC)      SDL_GL_GetProcAddress("glBindBufferARB");
+		glMapBuffer_        = (PFNGLMAPBUFFERARBPROC)       SDL_GL_GetProcAddress("glMapBufferARB");
+		glUnmapBuffer_      = (PFNGLUNMAPBUFFERARBPROC)     SDL_GL_GetProcAddress("glUnmapBufferARB");
+		glBufferData_       = (PFNGLBUFFERDATAARBPROC)      SDL_GL_GetProcAddress("glBufferDataARB");
+		glBufferSubData_    = (PFNGLBUFFERSUBDATAARBPROC)   SDL_GL_GetProcAddress("glBufferSubDataARB");
+		glDeleteBuffers_    = (PFNGLDELETEBUFFERSARBPROC)   SDL_GL_GetProcAddress("glDeleteBuffersARB");
+		glGetBufferSubData_ = (PFNGLGETBUFFERSUBDATAARBPROC)SDL_GL_GetProcAddress("glGetBufferSubDataARB");
+		supported.VBO = 1;
 	}
 }

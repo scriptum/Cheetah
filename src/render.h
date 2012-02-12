@@ -52,6 +52,15 @@ extern PFNGLMULTITEXCOORD2FARBPROC     glMultiTexCoord2f_;
 extern PFNGLMULTITEXCOORD3FARBPROC     glMultiTexCoord3f_;
 extern PFNGLMULTITEXCOORD4FARBPROC     glMultiTexCoord4f_;
 
+// GL_ARB_vertex_buffer_object
+extern PFNGLGENBUFFERSARBPROC       glGenBuffers_;
+extern PFNGLBINDBUFFERARBPROC       glBindBuffer_;
+extern PFNGLMAPBUFFERARBPROC        glMapBuffer_;
+extern PFNGLUNMAPBUFFERARBPROC      glUnmapBuffer_;
+extern PFNGLBUFFERDATAARBPROC       glBufferData_;
+extern PFNGLBUFFERSUBDATAARBPROC    glBufferSubData_;
+extern PFNGLDELETEBUFFERSARBPROC    glDeleteBuffers_;
+extern PFNGLGETBUFFERSUBDATAARBPROC glGetBufferSubData_;
 
 // GL_EXT_framebuffer_blit
 #ifndef GL_EXT_framebuffer_blit
