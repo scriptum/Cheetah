@@ -83,8 +83,14 @@ enum {
 	blend_multiplicative,
 	blend_screen,
 	blend_detail,
-	blend_substractive
-} BlendMode;
+	blend_substractive,
+	blendAlpha = 0,
+	blendAdditive,
+	blendMultiplicative,
+	blendScreen,
+	blendDetail,
+	blendSubstractive,
+};
 
 #if 0
 enum {
