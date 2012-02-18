@@ -1,6 +1,6 @@
 #include <math.h>
 #include "cheetah.h"
-#include "SOIL/SOIL.h"
+//~ #include "SOIL/SOIL.h"
 #include "render.h"
 //~ void stackdumper(int param)
 //~ {
@@ -377,48 +377,90 @@ void drawUsingStencil() {
 	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 }
 
-Image *newImage(const char *name) {
-	Image *ptr;
-	if(!screen)
-	{
-		myError("Call init function before!");
-		return 0;
-	}
-	int width, height, channels, repeat = 1;
-	unsigned int tex_id;
-	unsigned char* img;
-	unsigned int file_size;
-	unsigned char * myBuf = loadfile(name, &file_size);
-	img = SOIL_load_image_from_memory(
-				myBuf, sizeof(unsigned char) * file_size,
-				&width, &height, &channels,
-				0 );
-	if( NULL == img ) {
-		myError("can't load image %s", name);
-		return 0;
-	}
-	tex_id = SOIL_internal_create_OGL_texture(
-			img, width, height, channels,
-			0, SOIL_FLAG_TEXTURE_REPEATS,
-			GL_TEXTURE_2D, GL_TEXTURE_2D,
-			GL_MAX_TEXTURE_SIZE );
+//~ /**
+ //~ * @descr Load image from disc with specific optons
+ //~ * @group image
+ //~ * @param File name
+ //~ * @param String of options. Supported options:
+ //~ * `n` - use nearest interpolation
+ //~ * `m` - generate mip-maps (automatically sets mip-map interpolation)
+ //~ * @return Image object
+ //~ * */
+//~ Image *newImageOpt(const char *name, const char *options) {
+	//~ Image *ptr;
+	//~ char ch;
+	//~ if(!screen)
+	//~ {
+		//~ myError("Call init function before!");
+		//~ return NULL;
+	//~ }
+	//~ int width, height, channels, repeat = 1;
+	//~ unsigned int tex_id;
+	//~ unsigned char* img;
+	//~ unsigned int file_size;
+	//~ unsigned char * myBuf = loadfile(name, &file_size);
+	//~ img = SOIL_load_image_from_memory(
+				//~ myBuf, sizeof(unsigned char) * file_size,
+				//~ &width, &height, &channels,
+				//~ 0 );
+	//~ if( NULL == img ) {
+		//~ myError("can't load image %s", name);
+		//~ return 0;
+	//~ }
+	//~ tex_id = SOIL_internal_create_OGL_texture(
+			//~ img, width, height, channels,
+			//~ 0, SOIL_FLAG_TEXTURE_REPEATS,
+			//~ GL_TEXTURE_2D, GL_TEXTURE_2D,
+			//~ GL_MAX_TEXTURE_SIZE );
+	//~ 
+	//~ while(*options)
+	//~ {
+		//~ ch = *options;
+		//~ if(ch == 'n') {
+			//~ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			//~ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		//~ }
+		//~ options++;
+	//~ }
+	//~ SOIL_free_image_data( img );
+	//~ ptr = (Image *)malloc(sizeof(Image));
+	//~ ptr->id = tex_id;
+	//~ ptr->w = width;
+	//~ ptr->h = height;
+	//~ return ptr;
+//~ }
+//~ 
+//~ /**
+ //~ * @descr Load image from disc
+ //~ * @group image
+ //~ * @param File name
+ //~ * @return Image object
+ //~ * */
+//~ Image *newImage(const char *name) {
+	//~ return newImageOpt(name, "");
+//~ }
 
-	SOIL_free_image_data( img );
-	ptr = (Image *)malloc(sizeof(Image));
-	ptr->id = tex_id;
-	ptr->w = width;
-	ptr->h = height;
-	return ptr;
-}
-
+/**
+ * @descr Bind Image object. Equivalent to glBindTexture.
+ * @group image
+ * @param Image object
+ * */
 void imageBind(Image * image) {
 	glBindTexture(GL_TEXTURE_2D, image->id);
 }
 
+/**
+ * @descr Enable texturing. Equivalent to glEnable(GL_TEXTURE_2D).
+ * @group image
+ * */
 void enableTexture2D() {
 	glEnable(GL_TEXTURE_2D);
 }
 
+/**
+ * @descr Disable texturing. Equivalent to glDisable(GL_TEXTURE_2D).
+ * @group image
+ * */
 void disableTexture2D() {
 	glDisable(GL_TEXTURE_2D);
 }
@@ -494,6 +536,18 @@ void deleteImage(Image * ptr) {
 	else myError("Trying to free a null-image. Maybe, you did it manually?");
 }
 
+void disableFiltering(Image * img) {
+	glBindTexture(GL_TEXTURE_2D, img->id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+}
+
+void enableFiltering(Image * img) {
+	glBindTexture(GL_TEXTURE_2D, img->id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+}
+
 int checkFramebufferStatus()
 {
 	GLenum status;
@@ -526,12 +580,18 @@ int checkFramebufferStatus()
 	return 0;
 }
 
-Framebuffer * newFramebuffer(unsigned int width, unsigned int height, unsigned int percision, bool alpha, bool interpolation, bool repeat) {
+Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char * options) {
+	//unsigned int percision, bool alpha, bool interpolation, bool repeat) {
+	unsigned int percision = 8;
+	bool alpha = 0;
+	bool interpolation = 1;
+	bool repeat = 0;
 	Image *ptr;
 	Framebuffer *fboptr;
 	GLint current_fbo;
 	GLenum internal, format;
 	bool status;
+	char ch;
 	
 	if(!screen)
 	{
@@ -540,17 +600,29 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, unsigned i
 	}
 	
 	if(!supported.FBO) {
-		myError("Framebuffers are not supported on this machine. You'd better to check it in script (isSupported)");
+		myError("Framebuffers are not supported on this machine. You'd better to check it in script (cheetah.supported)");
 		return 0;
 	}
 	
+	while(*options)
+	{
+		ch = *options;
+		if(ch == 'a') alpha = 1;
+		if(ch == 'n') interpolation = 0;
+		if(ch == 'r') repeat = 1;
+		if(ch == '4') percision = 32;
+		if(ch == '2') percision = 16;
+		if(ch == '1') percision = 8;
+		options++;
+	}
+	
 	if(percision == 32) {
-		internal = alpha ? GL_RGBA32F_ARB : GL_RGB32F_ARB;
+		internal = alpha ? GL_RGBA32F_ARB : 0x822E;
 		format = GL_FLOAT;
 	}
 	else if(percision == 16) {
 		internal = alpha ? GL_RGBA16F_ARB : GL_RGB16F_ARB;
-		format = GL_FLOAT;
+		format = GL_HALF_FLOAT_ARB;
 	}
 	else {
 		if(percision != 8) myError("Invalid parameter in framebuffer's percision (8 expected, got %d). Using 8bit framebuffer.", percision);
@@ -565,6 +637,12 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, unsigned i
 	fboptr = (Framebuffer*)malloc(sizeof(Framebuffer));
 	ptr->w = width;
 	ptr->h = height;
+	GLuint depthbuffer;
+	glGenRenderbuffers_(1, &depthbuffer);
+			glBindRenderbuffer_(GL_RENDERBUFFER_EXT, depthbuffer);
+			glRenderbufferStorage_(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT16, width, height);
+			glBindRenderbuffer_(GL_RENDERBUFFER_EXT, 0);
+			
 	// generate texture save target
 	glGenTextures(1, &ptr->id);
 	glBindTexture(GL_TEXTURE_2D, ptr->id);
@@ -594,6 +672,8 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, unsigned i
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, fboptr->id);
 	glFramebufferTexture2D_(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, ptr->id, 0);
+	glFramebufferRenderbuffer_(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
+					GL_RENDERBUFFER_EXT, depthbuffer);
 	status = checkFramebufferStatus();
 
 	// unbind framebuffer
@@ -655,9 +735,9 @@ Vbo * newVbo(Point * data, Point * tex, unsigned int count) {
 	glGenBuffers_(1, &ptr->id);
 	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
 	glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*4*count, (void*)data, GL_STATIC_DRAW_ARB);
-	glGenBuffersARB(1, &ptr->tex);
-	glBindBufferARB(GL_ARRAY_BUFFER_ARB, ptr->tex);
-	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Point)*4*count, (void*)tex, GL_STATIC_DRAW_ARB);
+	glGenBuffers_(1, &ptr->tex);
+	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->tex);
+	glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*4*count, (void*)tex, GL_STATIC_DRAW_ARB);
 	return ptr;
 }
 
@@ -679,33 +759,66 @@ Vbo * newVboPoints(Point * data, unsigned int count) {
 	Vbo * ptr = (Vbo*)malloc(sizeof(Vbo));
 	ptr->count = count;
 	int i;
-	glGenBuffers_(1, &ptr->id);
-	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
-	glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*count, (void*)data, GL_STATIC_DRAW_ARB);
-	//~ ptr->id = glGenLists(1);
-	//~ glNewList(ptr->id, GL_COMPILE);
-	//~ glBegin(GL_POINTS);
-	//~ for (i = 0; i < count; i++)
-	//~ {
-		//~ glVertex2f(data[i].x, data[i].y);
-	//~ }
-	//~ glEnd();
-	//~ glEndList();
+	if(supported.PS)
+	{
+		if(supported.VBO)
+		{
+			glGenBuffers_(1, &ptr->id);
+			glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
+			glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*count, (void*)data, GL_STATIC_DRAW_ARB);
+		}
+		else
+		{
+			printf("No VBO support: rendering VBO's using lists.\n");
+			ptr->id = glGenLists(1);
+			glNewList(ptr->id, GL_COMPILE);
+			glBegin(GL_POINTS);
+			for (i = 0; i < count; i++)
+				glVertex2f(data[i].x, data[i].y);
+			glEnd();
+			glEndList();
+		}
+	}
+	else
+	{
+		ptr->data = data;
+		printf("No Point Sprite support: falling down to quads.\n");
+	}
+	
 	return ptr;
 }
 void vboDrawSprites(Vbo * ptr, Image * img, float size) {
+	int i;
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, img->id);
-	glPointSize(size);
-	glEnable(GL_POINT_SPRITE);
-	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-	
-	//~ glCallList(ptr->id);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
-	glVertexPointer(2, GL_FLOAT, 0, (char *) NULL);
-	glDrawArrays(GL_POINTS, 0, ptr->count); 
-	glDisableClientState(GL_VERTEX_ARRAY);
+	if(supported.PS)
+	{
+		glPointSize(size);
+		glEnable(GL_POINT_SPRITE);
+		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+		
+		if(supported.VBO)
+		{
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
+			glVertexPointer(2, GL_FLOAT, 0, (char *) NULL);
+			glDrawArrays(GL_POINTS, 0, ptr->count); 
+			glDisableClientState(GL_VERTEX_ARRAY);
+		}
+		else
+			glCallList(ptr->id);
+	}
+	else
+	{
+		for (i = 0; i < ptr->count; i++)
+		{
+			glPushMatrix();
+			glTranslatef(ptr->data[i].x - size/2, ptr->data[i].y - size/2, 0.0);
+			glScalef(size, size, 1.0);
+			glCallList(quadlist);
+			glPopMatrix();
+		}
+	}
 	
 	glDisable(GL_TEXTURE_2D);
 }

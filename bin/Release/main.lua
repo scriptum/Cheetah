@@ -1,4 +1,5 @@
 require 'lib.cheetah'
+require 'lib.mixer'
 require 'lib.lquery.init'
 local C = cheetah
 C.init('Test', 512, 512, 32, '')
@@ -136,9 +137,9 @@ end
 --~ end):size(512,512)
 
 --ещё хитрое размывание
-fbo1 = C.newFramebuffer(512,512,8,false,false,false)
+fbo1 = C.newFramebuffer(512,512,'')
 local scale = 1
-fbo2 = C.newFramebuffer(512,512,8,false,false,false)
+fbo2 = C.newFramebuffer(512,512,'')
 local function step(step, gauss)
 	if step % 2 == 1 then fbo1:bind() else fbo2:bind() end
 	C.scale(512,512)
@@ -164,6 +165,9 @@ E:new(screen):draw(function(s)
 	C.line(0,0,0.5,0.5)
 end):size(512,512):draggable()
 
+C.playMusic('data/03 - Cather Rhythm.ogg')
+C.playMusic('data/11 - Impera.ogg')
 
-
+--~ require 'lib.table'
+--~ table.print(jit)
 C.mainLoop()

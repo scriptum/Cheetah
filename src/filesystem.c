@@ -2,8 +2,7 @@
 #include <sys/stat.h>
 #include "cheetah.h"
 
-void myError(char *fmt, ...)
-{
+void myError(const char *fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
 	fprintf(stderr, "error: ");
