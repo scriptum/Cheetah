@@ -491,43 +491,8 @@ void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
 	glDisable(GL_TEXTURE_2D);
 }
 
-void imageDrawMultitexture2(Image * image0, Image * image1) {
-	glEnable(GL_TEXTURE_2D);
-	glActiveTexture_(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, image0->id);
-	glActiveTexture_(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, image1->id);
-	glActiveTexture_(GL_TEXTURE0);
-	glCallList(quadlist);
-	glDisable(GL_TEXTURE_2D);
-}
-
-void imageDrawMultitexture3(Image * image0, Image * image1, Image * image2) {
-	glEnable(GL_TEXTURE_2D);
-	glActiveTexture_(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, image0->id);
-	glActiveTexture_(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, image1->id);
-	glActiveTexture_(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, image2->id);
-	glActiveTexture_(GL_TEXTURE0);
-	glCallList(quadlist);
-	glDisable(GL_TEXTURE_2D);
-}
-
-void imageDrawMultitexture4(Image * image0, Image * image1, Image * image2, Image * image3) {
-	glEnable(GL_TEXTURE_2D);
-	glActiveTexture_(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, image0->id);
-	glActiveTexture_(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, image1->id);
-	glActiveTexture_(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, image2->id);
-	glActiveTexture_(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, image3->id);
-	glActiveTexture_(GL_TEXTURE0);
-	glCallList(quadlist);
-	glDisable(GL_TEXTURE_2D);
+void activeTexture(int i) {
+	glActiveTexture_(GL_TEXTURE0 + i);
 }
 
 void deleteImage(Image * ptr) {
@@ -617,7 +582,7 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char
 	}
 	
 	if(percision == 32) {
-		internal = alpha ? GL_RGBA32F_ARB : 0x822E;
+		internal = alpha ? GL_RGBA32F_ARB : GL_RGB32F_ARB;
 		format = GL_FLOAT;
 	}
 	else if(percision == 16) {
@@ -625,7 +590,7 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char
 		format = GL_HALF_FLOAT_ARB;
 	}
 	else {
-		if(percision != 8) myError("Invalid parameter in framebuffer's percision (8 expected, got %d). Using 8bit framebuffer.", percision);
+		//~ if(percision != 8) myError("Invalid parameter in framebuffer's percision (8 expected, got %d). Using 8bit framebuffer.", percision);
 		internal = alpha ? GL_RGBA : GL_RGB;
 		format = GL_UNSIGNED_BYTE;
 	}
@@ -637,11 +602,11 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char
 	fboptr = (Framebuffer*)malloc(sizeof(Framebuffer));
 	ptr->w = width;
 	ptr->h = height;
-	GLuint depthbuffer;
-	glGenRenderbuffers_(1, &depthbuffer);
-			glBindRenderbuffer_(GL_RENDERBUFFER_EXT, depthbuffer);
-			glRenderbufferStorage_(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT16, width, height);
-			glBindRenderbuffer_(GL_RENDERBUFFER_EXT, 0);
+	//~ GLuint depthbuffer;
+	//~ glGenRenderbuffers_(1, &depthbuffer);
+			//~ glBindRenderbuffer_(GL_RENDERBUFFER_EXT, depthbuffer);
+			//~ glRenderbufferStorage_(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT16, width, height);
+			//~ glBindRenderbuffer_(GL_RENDERBUFFER_EXT, 0);
 			
 	// generate texture save target
 	glGenTextures(1, &ptr->id);
@@ -672,8 +637,8 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, fboptr->id);
 	glFramebufferTexture2D_(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, ptr->id, 0);
-	glFramebufferRenderbuffer_(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
-					GL_RENDERBUFFER_EXT, depthbuffer);
+	//~ glFramebufferRenderbuffer_(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
+					//~ GL_RENDERBUFFER_EXT, depthbuffer);
 	status = checkFramebufferStatus();
 
 	// unbind framebuffer
