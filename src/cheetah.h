@@ -22,7 +22,17 @@ typedef struct SDL_Rect {
 	short x, y;
 	unsigned short w, h;
 } SDL_Rect;
+
+typedef struct __dirstream DIR;
 #endif
+
+typedef struct dirent {
+	unsigned d_ino;
+	unsigned d_off;
+	unsigned short int d_reclen;
+	unsigned char d_type;
+	char d_name[256];
+} dirent;
 
 struct {
 	char GLSL, BE, FBO, VBO, MT, PS;

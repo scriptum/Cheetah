@@ -51,4 +51,7 @@ filetime(c)
 int fileatime(const char * filename) {
 int filemtime(const char * filename) {
 int filectime(const char * filename) {
+DIR *opendir (const char *name) {
+dirent *readdir (DIR *dirp) {
+int closedir (DIR *dirp) {
 #endif

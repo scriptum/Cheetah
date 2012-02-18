@@ -3,9 +3,9 @@ package.kind = "dll"
 package.language = "c"
 package.files = { 
 	matchfiles(
-		"src/*.h", "src/*.c",
-		"src/SOIL/*.h", 
-		"src/SOIL/*.c"
+		"src/*.h", "src/*.c"
+		--~ "src/SOIL/*.h", 
+		--~ "src/SOIL/*.c"
 		--~ "Graphics/*.h", 
 		--~ "Graphics/*.c"
 		)

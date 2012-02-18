@@ -359,12 +359,12 @@ void clearStencil() {
 	glClear(GL_STENCIL_BUFFER_BIT);
 }
 
-void setStencilFunc() {
-	glStencilFunc (GL_NEVER, 0x1, 0x1);
+void setStencilFunc(int func, int ref, unsigned int mask) {
+	glStencilFunc(func, ref, mask);
 }
 
-void setStencilOp() {
-	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
+void setStencilOp(int fail, int zfail, int zpass) {
+	glStencilOp(fail, zfail, zpass);
 }
 
 void drawToStencil() {
@@ -472,7 +472,7 @@ void imageDraw(Image * image) {
 	glDisable(GL_TEXTURE_2D);
 }
 
-/*todo: Заюзать шейдры для передачи координат, а выводить квад листом. В шрифтах аналогично*/
+/*TODO: Заюзать шейдры для передачи координат, а выводить квад листом. В шрифтах аналогично*/
 void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
 	glBindTexture(GL_TEXTURE_2D, image->id);
 	glEnable(GL_TEXTURE_2D);
@@ -572,12 +572,13 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char
 	while(*options)
 	{
 		ch = *options;
-		if(ch == 'a') alpha = 1;
-		if(ch == 'n') interpolation = 0;
-		if(ch == 'r') repeat = 1;
-		if(ch == '4') percision = 32;
-		if(ch == '2') percision = 16;
-		if(ch == '1') percision = 8;
+		options++;
+		if(ch == 'a') {alpha = 1; continue;}
+		if(ch == 'n') {interpolation = 0; continue;}
+		if(ch == 'r') {repeat = 1; continue;}
+		if(ch == '4') {percision = 32; continue;}
+		if(ch == '2') {percision = 16; continue;}
+		if(ch == '1') {percision = 8; continue;}
 		options++;
 	}
 	
@@ -795,15 +796,6 @@ Vbo * newVboPoints3(Point3 * data, unsigned int count) {
 	glGenBuffers_(1, &ptr->id);
 	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
 	glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point3)*count, (void*)data, GL_STATIC_DRAW_ARB);
-	//~ ptr->id = glGenLists(1);
-	//~ glNewList(ptr->id, GL_COMPILE);
-	//~ glBegin(GL_POINTS);
-	//~ for (i = 0; i < count; i++)
-	//~ {
-		//~ glVertex2f(data[i].x, data[i].y);
-	//~ }
-	//~ glEnd();
-	//~ glEndList();
 	return ptr;
 }
 void vboDrawSprites3(Vbo * ptr, Image * img, float size) {
@@ -812,8 +804,6 @@ void vboDrawSprites3(Vbo * ptr, Image * img, float size) {
 	glPointSize(size);
 	glEnable(GL_POINT_SPRITE);
 	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-	
-	//~ glCallList(ptr->id);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
 	glVertexPointer(3, GL_FLOAT, 0, (char *) NULL);
