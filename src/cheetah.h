@@ -15,7 +15,7 @@ SDL_Surface *screen;
 
 #define new(type) (type *)malloc(sizeof(type))
 
-void myError(char *fmt, ...);
+void myError(const char *fmt, ...);
 
 #if 0
 typedef struct SDL_Rect {
@@ -25,7 +25,7 @@ typedef struct SDL_Rect {
 #endif
 
 struct {
-	char GLSL, BE, FBO, VBO, MT;
+	char GLSL, BE, FBO, VBO, MT, PS;
 } supported;
 
 /*=================================images=====================================*/
@@ -64,10 +64,6 @@ typedef struct Shader {
 } Shader;
 
 /*==================================VBO=======================================*/
-typedef struct Vbo {
-	unsigned int id, count, tex;
-} Vbo;
-
 typedef struct Point {
 	float x, y;
 } Point;
@@ -75,6 +71,11 @@ typedef struct Point {
 typedef struct Point3 {
 	float x, y, z;
 } Point3;
+
+typedef struct Vbo {
+	unsigned int id, count, tex;
+	Point * data;
+} Vbo;
 
 enum {
 	blend_alpha,
@@ -621,7 +622,7 @@ enum {
 	GL_COLOR_INDEX8_EXT = 0x80E5,
 	GL_COLOR_INDEX12_EXT = 0x80E6,
 	GL_COLOR_INDEX16_EXT = 0x80E7,
-} GlConstants;
+};
 #endif
 
 #endif //__CHEETAH_H__

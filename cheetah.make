@@ -36,10 +36,6 @@ OBJECTS := \
 	$(OBJDIR)/font.o \
 	$(OBJDIR)/thread.o \
 	$(OBJDIR)/shader.o \
-	$(OBJDIR)/image_helper.o \
-	$(OBJDIR)/image_DXT.o \
-	$(OBJDIR)/stb_image_aug.o \
-	$(OBJDIR)/SOIL.o \
 
 MKDIR_TYPE := msdos
 CMD := $(subst \,\\,$(ComSpec)$(COMSPEC))
@@ -113,26 +109,6 @@ $(OBJDIR)/thread.o: src/thread.c
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/shader.o: src/shader.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/image_helper.o: src/SOIL/image_helper.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/image_DXT.o: src/SOIL/image_DXT.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/stb_image_aug.o: src/SOIL/stb_image_aug.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/SOIL.o: src/SOIL/SOIL.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"

@@ -75,6 +75,9 @@ void initRenderer()
 	const char *version = (const char *)glGetString(GL_VERSION);
 	printf("Renderer: %s (%s)\n", renderer, vendor);
 	printf("Driver: %s\n", version);
+	
+	printf("Checking extensions...\n");
+	printf("Shaders:\t");
 	supported.GLSL = 0;
 	//проверка поддержки шейдров
 	if(strstr(exts, "GL_ARB_shading_language_100") && strstr(exts, "GL_ARB_shader_objects") && strstr(exts, "GL_ARB_vertex_shader") && strstr(exts, "GL_ARB_fragment_shader"))
@@ -104,8 +107,11 @@ void initRenderer()
 		glGetShaderiv_ =                (PFNGLGETSHADERIVPROC)                SDL_GL_GetProcAddress("glGetShaderiv");
 		glGetProgramiv_ =               (PFNGLGETPROGRAMIVPROC)               SDL_GL_GetProcAddress("glGetProgramiv");
 		supported.GLSL = 1;
+		printf("yes\n");
 	}
+	else printf("no\n");
 	
+	printf("Minmax blend:\t");
 	supported.BE = 0;
 	if(strstr(exts, "GL_EXT_blend_minmax"))
 	{
@@ -113,8 +119,11 @@ void initRenderer()
 		supported.BE = 1;
 		//~ if(strstr(vendor, "ATI")) ati_minmax_bug = 1;
 		//~ if(dbgexts) conoutf(CON_INIT, "Using GL_EXT_blend_minmax extension.");
+		printf("yes\n");
 	}
+	else printf("no\n");
 	
+	printf("Framebuffer:\t");
 	supported.FBO = 0;
 	if(strstr(exts, "GL_EXT_framebuffer_object"))
 	{
@@ -137,17 +146,25 @@ void initRenderer()
 				//~ hasFBB = true;
 				//~ if(dbgexts) conoutf(CON_INIT, "Using GL_EXT_framebuffer_blit extension.");
 		//~ }
+		printf("yes\n");
 	}
+	else printf("no\n");
+	
+	printf("Multitexture:\t");
 	supported.MT = 0;
 	if(strstr(exts, "GL_ARB_multitexture"))
 	{
-			glActiveTexture_       = (PFNGLACTIVETEXTUREARBPROC)      SDL_GL_GetProcAddress("glActiveTextureARB");
-			glClientActiveTexture_ = (PFNGLCLIENTACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glClientActiveTextureARB");
-			glMultiTexCoord2f_     = (PFNGLMULTITEXCOORD2FARBPROC)    SDL_GL_GetProcAddress("glMultiTexCoord2fARB");
-			glMultiTexCoord3f_     = (PFNGLMULTITEXCOORD3FARBPROC)    SDL_GL_GetProcAddress("glMultiTexCoord3fARB");
-			glMultiTexCoord4f_     = (PFNGLMULTITEXCOORD4FARBPROC)    SDL_GL_GetProcAddress("glMultiTexCoord4fARB");
-			supported.MT = 1;
+		glActiveTexture_       = (PFNGLACTIVETEXTUREARBPROC)      SDL_GL_GetProcAddress("glActiveTextureARB");
+		glClientActiveTexture_ = (PFNGLCLIENTACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glClientActiveTextureARB");
+		glMultiTexCoord2f_     = (PFNGLMULTITEXCOORD2FARBPROC)    SDL_GL_GetProcAddress("glMultiTexCoord2fARB");
+		glMultiTexCoord3f_     = (PFNGLMULTITEXCOORD3FARBPROC)    SDL_GL_GetProcAddress("glMultiTexCoord3fARB");
+		glMultiTexCoord4f_     = (PFNGLMULTITEXCOORD4FARBPROC)    SDL_GL_GetProcAddress("glMultiTexCoord4fARB");
+		supported.MT = 1;
+		printf("yes\n");
 	}
+	else printf("no\n");
+	
+	printf("Vertex Buffer:\t");
 	supported.VBO = 0;
 	if(strstr(exts, "GL_ARB_vertex_buffer_object"))
 	{
@@ -160,5 +177,16 @@ void initRenderer()
 		glDeleteBuffers_    = (PFNGLDELETEBUFFERSARBPROC)   SDL_GL_GetProcAddress("glDeleteBuffersARB");
 		glGetBufferSubData_ = (PFNGLGETBUFFERSUBDATAARBPROC)SDL_GL_GetProcAddress("glGetBufferSubDataARB");
 		supported.VBO = 1;
+		printf("yes\n");
 	}
+	else printf("no\n");
+	
+	printf("Point Sprite:\t");
+	supported.PS = 0;
+	if(strstr(exts, "GL_ARB_point_sprite"))
+	{
+		supported.PS = 1;
+		printf("yes\n");
+	}
+	else printf("no\n");
 }
