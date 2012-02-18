@@ -22,7 +22,6 @@ typedef struct SDL_Rect {
 	short x, y;
 	unsigned short w, h;
 } SDL_Rect;
-
 typedef struct __dirstream DIR;
 #endif
 

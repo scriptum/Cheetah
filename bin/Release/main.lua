@@ -168,6 +168,10 @@ end):size(512,512):draggable()
 C.playMusic('data/03 - Cather Rhythm.ogg')
 C.playMusic('data/11 - Impera.ogg')
 
+local dir = C.opendir('.')
+local de = C.readdir(dir)
+print(de.name)
+
 --~ require 'lib.table'
 --~ table.print(jit)
 C.mainLoop()
