@@ -299,7 +299,7 @@ local function animate(ent)
         end
       end
       
-      if aq.lasttime + aq.speed <= time or lquery_fx == false then
+      if aq.lasttime + aq.speed <= time or lQuery.fx == false then
         for k, v in pairs(aq._keys) do
           ent[k] = v
         end
