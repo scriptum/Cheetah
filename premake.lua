@@ -19,7 +19,7 @@ package.includepaths = {
 	"inc"
 }
 package.links = {"SDL", "SDLmain", "GL", --[["luajit",]]}
---~ package.buildoptions = { "`sdl-config --cflags` -s -ffast-math -I/usr/include/lua5.1" }
+--~ package.buildoptions = { "-ffast-math -mtune=generic -march=core2" }
 package.linkoptions = { "-s" }
 
 package.postbuildcommands = {

@@ -11,8 +11,11 @@ void myError(const char *fmt, ...) {
 	va_end(args);
 }
 
-unsigned char * loadfile(const char * filename, unsigned int * length)
-{
+bool isPointer(void * ptr) {
+	return ptr != NULL;
+}
+
+unsigned char * loadfile(const char * filename, unsigned int * length) {
 	unsigned char * result;
 	unsigned int size = 0;
 	FILE *f = fopen(filename, "rb");
@@ -29,7 +32,8 @@ unsigned char * loadfile(const char * filename, unsigned int * length)
 		myError("can't load file %s", filename);
 		return 0;
 	}
-	*length = size;
+	if (length)
+		*length = size;
 	fclose(f);
 	return result;
 }

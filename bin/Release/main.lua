@@ -1,8 +1,10 @@
 require 'lib.cheetah'
-require 'lib.mixer'
+--~ require 'lib.mixer'
 require 'lib.lquery.init'
 local C = cheetah
 C.init('Test', 512, 512, 32, '')
+
+local ffi = require "ffi"
 
 require 'data.tahoma'
 
@@ -165,12 +167,16 @@ E:new(screen):draw(function(s)
 	C.line(0,0,0.5,0.5)
 end):size(512,512):draggable()
 
-C.playMusic('data/03 - Cather Rhythm.ogg')
-C.playMusic('data/11 - Impera.ogg')
 
-local dir = C.opendir('.')
-local de = C.readdir(dir)
-print(de.name)
+
+--~ C.playMusic('data/03 - Cather Rhythm.ogg')
+--~ C.playMusic('data/11 - Impera.ogg')
+--~ local dir = C.opendir('.')
+--~ local de = C.readdir(dir)
+--~ while C.isPointer(de) do
+	--~ print(ffi.string(de.name), de.type, de.reclen)
+	--~ de = C.readdir(dir)
+--~ end
 
 --~ require 'lib.table'
 --~ table.print(jit)

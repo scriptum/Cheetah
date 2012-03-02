@@ -28,10 +28,12 @@ void colorMask(bool r, bool g, bool b, bool a) {
 
 GLuint quadlist;
 
+
+
 bool init(const char * appName, unsigned int width, unsigned int height, int bpp, const char * attr) {
 	bool fullscreen = 0;
 	bool resizable = 0;
-	bool vsync = 0;
+	int vsync = 0;
 	bool firstrun = 0;
 	bool depth = 0;
 	bool stencil = 0;
@@ -41,6 +43,7 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 	while(*attr)
 	{
 		ch = *attr;
+		//~ printf("%d %d\n", ch, 'v');
 		if(ch == 'f') fullscreen = 1;
 		if(ch == 'r') resizable = 1;
 		if(ch == 'v') vsync = 1;
@@ -49,7 +52,7 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		//if(ch == 'm') flags |= SDL_WINDOW_MAXIMIZED;
 		attr++;
 	}
-
+//~ printf("%d %d\n", vsync, 'v');
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
 	} else if (resizable) {
@@ -64,19 +67,20 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 			return 0;
 		atexit(SDL_Quit);
 		SDL_EnableUNICODE(1);
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		//~ SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
 		if(depth) SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 		if(stencil) SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 		firstrun = 1;
 	}
 	if(appName) SDL_WM_SetCaption (appName, appName);
-	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
 	screen = SDL_SetVideoMode(width, height, bpp, flags);
 	if (screen == NULL)
 		myError("couldn't set %dx%dx%d video mode: %s",
 								width, height, bpp, SDL_GetError());
-	initRenderer();
+
 	if (firstrun) {
+		initRenderer();
 		/* set background color */
 		glClearColor( 0, 0, 0, 1);
 		/* set line antialiasing */
@@ -579,7 +583,6 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char
 		if(ch == '4') {percision = 32; continue;}
 		if(ch == '2') {percision = 16; continue;}
 		if(ch == '1') {percision = 8; continue;}
-		options++;
 	}
 	
 	if(percision == 32) {
