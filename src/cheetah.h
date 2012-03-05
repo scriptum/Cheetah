@@ -26,13 +26,13 @@ typedef struct SDL_Rect {
 typedef struct __dirstream {
 } DIR;
 
-typedef struct dirent {
-	unsigned int ino;
-	unsigned int off;
-	unsigned short int reclen;
-	unsigned char type;
-	char name[256];
-} dirent;
+//~ typedef struct dirent {
+	//~ unsigned int ino;
+	//~ unsigned int off;
+	//~ unsigned short int reclen;
+	//~ unsigned char type;
+	//~ char name[256];
+//~ } dirent;
 
 //~ typedef struct lstat {
 	//~ unsigned long int     st_dev;     /* ID of device containing file */

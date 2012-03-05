@@ -1,5 +1,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <dirent.h>
 #include "cheetah.h"
 
 void myError(const char *fmt, ...) {
@@ -55,7 +56,42 @@ filetime(c)
 int fileatime(const char * filename) {
 int filemtime(const char * filename) {
 int filectime(const char * filename) {
-DIR *opendir (const char *name) {
-dirent *readdir (DIR *dirp) {
-int closedir (DIR *dirp) {
 #endif
+
+DIR *openDir(const char *name) {
+	return opendir (name);
+}
+
+struct dirent *readDir (DIR *dirp) {
+	return readdir(dirp);
+}
+
+int closeDir(DIR *dirp) {
+	return closedir(dirp);
+}
+
+bool isDir(const char *name) {
+	DIR *dir = opendir(name);
+	if(dir)
+	{
+		closedir(dir);
+		return 1;
+	}
+	return 0;
+}
+
+//~ const char * fileExt(const char * name) {
+	//~ int i, pos = 0;
+	//~ char ch;
+	//~ for (i = 0; ; i++)
+	//~ {
+		//~ ch = name[i];
+		//~ if(ch)
+		//~ {
+			//~ if(ch == '.') pos = i;
+		//~ }
+		//~ else
+			//~ break;
+	//~ }
+	//~ return (name + pos + 1);
+//~ }
