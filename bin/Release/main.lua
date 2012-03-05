@@ -168,16 +168,16 @@ E:new(screen):draw(function(s)
 end):size(512,512):draggable()
 
 
-
+require 'lib.table'
 --~ C.playMusic('data/03 - Cather Rhythm.ogg')
 --~ C.playMusic('data/11 - Impera.ogg')
---~ local dir = C.opendir('.')
---~ local de = C.readdir(dir)
+--~ local dir = C.openDir('.')
+--~ local de = C.readDir(dir)
 --~ while C.isPointer(de) do
-	--~ print(ffi.string(de.name), de.type, de.reclen)
-	--~ de = C.readdir(dir)
+	--~ print(ffi.string(de.name), C.isDir(de.name), ffi.string(C.fileExt(de.name)))
+	--~ de = C.readDir(dir)
 --~ end
-
+table.print(cheetah.resLoader('data', true))
 --~ require 'lib.table'
 --~ table.print(jit)
-C.mainLoop()
+--~ C.mainLoop()

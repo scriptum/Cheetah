@@ -11,7 +11,11 @@ lQuery = {
 		table.insert(lQuery._onresize, func)
 	end,
 	_MousePressedOwner = false,
-	MousePressed = false
+	MousePressed = false,
+	_last_click_millis = 0,
+	_last_clickX = -1,
+	_last_clickY = -1,
+	dblclickInterval = 0.3
 }
 
 
@@ -186,7 +190,7 @@ end
 
 --до сих пор охреневаю как я это сделал. Куча методов в пяти строчках кода
 --callbacks
-for k, v in pairs({'click', 'mousepress', 'mouserelease', 'mouseover', 'mouseout', 'mousewheel', 'mousemove', 'keypress', 'keyrelease', 'keyrepeat', 'wheel'}) do
+for k, v in pairs({'click', 'dblclick', 'mousepress', 'mouserelease', 'mouseover', 'mouseout', 'mousewheel', 'mousemove', 'keypress', 'keyrelease', 'keyrepeat', 'wheel'}) do
   Entity[v] = function (self, callback)
     if callback then
       if not self._bound then self._bound = Entity.bounds.rectangle end
@@ -195,6 +199,11 @@ for k, v in pairs({'click', 'mousepress', 'mouserelease', 'mouseover', 'mouseout
     end
     return self
   end
+end
+
+--object can get focus
+function Entity:focus(f)
+	self._focus = f or true
 end
 
 --special event: calls when parameter key was changed
@@ -421,8 +430,17 @@ lQuery.event = function(e, a, b, c)
       if v._mouserelease then 
         v._mouserelease(v, mX, mY, c)
       end
-      if v._click and v._bound and v._bound(v, mX, mY) then 
-        v._click(v, mX, mY, c)
+      if v._bound and v._bound(v, mX, mY) then 
+				if  lQuery._last_click_millis + lQuery.dblclickInterval > time 
+				and lQuery._last_clickX == mX and lQuery._last_clickY == mY then
+					if v._dblclick then v._dblclick(v, mX, mY, c) end
+				else
+					if v._click then v._click(v, mX, mY, c) end
+				end
+				lQuery._last_click_millis = time
+				lQuery._last_clickX = mX
+				lQuery._last_clickY = mY
+				if v._focus then lQuery.focus = v end
       end
     end
     lQuery.MousePressedOwner = nil
