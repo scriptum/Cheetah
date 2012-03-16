@@ -1,3 +1,26 @@
+/*******************************************************************************
+
+Copyright (c) 2012 Pavel Roschin (aka RPG) <rpg89@post.ru>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy 
+of this software and associated documentation files (the "Software"), to 
+deal in the Software without restriction, including without limitation the 
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
+sell copies of the Software, and to permit persons to whom the Software is 
+furnished to do so, subject to the following conditions:  The above 
+copyright notice and this permission notice shall be included in all copies 
+or substantial portions of the Software.
+ 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+IN THE SOFTWARE.
+
+*******************************************************************************/
+
 #include "cheetah.h"
 #include "render.h"
 
@@ -47,28 +70,31 @@ int compile(GLuint shader, const char* name)
 	}
 	return 1;
 }
-Shader * newPixelShader(const char * str) {
+
+Shader * newVertexFragmentShader(const char * ver, const char * pix) {
 	GLuint v, f, p, linked;
 	if(!screen)
 	{
 		myError("Call init function before!");
 		return 0;
 	}
+	Shader *ptr = new(Shader);
+	ptr->id = 0;
 	if(!supported.GLSL)
 	{
 		myError("Trying to create shader, but system doesn't support shaders.");
-		return 0;
+		return ptr;
 	}
 	v = glCreateShaderObject_(GL_VERTEX_SHADER);
 	f = glCreateShaderObject_(GL_FRAGMENT_SHADER);
-	glShaderSource_(v, 1, &std_vertex_shader, NULL);
-	glShaderSource_(f, 1, &str, NULL);
+	glShaderSource_(v, 1, &ver, NULL);
+	glShaderSource_(f, 1, &pix, NULL);
 	if(!compile(v, "string_shader"))
-		return 0;
+		return ptr;
 	if(!compile(f, "string_shader"))
 	{
 		glDeleteObject_(v);
-		return 0;
+		return ptr;
 	}
 	p = glCreateProgramObject_();
 	glAttachObject_(p,v);
@@ -81,13 +107,16 @@ Shader * newPixelShader(const char * str) {
 		myError("Error while linking shader\n");
 		glDeleteObject_(v);
 		glDeleteObject_(f);
-		return 0;
+		return ptr;
 	}
 	glDeleteObject_(v);
 	glDeleteObject_(f);
-	Shader *ptr = new(Shader);
 	ptr->id = p;
 	return ptr;
+}
+
+Shader * newFragmentShader(const char * str) {
+	return newVertexFragmentShader(std_vertex_shader, str);
 }
 
 void deleteShader(Shader * ptr) {

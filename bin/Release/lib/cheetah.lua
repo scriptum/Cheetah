@@ -131,9 +131,13 @@ cheetah.getFps = function()
 end
 
 local uniforms = {}
-
-cheetah.newShader = function(str)
-	local shader = libcheetah.newPixelShader(str)
+cheetah.newShader = function(ver, frag)
+	local shader
+	if frag then
+		shader = libcheetah.newVertexFragmentShader(ver, frag)
+	else
+		shader = libcheetah.newFragmentShader(ver)
+	end
 	local location, float
 	if shader then
 		uniforms[shader.id] = {}
@@ -169,6 +173,10 @@ end
 
 cheetah.fileExt = function(name)
 	return name:gsub('^.*%.', '')
+end
+
+cheetah.fileName = function(name)
+	return name:gsub('%..*', '')
 end
 
 local _exts = {
@@ -216,6 +224,39 @@ cheetah.resLoader = function(dirname, recursive)
 				end
 			end
 		end
+		de = libcheetah.readDir(dir)
+	end
+	return t
+end
+
+cheetah.fileExists = function(name)
+	local f = io.open(name, 'r')
+	if f then
+		f:close()
+		return true
+	end
+	return false
+end
+
+--exec func for each file in directory
+cheetah.fileEach = function(dirname, func)
+	if not dirname or type(dirname) ~= 'string' then
+		libcheetah.myError('fileEach: you must specify directory name')
+		return
+	end
+	if not func then
+		libcheetah.myError('fileEach: you must specify callback function')
+		return
+	end
+	local dir = libcheetah.openDir(dirname)
+	if not libcheetah.isPointer(dir) then
+		libcheetah.myError('fileEach: cannot open dir %s', dirname)
+		return
+	end
+	local de = libcheetah.readDir(dir)
+	local s, ext, n, name
+	while libcheetah.isPointer(de) do
+		func(ffi.string(de.name))
 		de = libcheetah.readDir(dir)
 	end
 	return t

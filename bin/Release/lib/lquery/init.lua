@@ -7,10 +7,10 @@ end
 require("lib.lquery.entity")
 require("lib.lquery.objects")
 
-getMouseXY = cheetah.getMousePos
+lQuery.getMouseXY = cheetah.getMousePos
 
 cheetah.render = function()
-	mX, mY = getMouseXY()
+	mX, mY = lQuery.getMouseXY()
 	time = cheetah.getTime()
 	--events
 	local e, a, b, c = cheetah.poll()
