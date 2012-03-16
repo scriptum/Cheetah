@@ -22,8 +22,9 @@ table.print = function(tt, indent, done)
   end
 end
 
-table.serialize = function(t, norecursive)
+table.serialize = function(t, norecursive, lvl)
 	assert(type(t) == "table", "Can only serialize tables.")
+	if not lvl then lvl = 1  end
 	if not t then return nil end
 	local s = "{\n"
 	for k, v in pairs(t) do
@@ -32,11 +33,11 @@ table.serialize = function(t, norecursive)
 		else error("Attempted to serialize a table with an invalid key: "..tostring(k))
 		end
 		if type(v) == "string" then v = "\""..v.."\""			
-		elseif type(v) == "table" then if norecursive then v = nil else v = table.serialize(v) end
+		elseif type(v) == "table" then if norecursive then v = nil else v = table.serialize(v, norecursive, lvl + 1) end
 		elseif type(v) == "boolean" then v = v and "true" or "false"
 		elseif type(v) == "userdata" then v = ("%q"):format(tostring(v))
 		end
-		if v then s = s..k.."="..v..",\n" end
+		if v then s = s..string.rep("\t", lvl)..k.."="..v..",\n" end
 	end
 	return s.."}\n"
 end
