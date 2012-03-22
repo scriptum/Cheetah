@@ -1,7 +1,7 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Test', 512, 512, 32, '')
+--~ C.init('Test', 512, 512, 32, '')
 local cp = require 'lib.chipmunk'
 space = cp.cpSpaceNew()
 space:setGravity(cp.v(0, -100))
