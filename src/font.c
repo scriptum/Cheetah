@@ -55,8 +55,9 @@ float fontHeight(Font *font) {
 	return font->height * font->scale;
 }
 
-#define ALIGN(width) if(align == 0) glTranslatef(floor((maxw - width)/2.0f), 0, 0);\
-    else if(align == 1) glTranslatef(floor(maxw - width), 0, 0);
+#define ALIGN(width) if(align == 0) \
+	glTranslatef(floor((maxw - width)*0.5), 0, 0);\
+	else if(align == 1) glTranslatef(floor((maxw - width)), 0, 0);
 #ifdef NO_VBO
 #define DRAW_CHAR glCallList(ch->vertex);
 #else
@@ -94,7 +95,9 @@ void fontPrint(register const char * str, int maxw, int align) {
 	ALIGN(Font_Width(currentFont, str))
 	
 	glPushMatrix();
-	glScalef(currentFont->scale, currentFont->scale, 0);
+	glScalef(currentFont->scale / screenScale.scaleX, currentFont->scale / screenScale.scaleY, 1);
+	//~ glScalef(currentFont->scale, currentFont->scale, 1);
+	
 	glBindTexture(GL_TEXTURE_2D, currentFont->image->id);
 	glEnable(GL_TEXTURE_2D);
 	#ifndef NO_VBO
@@ -159,9 +162,11 @@ void fontPrintf(register const char * str, float maxw, int align) {
 	float w = 0;
 	unsigned char c;
 	if(!currentFont) myError("Call <yourfont>:select() first!");
-	maxw = maxw / currentFont->scale;
+	maxw = maxw / currentFont->scale * screenScale.scaleX;
 	glPushMatrix();
-	glScalef(currentFont->scale, currentFont->scale, 0);
+	glScalef(currentFont->scale / screenScale.scaleX, currentFont->scale / screenScale.scaleY, 1);
+	//~ glScalef(currentFont->scale, currentFont->scale, 1);
+
 	glBindTexture(GL_TEXTURE_2D, currentFont->image->id);
 	glEnable(GL_TEXTURE_2D);
 	#ifndef NO_VBO

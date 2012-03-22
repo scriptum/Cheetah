@@ -78,6 +78,13 @@ enum {
 	blendDetail,
 	blendSubstractive,
 };
+struct {
+	double scaleX, scaleY, offsetX, offsetY;
+	/*оригинальные ширина и высота, относительно которых считаются все координаты*/
+	double origWidth, origHeight;
+	double aspect;
+	bool autoScale, autoScaleFont;
+} screenScale;
 unsigned int getEventType();
 unsigned int getEventKey();
 unsigned int getEventKeyUnicode();
@@ -123,19 +130,19 @@ void enableStencilTest();
 void disableStencilTest();
 unsigned int getTicks();
 double getTime();
-unsigned int GetTicks();
 void delay(unsigned int ms);
 void translate(double translateX, double translateY);
 void move(double translateX, double translateY);
 void scale(double scaleX, double scaleY);
 void rotate(double rotate);
+void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y);
+void setAutoScale(bool autoScale);
+void doAutoScale();
 void blend(bool bl);
 void enableBlend();
 void disableBlend();
 void push();
 void pop();
-void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y);
-void reset();
 void line(double x1, double y1, double x2, double y2);
 void rectangle(bool filled);
 void circle(double rad, double segments, bool filled);

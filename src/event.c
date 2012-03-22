@@ -22,11 +22,12 @@ IN THE SOFTWARE.
 *******************************************************************************/
 
 #include "cheetah.h"
+#include "math.h"
 
 SDL_Event event;
 
 unsigned int getEventType() {
-	//В общем, тут идет дохрена ненужных нам событий (штук 300), которые могут тормозить игру, их нужно пропускать.
+	//В общем, тут идет дохрена ненужных нам событий (в основном mousemove), которые могут тормозить игру, их нужно пропускать.
 	while(SDL_PollEvent(&event)) {
 		//printf("%d\n", event.type);
 		switch(event.type) {
@@ -35,7 +36,28 @@ unsigned int getEventType() {
 			case SDL_KEYUP: return 3;
 			case SDL_MOUSEBUTTONDOWN: return 4;
 			case SDL_MOUSEBUTTONUP: return 5;
-			case SDL_VIDEORESIZE: return 6;
+			case SDL_VIDEORESIZE: 
+				screenScale.aspect = (float)event.resize.w/(float)event.resize.h;
+				if(screenScale.aspect > (float)4/3)
+				{
+					screenScale.scaleX = screenScale.scaleY = event.resize.h/screenScale.origHeight;
+					screenScale.offsetX = floor((event.resize.w - screenScale.origWidth * screenScale.scaleX)*0.5);
+					screenScale.offsetY = 0;
+				}
+				else
+				{
+					screenScale.scaleX = screenScale.scaleY = event.resize.w/screenScale.origWidth;
+					screenScale.offsetY = floor((event.resize.h - screenScale.origHeight * screenScale.scaleY)*0.5);
+					screenScale.offsetX = 0;
+				}
+				SDL_SetVideoMode(event.resize.w, event.resize.h, 32, screen->flags);
+				glViewport( 0, 0, event.resize.w, event.resize.h );
+				glMatrixMode( GL_PROJECTION );
+				glLoadIdentity();
+				glOrtho( 0, event.resize.w, event.resize.h, 0, -1000, 1000 );
+				glMatrixMode( GL_MODELVIEW );
+				glLoadIdentity();
+				return 6;
 			case SDL_VIDEOEXPOSE: return 7;
 			case SDL_ACTIVEEVENT: return 8;
 			case SDL_JOYAXISMOTION:
@@ -57,10 +79,14 @@ unsigned int getEventKeyUnicode() {
 }
 
 int getEventMouseX() {
+	if(screenScale.autoScale)
+		return (int)(((float)event.button.x - screenScale.offsetX) / screenScale.scaleX);
 	return event.button.x;
 }
 
 int getEventMouseY() {
+	if(screenScale.autoScale)
+		return (int)(((float)event.button.y - screenScale.offsetY) / screenScale.scaleY);
 	return event.button.y;
 }
 
@@ -79,11 +105,15 @@ unsigned int getEventResizeH() {
 int getMouseX() {
 	int x;
 	SDL_GetMouseState(&x, NULL);
+	if(screenScale.autoScale)
+		return (int)(((float)x - screenScale.offsetX) / screenScale.scaleX);
 	return x;
 }
 
 int getMouseY() {
 	int y;
 	SDL_GetMouseState(NULL, &y);
+	if(screenScale.autoScale)
+		return (int)(((float)y - screenScale.offsetY) / screenScale.scaleY);
 	return y;
 }

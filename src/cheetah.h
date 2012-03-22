@@ -142,4 +142,12 @@ enum {
 	blendSubstractive,
 };
 
+struct {
+	double scaleX, scaleY, offsetX, offsetY;
+	/*оригинальные ширина и высота, относительно которых считаются все координаты*/
+	double origWidth, origHeight;
+	double aspect;
+	bool autoScale, autoScaleFont;
+} screenScale;
+
 #endif //__CHEETAH_H__
