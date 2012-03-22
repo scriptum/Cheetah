@@ -15,6 +15,15 @@ cheetah.putFile = function(filename, str, writemode)
 	file:close()
 end
 
+cheetah.fileExists = function(name)
+	local f = io.open(name, 'r')
+	if f then
+		f:close()
+		return true
+	end
+	return false
+end
+
 cheetah.appendFile = function(filename, str)
 	cheetah.putFile(filename, str, "wa")
 end
@@ -22,16 +31,28 @@ end
 local archToInt = {x86 = 32, x86_64 = 64}
 
 cheetah.loadDLL = function(filename)
+	local res
+	print(filename)
 	if ffi.os == "Windows" then
-		return ffi.load('./bin/win32/' .. filename .. '.dll')
+		res = ffi.load('./bin/win32/' .. filename .. '.dll')
 	elseif ffi.os == "OSX" then
-		return ffi.load('./bin/macosx/' .. filename .. '.dynlib')
+		res = ffi.load('./bin/macosx/' .. filename .. '.dynlib')
 	else
-		return ffi.load('./bin/linux'..archToInt[jit.arch]..'/lib' .. filename .. '.so')
+		res = ffi.load('./bin/linux'..archToInt[jit.arch]..'/lib' .. filename .. '.so')
+	end
+	if res then
+		local header = 'lib/'..filename..'.h'
+		if cheetah.fileExists(header) then
+			ffi.cdef(cheetah.getFile(header))
+		end
+		print('Successfully loaded module: '..filename)
+		return res
+	else
+		print('Error: cannot load module '..filename)
+		return nil
 	end
 end
-
-ffi.cdef(cheetah.getFile 'lib/cheetah.h')
+cheetah.module = cheetah.loadDLL
 
 --stupid win api
 if ffi.os == "Windows" then
@@ -53,6 +74,8 @@ end
 
 local libcheetah = cheetah.loadDLL 'cheetah'
 
+assert(libcheetah, 'Cannot load cheetah library!')
+
 --~ if not libcheetah.initSDL() then print 'Cannot init SDL!' end
 --~ libcheetah.init('Cheetah engine', 640, 480, 32, '')
 
@@ -73,10 +96,11 @@ local lasttime = 0
 
 cheetah.mainLoop = function()
 	while done == 0 do
-		time = cheetah.getTime()
+		time = libcheetah.getTime()
+		libcheetah.doAutoScale()
 		if cheetah.render then cheetah.render() end
-		cheetah.swapBuffers()
-		FPS = (FPS + 1) / (1 + (cheetah.getTime() - time));
+		libcheetah.swapBuffers()
+		FPS = (FPS + 1) / (1 + (libcheetah.getTime() - time));
 		if time - lasttime > 0.5 then
 			lasttime = time
 			if cheetah.printFPS then print(FPS) end
@@ -132,11 +156,13 @@ end
 
 local uniforms = {}
 cheetah.newShader = function(ver, frag)
-	local shader
+	local shader, str
 	if frag then
 		shader = libcheetah.newVertexFragmentShader(ver, frag)
+		str = frag
 	else
 		shader = libcheetah.newFragmentShader(ver)
+		str = ver
 	end
 	local location, float
 	if shader then
@@ -227,15 +253,6 @@ cheetah.resLoader = function(dirname, recursive)
 		de = libcheetah.readDir(dir)
 	end
 	return t
-end
-
-cheetah.fileExists = function(name)
-	local f = io.open(name, 'r')
-	if f then
-		f:close()
-		return true
-	end
-	return false
 end
 
 --exec func for each file in directory

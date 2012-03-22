@@ -1,5 +1,6 @@
 local ffi = require "ffi"
-
+local bit = require "bit"
+local bor = bit.bor
 ffi.cdef[[
 unsigned char*
 	SOIL_load_image_from_memory

@@ -95,6 +95,16 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		if(depth) SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 		if(stencil) SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 		firstrun = 1;
+		/*Set screen auto-scale properties*/
+		screenScale.origWidth = width;
+		screenScale.origHeight = height;
+		screenScale.autoScale = 1;
+		screenScale.autoScaleFont = 1;
+		screenScale.scaleX = 1.0f;
+		screenScale.scaleY = 1.0f;
+		screenScale.offsetX = 0.0f;
+		screenScale.offsetY = 0.0f;
+		screenScale.aspect = (float)width/height;
 	}
 	if(appName) SDL_WM_SetCaption (appName, appName);
 	screen = SDL_SetVideoMode(width, height, bpp, flags);
@@ -118,11 +128,11 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		glDisable(GL_DEPTH_TEST);
 	}
 
-	glViewport( 0, 0, width, height );
-	glMatrixMode( GL_PROJECTION );
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho( 0, width, height, 0, -1, 1 );
-	glMatrixMode( GL_MODELVIEW );
+	glOrtho(0, width, height, 0, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glDepthRange(-10000,10000);
 	if(firstrun) {
@@ -198,10 +208,6 @@ double getTime() {
 	return (double)SDL_GetTicks()/1000;
 }
 
-unsigned int GetTicks() {
-	return SDL_GetTicks();
-}
-
 void delay(unsigned int ms) {
 	return SDL_Delay(ms);
 }
@@ -215,13 +221,53 @@ void move(double translateX, double translateY) {
 }
 
 void scale(double scaleX, double scaleY) {
-	glScaled(scaleX, scaleY, 0);
+	glScaled(scaleX, scaleY, 1);
 }
 
 void rotate(double rotate) {
 	glRotated(rotate, 0, 0, 1);
 }
 
+void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y) {
+	glTranslated(x, y, 0);
+	glTranslated(origin_x, origin_y, 0);
+	glRotated(angle, 0, 0, 1);
+	glScalef(width, height, 1);
+	glTranslated(-origin_x/width, -origin_y/height, 0);
+	//glTranslated(ox, oy, 0);
+}
+
+void setAutoScale(bool autoScale) {
+	screenScale.autoScale = autoScale;
+}
+
+//~ void printMatrix(GLdouble *m)
+//~ {
+	//~ int i, j;
+	//~ for (i = 0; i < 4; i++)
+	//~ {
+		//~ for (j = 0; j < 4; j++)
+		//~ {
+			//~ printf("%E\t", *(m+i*4+j));
+		//~ }
+		//~ putc('\n', stdout);
+	//~ }
+//~ }
+
+void doAutoScale() {
+	glLoadIdentity();
+	glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
+	glScalef(screenScale.scaleX, screenScale.scaleY, 1);
+	//~ glPushMatrix();
+	//~ GLdouble projMatrix[16];
+	//~ GLdouble modelMatrix[16];
+	//~ glGetDoublev(GL_PROJECTION, projMatrix);
+	//~ printMatrix(projMatrix);
+	//~ glGetDoublev(GL_MODELVIEW, modelMatrix);
+	//~ printMatrix(modelMatrix);
+	//~ putc('\n', stdout);
+	//~ glPopMatrix();
+}
 void blend(bool bl) {
 	if(bl) glEnable(GL_BLEND);
 	else glDisable(GL_BLEND);
@@ -247,18 +293,9 @@ void pop() {
 		myError("No saved view was found.");
 }
 
-void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y) {
-	glTranslated(x, y, 0);
-	glTranslated(origin_x, origin_y, 0);
-	glRotated(angle, 0, 0, 1);
-	glScalef(width, height, 0);
-	glTranslated(-origin_x/width, -origin_y/height, 0);
-	//glTranslated(ox, oy, 0);
-}
-
-void reset() {
-	glLoadIdentity();
-}
+//~ void reset() {
+	//~ glLoadIdentity();
+//~ }
 
 void line(double x1, double y1, double x2, double y2) {
 	glBegin(GL_LINES);
@@ -810,7 +847,7 @@ void vboDrawSprites(Vbo * ptr, Image * img, float size) {
 		{
 			glPushMatrix();
 			glTranslatef(ptr->data[i].x - size/2, ptr->data[i].y - size/2, 0.0);
-			glScalef(size, size, 1.0);
+			glScalef(size, size, 1);
 			glCallList(quadlist);
 			glPopMatrix();
 		}
