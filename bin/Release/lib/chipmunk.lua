@@ -1,7 +1,10 @@
 local ffi = require 'ffi'
 local chipmunk = cheetah.loadDLL 'chipmunk'
-local cp = {}
-cp.cpvzero = ffi.new('cpVect', {0,0})
+local cp = {
+	v = chipmunk._cpv,
+}
+cp.vzero = ffi.new('cpVect', {0,0})
+
 ffi.metatype('cpBody', {
 	__index = {
 		init = chipmunk.cpBodyInit,
@@ -108,9 +111,40 @@ ffi.metatype('cpSpace', {
 		getStaticBody = chipmunk._cpSpaceGetStaticBody,
 		getCurrentTimeStep = chipmunk._cpSpaceGetCurrentTimeStep,
 		isLocked = chipmunk._cpSpaceIsLocked,
+		removeCollisionHandler = chipmunk.cpSpaceRemoveCollisionHandler,
+		addShape = chipmunk.cpSpaceAddShape,
+		addStaticShape = chipmunk.cpSpaceAddStaticShape,
+		addBody = chipmunk.cpSpaceAddBody,
+		addConstraint = chipmunk.cpSpaceAddConstraint,
+		removeShape = chipmunk.cpSpaceRemoveShape,
+		removeStaticShape = chipmunk.cpSpaceRemoveStaticShape,
+		removeBody = chipmunk.cpSpaceRemoveBody,
+		removeConstraint = chipmunk.cpSpaceRemoveConstraint,
+		containsShape = chipmunk.cpSpaceContainsShape,
+		containsBody = chipmunk.cpSpaceContainsBody,
+		containsConstraint = chipmunk.cpSpaceContainsConstraint,
+		addPostStepCallback = chipmunk.cpSpaceAddPostStepCallback,
+		pointQuery = chipmunk.cpSpacePointQuery,
+		pointQueryFirst = chipmunk.cpSpacePointQueryFirst,
+		segmentQuery = chipmunk.cpSpaceSegmentQuery,
+		segmentQueryFirst = chipmunk.cpSpaceSegmentQueryFirst,
+		bBQuery = chipmunk.cpSpaceBBQuery,
+		shapeQuery = chipmunk.cpSpaceShapeQuery,
+		activateShapesTouchingShape = chipmunk.cpSpaceActivateShapesTouchingShape,
+		eachBody = chipmunk.cpSpaceEachBody,
+		eachShape = chipmunk.cpSpaceEachShape,
+		eachConstraint = chipmunk.cpSpaceEachConstraint,
+		reindexStatic = chipmunk.cpSpaceReindexStatic,
+		reindexShape = chipmunk.cpSpaceReindexShape,
+		reindexShapesForBody = chipmunk.cpSpaceReindexShapesForBody,
+		useSpatialHash = chipmunk.cpSpaceUseSpatialHash,
+		step = chipmunk.cpSpaceStep,
 	},
 	__gc = chipmunk.cpSpaceFree
 })
+
+
+
 
 
 

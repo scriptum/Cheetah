@@ -72,6 +72,8 @@ else
 	};]]
 end
 
+ffi.cdef 'void printf(const char * str, ...);'
+
 local libcheetah = cheetah.loadDLL 'cheetah'
 
 assert(libcheetah, 'Cannot load cheetah library!')
