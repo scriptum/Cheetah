@@ -8,6 +8,7 @@ require("lib.lquery.entity")
 require("lib.lquery.objects")
 
 lQuery.getMouseXY = cheetah.getMousePos
+time = cheetah.getTime()
 
 cheetah.render = function()
 	mX, mY = lQuery.getMouseXY()
