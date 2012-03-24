@@ -652,17 +652,17 @@ typedef struct cpComponentNode {
 struct cpBody {
  cpBodyVelocityFunc velocity_func;
  cpBodyPositionFunc position_func;
- cpFloat m;
+ cpFloat m; //mass
  cpFloat m_inv;
- cpFloat i;
+ cpFloat i; //moment
  cpFloat i_inv;
- cpVect p;
- cpVect v;
- cpVect f;
- cpFloat a;
- cpFloat w;
- cpFloat t;
- cpVect rot;
+ cpVect p; //pos
+ cpVect v; //vel
+ cpVect f; //force
+ cpFloat a; //angle
+ cpFloat w; //angvel
+ cpFloat t; //torque
+ cpVect rot; //rot???
  cpDataPointer data;
  cpFloat v_limit;
  cpFloat w_limit;
