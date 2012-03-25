@@ -23,11 +23,15 @@ local function getSleep(s)
 		C.Color(255,255,255,255)
 	end
 end
---~ E:new(screen):draw(function()C.rectangle(true)end):color('PeachPuff'):move(400,0):size(400,600)
-
-E:new(screen):draw(function()
-	for i=1,2000 do
-		C.point(i,i)
-	end
-end)
+E:new(screen):draw(function()C.rectangle(true)end):color('PeachPuff'):move(400,0):size(400,600)
+for i=1,1000 do
+	E:new(screen)
+	:draw(getSleep)
+	:image('data/ball_small.png')
+	:move(150+i/2,100+i/3)
+	:offset(5,5)
+	:physCircle(1, 5)
+	:physDraggable()
+	:size(10,10)
+end
 C.mainLoop()

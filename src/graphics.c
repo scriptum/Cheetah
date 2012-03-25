@@ -237,7 +237,7 @@ void rotate(double rotate) {
 void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y) {
 	if(x || y) glTranslated(x, y, 0);
 	//~ glTranslated(origin_x, origin_y, 0);
-	if(angle) {glRotated(angle, 0, 0, 1);printf("%f %f %f %f\n", angle, width, x, origin_x);}
+	if(angle) glRotated(angle, 0, 0, 1);
 	if(width != 1.0 || height != 1.0) glScalef(width, height, 1);
 	if(origin_x || origin_y) glTranslated(-origin_x/width, -origin_y/height, 0);
 	
