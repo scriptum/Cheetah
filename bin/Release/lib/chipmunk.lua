@@ -155,9 +155,11 @@ cp.defaultScape = function(gravity)
 			cp.space:step(1/C.FPS)
 			mPoint = chipmunk.v(mX, mY)
 			mouseShape = chipmunk.SpacePointQueryFirst(cp.space, mPoint, 1, 1)
-			local newPoint = cp.vlerp(mouseBody.p, mPoint, 0.25);
-			mouseBody.v = cp.vmult(cp.vsub(newPoint, mouseBody.p), 60.0);
-			mouseBody.p = newPoint;
+			--~ if lQuery.mousePressed then
+				local newPoint = cp.vlerp(mouseBody.p, mPoint, 0.25)
+				mouseBody.v = cp.vmult(cp.vsub(newPoint, mouseBody.p), 60.0)
+				mouseBody.p = newPoint
+			--~ end
 		end)
 	end
 	cp.space = chipmunk.SpaceNew()
@@ -181,9 +183,9 @@ end
 --lQuery support
 if lQuery then
 	local physBound = function(s, x, y)
-		local shape = chipmunk.SpacePointQueryFirst(cp.space, chipmunk.v(x, y), 1, 1)
-		if C.isPointer(shape) then
-			return shape == s.shape
+		--~ local shape = chipmunk.SpacePointQueryFirst(cp.space, chipmunk.v(x, y), 1, 1)
+		if C.isPointer(mouseShape) then
+			return mouseShape == s.shape
 		end
 		return false
 	end

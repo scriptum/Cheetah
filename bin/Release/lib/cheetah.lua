@@ -161,7 +161,7 @@ cheetah.newShader = function(ver, frag)
 	local shader, str
 	if frag then
 		shader = libcheetah.newVertexFragmentShader(ver, frag)
-		str = frag
+		str = ver .. frag
 	else
 		shader = libcheetah.newFragmentShader(ver)
 		str = ver
