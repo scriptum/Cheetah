@@ -5,6 +5,8 @@ local cp = {
 }
 cp.vzero = ffi.new('cpVect', {0,0})
 
+--OOP definitions
+
 ffi.metatype('cpBody', {
 	__index = {
 		init = chipmunk.BodyInit,
@@ -143,7 +145,93 @@ ffi.metatype('cpSpace', {
 	__gc = chipmunk.SpaceFree
 })
 
+local C = cheetah
+local mouseBody, mouseJoint, mouseShape, mPoint
 
+cp.defaultScape = function(gravity)
+	if lQuery then 
+		lQuery.addhook(function()
+			--fit physics steps inside frames
+			cp.space:step(1/C.FPS)
+			mPoint = chipmunk.v(mX, mY)
+			mouseShape = chipmunk.SpacePointQueryFirst(cp.space, mPoint, 1, 1)
+			local newPoint = cp.vlerp(mouseBody.p, mPoint, 0.25);
+			mouseBody.v = cp.vmult(cp.vsub(newPoint, mouseBody.p), 60.0);
+			mouseBody.p = newPoint;
+		end)
+	end
+	cp.space = chipmunk.SpaceNew()
+	cp.space:setGravity(cp.v(0, gravity))
+	mouseBody = chipmunk.BodyNew(1e300, 1e300)
+end
+local defSpaceErr = 'Init default space before (cp.defaultScape)'
+cp.addBorder = function(x1, y1, x2, y2, friction)
+	assert(cp.space, defSpaceErr)
+	local ground = chipmunk.SegmentShapeNew(cp.space.staticBody, chipmunk.v(x1, y1), chipmunk.v(x2, y2), 0)
+	ground:setFriction(friction or 1)
+	cp.space:addShape(ground)
+end
+cp.addFrame = function(x, y, w, h, friction)
+	cp.addBorder(x, y, w, y, friction) --top
+	cp.addBorder(x, h, w, h, friction) --bottom
+	cp.addBorder(x, y, x, h, friction) --left
+	cp.addBorder(w, y, w, h, friction) --right
+end
+--lQuery support
+if lQuery then
+	local physBound = function(s, x, y)
+		local shape = chipmunk.SpacePointQueryFirst(cp.space, chipmunk.v(x, y), 1, 1)
+		if C.isPointer(shape) then
+			return shape == s._shape
+		end
+		return false
+	end
+	local physDraw = function(s)
+		local b = s._body
+		C.translateObject(b.p.x, b.p.y, b.a * 180 / math.pi, s.w, s.h, s.ox, s.oy)
+	end
+	function Entity:physCircle(mass, friction, radius)
+		assert(cp.space, defSpaceErr)
+		if radius then self.R = radius end
+		assert(self.R, 'Set circle radius (.R or 2nd argument)')
+		assert(mass, 'Set circle mass (first argument)')
+		
+		self._body = cp.space:addBody(chipmunk.BodyNew(mass, chipmunk.MomentForCircle(mass, 0, self.R, cp.vzero)))
+		self._body:setPos(chipmunk.v(self.x + self.ox, self.y + self.oy))
+		
+		self._shape = cp.space:addShape(chipmunk.CircleShapeNew(self._body, self.R, cp.vzero))
+		self._shape:setFriction(friction or 1)
+		
+		if self._draw then
+			self._draw[1] = physDraw
+		else
+			self._draw = {physDraw}
+		end
+		self:bound(physBound)
+		
+		return self
+	end
+	local function physPressed(s)
+		if C.isPointer(mouseShape) then
+			mouseJoint = chipmunk.PivotJointNew2(mouseBody, mouseShape.body, cp.vzero, chipmunk.BodyWorld2Local(mouseShape.body, mPoint))
+			mouseJoint.maxForce = 50000.0
+			mouseJoint.errorBias = math.pow(1.0 - 0.15, 60.0)
+			chipmunk.SpaceAddConstraint(cp.space, mouseJoint)
+		end
+	end
+	local function physReleased(s)
+		if C.isPointer(mouseJoint) then 
+			chipmunk.SpaceRemoveConstraint(cp.space, mouseJoint);
+			chipmunk.ConstraintFree(mouseJoint);
+		end
+	end
+	function Entity:physDraggable()
+		assert(cp.space, defSpaceErr)
+		self:mousepressed(physPressed)
+		self:mousereleased(physReleased)
+		return self
+	end
+end
 
 
 

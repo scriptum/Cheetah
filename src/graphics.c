@@ -230,7 +230,7 @@ void rotate(double rotate) {
 
 void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y) {
 	glTranslated(x, y, 0);
-	glTranslated(origin_x, origin_y, 0);
+	//~ glTranslated(origin_x, origin_y, 0);
 	glRotated(angle, 0, 0, 1);
 	glScalef(width, height, 1);
 	glTranslated(-origin_x/width, -origin_y/height, 0);
