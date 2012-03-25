@@ -8,6 +8,8 @@ local cp = require 'lib.chipmunk'
 --set space into cp.space with gravity 300
 cp.defaultScape(300)
 
+print(cp.space:getIterations())
+
 --borders around the screen
 cp.addFrame(0,0,800,600, 0.5, 1)
 cp.addBorder(0,500,800,600, 0.5, 1)
