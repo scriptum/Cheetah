@@ -148,6 +148,12 @@ ffi.metatype('cpSpace', {
 local C = cheetah
 local mouseBody, mouseJoint, mouseShape, mPoint
 
+local maxMouseForce = 50000
+
+cp.mouseForce = function(v)
+	maxMouseForce = v
+end
+
 cp.defaultScape = function(gravity)
 	if lQuery then 
 		lQuery.addhook(function()
@@ -164,7 +170,7 @@ cp.defaultScape = function(gravity)
 	end
 	cp.space = chipmunk.SpaceNew()
 	cp.space:setGravity(cp.v(0, gravity))
-	mouseBody = chipmunk.BodyNew(1e300, 1e300)
+	mouseBody = chipmunk.BodyNew(math.huge, math.huge)
 end
 local defSpaceErr = 'Init default space before (cp.defaultScape)'
 cp.addBorder = function(x1, y1, x2, y2, friction, elasticity)
@@ -183,7 +189,6 @@ end
 --lQuery support
 if lQuery then
 	local physBound = function(s, x, y)
-		--~ local shape = chipmunk.SpacePointQueryFirst(cp.space, chipmunk.v(x, y), 1, 1)
 		if C.isPointer(mouseShape) then
 			return mouseShape == s.shape
 		end
@@ -194,9 +199,9 @@ if lQuery then
 		C.translateObject(b.p.x, b.p.y, b.a * 180 / math.pi, s.w, s.h, s.ox, s.oy)
 		C.setColor(s.r or 255, s.g or 255, s.b or 255, s.a or 255)
 	end
-	function Entity:physCircle(mass, radius, friction, elasticity)
+	function Entity:physCircle(mass, friction, elasticity)
 		assert(cp.space, defSpaceErr)
-		if radius then self.R = radius end
+		--~ if radius then self.R = radius end
 		assert(self.R, 'Set circle radius (.R or 2nd argument)')
 		assert(mass, 'Set circle mass (first argument)')
 		
@@ -215,10 +220,37 @@ if lQuery then
 		
 		return self
 	end
+	function Entity:physBox(mass, friction, elasticity)
+		assert(cp.space, defSpaceErr)
+		assert(mass, 'Set box mass (first argument)')
+		if mass == math.huge then
+			self.body = chipmunk.BodyNewStatic()
+		else
+			self.body = cp.space:addBody(chipmunk.BodyNew(mass, chipmunk.MomentForBox(mass, self.w, self.h)))
+		end
+		self.body:setPos(chipmunk.v(self.x + self.ox, self.y + self.oy))
+		
+		if mass == math.huge then
+			self.shape = cp.space:addStaticShape(chipmunk.BoxShapeNew(self.body, self.w, self.h))
+			print('HUGE')
+		else
+			self.shape = cp.space:addShape(chipmunk.BoxShapeNew(self.body, self.w, self.h))
+		end
+		self.shape:setFriction(friction or 0.5)
+		self.shape:setElasticity(elasticity or 0.5)
+		if self._draw then
+			self._draw[1] = physDraw
+		else
+			self._draw = {physDraw}
+		end
+		self:bound(physBound)
+		
+		return self
+	end
 	local function physPressed(s)
 		if C.isPointer(mouseShape) then
 			mouseJoint = chipmunk.PivotJointNew2(mouseBody, mouseShape.body, cp.vzero, chipmunk.BodyWorld2Local(mouseShape.body, mPoint))
-			mouseJoint.maxForce = 50000.0
+			mouseJoint.maxForce = maxMouseForce
 			mouseJoint.errorBias = math.pow(1.0 - 0.15, 60.0)
 			chipmunk.SpaceAddConstraint(cp.space, mouseJoint)
 		end
