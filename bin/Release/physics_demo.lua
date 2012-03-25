@@ -9,15 +9,17 @@ local cp = require 'lib.chipmunk'
 cp.defaultScape(300)
 
 --borders around the screen
-cp.addFrame(0,0,800,600, 0.8)
-cp.addBorder(0,500,800,600, 0.8)
+cp.addFrame(0,0,800,600, 0.5, 1)
+cp.addBorder(0,500,800,600, 0.5, 1)
 local img = C.newImage('data/ball.png')
+C.setBlendMode(0)
+E:new(screen):draw(function()C.rectangle(true)end):color('PeachPuff'):move(400,0):size(400,600)
 for i=1,10 do
 	E:new(screen)
 	:image(img)
 	:move(i*64,i*64)
 	:offset(64,64)
-	:physCircle(10, 0.5, 63)
+	:physCircle(10, 63, 0.5, 1)
 	:physDraggable()
 end
 C.mainLoop()
