@@ -1,5 +1,7 @@
 local easing = require("lib/lquery/easing")
 
+local C = cheetah
+
 lQuery = {
 	fx = true,
 	hooks = {},
@@ -39,6 +41,11 @@ function Entity:new(parent)  -- constructor
 	local object = {
 		x = 0,   --x coord
 		y = 0,   --y coord
+		w = 1,
+		h = 1,
+		ox = 0,
+		oy = 0,
+		angle = 0,
 		_visible = true --visibility
 	}
 	setmetatable(object, EntityMeta)  -- Inheritance
@@ -74,6 +81,12 @@ end
 function Entity:size(w, h)
 	self.w = w or self.w or 0
 	self.h = h or self.h or 0
+	return self --so we can chain methods
+end
+--Sets the origin of entity
+function Entity:offset(ox, oy)
+	self.ox = ox or self.ox or 0
+	self.oy = oy or self.oy or 0
 	return self --so we can chain methods
 end
 --Sets angle (rotation) of entity
@@ -256,14 +269,22 @@ function Entity:update(key, func)
 	return self --so we can chain methods
 end
 
+local stdDraw = function(s)
+	C.translateObject(s.x, s.y, s.angle, s.w, s.h, s.ox, s.oy)
+end
+
 function Entity:draw(callback)
 	if type(callback) == 'function' then
+		--~ if not self._draw then
+			--~ self._draw = callback
+		--~ else
+			--~ if type(self._draw) ~= 'table' then self._draw = {self._draw} end
+			--~ table.insert(self._draw, callback)
+		--~ end
 		if not self._draw then
-			self._draw = callback
-		else
-			if type(self._draw) ~= 'table' then self._draw = {self._draw} end
-			table.insert(self._draw, callback)
+			self._draw = {stdDraw}
 		end
+		table.insert(self._draw, callback)
 	end
 	return self --so we can chain methods
 end
@@ -422,17 +443,17 @@ local function process_entities(ent)
 			events(ent)
 		end
 		if ent._draw then
-			cheetah.setColor(ent.r or 255, ent.g or 255, ent.b or 255, ent.a or 255)
-			cheetah.push()
-			cheetah.translateObject(ent.x, ent.y, ent.angle or 0, ent.w or 1, ent.h or 1, ent.ox or 0, ent.oy or 0)
-			if ent.blendMode then cheetah.setBlendMode(ent.blendMode) end
-			if type(ent._draw) == 'function' then
-				ent._draw(ent)
-			else
+			--~ C.setColor(ent.r or 255, ent.g or 255, ent.b or 255, ent.a or 255)
+			C.push()
+			--~ C.translateObject(ent.x, ent.y, ent.angle or 0, ent.w or 1, ent.h or 1, ent.ox or 0, ent.oy or 0)
+			--~ if ent.blendMode then C.setBlendMode(ent.blendMode) end
+			--~ if type(ent._draw) == 'function' then
+				--~ ent._draw(ent)
+			--~ else
 				for _, v in ipairs(ent._draw) do v(ent) end
-			end
-			cheetah.setBlendAlpha()
-			cheetah.pop()
+			--~ end
+			C.setBlendAlpha()
+			C.pop()
 		end
 		if ent._child then 
 			for k, v in pairs(ent._child) do
