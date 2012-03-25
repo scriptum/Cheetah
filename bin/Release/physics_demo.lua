@@ -10,7 +10,7 @@ cp.defaultScape(300)
 
 cp.space:setIterations(10)
 cp.space:setSleepTimeThreshold(1)
-cp.space:useSpatialHash(20, 10000)
+cp.space:useSpatialHash(10, 10000)
 C.printFPS = true
 
 --borders around the screen
