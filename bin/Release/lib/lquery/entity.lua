@@ -433,11 +433,12 @@ end
 
 local stdDraw = function(s)
 	C.translateObject(s.x, s.y, s.angle, s.w, s.h, s.ox, s.oy)
-	C.setColor(s.r or 255, s.g or 255, s.b or 255, s.a or 255)
+	C.Color(s.r or 255, s.g or 255, s.b or 255, s.a or 255)
 end
 
 function Entity:draw(callback)
-	if type(callback) == 'function' then
+	--~ print(type(callback))
+	--~ if type(callback) == 'function' then
 		--~ if not self._draw then
 			--~ self._draw = callback
 		--~ else
@@ -448,7 +449,7 @@ function Entity:draw(callback)
 			self._draw = {stdDraw}
 		end
 		table.insert(self._draw, callback)
-	end
+	--~ end
 	return self --so we can chain methods
 end
 
@@ -613,14 +614,17 @@ local function process_entities(ent)
 			--~ if type(ent._draw) == 'function' then
 				--~ ent._draw(ent)
 			--~ else
-				for _, v in ipairs(ent._draw) do v(ent) end
+				for i = 1, #ent._draw do
+					ent._draw[i](ent)
+				end
+				--~ for _, v in ipairs(ent._draw) do v(ent) end
 			--~ end
-			C.setBlendAlpha()
+			--~ C.setBlendAlpha()
 			C.pop()
 		end
 		if ent._child then 
-			for k, v in pairs(ent._child) do
-				process_entities(v)
+			for i = 1, #ent._child do
+				process_entities(ent._child[i])
 			end
 		end
 	end

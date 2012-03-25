@@ -49,7 +49,7 @@ void colorMask(bool r, bool g, bool b, bool a) {
 }
 //~ #endif
 
-GLuint quadlist;
+GLuint quadlist, pointlist;
 
 
 
@@ -145,6 +145,12 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		glTexCoord2f(1, 0); glVertex2f(1, 0);
 		glEnd();
 		glEndList();
+		pointlist = glGenLists(1);
+		glNewList(pointlist, GL_COMPILE);
+		glBegin(GL_POINTS);
+		glVertex2f(0, 0);
+		glEnd();
+		glEndList();
 	}
 	return 0;
 }
@@ -229,11 +235,12 @@ void rotate(double rotate) {
 }
 
 void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y) {
-	glTranslated(x, y, 0);
+	if(x || y) glTranslated(x, y, 0);
 	//~ glTranslated(origin_x, origin_y, 0);
-	glRotated(angle, 0, 0, 1);
-	glScalef(width, height, 1);
-	glTranslated(-origin_x/width, -origin_y/height, 0);
+	if(angle) {glRotated(angle, 0, 0, 1);printf("%f %f %f %f\n", angle, width, x, origin_x);}
+	if(width != 1.0 || height != 1.0) glScalef(width, height, 1);
+	if(origin_x || origin_y) glTranslated(-origin_x/width, -origin_y/height, 0);
+	
 	//glTranslated(ox, oy, 0);
 }
 
@@ -293,9 +300,9 @@ void pop() {
 		myError("No saved view was found.");
 }
 
-//~ void reset() {
-	//~ glLoadIdentity();
-//~ }
+void reset() {
+	glLoadIdentity();
+}
 
 void line(double x1, double y1, double x2, double y2) {
 	glBegin(GL_LINES);
@@ -332,10 +339,14 @@ void circle(double rad, double segments, bool filled) {
 	glEnd();
 }
 
-void point(double x1, double y1) {
-	glBegin(GL_POINTS);
-	glVertex2d(x1, y1);
-	glEnd();
+void point() {
+	glCallList(pointlist);
+}
+
+double getPointSize() {
+	double s;
+	glGetDoublev(GL_POINT_SIZE, &s);
+	return s;
 }
 
 void setPointSize(float size) {
