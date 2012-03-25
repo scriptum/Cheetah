@@ -253,7 +253,6 @@ function Entity:color(r, g, b, a)
 			print('Cannot recognise color: '..r)
 			return self
 		end
-		print(tonumber(r:sub(3,4), 16))
 		self.r = tonumber(r:sub(1,2), 16)
 		self.g = tonumber(r:sub(3,4), 16)
 		self.b = tonumber(r:sub(5,6), 16)
