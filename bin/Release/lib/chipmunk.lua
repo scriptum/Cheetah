@@ -151,14 +151,20 @@ local mouseBody, mouseJoint, mouseShape, mPoint
 local maxMouseForce = 50000
 
 cp.mouseForce = function(v)
-	maxMouseForce = v
+	maxMouseForce = v or 50000
 end
 
-cp.defaultScape = function(gravity)
-	if lQuery then 
+local maxStepsPerFrame = 1
+cp.stepsPerFrame = function(v)
+	maxStepsPerFrame = v or 1
+end
+cp.defaultScape = function(gravity, steps)
+	if lQuery then
 		lQuery.addhook(function()
 			--fit physics steps inside frames
-			cp.space:step(1/C.FPS)
+			for i = 1, maxStepsPerFrame do 
+				cp.space:step(1/C.FPS/maxStepsPerFrame)
+			end
 			mPoint = chipmunk.v(mX, mY)
 			mouseShape = chipmunk.SpacePointQueryFirst(cp.space, mPoint, 1, 1)
 			--~ if lQuery.mousePressed then
