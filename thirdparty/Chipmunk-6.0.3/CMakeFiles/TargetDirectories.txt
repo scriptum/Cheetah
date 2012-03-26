@@ -1,0 +1,2 @@
+/home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/CMakeFiles/chipmunk.dir
+/home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/CMakeFiles/chipmunk_static.dir
