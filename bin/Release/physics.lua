@@ -4,6 +4,7 @@ local C = cheetah
 --~ C.init('Test', 512, 512, 32, '')
 local cp = require 'lib.chipmunk'
 space = cp.SpaceNew()
+space:setIterations(100)
 space:setGravity(cp.v(0, -100))
 ground = cp.SegmentShapeNew(space.staticBody, cp.v(-20, 5), cp.v(20, -5), 0)
 ground:setFriction(1)
@@ -19,6 +20,8 @@ for t = 0, 2, 1.0/60.0 do
 	C.printf(
 		"Time is %5.2f. ballBody is at (%5.2f, %5.2f). It's velocity is (%5.2f, %5.2f)\n",
 		t, pos.x, pos.y, vel.x, vel.y)
-	space:step(1.0/60.0)
+	for i = 1, 10000 do
+		space:step(1.0/6000.0)
+	end
 end
 
