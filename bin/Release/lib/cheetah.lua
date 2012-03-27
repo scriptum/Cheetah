@@ -28,7 +28,7 @@ cheetah.appendFile = function(filename, str)
 	cheetah.putFile(filename, str, "wa")
 end
 
-local archToInt = {x86 = 32, x86_64 = 64}
+local archToInt = {x86 = 32, x64 = 64}
 
 cheetah.loadDLL = function(filename)
 	local res
