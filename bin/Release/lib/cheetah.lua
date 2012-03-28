@@ -119,9 +119,9 @@ end
 
 cheetah.setColor = function(r,g,b,a)
 	if type(r) == 'table' then
-		libcheetah.Color(r[1] or 255, r[2] or 255, r[3] or 255, r[4] or 255)
+		libcheetah.color(r[1] or 255, r[2] or 255, r[3] or 255, r[4] or 255)
 	else
-		libcheetah.Color(r or 255, g or 255, b or 255, a or 255)
+		libcheetah.color(r or 255, g or 255, b or 255, a or 255)
 	end
 end
 

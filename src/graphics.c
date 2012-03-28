@@ -52,7 +52,21 @@ void colorMask(bool r, bool g, bool b, bool a) {
 GLuint quadlist, pointlist;
 
 
-
+/**
+ * @descr Create window and init all OpenGL's syuff. You MUST call this before any graphics function, e.g. cheetah.newImage. You may call this function again to resize window, change application title, toggle fullscreen. Other optoins are ignored.
+ * @group graphics/window
+ * @var application's title shown in titlebar
+ * @var width of the window
+ * @var height of the window
+ * @var bits per pixel (8, 16, 32, usually 32)
+ * @var string of options. Supported options:
+ * `f` - fullscreen
+ * `r` - allow to resize window
+ * `v` - enable vertical sync (recommend)
+ * `d` - enable depth buffer (usually 2D apps do not need this)
+ * `s` - enable stencil buffer (usually 2D apps do not need this)
+ * @return true if success
+ * */
 bool init(const char * appName, unsigned int width, unsigned int height, int bpp, const char * attr) {
 	bool fullscreen = 0;
 	bool resizable = 0;
@@ -152,29 +166,61 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		glEnd();
 		glEndList();
 	}
-	return 0;
+	return 1;
 }
 
+/**
+ * @descr Check, if screen exists. Useful if you have windowless version of your application, e.g. server.
+ * @group graphics/window
+ * @return true if screen was initialised
+ * */
 bool isInit() {
 	return screen != NULL;
 }
 
+/**
+ * @descr Get window's width
+ * @group graphics/window
+ * @return width of the window
+ * @see getWindowHeight
+ * */
 int getWindowWidth() {
 	return screen->w;
 }
 
+/**
+ * @descr Get window's height
+ * @group graphics/window
+ * @return height of the window
+ * @see getWindowWidth
+ * */
 int getWindowHeight() {
 	return screen->h;
 }
 
+/**
+ * @descr Swap buffers and present graphics
+ * @group graphics/window
+ * */
 void swapBuffers() {
 	SDL_GL_SwapBuffers();
 }
 
+/**
+ * @descr Set window's title
+ * @group graphics/window
+ * @var text to replace the caption
+ * @see init
+ * */
 void setWindowCaption(const char * text){
 	SDL_WM_SetCaption(text, text);
 }
 
+/**
+ * @descr Get list of possible screen modes. You need this if you want to run application in fullscreen mode.
+ * @group graphics/window
+ * @return array of pointers to SDL_Rect structure.
+ * */
 SDL_Rect ** getModes() {
 	SDL_Rect ** modes = SDL_ListModes(0, SDL_OPENGL | SDL_FULLSCREEN);
 	if(modes == (SDL_Rect **)0 || modes == (SDL_Rect **)-1)
@@ -182,58 +228,143 @@ SDL_Rect ** getModes() {
 	return modes;
 }
 
+/**
+ * @descr Shows the cursor
+ * @group graphics/window
+ * */
 void showCursor() {
 	SDL_ShowCursor(SDL_ENABLE);
 }
 
+/**
+ * @descr Hides the cursor
+ * @group graphics/window
+ * */
 void hideCursor() {
 	SDL_ShowCursor(SDL_DISABLE);
 }
 
+/**
+ * @descr Enables depth test. Useles, if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_DEPTH_TEST);
+ * @group graphics/drawing
+ * @see disableDepthTest
+ * */
 void enableDepthTest() {
 	glEnable(GL_DEPTH_TEST);
 }
 
+/**
+ * @descr Disables depth test. Useles, if you didn't pass 'd' option to cheetah.init. Equivalent to glDisable(GL_DEPTH_TEST);
+ * @group graphics/drawing
+ * @see enableDepthTest
+ * */
 void disableDepthTest() {
 	glDisable(GL_DEPTH_TEST);
 }
 
+/**
+ * @descr Enables stencil test. Useles, if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_STENCIL_TEST);
+ * @group graphics/drawing
+ * @see disableStencilTest
+ * */
 void enableStencilTest() {
 	glEnable(GL_STENCIL_TEST);
 }
 
+/**
+ * @descr Disables stencil test. Useles, if you didn't pass 'd' option to cheetah.init. Equivalent to glDisable(GL_STENCIL_TEST);
+ * @group graphics/drawing
+ * @see enableStencilTest
+ * */
 void disableStencilTest() {
 	glDisable(GL_STENCIL_TEST);
 }
 
+/**
+ * @descr Gets the nubmer of milliseconds past from the execution time. Equivalent to SDL_GetTicks();
+ * @group graphics/timer
+ * */
 unsigned int getTicks() {
 	return SDL_GetTicks();
 }
 
+/**
+ * @descr Gets the time in seconds past from the execution time.
+ * @group graphics/timer
+ * */
 double getTime() {
 	return (double)SDL_GetTicks()/1000;
 }
 
+/**
+ * @descr Do nothing some time.
+ * @group graphics/timer
+ * @var delay in milliseconds (1/1000 s)
+ * @see sleep
+ * */
 void delay(unsigned int ms) {
 	return SDL_Delay(ms);
 }
 
-void translate(double translateX, double translateY) {
-	glTranslated(translateX, translateY, 0);
+/**
+ * @descr Do nothing some time.
+ * @group graphics/timer
+ * @var delay in seconds
+ * @see delay
+ * */
+void sleep(unsigned int ms) {
+	return SDL_Delay(ms);
 }
 
+
+//~ void translate(double translateX, double translateY) {
+	//~ glTranslated(translateX, translateY, 0);
+//~ }
+
+/**
+ * @descr Move object relatively to the current matrix position.
+ * @group graphics/drawing
+ * @var x coordinate
+ * @var y coordinate
+ * @see scale rotate translateObject
+ * */
 void move(double translateX, double translateY) {
 	glTranslated(translateX, translateY, 0);
 }
 
+/**
+ * @descr Scale object relatively to the current matrix size (initially, matrix has size 1x1 pixel).
+ * @group graphics/drawing
+ * @var x scale
+ * @var y scale
+ * @see move rotate translateObject
+ * */
 void scale(double scaleX, double scaleY) {
 	glScaled(scaleX, scaleY, 1);
 }
 
-void rotate(double rotate) {
-	glRotated(rotate, 0, 0, 1);
+/**
+ * @descr Rotate object relatively to the current matrix angle.
+ * @group graphics/drawing
+ * @var angle
+ * @see move scale translateObject
+ * */
+void rotate(double angle) {
+	glRotated(angle, 0, 0, 1);
 }
 
+/**
+ * @descr Move, rotate and scale object relatively to it's center (origin)
+ * @group graphics/drawing
+ * @var x coordinate
+ * @var y coordinate
+ * @var angle
+ * @var x scale
+ * @var y scale
+ * @var x offset (center)
+ * @var y offset (center)
+ * @see move scale rotate
+ * */
 void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y) {
 	if(x || y) glTranslated(x, y, 0);
 	//~ glTranslated(origin_x, origin_y, 0);
@@ -244,6 +375,11 @@ void translateObject(double x, double y, double angle, double width, double heig
 	//glTranslated(ox, oy, 0);
 }
 
+/**
+ * @descr Enable or disable autoscale. Autoscle allows you to draw stuff in the fixed pixel coordinates, and engine automatically translates all coordinates while window resizes. Is you want to control screen size yorself, disable this.
+ * @group graphics/drawing
+ * @var enable or disable autoscale
+ * */
 void setAutoScale(bool autoScale) {
 	screenScale.autoScale = autoScale;
 }
@@ -275,35 +411,76 @@ void doAutoScale() {
 	//~ putc('\n', stdout);
 	//~ glPopMatrix();
 }
-void blend(bool bl) {
-	if(bl) glEnable(GL_BLEND);
+
+/**
+ * @descr Enable or disable blending. Drawing without blending usually faster, but textures with alpha-channel will be poor. Blending is enabled by defaults.
+ * @group graphics/drawing
+ * @var enable or disable blending
+ * @see enableBlend disableBlend
+ * */
+void blend(bool blend) {
+	if(blend) glEnable(GL_BLEND);
 	else glDisable(GL_BLEND);
 }
 
+/**
+ * @descr Enable blending.
+ * @group graphics/drawing
+ * @see blend
+ * */
 void enableBlend() {
 	glEnable(GL_BLEND);
 }
 
+/**
+ * @descr Disable blending.
+ * @group graphics/drawing
+ * @see blend
+ * */
 void disableBlend() {
 	glDisable(GL_BLEND);
 }
 
+/**
+ * @descr Push the transformation matrix. Equivalent to glPushMatrix();
+ * @group graphics/drawing
+ * @see pop reset
+ * */
 void push() {
 	glPushMatrix();
 	if (glGetError() == GL_STACK_OVERFLOW)
 		myError("No more free slots to save the view.");
 }
 
+/**
+ * @descr Pop the transformation matrix. Equivalent to glPopMatrix();
+ * @group graphics/drawing
+ * @see push reset
+ * */
 void pop() {
 	glPopMatrix();
 	if (glGetError() == GL_STACK_UNDERFLOW)
 		myError("No saved view was found.");
 }
 
+/**
+ * @descr Reset the transformation matrix. Equivalent to glLoadIdentity();
+ * @group graphics/drawing
+ * @see pop push
+ * */
 void reset() {
 	glLoadIdentity();
 }
 
+/**
+ * @descr Draw line.
+ * @group graphics/drawing
+ * @var x start
+ * @var y start
+ * @var x end
+ * @var y end
+ * @see color setLineWidth setSmooth
+ * */
 void line(double x1, double y1, double x2, double y2) {
 	glBegin(GL_LINES);
 	glVertex2d(x1, y1);
@@ -311,6 +488,12 @@ void line(double x1, double y1, double x2, double y2) {
 	glEnd();
 }
 
+/**
+ * @descr Draw rectangle. Note, if you bind texture or shader, filled rectangle may be shaded or textured.
+ * @group graphics/drawing
+ * @var is rectangle filled
+ * @see color imageDraw framebufferDraw
+ * */
 void rectangle(bool filled) {
 	if(filled)
 		glCallList(quadlist);
@@ -325,6 +508,14 @@ void rectangle(bool filled) {
 	}
 }
 
+/**
+ * @descr Draw circle.
+ * @group graphics/drawing
+ * @var radius
+ * @var segments (more is slower and better)
+ * @var is circle filled
+ * @see color
+ * */
 void circle(double rad, double segments, bool filled) {
 	int i;
 	const double DBLPI = 3.1415926 * 2;
@@ -339,24 +530,66 @@ void circle(double rad, double segments, bool filled) {
 	glEnd();
 }
 
+/**
+ * @descr Draw point.
+ * @group graphics/drawing
+ * @see color setPointSize setSmooth getPointSize
+ * */
 void point() {
 	glCallList(pointlist);
 }
 
+/**
+ * @descr Gets the current point size.
+ * @group graphics/drawing
+ * @return point size
+ * @see point setPointSize
+ * */
 double getPointSize() {
 	double s;
 	glGetDoublev(GL_POINT_SIZE, &s);
 	return s;
 }
 
+/**
+ * @descr Sets the current point size. Not all platforms supports point size correct.
+ * @group graphics/drawing
+ * @var point size
+ * @see point getPointSize
+ * */
 void setPointSize(float size) {
 	glPointSize(size);
 }
 
+/**
+ * @descr Sets the line width. Not all platforms supports line width correct.
+ * @group graphics/drawing
+ * @var line size
+ * @see line getLineWidth
+ * */
 void setLineWidth(float width) {
 	glLineWidth(width);
 }
 
+/**
+ * @descr Gets the line width.
+ * @group graphics/drawing
+ * @return line size
+ * @see line setLineWidth
+ * */
+double getLineWidth() {
+	double s;
+	glGetDoublev(GL_LINE_WIDTH, &s);
+	return s;
+	glLineWidth(width);
+}
+
+/**
+ * @descr Enables or disables lines and points smoothing. Not all patforms support this.
+ * @group graphics/drawing
+ * @var enable or disable smoothing
+ * @see line point
+ * */
 void setSmooth(bool smooth) {
 	if(smooth) {
 		glEnable(GL_POINT_SMOOTH);
@@ -367,24 +600,43 @@ void setSmooth(bool smooth) {
 	}
 }
 
-//~ void setColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
-	//~ glColor4ub(r,g,b,a);
-//~ }
-//~ 
-//~ void setColorf(float r, float g, float b, float a) {
-	//~ glColor4f(r,g,b,a);
-//~ }
-
-//export OGL color functions
-
-void Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+/**
+ * @descr Sets the color. Faster than setColor.
+ * @group graphics/drawing
+ * @var red
+ * @var green
+ * @var blue
+ * @var alpha
+ * @see setColor
+ * */
+void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
 	glColor4ub(r,g,b,a);
 }
 
+/**
+ * @descr Sets the color for clear screen.
+ * @group graphics/drawing
+ * @var red
+ * @var green
+ * @var blue
+ * @var alpha
+ * @see clear
+ * */
 void setClearColor(float r, float g, float b, float a) {
 	glClearColor(r,g,b,a);
 }
 
+/**
+ * @descr Sets the blending mode. Blending modes allow you to create some cool effects.
+ * @group graphics/drawing
+ * @var One of possible blending modes. 0 is defaults. Use pre-defined blending modes:
+ * cheetah.blendAlpha or 0 - defaults
+ * cheetah.blendMultiplicative
+ * cheetah.blendAdditive
+ * cheetah.blendSubstractive
+ * cheetah.blendScreen - as photoshop blend mode
+ * cheetah.blendDetail - interesting effect, allows to use gray detail textures
+ * */
 void setBlendMode(int mode) {
 	if(mode == blend_substractive) {
 		glBlendEquation_(GL_FUNC_REVERSE_SUBTRACT);
@@ -411,11 +663,6 @@ void setBlendMode(int mode) {
 				break;
 		}
 	}
-}
-
-void setBlendAlpha() {
-	glBlendEquation_(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void clear() {
@@ -459,8 +706,8 @@ void drawUsingStencil() {
 //~ /**
  //~ * @descr Load image from disc with specific optons
  //~ * @group image
- //~ * @param File name
- //~ * @param String of options. Supported options:
+ //~ * @var File name
+ //~ * @var String of options. Supported options:
  //~ * `n` - use nearest interpolation
  //~ * `m` - generate mip-maps (automatically sets mip-map interpolation)
  //~ * @return Image object
@@ -512,7 +759,7 @@ void drawUsingStencil() {
 //~ /**
  //~ * @descr Load image from disc
  //~ * @group image
- //~ * @param File name
+ //~ * @var File name
  //~ * @return Image object
  //~ * */
 //~ Image *newImage(const char *name) {
@@ -521,8 +768,8 @@ void drawUsingStencil() {
 
 /**
  * @descr Bind Image object. Equivalent to glBindTexture.
- * @group image
- * @param Image object
+ * @group graphics/image
+ * @var Image object
  * */
 void imageBind(Image * image) {
 	glBindTexture(GL_TEXTURE_2D, image->id);
@@ -530,7 +777,7 @@ void imageBind(Image * image) {
 
 /**
  * @descr Enable texturing. Equivalent to glEnable(GL_TEXTURE_2D).
- * @group image
+ * @group graphics/image
  * */
 void enableTexture2D() {
 	glEnable(GL_TEXTURE_2D);
@@ -538,12 +785,16 @@ void enableTexture2D() {
 
 /**
  * @descr Disable texturing. Equivalent to glDisable(GL_TEXTURE_2D).
- * @group image
+ * @group graphics/image
  * */
 void disableTexture2D() {
 	glDisable(GL_TEXTURE_2D);
 }
 
+/**
+ * @descr Draw while image using 1x1 pixel quad. You may change quad size and position using transformations.
+ * @group graphics/image
+ * */
 void imageDraw(Image * image) {
 	glBindTexture(GL_TEXTURE_2D, image->id);
 	glEnable(GL_TEXTURE_2D);
@@ -552,6 +803,15 @@ void imageDraw(Image * image) {
 }
 
 /*TODO: Заюзать шейдры для передачи координат, а выводить квад листом. В шрифтах аналогично*/
+/**
+ * @descr Draw part of image using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
+ * @group graphics/image
+ * @var Image object
+ * @var x offset of texture
+ * @var y offset of texture
+ * @var width of texture
+ * @var height of texture
+ * */
 void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
 	glBindTexture(GL_TEXTURE_2D, image->id);
 	glEnable(GL_TEXTURE_2D);
@@ -570,26 +830,44 @@ void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
 	glDisable(GL_TEXTURE_2D);
 }
 
+/**
+ * @descr Set the current active texture for multitexturenig. Equivalent to glActiveTexture(GL_TEXTURE0 + i).
+ * @group graphics/image
+ * @var number of texture slot (min 0, max 7)
+ * */
 void activeTexture(int i) {
 	glActiveTexture_(GL_TEXTURE0 + i);
 }
 
+/**
+ * @descr Delete image and free memory.
+ * @group graphics/image
+ * @var Image object
+ * */
 void deleteImage(Image * ptr) {
 	if(ptr)
 		glDeleteTextures(1, &ptr->id);
 	else myError("Trying to free a null-image. Maybe, you did it manually?");
 }
 
-void disableFiltering(Image * img) {
+/**
+ * @descr Enable/disable smooth interpolation for image. Disabled filtering useful, if uou want to fit image to pixel matrix. If this image will be scaled and/or rotated you must enable filtering (this is by defaults).
+ * @group graphics/image
+ * @var Image object
+ * @var true means that filtering is enabled, false means that filtering is disabled
+ * */
+void imageFiltering(Image * img, bool enabled) {
 	glBindTexture(GL_TEXTURE_2D, img->id);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-}
-
-void enableFiltering(Image * img) {
-	glBindTexture(GL_TEXTURE_2D, img->id);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	if(enabled)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	}
+	else
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	}
 }
 
 int checkFramebufferStatus()
@@ -624,6 +902,20 @@ int checkFramebufferStatus()
 	return 0;
 }
 
+/**
+ * @descr Create framebuffer object. Note, that not all video drivers support this. It's recommend to check returning value using cheetah.inPointer and check framebuffer support using chetah.supported.FBO.
+ * @group graphics/framebuffer
+ * @var width
+ * @var height
+ * @var string of options. Supported options:
+ * `a` - enable alpha channel
+ * `n` - enable smooth interpolation
+ * `r` - repeat as texture (not all faramebuffers need this)
+ * `1` - create 8 bits (1 byte) per channel framebuffer (default)
+ * `2` - create 16 bits (2 byte) per channel framebuffer (slow), not all systems support this
+ * `4` - create 32 bits (4 byte) per channel framebuffer (very SLOW), use only if you know, that you doing, not all systems support this
+ * @return Framebuffer object
+ * */
 Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char * options) {
 	//unsigned int percision, bool alpha, bool interpolation, bool repeat) {
 	unsigned int percision = 8;
@@ -736,6 +1028,11 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char
 	}
 }
 
+/**
+ * @descr Bind framebuffer object. Means, that now all graphics will be rendered to this framebuffer.
+ * @group graphics/framebuffer
+ * @var Framebuffer object
+ * */
 void framebufferBind(Framebuffer * ptr) {
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, ptr->id);
 	glViewport( 0, 0, ptr->image->w, ptr->image->h );
@@ -746,6 +1043,10 @@ void framebufferBind(Framebuffer * ptr) {
 	glLoadIdentity();
 }
 
+/**
+ * @descr Unbind framebuffer object. Means, that now all graphics will be rendered to default screen. This function unbinds the current framebuffer object.
+ * @group graphics/framebuffer
+ * */
 void framebufferUnbind() {
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, 0);
 	glViewport( 0, 0, screen->w, screen->h );
@@ -756,14 +1057,35 @@ void framebufferUnbind() {
 	glLoadIdentity();
 }
 
+/**
+ * @descr Draw framebuffer. Same as draw Image.
+ * @group graphics/framebuffer
+ * @var Framebuffer object
+ * @see imageDraw
+ * */
 void framebufferDraw(Framebuffer * ptr) {
 	imageDraw(ptr->image);
 }
 
+/**
+ * @descr Draw part of framebuffer with texture coordinates.
+ * @group graphics/framebuffer
+ * @var Framebuffer object
+ * @var x offset of framebuffer's texture
+ * @var y offset of framebuffer's texture
+ * @var width of framebuffer's texture
+ * @var height of framebuffer's texture
+ * @see imageDrawq
+ * */
 void framebufferDrawq(Framebuffer * ptr, float qx, float qy, float qw, float qh) {
 	imageDrawq(ptr->image, qx, qy, qw, qh);
 }
 
+/**
+ * @descr Delete framebuffer and free memory.
+ * @group graphics/framebuffer
+ * @var Framebuffer object
+ * */
 void deleteFramebuffer(Framebuffer * ptr) {
 	if(ptr) {
 		glDeleteTextures(1, &ptr->image->id);
