@@ -433,7 +433,7 @@ end
 
 local stdDraw = function(s)
 	C.translateObject(s.x, s.y, s.angle, s.w, s.h, s.ox, s.oy)
-	C.Color(s.r or 255, s.g or 255, s.b or 255, s.a or 255)
+	C.color(s.r or 255, s.g or 255, s.b or 255, s.a or 255)
 end
 
 function Entity:draw(callback)
