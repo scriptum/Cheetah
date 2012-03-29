@@ -315,7 +315,7 @@ void delay(unsigned int ms) {
  * @see delay
  * */
 void sleep(unsigned int sec) {
-	return SDL_Delay(sec);
+	return SDL_Delay(sec*1000);
 }
 
 
@@ -511,7 +511,7 @@ void rectangle(bool filled) {
 }
 
 /**
- * @descr Draw rectangle of given size by given position. Note, if you bind texture or shader, filled rectangle may be shaded or textured.
+ * @descr Draw rectangle of given size at a given position. Note, if you bind texture or shader, filled rectangle may be shaded or textured.
  * @group graphics/drawing
  * @var position of left top corner
  * @var position of left top corner
@@ -547,7 +547,7 @@ void rectanglexy(float x, float y, float w, float h, bool filled) {
  * @var radius
  * @var segments (more is slower and better)
  * @var is circle filled
- * @see color
+ * @see color circlexy
  * */
 void circle(double rad, double segments, bool filled) {
 	int i;
@@ -564,14 +564,50 @@ void circle(double rad, double segments, bool filled) {
 }
 
 /**
+ * @descr Draw circle at a given position.
+ * @group graphics/drawing
+ * @var position of circle center
+ * @var position of circle center
+ * @var radius
+ * @var segments (more is slower and better)
+ * @var is circle filled
+ * @see color circle
+ * */
+void circlexy(float x, float y, double rad, double segments, bool filled) {
+	int i;
+	const double DBLPI = 3.1415926 * 2;
+	GLdouble angle;
+	glBegin(filled ? GL_TRIANGLE_FAN : GL_LINE_LOOP);
+	int max = segments;
+	for (i = 0; i <= max; i++)
+	{
+		angle = DBLPI / segments * (double)i;
+		glVertex2d(sin(angle) * rad + x, cos(angle) * rad + y);
+	}
+	glEnd();
+}
+
+/**
  * @descr Draw point.
  * @group graphics/drawing
- * @see color setPointSize setSmooth getPointSize
+ * @see color pointxy setPointSize setSmooth getPointSize
  * */
 void point() {
 	glCallList(pointlist);
 }
 
+/**
+ * @descr Draw point at a given position.
+ * @group graphics/drawing
+ * @var position
+ * @var position
+ * @see color point setPointSize setSmooth getPointSize
+ * */
+void pointxy(float x, float y) {
+	glBegin(GL_POINTS);
+	glVertex2f(x, y);
+	glEnd();
+}
 /**
  * @descr Gets the current point size.
  * @group graphics/drawing
@@ -670,13 +706,13 @@ void setClearColor(float r, float g, float b, float a) {
  *  * cheetah.blendDetail - interesting effect, allows to use gray detail textures
  * */
 void setBlendMode(int mode) {
-	if(mode == blend_substractive) {
-		glBlendEquation_(GL_FUNC_REVERSE_SUBTRACT);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
-	else
-	{
-		glBlendEquation_(GL_FUNC_ADD);
+	//~ if(mode == blend_substractive) {
+		//~ glBlendEquation_(GL_FUNC_REVERSE_SUBTRACT);
+		//~ glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//~ }
+	//~ else
+	//~ {
+		//~ glBlendEquation_(GL_FUNC_ADD);
 		switch(mode) {
 			case blend_alpha:
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -690,11 +726,31 @@ void setBlendMode(int mode) {
 			case blend_screen:
 				glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
 				break;
+			case blend_substractive:
+				glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
+				break;
 			case blend_detail:
 				glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
 				break;
+			case blend_mask:
+				glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
+				break;
 		}
-	}
+	//~ }
+}
+
+/**
+ * @descr Specify the equation used for both the RGB blend equation and the Alpha blend equation. Equivalent to glBlendEquation(mode);
+ * @group graphics/drawing
+ * @var Specifies how source and destination colors are combined. It must be:
+ *  * cheetah.GL_FUNC_ADD
+ *  * cheetah.GL_FUNC_SUBTRACT
+ *  * cheetah.GL_FUNC_REVERSE_SUBTRACT
+ *  * cheetah.GL_MIN
+ *  * cheetah.GL_MAX
+ * */
+void setBlendEquation(int mode) {
+	glBlendEquation_(mode);
 }
 
 /**
@@ -723,6 +779,7 @@ void setBlendMode(int mode) {
 void setBlendFunc(int sourcefactor, int destinationfactor) {
 	glBlendFunc(sourcefactor, destinationfactor);
 }
+
 /**
  * @descr Clear screen. Usually used in lQuery.addhook(cheetah.clear). Slow. Do not use it if you have in your game image background.
  * @group graphics/drawing
@@ -919,7 +976,7 @@ void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
 }
 
 /**
- * @descr Draw part of image of given size by given coordinates using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
+ * @descr Draw part of image of given size at a given position using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
  * @group graphics/image
  * @var Image object
  * @var position of left top corner

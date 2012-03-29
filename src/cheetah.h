@@ -134,12 +134,16 @@ enum {
 	blend_screen,
 	blend_detail,
 	blend_substractive,
+	blend_difference,
+	blend_mask,
 	blendAlpha = 0,
 	blendAdditive,
 	blendMultiplicative,
 	blendScreen,
 	blendDetail,
 	blendSubstractive,
+	blendDifference,
+	blendMask,
 };
 
 struct {

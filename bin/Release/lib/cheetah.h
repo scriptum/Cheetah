@@ -71,12 +71,16 @@ enum {
 	blend_screen,
 	blend_detail,
 	blend_substractive,
+	blend_difference,
+	blend_mask,
 	blendAlpha = 0,
 	blendAdditive,
 	blendMultiplicative,
 	blendScreen,
 	blendDetail,
 	blendSubstractive,
+	blendDifference,
+	blendMask,
 };
 struct {
 	double scaleX, scaleY, offsetX, offsetY;
@@ -147,8 +151,11 @@ void pop();
 void reset();
 void line(double x1, double y1, double x2, double y2);
 void rectangle(bool filled);
+void rectanglexy(float x, float y, float w, float h, bool filled);
 void circle(double rad, double segments, bool filled);
+void circlexy(float x, float y, double rad, double segments, bool filled);
 void point();
+void pointxy(float x, float y);
 double getPointSize();
 void setPointSize(float size);
 void setLineWidth(float width);
@@ -157,6 +164,7 @@ void setSmooth(bool smooth);
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void setClearColor(float r, float g, float b, float a);
 void setBlendMode(int mode);
+void setBlendEquation(int mode);
 void setBlendFunc(int sourcefactor, int destinationfactor);
 void clear();
 void clearColorDepth();
