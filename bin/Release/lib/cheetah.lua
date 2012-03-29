@@ -105,7 +105,10 @@ cheetah.mainLoop = function()
 		FPS = (FPS + 1) / (1 + (libcheetah.getTime() - time));
 		if time - lasttime > 0.5 then
 			lasttime = time
-			if cheetah.printFPS then print(FPS) end
+			if cheetah.printFPS then 
+				print(cheetah.FPS)
+				cheetah.setCaption('FPS: ' .. cheetah.FPS)
+			end
 			cheetah.FPS = tostring(math.floor(FPS))
 		end
 	end

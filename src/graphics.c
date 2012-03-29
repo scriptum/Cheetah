@@ -165,6 +165,8 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		glVertex2f(0, 0);
 		glEnd();
 		glEndList();
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
 	return 1;
 }
@@ -212,7 +214,7 @@ void swapBuffers() {
  * @var text to replace the caption
  * @see init
  * */
-void setWindowCaption(const char * text){
+void setCaption(const char * text) {
 	SDL_WM_SetCaption(text, text);
 }
 
@@ -629,12 +631,12 @@ void setClearColor(float r, float g, float b, float a) {
  * @descr Sets the blending mode. Blending modes allow you to create some cool effects.
  * @group graphics/drawing
  * @var One of possible blending modes. 0 is defaults. Use pre-defined blending modes:
- * cheetah.blendAlpha or 0 - defaults
- * cheetah.blendMultiplicative
- * cheetah.blendAdditive
- * cheetah.blendSubstractive
- * cheetah.blendScreen - as photoshop blend mode
- * cheetah.blendDetail - interesting effect, allows to use gray detail textures
+ *  * cheetah.blendAlpha or 0 - defaults
+ *  * cheetah.blendMultiplicative
+ *  * cheetah.blendAdditive
+ *  * cheetah.blendSubstractive
+ *  * cheetah.blendScreen - as photoshop blend mode
+ *  * cheetah.blendDetail - interesting effect, allows to use gray detail textures
  * */
 void setBlendMode(int mode) {
 	if(mode == blend_substractive) {
@@ -664,6 +666,32 @@ void setBlendMode(int mode) {
 	}
 }
 
+/**
+ * @descr Specify pixel arithmetic. Equivalent to glBlendFunc(sourcefactor, destinationfactor);
+ * @group graphics/drawing
+ * @var Specifies how the red, green, blue, and alpha source blending factors are computed. The following symbolic constants are accepted: 
+ *  * cheetah.GL_ZERO
+ *  * cheetah.GL_ONE
+ *  * cheetah.GL_DST_COLOR
+ *  * cheetah.GL_ONE_MINUS_DST_COLOR
+ *  * cheetah.GL_SRC_ALPHA
+ *  * cheetah.GL_ONE_MINUS_SRC_ALPHA
+ *  * cheetah.GL_DST_ALPHA
+ *  * cheetah.GL_ONE_MINUS_DST_ALPHA
+ *  * cheetah.GL_SRC_ALPHA_SATURATE
+ * @var Specifies how the red, green, blue, and alpha destination blending factors are computed. Eight symbolic constants are accepted: 
+ *  * cheetah.GL_ZERO
+ *  * cheetah.GL_ONE
+ *  * cheetah.GL_SRC_COLOR
+ *  * cheetah.GL_ONE_MINUS_SRC_COLOR
+ *  * cheetah.GL_SRC_ALPHA
+ *  * cheetah.GL_ONE_MINUS_SRC_ALPHA
+ *  * cheetah.GL_DST_ALPHA
+ *  * cheetah.GL_ONE_MINUS_DST_ALPHA
+ * */
+void setBlendFunc(int sourcefactor, int destinationfactor) {
+	glBlendFunc(sourcefactor, destinationfactor);
+}
 /**
  * @descr Clear screen. Usually used in lQuery.addhook(cheetah.clear). Slow. Do not use it if you have in your game image background.
  * @group graphics/drawing
@@ -859,6 +887,19 @@ void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
 	glDisable(GL_TEXTURE_2D);
 }
 
+/**
+ * @descr Draw part of image of given size by given coordinates using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
+ * @group graphics/image
+ * @var Image object
+ * @var position of left top corner
+ * @var position of left top corner
+ * @var width of quad
+ * @var height of quad
+ * @var x offset of texture
+ * @var y offset of texture
+ * @var width of texture
+ * @var height of texture
+ * */
 void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
 	glBindTexture(GL_TEXTURE_2D, image->id);
 	glEnable(GL_TEXTURE_2D);
@@ -870,9 +911,9 @@ void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, f
 	glEnable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
 	glTexCoord2f(qx, qy);   glVertex2f(x, y);
-	glTexCoord2f(qx, qh);   glVertex2f(x, h);
-	glTexCoord2f(qw, qh);   glVertex2f(w, h);
-	glTexCoord2f(qw, qy);   glVertex2f(w, y);
+	glTexCoord2f(qx, qh);   glVertex2f(x, y+h);
+	glTexCoord2f(qw, qh);   glVertex2f(x+w, y+h);
+	glTexCoord2f(qw, qy);   glVertex2f(x+w, y);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 }
