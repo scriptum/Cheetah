@@ -60,11 +60,11 @@ GLuint quadlist, pointlist;
  * @var height of the window
  * @var bits per pixel (8, 16, 32, usually 32)
  * @var string of options. Supported options:
- * `f` - fullscreen
- * `r` - allow to resize window
- * `v` - enable vertical sync (recommend)
- * `d` - enable depth buffer (usually 2D apps do not need this)
- * `s` - enable stencil buffer (usually 2D apps do not need this)
+ *  * _f_ - fullscreen
+ *  * _r_ - allow to resize window
+ *  * _v_ - enable vertical sync (recommend)
+ *  * _d_ - enable depth buffer (usually 2D apps do not need this)
+ *  * _s_ - enable stencil buffer (usually 2D apps do not need this)
  * @return true if success
  * */
 bool init(const char * appName, unsigned int width, unsigned int height, int bpp, const char * attr) {
@@ -245,7 +245,7 @@ void hideCursor() {
 }
 
 /**
- * @descr Enables depth test. Useless, if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_DEPTH_TEST);
+ * @descr Enables depth test. Useless if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_DEPTH_TEST);
  * @group graphics/drawing
  * @see disableDepthTest
  * */
@@ -254,7 +254,7 @@ void enableDepthTest() {
 }
 
 /**
- * @descr Disables depth test. Useless, if you didn't pass 'd' option to cheetah.init. Equivalent to glDisable(GL_DEPTH_TEST);
+ * @descr Disables depth test. Useless if you didn't pass 'd' option to cheetah.init. Equivalent to glDisable(GL_DEPTH_TEST);
  * @group graphics/drawing
  * @see enableDepthTest
  * */
@@ -263,7 +263,7 @@ void disableDepthTest() {
 }
 
 /**
- * @descr Enables stencil test. Useless, if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_STENCIL_TEST);
+ * @descr Enables stencil test. Useless if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_STENCIL_TEST);
  * @group graphics/drawing
  * @see disableStencilTest
  * */
@@ -272,7 +272,7 @@ void enableStencilTest() {
 }
 
 /**
- * @descr Disables stencil test. Useless, if you didn't pass 'd' option to cheetah.init. Equivalent to glDisable(GL_STENCIL_TEST);
+ * @descr Disables stencil test. Useless if you didn't pass 'd' option to cheetah.init. Equivalent to glDisable(GL_STENCIL_TEST);
  * @group graphics/drawing
  * @see enableStencilTest
  * */
@@ -312,8 +312,8 @@ void delay(unsigned int ms) {
  * @var delay in seconds
  * @see delay
  * */
-void sleep(unsigned int ms) {
-	return SDL_Delay(ms);
+void sleep(unsigned int sec) {
+	return SDL_Delay(sec);
 }
 
 
@@ -376,7 +376,7 @@ void translateObject(double x, double y, double angle, double width, double heig
 }
 
 /**
- * @descr Enable or disable autoscale. Autoscle allows you to draw stuff in the fixed pixel coordinates, and engine automatically translates all coordinates while window re-sized. Is you want to control screen size yourself, disable this.
+ * @descr Enable or disable autoscale. Autoscale allows you to draw stuff in the fixed coordinates, and engine automatically translates all coordinates if window changes his size. Is you want to control screen size yourself, disable this.
  * @group graphics/drawing
  * @var enable or disable autoscale
  * */
@@ -552,7 +552,7 @@ double getPointSize() {
 }
 
 /**
- * @descr Sets the current point size. Not all platforms supports point size correct.
+ * @descr Sets the current point size. Not all platforms support point size correctly.
  * @group graphics/drawing
  * @var point size
  * @see point getPointSize
@@ -562,7 +562,7 @@ void setPointSize(float size) {
 }
 
 /**
- * @descr Sets the line width. Not all platforms supports line width correct.
+ * @descr Sets the line width. Not all platforms support line width correctly.
  * @group graphics/drawing
  * @var line size
  * @see line getLineWidth
@@ -731,12 +731,22 @@ void drawUsingStencil() {
 #ifdef 0
 
 /**
- * @descr Load image from disc with specific options
+ * @descr Load image from disc.
  * @group graphics/image
- * @var File name
- * @var String of options. This is depends on image loading module you use. Supported options:
- * `n` - use nearest interpolation
- * `m` - generate mip-maps (automatically sets mip-map interpolation)
+ * @var file name
+ * @return Image object
+ * */
+Image *newImage(const char *name) {
+	return newImageOpt(name, "");
+}
+
+/**
+ * @descr Load image from disc with specific options.
+ * @group graphics/image
+ * @var file name
+ * @var string of options. This is depends on image loading module you use. Supported options:
+ *  * _n_ - use nearest interpolation
+ *  * _m_ - generate mip-maps (automatically sets mip-map interpolation)
  * @return Image object
  * */
 Image *newImageOpt(const char *name, const char *options) {
@@ -781,16 +791,6 @@ Image *newImageOpt(const char *name, const char *options) {
 	ptr->w = width;
 	ptr->h = height;
 	return ptr;
-}
-
-/**
- * @descr Load image from disc
- * @group graphics/image
- * @var File name
- * @return Image object
- * */
-Image *newImage(const char *name) {
-	return newImageOpt(name, "");
 }
 
 #endif
@@ -938,12 +938,12 @@ int checkFramebufferStatus()
  * @var width
  * @var height
  * @var string of options. Supported options:
- * `a` - enable alpha channel
- * `n` - enable smooth interpolation
- * `r` - repeat as texture (not all faramebuffers need this)
- * `1` - create 8 bits (1 byte) per channel framebuffer (default)
- * `2` - create 16 bits (2 byte) per channel framebuffer (slow), not all systems support this
- * `4` - create 32 bits (4 byte) per channel framebuffer (very SLOW), use only if you know, that you doing, not all systems support this
+ *  * _a_ - enable alpha channel
+ *  * _n_ - enable smooth interpolation
+ *  * _r_ - repeat as texture (not all faramebuffers need this)
+ *  * _1_ - create 8 bits (1 byte) per channel framebuffer (default)
+ *  * _2_ - create 16 bits (2 byte) per channel framebuffer (slow), not all systems support this
+ *  * _4_ - create 32 bits (4 byte) per channel framebuffer (very SLOW), use only if you know, that you doing, not all systems support this
  * @return Framebuffer object
  * */
 Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char * options) {
