@@ -859,6 +859,24 @@ void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
 	glDisable(GL_TEXTURE_2D);
 }
 
+void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
+	glBindTexture(GL_TEXTURE_2D, image->id);
+	glEnable(GL_TEXTURE_2D);
+	qx = qx/(float)image->w;
+	qy = qy/(float)image->h;
+	qw = qw ? qx + qw/(float)image->w : 1;
+	qh = qh ? qy + qh/(float)image->h : 1;
+	glBindTexture(GL_TEXTURE_2D, image->id);
+	glEnable(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+	glTexCoord2f(qx, qy);   glVertex2f(x, y);
+	glTexCoord2f(qx, qh);   glVertex2f(x, h);
+	glTexCoord2f(qw, qh);   glVertex2f(w, h);
+	glTexCoord2f(qw, qy);   glVertex2f(w, y);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+}
+
 /**
  * @descr Set the current active texture for multitexturenig. Equivalent to glActiveTexture(GL_TEXTURE0 + i).
  * @group graphics/image
