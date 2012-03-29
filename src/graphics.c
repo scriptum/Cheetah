@@ -494,7 +494,7 @@ void line(double x1, double y1, double x2, double y2) {
  * @descr Draw rectangle. Note, if you bind texture or shader, filled rectangle may be shaded or textured.
  * @group graphics/drawing
  * @var is rectangle filled
- * @see color imageDraw framebufferDraw
+ * @see color rectanglexy imageDraw framebufferDraw
  * */
 void rectangle(bool filled) {
 	if(filled)
@@ -502,10 +502,41 @@ void rectangle(bool filled) {
 	else
 	{
 		glBegin(GL_LINE_LOOP);
-		glVertex2d(0, 0);
-		glVertex2d(1, 0);
-		glVertex2d(1, 1);
-		glVertex2d(0, 1);
+		glVertex2f(0, 0);
+		glVertex2f(1, 0);
+		glVertex2f(1, 1);
+		glVertex2f(0, 1);
+		glEnd();
+	}
+}
+
+/**
+ * @descr Draw rectangle of given size by given position. Note, if you bind texture or shader, filled rectangle may be shaded or textured.
+ * @group graphics/drawing
+ * @var position of left top corner
+ * @var position of left top corner
+ * @var width of quad
+ * @var height of quad
+ * @var is rectangle filled
+ * @see color rectangle imageDraw framebufferDraw
+ * */
+void rectanglexy(float x, float y, float w, float h, bool filled) {
+	if(filled)
+	{
+		glBegin(GL_QUADS);
+		glVertex2f(x,   y);
+		glVertex2f(x+w, y);
+		glVertex2f(x+w, y+h);
+		glVertex2f(x,   y+h);
+		glEnd();
+	}
+	else
+	{
+		glBegin(GL_LINE_LOOP);
+		glVertex2f(x,   y);
+		glVertex2f(x+w, y);
+		glVertex2f(x+w, y+h);
+		glVertex2f(x,   y+h);
 		glEnd();
 	}
 }
