@@ -172,6 +172,7 @@ void enableTexture2D();
 void disableTexture2D();
 void imageDraw(Image * image);
 void imageDrawq(Image * image, float qx, float qy, float qw, float qh);
+void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
 void activeTexture(int i);
 void deleteImage(Image * ptr);
 void imageFiltering(Image * img, bool enabled);
