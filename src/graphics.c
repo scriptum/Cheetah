@@ -53,7 +53,7 @@ GLuint quadlist, pointlist;
 
 
 /**
- * @descr Create window and init all OpenGL's syuff. You MUST call this before any graphics function, e.g. cheetah.newImage. You may call this function again to resize window, change application title, toggle fullscreen. Other optoins are ignored.
+ * @descr Create window and initialize all OpenGL's stuff. You MUST call this before any graphics function, e.g. cheetah.newImage. You may call this function again to re-size window, change application title, toggle fullscreen. Other options are ignored.
  * @group graphics/window
  * @var application's title shown in titlebar
  * @var width of the window
@@ -170,9 +170,9 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 }
 
 /**
- * @descr Check, if screen exists. Useful if you have windowless version of your application, e.g. server.
+ * @descr Check, if screen exists. Useful if you have windowless version of y our application, e.g. server.
  * @group graphics/window
- * @return true if screen was initialised
+ * @return true if screen was initialized
  * */
 bool isInit() {
 	return screen != NULL;
@@ -245,7 +245,7 @@ void hideCursor() {
 }
 
 /**
- * @descr Enables depth test. Useles, if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_DEPTH_TEST);
+ * @descr Enables depth test. Useless, if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_DEPTH_TEST);
  * @group graphics/drawing
  * @see disableDepthTest
  * */
@@ -254,7 +254,7 @@ void enableDepthTest() {
 }
 
 /**
- * @descr Disables depth test. Useles, if you didn't pass 'd' option to cheetah.init. Equivalent to glDisable(GL_DEPTH_TEST);
+ * @descr Disables depth test. Useless, if you didn't pass 'd' option to cheetah.init. Equivalent to glDisable(GL_DEPTH_TEST);
  * @group graphics/drawing
  * @see enableDepthTest
  * */
@@ -263,7 +263,7 @@ void disableDepthTest() {
 }
 
 /**
- * @descr Enables stencil test. Useles, if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_STENCIL_TEST);
+ * @descr Enables stencil test. Useless, if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_STENCIL_TEST);
  * @group graphics/drawing
  * @see disableStencilTest
  * */
@@ -272,7 +272,7 @@ void enableStencilTest() {
 }
 
 /**
- * @descr Disables stencil test. Useles, if you didn't pass 'd' option to cheetah.init. Equivalent to glDisable(GL_STENCIL_TEST);
+ * @descr Disables stencil test. Useless, if you didn't pass 'd' option to cheetah.init. Equivalent to glDisable(GL_STENCIL_TEST);
  * @group graphics/drawing
  * @see enableStencilTest
  * */
@@ -281,7 +281,7 @@ void disableStencilTest() {
 }
 
 /**
- * @descr Gets the nubmer of milliseconds past from the execution time. Equivalent to SDL_GetTicks();
+ * @descr Gets the number of milliseconds past from the execution time. Equivalent to SDL_GetTicks();
  * @group graphics/timer
  * */
 unsigned int getTicks() {
@@ -376,7 +376,7 @@ void translateObject(double x, double y, double angle, double width, double heig
 }
 
 /**
- * @descr Enable or disable autoscale. Autoscle allows you to draw stuff in the fixed pixel coordinates, and engine automatically translates all coordinates while window resizes. Is you want to control screen size yorself, disable this.
+ * @descr Enable or disable autoscale. Autoscle allows you to draw stuff in the fixed pixel coordinates, and engine automatically translates all coordinates while window re-sized. Is you want to control screen size yourself, disable this.
  * @group graphics/drawing
  * @var enable or disable autoscale
  * */
@@ -585,7 +585,7 @@ double getLineWidth() {
 }
 
 /**
- * @descr Enables or disables lines and points smoothing. Not all patforms support this.
+ * @descr Enables or disables lines and points smoothing. Not all platforms support this.
  * @group graphics/drawing
  * @var enable or disable smoothing
  * @see line point
@@ -665,22 +665,47 @@ void setBlendMode(int mode) {
 	}
 }
 
+/**
+ * @descr Clear screen. Usually used in lQuery.addhook(cheetah.clear). Slow. Do not use it if you have in your game image background.
+ * @group graphics/drawing
+ * @see clearColorDepth clearColorStencil clearDepth clearStencil
+ * */
 void clear() {
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
+/**
+ * @descr Clear screen and depth buffer. Usually used in lQuery.addhook(cheetah.clearColorDepth). Slow.
+ * @group graphics/drawing
+ * @see clear clearColorStencil clearDepth clearStencil
+ * */
 void clearColorDepth() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+/**
+ * @descr Clear screen and stencil buffer. Usually used in lQuery.addhook(cheetah.clearColorStencil). Slow.
+ * @group graphics/drawing
+ * @see clear clearColorDepth clearDepth clearStencil
+ * */
 void clearColorStencil() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
+/**
+ * @descr Clear depth buffer. Usually used in lQuery.addhook(cheetah.clearDepth). Slow.
+ * @group graphics/drawing
+ * @see clear clearColorDepth clearColorStencil clearStencil
+ * */
 void clearDepth() {
 	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
+/**
+ * @descr Clear stencil buffer. Usually used in lQuery.addhook(cheetah.clearStencil). Slow.
+ * @group graphics/drawing
+ * @see clear clearColorDepth clearColorStencil clearDepth
+ * */
 void clearStencil() {
 	glClear(GL_STENCIL_BUFFER_BIT);
 }
@@ -703,68 +728,72 @@ void drawUsingStencil() {
 	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 }
 
-//~ /**
- //~ * @descr Load image from disc with specific optons
- //~ * @group image
- //~ * @var File name
- //~ * @var String of options. Supported options:
- //~ * `n` - use nearest interpolation
- //~ * `m` - generate mip-maps (automatically sets mip-map interpolation)
- //~ * @return Image object
- //~ * */
-//~ Image *newImageOpt(const char *name, const char *options) {
-	//~ Image *ptr;
-	//~ char ch;
-	//~ if(!screen)
-	//~ {
-		//~ myError("Call init function before!");
-		//~ return NULL;
-	//~ }
-	//~ int width, height, channels, repeat = 1;
-	//~ unsigned int tex_id;
-	//~ unsigned char* img;
-	//~ unsigned int file_size;
-	//~ unsigned char * myBuf = loadfile(name, &file_size);
-	//~ img = SOIL_load_image_from_memory(
-				//~ myBuf, sizeof(unsigned char) * file_size,
-				//~ &width, &height, &channels,
-				//~ 0 );
-	//~ if( NULL == img ) {
-		//~ myError("can't load image %s", name);
-		//~ return 0;
-	//~ }
-	//~ tex_id = SOIL_internal_create_OGL_texture(
-			//~ img, width, height, channels,
-			//~ 0, SOIL_FLAG_TEXTURE_REPEATS,
-			//~ GL_TEXTURE_2D, GL_TEXTURE_2D,
-			//~ GL_MAX_TEXTURE_SIZE );
-	//~ 
-	//~ while(*options)
-	//~ {
-		//~ ch = *options;
-		//~ if(ch == 'n') {
-			//~ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			//~ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		//~ }
-		//~ options++;
-	//~ }
-	//~ SOIL_free_image_data( img );
-	//~ ptr = (Image *)malloc(sizeof(Image));
-	//~ ptr->id = tex_id;
-	//~ ptr->w = width;
-	//~ ptr->h = height;
-	//~ return ptr;
-//~ }
-//~ 
-//~ /**
- //~ * @descr Load image from disc
- //~ * @group image
- //~ * @var File name
- //~ * @return Image object
- //~ * */
-//~ Image *newImage(const char *name) {
-	//~ return newImageOpt(name, "");
-//~ }
+#ifdef 0
+
+/**
+ * @descr Load image from disc with specific options
+ * @group graphics/image
+ * @var File name
+ * @var String of options. This is depends on image loading module you use. Supported options:
+ * `n` - use nearest interpolation
+ * `m` - generate mip-maps (automatically sets mip-map interpolation)
+ * @return Image object
+ * */
+Image *newImageOpt(const char *name, const char *options) {
+	Image *ptr;
+	char ch;
+	if(!screen)
+	{
+		myError("Call init function before!");
+		return NULL;
+	}
+	int width, height, channels, repeat = 1;
+	unsigned int tex_id;
+	unsigned char* img;
+	unsigned int file_size;
+	unsigned char * myBuf = loadfile(name, &file_size);
+	img = SOIL_load_image_from_memory(
+				myBuf, sizeof(unsigned char) * file_size,
+				&width, &height, &channels,
+				0 );
+	if( NULL == img ) {
+		myError("can't load image %s", name);
+		return 0;
+	}
+	tex_id = SOIL_internal_create_OGL_texture(
+			img, width, height, channels,
+			0, SOIL_FLAG_TEXTURE_REPEATS,
+			GL_TEXTURE_2D, GL_TEXTURE_2D,
+			GL_MAX_TEXTURE_SIZE );
+	
+	while(*options)
+	{
+		ch = *options;
+		if(ch == 'n') {
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		}
+		options++;
+	}
+	SOIL_free_image_data( img );
+	ptr = (Image *)malloc(sizeof(Image));
+	ptr->id = tex_id;
+	ptr->w = width;
+	ptr->h = height;
+	return ptr;
+}
+
+/**
+ * @descr Load image from disc
+ * @group graphics/image
+ * @var File name
+ * @return Image object
+ * */
+Image *newImage(const char *name) {
+	return newImageOpt(name, "");
+}
+
+#endif
 
 /**
  * @descr Bind Image object. Equivalent to glBindTexture.
@@ -794,6 +823,7 @@ void disableTexture2D() {
 /**
  * @descr Draw while image using 1x1 pixel quad. You may change quad size and position using transformations.
  * @group graphics/image
+ * @var Image object
  * */
 void imageDraw(Image * image) {
 	glBindTexture(GL_TEXTURE_2D, image->id);
@@ -851,7 +881,7 @@ void deleteImage(Image * ptr) {
 }
 
 /**
- * @descr Enable/disable smooth interpolation for image. Disabled filtering useful, if uou want to fit image to pixel matrix. If this image will be scaled and/or rotated you must enable filtering (this is by defaults).
+ * @descr Enable/disable smooth interpolation for image. Disabled filtering useful, if you want to fit image to pixel matrix. If this image will be scaled and/or rotated you must enable filtering (this is by defaults).
  * @group graphics/image
  * @var Image object
  * @var true means that filtering is enabled, false means that filtering is disabled
@@ -903,7 +933,7 @@ int checkFramebufferStatus()
 }
 
 /**
- * @descr Create framebuffer object. Note, that not all video drivers support this. It's recommend to check returning value using cheetah.inPointer and check framebuffer support using chetah.supported.FBO.
+ * @descr Create framebuffer object. Note, that not all video drivers support this. It's recommend to check returning value using cheetah.inPointer and check framebuffer support using cheetah.supported.FBO.
  * @group graphics/framebuffer
  * @var width
  * @var height
