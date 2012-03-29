@@ -581,7 +581,6 @@ double getLineWidth() {
 	double s;
 	glGetDoublev(GL_LINE_WIDTH, &s);
 	return s;
-	glLineWidth(width);
 }
 
 /**
@@ -728,7 +727,7 @@ void drawUsingStencil() {
 	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 }
 
-#ifdef 0
+#if 0
 
 /**
  * @descr Load image from disc.
