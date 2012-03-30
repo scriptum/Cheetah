@@ -214,7 +214,7 @@ void swapBuffers() {
  * @var text to replace the caption
  * @see init
  * */
-void setCaption(const char * text) {
+void caption(const char * text) {
 	SDL_WM_SetCaption(text, text);
 }
 
@@ -382,7 +382,7 @@ void translateObject(double x, double y, double angle, double width, double heig
  * @group graphics/drawing
  * @var enable or disable autoscale
  * */
-void setAutoScale(bool autoScale) {
+void autoScale(bool autoScale) {
 	screenScale.autoScale = autoScale;
 }
 
@@ -481,7 +481,7 @@ void reset() {
  * @var y start
  * @var x end
  * @var y end
- * @see color setLineWidth setSmooth
+ * @see color lineWidth smooth
  * */
 void line(double x1, double y1, double x2, double y2) {
 	glBegin(GL_LINES);
@@ -590,7 +590,7 @@ void circlexy(float x, float y, double rad, double segments, bool filled) {
 /**
  * @descr Draw point.
  * @group graphics/drawing
- * @see color pointxy setPointSize setSmooth getPointSize
+ * @see color pointxy pointSize smooth getPointSize
  * */
 void point() {
 	glCallList(pointlist);
@@ -601,23 +601,12 @@ void point() {
  * @group graphics/drawing
  * @var position
  * @var position
- * @see color point setPointSize setSmooth getPointSize
+ * @see color point pointSize smooth getPointSize
  * */
 void pointxy(float x, float y) {
 	glBegin(GL_POINTS);
 	glVertex2f(x, y);
 	glEnd();
-}
-/**
- * @descr Gets the current point size.
- * @group graphics/drawing
- * @return point size
- * @see point setPointSize
- * */
-double getPointSize() {
-	double s;
-	glGetDoublev(GL_POINT_SIZE, &s);
-	return s;
 }
 
 /**
@@ -626,8 +615,20 @@ double getPointSize() {
  * @var point size
  * @see point getPointSize
  * */
-void setPointSize(float size) {
+void pointSize(float size) {
 	glPointSize(size);
+}
+
+/**
+ * @descr Gets the current point size.
+ * @group graphics/drawing
+ * @return point size
+ * @see point pointSize
+ * */
+double getPointSize() {
+	double s;
+	glGetDoublev(GL_POINT_SIZE, &s);
+	return s;
 }
 
 /**
@@ -636,7 +637,7 @@ void setPointSize(float size) {
  * @var line size
  * @see line getLineWidth
  * */
-void setLineWidth(float width) {
+void lineWidth(float width) {
 	glLineWidth(width);
 }
 
@@ -644,7 +645,7 @@ void setLineWidth(float width) {
  * @descr Gets the line width.
  * @group graphics/drawing
  * @return line size
- * @see line setLineWidth
+ * @see line lineWidth
  * */
 double getLineWidth() {
 	double s;
@@ -658,7 +659,7 @@ double getLineWidth() {
  * @var enable or disable smoothing
  * @see line point
  * */
-void setSmooth(bool smooth) {
+void smooth(bool smooth) {
 	if(smooth) {
 		glEnable(GL_POINT_SMOOTH);
 		glEnable(GL_LINE_SMOOTH);
@@ -690,7 +691,7 @@ void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
  * @var alpha
  * @see clear
  * */
-void setClearColor(float r, float g, float b, float a) {
+void clearColor(float r, float g, float b, float a) {
 	glClearColor(r,g,b,a);
 }
 
@@ -705,7 +706,7 @@ void setClearColor(float r, float g, float b, float a) {
  *  * cheetah.blendScreen - as photoshop blend mode
  *  * cheetah.blendDetail - interesting effect, allows to use gray detail textures
  * */
-void setBlendMode(int mode) {
+void blendMode(int mode) {
 	//~ if(mode == blend_substractive) {
 		//~ glBlendEquation_(GL_FUNC_REVERSE_SUBTRACT);
 		//~ glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -749,7 +750,7 @@ void setBlendMode(int mode) {
  *  * cheetah.GL_MIN
  *  * cheetah.GL_MAX
  * */
-void setBlendEquation(int mode) {
+void blendEquation(int mode) {
 	glBlendEquation_(mode);
 }
 
@@ -776,7 +777,7 @@ void setBlendEquation(int mode) {
  *  * cheetah.GL_DST_ALPHA
  *  * cheetah.GL_ONE_MINUS_DST_ALPHA
  * */
-void setBlendFunc(int sourcefactor, int destinationfactor) {
+void blendFunc(int sourcefactor, int destinationfactor) {
 	glBlendFunc(sourcefactor, destinationfactor);
 }
 
@@ -825,11 +826,11 @@ void clearStencil() {
 	glClear(GL_STENCIL_BUFFER_BIT);
 }
 
-void setStencilFunc(int func, int ref, unsigned int mask) {
+void stencilFunc(int func, int ref, unsigned int mask) {
 	glStencilFunc(func, ref, mask);
 }
 
-void setStencilOp(int fail, int zfail, int zpass) {
+void stencilOp(int fail, int zfail, int zpass) {
 	glStencilOp(fail, zfail, zpass);
 }
 
