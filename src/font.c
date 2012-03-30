@@ -29,6 +29,12 @@ IN THE SOFTWARE.
 
 Font * currentFont;
 
+/**
+ * @descr Create new font.
+ * @group font
+ * @var Image object
+ * @return Font object
+ * */
 Font * newFont(Image * img) {
 	Font *ptr;
 	ptr = new(Font);
@@ -37,6 +43,13 @@ Font * newFont(Image * img) {
 	return ptr;
 }
 
+/**
+ * @descr Calculate width of string.
+ * @group font
+ * @var Font object
+ * @var string 
+ * @return length of string in pixels
+ * */
 float fontWidth(Font *f, register const char *str) {
 	float width = 0;
 	if(*str) do {
