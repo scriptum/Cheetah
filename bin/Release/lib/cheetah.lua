@@ -26,20 +26,22 @@ local ffi = require "ffi"
 
 cheetah = {}
 
-cheetah.getFile = function(filename)
+local C = cheetah
+
+C.getFile = function(filename)
 	local file = assert(io.open(filename))
 	local contents = file:read '*a'
 	file:close()
 	return contents
 end
 
-cheetah.putFile = function(filename, str, writemode)
+C.putFile = function(filename, str, writemode)
 	local file = assert(io.open(filename, writemode or "w"))
 	file:write(str)
 	file:close()
 end
 
-cheetah.fileExists = function(name)
+C.fileExists = function(name)
 	local f = io.open(name, 'r')
 	if f then
 		f:close()
@@ -48,15 +50,14 @@ cheetah.fileExists = function(name)
 	return false
 end
 
-cheetah.appendFile = function(filename, str)
-	cheetah.putFile(filename, str, "wa")
+C.appendFile = function(filename, str)
+	C.putFile(filename, str, "wa")
 end
 
 local archToInt = {x86 = 32, x64 = 64}
 
-cheetah.loadDLL = function(filename)
+C.loadDLL = function(filename)
 	local res
-	print(filename)
 	if ffi.os == "Windows" then
 		res = ffi.load('./bin/win32/' .. filename .. '.dll')
 	elseif ffi.os == "OSX" then
@@ -66,8 +67,8 @@ cheetah.loadDLL = function(filename)
 	end
 	if res then
 		local header = 'lib/'..filename..'.h'
-		if cheetah.fileExists(header) then
-			ffi.cdef(cheetah.getFile(header))
+		if C.fileExists(header) then
+			ffi.cdef(C.getFile(header))
 		end
 		print('Successfully loaded module: '..filename)
 		return res
@@ -76,7 +77,7 @@ cheetah.loadDLL = function(filename)
 		return nil
 	end
 end
-cheetah.module = cheetah.loadDLL
+C.module = C.loadDLL
 
 --stupid win api
 if ffi.os == "Windows" then
@@ -96,14 +97,14 @@ else
 	};]]
 end
 
-ffi.cdef 'void printf(const char * str, ...);'
+ffi.cdef [[
+void printf(const char * str, ...);
+]]
 
-local libcheetah = cheetah.loadDLL 'cheetah'
-
+local libcheetah = C.loadDLL 'cheetah'
 assert(libcheetah, 'Cannot load cheetah library!')
-
 --~ if not libcheetah.initSDL() then print 'Cannot init SDL!' end
---~ libcheetah.init('Cheetah engine', 640, 480, 32, '')
+--~ libcheetah.init('C engine', 640, 480, 32, '')
 
 require "lib.gl"
 --~ 
@@ -115,48 +116,48 @@ local lua_events = {"q","kp","kr","mp","mr","rz"}
 
 local done = 0
 local FPS = 60
-cheetah.FPS = "60"
-cheetah.printFPS = false
+C.FPS = "60"
+C.printFPS = false
 local time = 0
 local lasttime = 0
 
-cheetah.mainLoop = function()
+C.mainLoop = function()
 	while done == 0 do
 		time = libcheetah.getTime()
 		libcheetah.doAutoScale()
-		if cheetah.render then cheetah.render() end
+		if C.render then C.render() end
 		libcheetah.swapBuffers()
 		FPS = (FPS + 1) / (1 + (libcheetah.getTime() - time));
 		if time - lasttime > 0.5 then
 			lasttime = time
-			if cheetah.printFPS then 
-				print(cheetah.FPS)
-				cheetah.setCaption('FPS: ' .. cheetah.FPS)
+			if C.printFPS then 
+				print(C.FPS)
+				C.setCaption('FPS: ' .. C.FPS)
 			end
-			cheetah.FPS = tostring(math.floor(FPS))
+			C.FPS = tostring(math.floor(FPS))
 		end
 	end
 end
 
---first time when you try to load an image this function autoloads SOIL library
-cheetah.newImage = function(name, opt)
-	require 'lib.SOIL'
-	return cheetah.newImage(name, opt)
-end
+--~ --first time when you try to load an image this function autoloads SOIL library
+--~ C.newImage = function(name, opt)
+	--~ require 'lib.SOIL'
+	--~ return C.newImage(name, opt)
+--~ end
 
-cheetah.setColor = function(r,g,b,a)
-	if type(r) == 'table' then
-		libcheetah.color(r[1] or 255, r[2] or 255, r[3] or 255, r[4] or 255)
-	else
-		libcheetah.color(r or 255, g or 255, b or 255, a or 255)
-	end
-end
+--~ C.setColor = function(r,g,b,a)
+	--~ if type(r) == 'table' then
+		--~ libcheetah.color(r[1] or 255, r[2] or 255, r[3] or 255, r[4] or 255)
+	--~ else
+		--~ libcheetah.color(r or 255, g or 255, b or 255, a or 255)
+	--~ end
+--~ end
 
-cheetah.getWindowSize = function()
+C.getWindowSize = function()
 	return libcheetah.getWindowWidth(), libcheetah.getWindowHeight()
 end
 
-cheetah.poll = function()
+C.poll = function()
 	local e = lua_events[libcheetah.getEventType()]
 	local a, b, c
 	if e == 'q' then
@@ -175,16 +176,16 @@ cheetah.poll = function()
 	return e, a, b, c
 end
 
-cheetah.getMousePos = function()
+C.getMousePos = function()
 	return libcheetah.getMouseX(), libcheetah.getMouseY()
 end
 
-cheetah.getFps = function()
+C.getFps = function()
 	return FPS
 end
 
 local uniforms = {}
-cheetah.newShader = function(ver, frag)
+C.newShader = function(ver, frag)
 	local shader, str
 	if frag then
 		shader = libcheetah.newVertexFragmentShader(ver, frag)
@@ -212,7 +213,7 @@ cheetah.newShader = function(ver, frag)
 	return shader
 end
 
-cheetah.drawMultitexture = function(...)
+C.drawMultitexture = function(...)
 	if #arg < 2 then
 		libcheetah.myError 'drawMultitexture: pass at least 2 images.'
 	end
@@ -226,11 +227,11 @@ cheetah.drawMultitexture = function(...)
 	libcheetah.disableTexture2D()
 end
 
-cheetah.fileExt = function(name)
+C.fileExt = function(name)
 	return name:gsub('^.*%.', '')
 end
 
-cheetah.fileName = function(name)
+C.fileName = function(name)
 	return name:gsub('%..*', '')
 end
 
@@ -248,7 +249,7 @@ local _exts = {
 }
 
 --recursive resource loader
-cheetah.resLoader = function(dirname, recursive)
+C.resLoader = function(dirname, recursive)
 	local t = {}
 	if not dirname or type(dirname) ~= 'string' then
 		libcheetah.myError('resLoader: you must specify directory name')
@@ -267,7 +268,7 @@ cheetah.resLoader = function(dirname, recursive)
 		if de.name[0] ~= 46 then
 			--~ print(s)
 			if libcheetah.isDir(s) and recursive then
-				t[n] = cheetah.resLoader(s)
+				t[n] = C.resLoader(s)
 			else
 				ext = s:gsub('^.*%.', '')
 				if _exts.image[ext] then
@@ -275,7 +276,7 @@ cheetah.resLoader = function(dirname, recursive)
 					if t[name] then
 						libcheetah.myError('resLoader: resourse %s already exists (replaced by with %s)', name, n)
 					end
-					t[name] = cheetah.newImage(s)
+					t[name] = C.newImage(s)
 				end
 			end
 		end
@@ -285,7 +286,7 @@ cheetah.resLoader = function(dirname, recursive)
 end
 
 --exec func for each file in directory
-cheetah.fileEach = function(dirname, func)
+C.fileEach = function(dirname, func)
 	if not dirname or type(dirname) ~= 'string' then
 		libcheetah.myError('fileEach: you must specify directory name')
 		return
@@ -308,7 +309,7 @@ cheetah.fileEach = function(dirname, func)
 	return t
 end
 
-setmetatable(cheetah, { __index = libcheetah})
+setmetatable(C, { __index = libcheetah})
 
 ffi.metatype('Image', {
 	__index = {
@@ -318,20 +319,51 @@ ffi.metatype('Image', {
 	__gc = libcheetah.deleteImage
 })
 
+local fntpat = '^(%d+)'..string.rep('%s(%d+)', 8)
+
+C.fonts = {}
+local fontTextures = {}
+C.newFont = function(name, scalable, codepage)
+	local a, b, c, font, img, c, x, y, cw, ch, cx, cy, w, h, n
+	local millis = C.getTicks()
+	local glyphs = 0
+	for line in io.lines(name) do
+		a = line:match('^textures: (.+)')
+		if a then
+			n = name:gsub('[^/]+$', a)
+			img = C.newImageOpt(n, 'i'..(scalable and '' or 'n'))
+			table.insert(fontTextures, img)
+		else
+			a, b, c = line:match('^([%w ]+) (%d+)(p[tx])$')
+			if a then
+				if c == 'px' then b = math.ceil(b * 72 / 96) end
+				font = ffi.new('Font')
+				font.image = img
+				font.scale = 1
+				font.scalable = scalable or false
+				if not C.fonts[a] then C.fonts[a] = {} end
+				C.fonts[a][tonumber(b)] = font
+			else
+				c,x,y,cw,ch,cx,cy,w,h = line:match(fntpat)
+				if c then
+					libcheetah.fontSetGlyph(font,tonumber(c),tonumber(x),tonumber(y),tonumber(cw),tonumber(ch),tonumber(cx),tonumber(cy),tonumber(w),tonumber(h))
+					glyphs = glyphs + 1
+				end
+			end
+		end
+	end
+	print('Loaded font '..name..' ('..glyphs..' glyphs) in '..(C.getTicks()-millis)..' ms')
+end
+
 ffi.metatype('Font', {
 	__index = {
-		setGlyph = libcheetah.fontSetGlyph, 
-		select = libcheetah.fontSelect,
-		print = function(font, text, width, align)
-			font:select()
-			libcheetah.fontPrint(text, width or 10000, align or 1)
-		end,
-		printf = function(font, text, width, align)
-			font:select()
-			libcheetah.fontPrintf(text, width, align or 1)
+		print = function(font, text, x, y, width, align)
+			--~ font:select()
+			--~ size = math.ceil(size*libcheetah.screenScale.scaleX)
+			libcheetah.fontPrintf(font, text, x or 0, y or 0, width or 0, align or 0)
 		end
 	},
-	__gc = libcheetah.deleteFont
+	--~ __gc = libcheetah.deleteFont
 })
 
 ffi.metatype('Framebuffer', {
@@ -349,7 +381,7 @@ ffi.metatype('Shader', {
 		bind = libcheetah.useShader,
 		unbind = function()libcheetah.disableShader()end,
 		--this method allows you to send uniforms to shader without thinking about its types
-		--type of uniform is detecting in cheetah.newShader
+		--type of uniform is detecting in C.newShader
 		set = function(shader, name, a, b, c, d)
 			local buf = uniforms[shader.id][name]
 			if buf and buf[1] >= 0 then

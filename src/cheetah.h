@@ -23,6 +23,7 @@ IN THE SOFTWARE.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdarg.h>
 
 #include <SDL.h>
@@ -36,9 +37,29 @@ typedef unsigned char bool;
 unsigned char * loadfile(const char * filename, unsigned int * length);
 SDL_Surface *screen;
 
-#define new(type) (type *)malloc(sizeof(type))
 
-void myError(const char *fmt, ...);
+#define new(data, type, size) do {\
+	if(data){\
+		myError("variable %s already contains data: %x. Delete it before allocating", #data, data);\
+		exit(1);\
+	}\
+	data = (type*)malloc(sizeof(type)*size);\
+	/*initialize memory for small structures*/\
+	if(size == 1) memset(data, 0, sizeof(type));\
+	if(!data) {\
+		myError("cannot allocate %d bytes for %s", sizeof(type)*size, #data);\
+		exit(1);\
+	}\
+} while(0)
+
+#define delete(data) do {\
+	if(data) {\
+		free(data);\
+		data = NULL;\
+	}\
+} while(0)
+
+/*#define new(type) (type *)malloc(sizeof(type))*/
 
 #if 0
 typedef struct SDL_Rect {
@@ -80,16 +101,20 @@ struct {
 
 /*=================================images=====================================*/
 typedef struct Image {
+	char *name;
+	char *options;
 	/* OpenGL texture id */
 	unsigned int id;
 	/* width and height of the original image */
-	unsigned int w, h;
+	int w, h;
+	int channels;
+	int queued;
 } Image;
 
 /*==============================framebuffers==================================*/
 typedef struct Framebuffer {
 	unsigned int id;
-	Image * image;
+	Image *image;
 } Framebuffer;
 
 /*=================================fonts======================================*/
@@ -102,9 +127,10 @@ typedef struct FontChar
 } FontChar;
 
 typedef struct Font {
-	Image * image;
+	Image *image;
 	float scale, height;
-	FontChar chars[256];
+	FontChar chars[255];
+	bool scalable;
 } Font;
 
 
@@ -124,7 +150,7 @@ typedef struct Point3 {
 
 typedef struct Vbo {
 	unsigned int id, count, tex;
-	Point * data;
+	Point *data;
 } Vbo;
 
 enum {
@@ -146,6 +172,15 @@ enum {
 	blendMask,
 };
 
+enum {
+	alignLeft = 1,
+	alignCenter,
+	alignRight,
+	align_left = 1,
+	align_center,
+	align_right
+};
+
 struct {
 	double scaleX, scaleY, offsetX, offsetY;
 	/*оригинальные ширина и высота, относительно которых считаются все координаты*/
@@ -153,5 +188,33 @@ struct {
 	double aspect;
 	bool autoScale, autoScaleFont;
 } screenScale;
+
+typedef struct Resource {
+	Image *image;
+	unsigned char *data;
+	char *name;
+	char *options;
+	int len;
+} Resource;
+
+/*queue*/
+SDL_mutex *resQueueMutex;
+#define QDATA Resource
+	typedef struct node_t node_t, *node, *queue;
+	struct node_t {QDATA val; node prev, next;};
+#define QHEAD(q) q->prev
+#define QTAIL(q) q->next
+#define QEMPTY(q) !QHEAD(q)
+inline queue newQueue();
+inline void enqueue(queue q, QDATA n);
+inline int dequeue(queue q, QDATA *val);
+queue resLoaderQueue;
+
+Resource *resShared;
+
+int resLoaderThread(void *unused);
+inline unsigned char * loadImageData(const char *name, int *width, int *height, int *channels);
+
+inline unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels);
 
 #endif //__CHEETAH_H__

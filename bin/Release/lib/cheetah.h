@@ -4,40 +4,22 @@ typedef struct SDL_Rect {
 } SDL_Rect;
 typedef struct __dirstream {
 } DIR;
-//~ typedef struct dirent {
-	//~ unsigned int ino;
-	//~ unsigned int off;
-	//~ unsigned short int reclen;
-	//~ unsigned char type;
-	//~ char name[256];
-//~ } dirent;
-//~ typedef struct lstat {
-	//~ unsigned long int     st_dev;     /* ID of device containing file */
-	//~ unsigned long int     st_ino;     /* inode number */
-	//~ int    st_mode;    /* protection */
-	   //~ st_nlink;   /* number of hard links */
-	 //~ uid_t     st_uid;     /* user ID of owner */
-	 //~ gid_t     st_gid;     /* group ID of owner */
-	 //~ dev_t     st_rdev;    /* device ID (if special file) */
-	 //~ off_t     st_size;    /* total size, in bytes */
-	 //~ blksize_t st_blksize; /* blocksize for file system I/O */
-	 //~ blkcnt_t  st_blocks;  /* number of 512B blocks allocated */
-	 //~ time_t    st_atime;   /* time of last access */
-	 //~ time_t    st_mtime;   /* time of last modification */
-	 //~ time_t    st_ctime;   /* time of last status change */
-//~ } lstat;
 struct {
 	char GLSL, BE, FBO, VBO, MT, PS;
 } supported;
 typedef struct Image {
+	char *name;
+	char *options;
 	/* OpenGL texture id */
 	unsigned int id;
 	/* width and height of the original image */
-	unsigned int w, h;
+	int w, h;
+	int channels;
+	int queued;
 } Image;
 typedef struct Framebuffer {
 	unsigned int id;
-	Image * image;
+	Image *image;
 } Framebuffer;
 typedef struct FontChar
 {
@@ -47,9 +29,10 @@ typedef struct FontChar
 	float w;
 } FontChar;
 typedef struct Font {
-	Image * image;
+	Image *image;
 	float scale, height;
-	FontChar chars[256];
+	FontChar chars[255];
+	bool scalable;
 } Font;
 typedef struct Shader {
 	unsigned int id;
@@ -62,7 +45,7 @@ typedef struct Point3 {
 } Point3;
 typedef struct Vbo {
 	unsigned int id, count, tex;
-	Point * data;
+	Point *data;
 } Vbo;
 enum {
 	blend_alpha,
@@ -82,6 +65,14 @@ enum {
 	blendDifference,
 	blendMask,
 };
+enum {
+	alignLeft = 1,
+	alignCenter,
+	alignRight,
+	align_left = 1,
+	align_center,
+	align_right
+};
 struct {
 	double scaleX, scaleY, offsetX, offsetY;
 	/*оригинальные ширина и высота, относительно которых считаются все координаты*/
@@ -89,6 +80,13 @@ struct {
 	double aspect;
 	bool autoScale, autoScaleFont;
 } screenScale;
+typedef struct Resource {
+	Image *image;
+	unsigned char *data;
+	char *name;
+	char *options;
+	int len;
+} Resource;
 unsigned int getEventType();
 unsigned int getEventKey();
 unsigned int getEventKeyUnicode();
@@ -113,9 +111,7 @@ bool mkDir(const char * path);
 Font * newFont(Image * img);
 float fontWidth(Font *f, register const char *str);
 float fontHeight(Font *font);
-void fontPrint(register const char * str, int maxw, int align);
-void fontPrintf(register const char * str, float maxw, int align);
-void fontSelect(Font *font);
+void fontPrintf(Font *currentFont, register const char * str, float x, float y, float maxw, int align);
 void fontScale(Font *font, float scale);
 void fontSetGlyph(Font *ptr, unsigned int ch, float x1, float y1, float x2, float y2, float cx1, float cy1, float w, float h);
 void deleteFont(Font * ptr);
@@ -125,7 +121,7 @@ bool isInit();
 int getWindowWidth();
 int getWindowHeight();
 void swapBuffers();
-void setCaption(const char * text);
+void caption(const char * text);
 SDL_Rect ** getModes();
 void showCursor();
 void hideCursor();
@@ -141,7 +137,7 @@ void move(double translateX, double translateY);
 void scale(double scaleX, double scaleY);
 void rotate(double angle);
 void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y);
-void setAutoScale(bool autoScale);
+void autoScale(bool autoScale);
 void doAutoScale();
 void blend(bool blend);
 void enableBlend();
@@ -156,28 +152,29 @@ void circle(double rad, double segments, bool filled);
 void circlexy(float x, float y, double rad, double segments, bool filled);
 void point();
 void pointxy(float x, float y);
+void pointSize(float size);
 double getPointSize();
-void setPointSize(float size);
-void setLineWidth(float width);
+void lineWidth(float width);
 double getLineWidth();
-void setSmooth(bool smooth);
+void smooth(bool smooth);
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
-void setClearColor(float r, float g, float b, float a);
-void setBlendMode(int mode);
-void setBlendEquation(int mode);
-void setBlendFunc(int sourcefactor, int destinationfactor);
+void colorf(float r, float g, float b, float a);
+void clearColor(float r, float g, float b, float a);
+void blendMode(int mode);
+void blendEquation(int mode);
+void blendFunc(int sourcefactor, int destinationfactor);
 void clear();
 void clearColorDepth();
 void clearColorStencil();
 void clearDepth();
 void clearStencil();
-void setStencilFunc(int func, int ref, unsigned int mask);
-void setStencilOp(int fail, int zfail, int zpass);
+void stencilFunc(int func, int ref, unsigned int mask);
+void stencilOp(int fail, int zfail, int zpass);
 void drawToStencil();
 void drawUsingStencil();
-Image *newImage(const char *name);
 Image *newImageOpt(const char *name, const char *options);
-void imageBind(Image * image);
+Image *newImage(const char *name);
+inline void imageBind(Image * image);
 void enableTexture2D();
 void disableTexture2D();
 void imageDraw(Image * image);
