@@ -14,7 +14,7 @@ ifeq ($(CONFIG),Release)
   OBJDIR := obj/Release
   OUTDIR := bin/Release
   CPPFLAGS := $(DEPFLAGS) -I "inc"
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g -Os -fomit-frame-pointer
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g -O3 -fomit-frame-pointer
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s -L"lib" -lSDL -lSDLmain -lGL
   LDDEPS :=
@@ -29,13 +29,17 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/graphics.o \
 	$(OBJDIR)/render.o \
 	$(OBJDIR)/event.o \
 	$(OBJDIR)/filesystem.o \
-	$(OBJDIR)/font.o \
 	$(OBJDIR)/thread.o \
 	$(OBJDIR)/shader.o \
+	$(OBJDIR)/font.o \
+	$(OBJDIR)/graphics.o \
+	$(OBJDIR)/SOIL.o \
+	$(OBJDIR)/stb_image_aug.o \
+	$(OBJDIR)/image_DXT.o \
+	$(OBJDIR)/image_helper.o \
 
 MKDIR_TYPE := msdos
 CMD := $(subst \,\\,$(ComSpec)$(COMSPEC))
@@ -78,11 +82,6 @@ else
 	-@if exist $(subst /,\,$(OBJDIR)) rmdir /s /q $(subst /,\,$(OBJDIR))
 endif
 
-$(OBJDIR)/graphics.o: src/graphics.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
 $(OBJDIR)/render.o: src/render.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
@@ -98,17 +97,42 @@ $(OBJDIR)/filesystem.o: src/filesystem.c
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/font.o: src/font.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
 $(OBJDIR)/thread.o: src/thread.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/shader.o: src/shader.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/font.o: src/font.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/graphics.o: src/graphics.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/SOIL.o: src/SOIL/SOIL.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/stb_image_aug.o: src/SOIL/stb_image_aug.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/image_DXT.o: src/SOIL/image_DXT.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/image_helper.o: src/SOIL/image_helper.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"

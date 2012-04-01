@@ -27,7 +27,7 @@ IN THE SOFTWARE.
 
 #define NO_VBO
 
-Font * currentFont;
+//~ Font * currentFont;
 
 /**
  * @descr Create new font.
@@ -37,7 +37,7 @@ Font * currentFont;
  * */
 Font * newFont(Image * img) {
 	Font *ptr;
-	ptr = new(Font);
+	new(ptr, Font, 1);
 	ptr->image = img;
 	ptr->scale = 1.0f;
 	return ptr;
@@ -64,13 +64,22 @@ float fontWidth(Font *f, register const char *str) {
 	return width * f->scale;
 }
 
+/**
+ * @descr Calculate height of string.
+ * @group font
+ * @var Font object
+ * @return font height (pixels)
+ * */
 float fontHeight(Font *font) {
 	return font->height * font->scale;
 }
 
-#define ALIGN(width) if(align == 0) \
+#define ALIGN(width) do { \
+	if(align == alignCenter) \
 	glTranslatef(floor((maxw - width)*0.5), 0, 0);\
-	else if(align == 1) glTranslatef(floor((maxw - width)), 0, 0);
+	else if(align == alignRight) glTranslatef(floor((maxw - width)), 0, 0); \
+} while(0);
+
 #ifdef NO_VBO
 #define DRAW_CHAR glCallList(ch->vertex);
 #else
@@ -99,129 +108,154 @@ float Font_Width(Font *f, register const char *str)
 	return width * f->scale;
 }
 
-void fontPrint(register const char * str, int maxw, int align) {
-	float w;
-	unsigned char c;
-	FontChar *ch;
-	if(!currentFont) return myError("Call <yourfont>:select() first!");
-	w = 0;
-	ALIGN(Font_Width(currentFont, str))
-	
-	glPushMatrix();
-	glScalef(currentFont->scale / screenScale.scaleX, currentFont->scale / screenScale.scaleY, 1);
-	//~ glScalef(currentFont->scale, currentFont->scale, 1);
-	
-	glBindTexture(GL_TEXTURE_2D, currentFont->image->id);
-	glEnable(GL_TEXTURE_2D);
-	#ifndef NO_VBO
-	glEnableClientState(GL_VERTEX_ARRAY); 
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY); 
-	#endif
-	if(*str)
-	do {
-		switch(*str) {
-			case '\n':
-				glTranslatef(-w, currentFont->height, 0);
-				w = 0;
-				continue;
-			case '\t':
-				glTranslatef(currentFont->chars[32].w * 8, 0, 0);
-				w += currentFont->chars[32].w * 8;
-				continue;
-    }
-		ch = &currentFont->chars[(unsigned char)*str];
-		DRAW_CHAR
-		glTranslatef(ch->w, 0, 0);
-		w += ch->w;
-	} while(*++str);
-	glPopMatrix();
-	glDisable(GL_TEXTURE_2D);
-	#ifndef NO_VBO
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	#endif
-}
+//~ void fontPrint(Font *currentFont, register const char * str, float x, float y, int maxw, int align) {
+	//~ float w;
+	//~ unsigned char c;
+	//~ FontChar *ch;
+	//~ w = 0;
+	//~ glPushMatrix();
+	//~ glTranslatef(x, y, 0);
+	//~ if(align) ALIGN(Font_Width(currentFont, str))
+	//~ if(!currentFont->scalable)
+		//~ if(screenScale.scaleX != 1.0)
+			//~ glScalef(1.0 / screenScale.scaleX, 1.0 / screenScale.scaleY, 1);
+	//~ else
+		//~ glScalef(currentFont->scale, currentFont->scale, 1);
+	//~ 
+	//~ glBindTexture(GL_TEXTURE_2D, currentFont->image->id);
+	//~ glEnable(GL_TEXTURE_2D);
+	//~ #ifndef NO_VBO
+	//~ glEnableClientState(GL_VERTEX_ARRAY); 
+	//~ glEnableClientState(GL_TEXTURE_COORD_ARRAY); 
+	//~ #endif
+	//~ if(*str)
+	//~ do {
+		//~ switch(*str) {
+			//~ case '\n':
+				//~ glTranslatef(-w, currentFont->height, 0);
+				//~ w = 0;
+				//~ continue;
+			//~ case '\t':
+				//~ glTranslatef(currentFont->chars[32].w * 8, 0, 0);
+				//~ w += currentFont->chars[32].w * 8;
+				//~ continue;
+    //~ }
+		//~ ch = &currentFont->chars[(unsigned char)*str];
+		//~ DRAW_CHAR
+		//~ glTranslatef(ch->w, 0, 0);
+		//~ w += ch->w;
+	//~ } while(*++str);
+	//~ glPopMatrix();
+	//~ glDisable(GL_TEXTURE_2D);
+	//~ #ifndef NO_VBO
+	//~ glDisableClientState(GL_VERTEX_ARRAY);
+	//~ glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	//~ #endif
+//~ }
 
 #define PRINT_LINES(A,B) \
-while(str[i]) {\
-    c = (unsigned char)str[i];\
-    switch(c)\
-    {\
-        case '\t':\
-            w += currentFont->chars[32].w * 8;\
-            last_space = i;\
-            break;\
-        case ' ':\
-            last_space = i;\
-        default:\
-            w += currentFont->chars[c].w;\
-    }\
-    if(w > maxw || c == '\n')\
-    {\
-        if(!last_space || c == '\n') last_space = i;\
-        A\
-        i = last_space;\
-        buf = last_space + 1;\
-        last_space = 0;\
-        w = 0;\
-    }\
-    i++;\
-}\
-B
+do { \
+	while(str[i]) {\
+			c = (unsigned char)str[i];\
+			switch(c)\
+			{\
+					case '\t':\
+							w += currentFont->chars[32].w * 8;\
+							last_space = i;\
+							break;\
+					case ' ':\
+							last_space = i;\
+					default:\
+							w += currentFont->chars[c].w;\
+			}\
+			if(w > maxw || c == '\n')\
+			{\
+					if(!last_space || c == '\n') last_space = i;\
+					A\
+					i = last_space;\
+					buf = last_space + 1;\
+					last_space = 0;\
+					w = 0;\
+			}\
+			i++;\
+	}\
+	B\
+} while(0);
 
-void fontPrintf(register const char * str, float maxw, int align) {
+void fontPrintf(Font *currentFont, register const char * str, float x, float y, float maxw, int align) {
 	FontChar *ch;
 	int i = 0, last_space = 0, buf = 0;
 	float w = 0;
 	unsigned char c;
-	if(!currentFont) myError("Call <yourfont>:select() first!");
+	bool scaled = screenScale.scaleX != 1.0;
 	maxw = maxw / currentFont->scale * screenScale.scaleX;
 	glPushMatrix();
-	glScalef(currentFont->scale / screenScale.scaleX, currentFont->scale / screenScale.scaleY, 1);
-	//~ glScalef(currentFont->scale, currentFont->scale, 1);
-
-	glBindTexture(GL_TEXTURE_2D, currentFont->image->id);
-	glEnable(GL_TEXTURE_2D);
-	#ifndef NO_VBO
-	glEnableClientState(GL_VERTEX_ARRAY); 
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	#endif
-	PRINT_LINES(
-		ALIGN(w)
-		w = 0;
-		while(buf < last_space) {
-			c = (unsigned char)str[buf];
-			if(c == '\t') {
-					glTranslatef(currentFont->chars[32].w * 8, 0, 0);
-					w += currentFont->chars[32].w * 8;
-					continue;
-			}
-			ch = &currentFont->chars[c];
-			DRAW_CHAR
-			glTranslatef(ch->w, 0, 0);
-			w += ch->w;
-			buf++;
+	if(!currentFont->scalable)
+		if(scaled)
+		{
+			glScalef(1.0 / screenScale.scaleX, 1.0 / screenScale.scaleY, 1);
+			glTranslatef(floor(x * screenScale.scaleX), floor(y * screenScale.scaleY), 0);
 		}
-		glTranslatef(-w, currentFont->height, 0);
-	,
-    ALIGN(w)
-		while(buf < i) {
-			c = (unsigned char)str[buf];
-			if(c == '\t') {
-				glTranslatef(currentFont->chars[32].w * 8, 0, 0);
-				continue;
+		else glTranslatef(floor(x), floor(y), 0);
+	else
+	{
+		glScalef(currentFont->scale, currentFont->scale, 1);
+		glTranslatef(x, y, 0);
+	}
+
+	imageBind(currentFont->image);
+	glEnable(GL_TEXTURE_2D);
+	if(maxw > .0)
+		PRINT_LINES(
+			ALIGN(w)
+			w = 0;
+			while(buf < last_space) {
+				c = (unsigned char)str[buf];
+				if(c == '\t') {
+						glTranslatef(currentFont->chars[32].w * 8, 0, 0);
+						w += currentFont->chars[32].w * 8;
+						continue;
+				}
+				ch = &currentFont->chars[c];
+				DRAW_CHAR
+				glTranslatef(ch->w, 0, 0);
+				w += ch->w;
+				buf++;
 			}
-			ch = &currentFont->chars[c];
-			DRAW_CHAR
-			glTranslatef(ch->w, 0, 0);
-			buf++;
-	})
+			glTranslatef(-w, currentFont->height, 0);
+		,
+			ALIGN(w)
+			while(buf < i) {
+				c = (unsigned char)str[buf];
+				if(c == '\t') {
+					glTranslatef(currentFont->chars[32].w * 8, 0, 0);
+					continue;
+				}
+				ch = &currentFont->chars[c];
+				DRAW_CHAR
+				glTranslatef(ch->w, 0, 0);
+				buf++;
+		})
+	else
+		if(*str)
+			do {
+				switch(*str) {
+					case '\n':
+						glTranslatef(-w, currentFont->height, 0);
+						w = 0;
+						continue;
+					case '\t':
+						glTranslatef(currentFont->chars[32].w * 8, 0, 0);
+						w += currentFont->chars[32].w * 8;
+						continue;
+				}
+				ch = &currentFont->chars[(unsigned char)*str];
+				DRAW_CHAR
+				glTranslatef(ch->w, 0, 0);
+				w += ch->w;
+			} while(*++str);
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-	#ifndef NO_VBO
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	#endif
 }
 
 //~ static int Font_stringToLines() {
@@ -245,9 +279,9 @@ void fontPrintf(register const char * str, float maxw, int align) {
     //~ return 1;
 //~ }
 
-void fontSelect(Font *font) {
-	currentFont = font;
-}
+//~ void fontSelect(Font *font) {
+	//~ currentFont = font;
+//~ }
 
 void fontScale(Font *font, float scale) {
 	font->scale = scale;
@@ -288,7 +322,7 @@ void fontSetGlyph(Font *ptr, unsigned int ch, float x1, float y1, float x2, floa
 void deleteFont(Font * ptr) {
 	if(ptr) {
 		glDeleteTextures(1, &ptr->image->id);
-		free(ptr->image);
+		delete(ptr->image);
 	}
 	else myError("Trying to free a null-font. Maybe, you did it manually?");
 }

@@ -22,8 +22,9 @@ IN THE SOFTWARE.
 *******************************************************************************/
 
 #include <math.h>
+#include <string.h>
 #include "cheetah.h"
-//~ #include "SOIL/SOIL.h"
+#include "SOIL/SOIL.h"
 #include "render.h"
 //~ void stackdumper(int param)
 //~ {
@@ -49,8 +50,7 @@ void colorMask(bool r, bool g, bool b, bool a) {
 }
 //~ #endif
 
-GLuint quadlist, pointlist;
-
+GLuint quadlist, pointlist, null_texture;
 
 /**
  * @descr Create window and initialize all OpenGL's stuff. You MUST call this before any graphics function, e.g. cheetah.newImage. You may call this function again to re-size window, change application title, toggle fullscreen. Other options are ignored.
@@ -61,7 +61,8 @@ GLuint quadlist, pointlist;
  * @var bits per pixel (8, 16, 32, usually 32)
  * @var string of options. Supported options:
  *  * _f_ - fullscreen
- *  * _r_ - allow to resize window
+ *  * _r_ - allow to re-size window
+ *  * _l_ - use delayed resource loader
  *  * _v_ - enable vertical sync (recommend)
  *  * _d_ - enable depth buffer (usually 2D apps do not need this)
  *  * _s_ - enable stencil buffer (usually 2D apps do not need this)
@@ -74,22 +75,22 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 	bool firstrun = 0;
 	bool depth = 0;
 	bool stencil = 0;
+	bool loader = 0;
 	char ch;
 	Uint32 flags = SDL_OPENGL;
-
+	
+	
 	while(*attr)
 	{
 		ch = *attr;
-		//~ printf("%d %d\n", ch, 'v');
 		if(ch == 'f') fullscreen = 1;
 		if(ch == 'r') resizable = 1;
 		if(ch == 'v') vsync = 1;
 		if(ch == 'd') depth = 1;
 		if(ch == 's') stencil = 1;
-		//if(ch == 'm') flags |= SDL_WINDOW_MAXIMIZED;
+		if(ch == 'l') loader = 1;
 		attr++;
 	}
-//~ printf("%d %d\n", vsync, 'v');
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
 	} else if (resizable) {
@@ -100,7 +101,7 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 	if(height < 1) height = 1;
 	
 	if (screen == NULL) {
-		if ( SDL_Init ( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) != 0 )
+		if ( SDL_Init ( SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER ) != 0 )
 			return 0;
 		atexit(SDL_Quit);
 		SDL_EnableUNICODE(1);
@@ -140,6 +141,17 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		glDisable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		glDisable(GL_DEPTH_TEST);
+		resLoaderQueue = NULL;
+		if(loader)
+		{
+			resLoaderQueue = newQueue();
+			resQueueMutex = SDL_CreateMutex();
+			resShared = 0;
+			SDL_CreateThread(resLoaderThread, (void *)NULL);
+			glGenTextures(1, &null_texture);
+			glBindTexture(GL_TEXTURE_2D, null_texture);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, "\0\0\0\0");
+		}
 	}
 
 	glViewport(0, 0, width, height);
@@ -670,16 +682,29 @@ void smooth(bool smooth) {
 }
 
 /**
- * @descr Sets the color. Faster than setColor.
+ * @descr Sets the color.
  * @group graphics/drawing
- * @var red
- * @var green
- * @var blue
- * @var alpha
- * @see setColor
+ * @var red (0 - 255)
+ * @var green (0 - 255)
+ * @var blue (0 - 255)
+ * @var alpha (0 - 255)
+ * @see colorf
  * */
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
 	glColor4ub(r,g,b,a);
+}
+
+/**
+ * @descr Sets the color, float.
+ * @group graphics/drawing
+ * @var red (0 - 1) float
+ * @var green (0 - 1) float
+ * @var blue (0 - 1) float
+ * @var alpha (0 - 1) float
+ * @see colorf
+ * */
+void colorf(float r, float g, float b, float a) {
+	glColor4f(r,g,b,a);
 }
 
 /**
@@ -703,41 +728,34 @@ void clearColor(float r, float g, float b, float a) {
  *  * cheetah.blendMultiplicative
  *  * cheetah.blendAdditive
  *  * cheetah.blendSubstractive
+ *  * cheetah.blendMask - render inverse alpha channel
  *  * cheetah.blendScreen - as photoshop blend mode
  *  * cheetah.blendDetail - interesting effect, allows to use gray detail textures
  * */
 void blendMode(int mode) {
-	//~ if(mode == blend_substractive) {
-		//~ glBlendEquation_(GL_FUNC_REVERSE_SUBTRACT);
-		//~ glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//~ }
-	//~ else
-	//~ {
-		//~ glBlendEquation_(GL_FUNC_ADD);
-		switch(mode) {
-			case blend_alpha:
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				break;
-			case blend_multiplicative:
-				glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-				break;
-			case blend_additive:
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-				break;
-			case blend_screen:
-				glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
-				break;
-			case blend_substractive:
-				glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
-				break;
-			case blend_detail:
-				glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
-				break;
-			case blend_mask:
-				glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
-				break;
-		}
-	//~ }
+	switch(mode) {
+		case blend_alpha:
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			break;
+		case blend_multiplicative:
+			glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+			break;
+		case blend_additive:
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			break;
+		case blend_screen:
+			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+			break;
+		case blend_substractive:
+			glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
+			break;
+		case blend_detail:
+			glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
+			break;
+		case blend_mask:
+			glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
+			break;
+	}
 }
 
 /**
@@ -844,7 +862,104 @@ void drawUsingStencil() {
 	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 }
 
-#if 0
+//~ #if 0
+
+
+inline unsigned char * loadImageData(const char *name, int *width, int *height, int *channels)
+{
+	unsigned int file_size;
+	unsigned char *img;
+	unsigned char *myBuf;
+	myBuf = loadfile(name, &file_size);
+	img = SOIL_load_image_from_memory(
+				myBuf, sizeof(unsigned char) * file_size,
+				width, height, channels,
+				0 );
+	delete(myBuf);
+	return img;
+}
+
+inline unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels)
+{
+	unsigned int tex_id;
+	tex_id = SOIL_internal_create_OGL_texture(
+			img, width, height, channels,
+			0, SOIL_FLAG_TEXTURE_REPEATS,
+			GL_TEXTURE_2D, GL_TEXTURE_2D,
+			GL_MAX_TEXTURE_SIZE);
+	//~ 
+	while(*options)
+	{
+		if(*options == 'n') {
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		}
+		options++;
+	}
+	SOIL_free_image_data(img);
+	return tex_id;
+}
+
+/**
+ * @descr Load image from disc with specific options.
+ * @group graphics/image
+ * @var file name
+ * @var string of options. This is depends on image loading module you use. Supported options:
+ *  * _n_ - use nearest interpolation
+ *  * _m_ - generate mip-maps (automatically sets mip-map interpolation)
+ *  * _i_ - load instantly without delayed resource loader
+ * @return Image object
+ * */
+Image *newImageOpt(const char *name, const char *options) {
+	Image *ptr;
+	char ch;
+	int width, height, channels, repeat = 1, instant = 0;
+	unsigned int tex_id;
+	unsigned char *img;
+	unsigned char *myBuf;
+	if(!screen)
+	{
+		myError("Call init function before!");
+		return NULL;
+	}
+	while(*options)
+	{
+		if(*options == 'i') {instant = 1; break;}
+		options++;
+	}
+	if(!resLoaderQueue||instant)
+	{
+		img = loadImageData(name, &width, &height, &channels);
+		if(img == NULL)
+		{
+			myError("can't load image %s", name);
+			return 0;
+		}
+		tex_id = loadImageTex(options, img, width, height, channels);
+		new(ptr, Image, 1);
+		ptr->id = tex_id;
+		ptr->w = width;
+		ptr->h = height;
+	}
+	else
+	{
+		new(ptr, Image, 1);
+		//~ printf("%s %d %d\n", name, ptr->name, ptr->options);
+		//~ ptr->options = 0;
+		//~ ptr->name = 0;
+		//~ r.image = ptr;
+		new(ptr->name, char, strlen(name)+1);
+		new(ptr->options, char, strlen(options)+1);
+		memcpy(ptr->name, name, strlen(name)+1);
+		memcpy(ptr->options, options, strlen(options)+1);
+		ptr->id = null_texture;
+		ptr->w = 1;
+		ptr->h = 1;
+		ptr->queued = 0;
+		//~ enqueue(resLoaderQueue, r);
+	}
+	return ptr;
+}
 
 /**
  * @descr Load image from disc.
@@ -856,67 +971,21 @@ Image *newImage(const char *name) {
 	return newImageOpt(name, "");
 }
 
-/**
- * @descr Load image from disc with specific options.
- * @group graphics/image
- * @var file name
- * @var string of options. This is depends on image loading module you use. Supported options:
- *  * _n_ - use nearest interpolation
- *  * _m_ - generate mip-maps (automatically sets mip-map interpolation)
- * @return Image object
- * */
-Image *newImageOpt(const char *name, const char *options) {
-	Image *ptr;
-	char ch;
-	if(!screen)
-	{
-		myError("Call init function before!");
-		return NULL;
-	}
-	int width, height, channels, repeat = 1;
-	unsigned int tex_id;
-	unsigned char* img;
-	unsigned int file_size;
-	unsigned char * myBuf = loadfile(name, &file_size);
-	img = SOIL_load_image_from_memory(
-				myBuf, sizeof(unsigned char) * file_size,
-				&width, &height, &channels,
-				0 );
-	if( NULL == img ) {
-		myError("can't load image %s", name);
-		return 0;
-	}
-	tex_id = SOIL_internal_create_OGL_texture(
-			img, width, height, channels,
-			0, SOIL_FLAG_TEXTURE_REPEATS,
-			GL_TEXTURE_2D, GL_TEXTURE_2D,
-			GL_MAX_TEXTURE_SIZE );
-	
-	while(*options)
-	{
-		ch = *options;
-		if(ch == 'n') {
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		}
-		options++;
-	}
-	SOIL_free_image_data( img );
-	ptr = (Image *)malloc(sizeof(Image));
-	ptr->id = tex_id;
-	ptr->w = width;
-	ptr->h = height;
-	return ptr;
-}
-
-#endif
+//~ #endif
 
 /**
  * @descr Bind Image object. Equivalent to glBindTexture.
  * @group graphics/image
  * @var Image object
  * */
-void imageBind(Image * image) {
+inline void imageBind(Image * image) {
+	if(resLoaderQueue&&image->id==null_texture&&!image->queued)
+	{
+		Resource r;
+		image->queued = 1;
+		r.image = image;
+		enqueue(resLoaderQueue, r);
+	}
 	glBindTexture(GL_TEXTURE_2D, image->id);
 }
 
@@ -942,7 +1011,7 @@ void disableTexture2D() {
  * @var Image object
  * */
 void imageDraw(Image * image) {
-	glBindTexture(GL_TEXTURE_2D, image->id);
+	imageBind(image);
 	glEnable(GL_TEXTURE_2D);
 	glCallList(quadlist);
 	glDisable(GL_TEXTURE_2D);
@@ -959,7 +1028,7 @@ void imageDraw(Image * image) {
  * @var height of texture
  * */
 void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
-	glBindTexture(GL_TEXTURE_2D, image->id);
+	imageBind(image);
 	glEnable(GL_TEXTURE_2D);
 	qx = qx/(float)image->w;
 	qy = qy/(float)image->h;
@@ -990,14 +1059,12 @@ void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
  * @var height of texture
  * */
 void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
-	glBindTexture(GL_TEXTURE_2D, image->id);
+	imageBind(image);
 	glEnable(GL_TEXTURE_2D);
 	qx = qx/(float)image->w;
 	qy = qy/(float)image->h;
 	qw = qw ? qx + qw/(float)image->w : 1;
 	qh = qh ? qy + qh/(float)image->h : 1;
-	glBindTexture(GL_TEXTURE_2D, image->id);
-	glEnable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
 	glTexCoord2f(qx, qy);   glVertex2f(x, y);
 	glTexCoord2f(qx, qh);   glVertex2f(x, y+h);
@@ -1016,11 +1083,11 @@ void activeTexture(int i) {
 	glActiveTexture_(GL_TEXTURE0 + i);
 }
 
-/**
- * @descr Delete image and free memory.
- * @group graphics/image
- * @var Image object
- * */
+//~ /**
+ //~ * @descr Delete image and free memory. 
+ //~ * @group graphics/image
+ //~ * @var Image object
+ //~ * */
 void deleteImage(Image * ptr) {
 	if(ptr)
 		glDeleteTextures(1, &ptr->id);
@@ -1035,7 +1102,7 @@ void deleteImage(Image * ptr) {
  * */
 void imageFiltering(Image * img, bool enabled) {
 	glBindTexture(GL_TEXTURE_2D, img->id);
-	if(enabled)
+	if(!enabled)
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -1146,8 +1213,8 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char
 	//save current fbo
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING_EXT, &current_fbo);
 	
-	ptr = (Image*)malloc(sizeof(Image));
-	fboptr = (Framebuffer*)malloc(sizeof(Framebuffer));
+	new(ptr, Image, 1);
+	new(fboptr, Framebuffer, 1);
 	ptr->w = width;
 	ptr->h = height;
 	//~ GLuint depthbuffer;
@@ -1199,8 +1266,8 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char
 	else {
 		glDeleteTextures(1, &ptr->id);
 		glDeleteFramebuffers_(1, &fboptr->id);
-		free(ptr);
-		free(fboptr);
+		delete(ptr);
+		delete(fboptr);
 		return 0;
 	}
 }
@@ -1267,13 +1334,14 @@ void deleteFramebuffer(Framebuffer * ptr) {
 	if(ptr) {
 		glDeleteTextures(1, &ptr->image->id);
 		glDeleteFramebuffers_(1, &ptr->id);
-		free(ptr->image);
+		delete(ptr->image);
 	}
 	else myError("Trying to free a null-framebuffer. Maybe, you did it manually?");
 }
 
 Vbo * newVbo(Point * data, Point * tex, unsigned int count) {
-	Vbo * ptr = (Vbo*)malloc(sizeof(Vbo));
+	Vbo *ptr;
+	new(ptr, Vbo, 1);
 	ptr->count = count;
 	glGenBuffers_(1, &ptr->id);
 	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
@@ -1299,7 +1367,8 @@ void vboDraw(Vbo * ptr) {
 }
 
 Vbo * newVboPoints(Point * data, unsigned int count) {
-	Vbo * ptr = (Vbo*)malloc(sizeof(Vbo));
+	Vbo *ptr;
+	new(ptr, Vbo, 1);
 	ptr->count = count;
 	int i;
 	if(supported.PS)
@@ -1333,7 +1402,7 @@ Vbo * newVboPoints(Point * data, unsigned int count) {
 void vboDrawSprites(Vbo * ptr, Image * img, float size) {
 	int i;
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, img->id);
+	imageBind(img);
 	if(supported.PS)
 	{
 		glPointSize(size);
@@ -1367,7 +1436,8 @@ void vboDrawSprites(Vbo * ptr, Image * img, float size) {
 }
 
 Vbo * newVboPoints3(Point3 * data, unsigned int count) {
-	Vbo * ptr = (Vbo*)malloc(sizeof(Vbo));
+	Vbo *ptr;
+	new(ptr, Vbo, 1);
 	ptr->count = count;
 	int i;
 	glGenBuffers_(1, &ptr->id);
@@ -1377,7 +1447,7 @@ Vbo * newVboPoints3(Point3 * data, unsigned int count) {
 }
 void vboDrawSprites3(Vbo * ptr, Image * img, float size) {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, img->id);
+	imageBind(img);
 	glPointSize(size);
 	glEnable(GL_POINT_SPRITE);
 	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);

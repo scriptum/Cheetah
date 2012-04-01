@@ -1,3 +1,64 @@
+#include "cheetah.h"
+
+inline queue newQueue()
+{
+	node q = malloc(sizeof(node_t));
+	q->next = q->prev = 0;
+	return q;
+}
+
+inline void enqueue(queue q, QDATA n)
+{
+	//~ printf("%s\n", n.name);
+	node nd = malloc(sizeof(node_t));
+	nd->val = n;
+	if (!QHEAD(q)) QHEAD(q) = nd;
+	nd->prev = QTAIL(q);
+	if (nd->prev) nd->prev->next = nd;
+	QTAIL(q) = nd;
+	nd->next = 0;
+}
+ 
+inline int dequeue(queue q, QDATA *val)
+{
+	node tmp = QHEAD(q);
+	if (!tmp) return 0;
+	*val = tmp->val;
+	QHEAD(q) = tmp->next;
+	if (QTAIL(q) == tmp) QTAIL(q) = 0;
+	free(tmp);
+	return 1;
+}
+
+int resLoaderThread(void *unused)
+{
+	Resource r;
+	SDL_Event e;
+	unsigned char *img;
+	unsigned char *myBuf;
+	while(1){
+		SDL_Delay(5);
+		//~ printf("Queue: %d\n", QEMPTY(resLoaderQueue));
+		if(!QEMPTY(resLoaderQueue)&&!resShared)
+		{
+			//~ printf("Queue: %d\n", QEMPTY(resLoaderQueue));
+			SDL_mutexP(resQueueMutex);
+			dequeue(resLoaderQueue, &r);
+			img = loadImageData(r.image->name, &r.image->w, &r.image->h, &r.image->channels);
+			r.data = img;
+			//~ printf("%s\n", r.data);
+			resShared = &r;
+			SDL_Delay(5);
+			//~ new(e, SDL_Event, 1);
+			//~ e.type = SDL_USEREVENT;
+			//~ e.user.code = 0;
+			//~ e.user.data1 = (void*)&r;
+			//~ SDL_PushEvent(&e);
+		}
+	}
+}
+
+
 //~ #include "Main.h"
 //~ 
 //~ #include "Macros.h"

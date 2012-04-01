@@ -27,6 +27,16 @@ IN THE SOFTWARE.
 SDL_Event event;
 
 unsigned int getEventType() {
+	Resource * r;
+	if(resShared) {
+		r = resShared;
+		//~ printf("Get image %s %d\n", r->image->name, r->image->id);
+		r->image->id = loadImageTex(r->image->options, r->data, r->image->w, r->image->h, r->image->channels);
+		printf("Get image %s  %d\n", r->image->name, r->image->id);
+		delete(r->image->name);
+		delete(r->image->options);
+		resShared = 0;
+	}
 	//В общем, тут идет дохрена ненужных нам событий (в основном mousemove), которые могут тормозить игру, их нужно пропускать.
 	while(SDL_PollEvent(&event)) {
 		//printf("%d\n", event.type);
@@ -65,6 +75,11 @@ unsigned int getEventType() {
 			case SDL_JOYHATMOTION:
 			case SDL_JOYBUTTONDOWN:
 			case SDL_JOYBUTTONUP: return 9;
+			case SDL_USEREVENT: {
+				//~ SDL_mutexP(resQueueMutex);
+				
+				//~ return 0;
+			}
 		}
 	}
 	return 0;

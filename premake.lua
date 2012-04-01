@@ -3,16 +3,16 @@ package.kind = "dll"
 package.language = "c"
 package.files = { 
 	matchfiles(
-		"src/*.h", "src/*.c"
-		--~ "src/SOIL/*.h", 
-		--~ "src/SOIL/*.c"
+		"src/*.h", "src/*.c",
+		"src/SOIL/*.h", 
+		"src/SOIL/*.c"
 		--~ "Graphics/*.h", 
 		--~ "Graphics/*.c"
 		)
 }
 project.configs = {"Release"}
 project.config["Release"].bindir = "bin/Release"
-package.buildflags = {"optimize-size", "no-frame-pointer"}
+package.buildflags = {"optimize-speed", "no-frame-pointer"}
 package.libpaths = {"lib"}
 package.includepaths = {
 	--~ "thirdparty/LuaJIT/src", 

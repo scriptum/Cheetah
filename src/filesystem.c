@@ -35,6 +35,7 @@ void myError(const char *fmt, ...) {
 	va_end(args);
 }
 
+
 bool isPointer(void * ptr) {
 	return ptr != NULL;
 }
@@ -50,7 +51,7 @@ unsigned char * loadfile(const char * filename, unsigned int * length) {
 	fseek(f, 0, SEEK_END);
 	size = ftell(f);
 	fseek(f, 0, SEEK_SET);
-	result = (char *)malloc(size);
+	new(result, char, size);
 	if (size != fread(result, sizeof(char), size, f)) {
 		free(result);
 		myError("can't load file %s", filename);

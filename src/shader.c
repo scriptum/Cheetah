@@ -61,10 +61,10 @@ int compile(GLuint shader, const char* name)
 		glGetShaderiv_(shader, GL_INFO_LOG_LENGTH , &blen);       
 		if (blen > 1)
 		{
-			compiler_log = (GLchar*)malloc(blen);
+			new(compiler_log, GLchar, blen);
 			glGetInfoLog_(shader, blen, &slen, compiler_log);
 			myError("Error while compiling shader %s: %s\n", name, compiler_log);
-			free (compiler_log);
+			delete(compiler_log);
 		}
 		return 0;
 	}
@@ -73,12 +73,13 @@ int compile(GLuint shader, const char* name)
 
 Shader * newVertexFragmentShader(const char * ver, const char * pix) {
 	GLuint v, f, p, linked;
+	Shader *ptr;
 	if(!screen)
 	{
 		myError("Call init function before!");
 		return 0;
 	}
-	Shader *ptr = new(Shader);
+	new(ptr, Shader, 1);
 	ptr->id = 0;
 	if(!supported.GLSL)
 	{
