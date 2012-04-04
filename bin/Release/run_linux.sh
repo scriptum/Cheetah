@@ -28,7 +28,12 @@ esac
 
 if [ $1 ]
 then
-	SCRIPT=$1
+	if [ -f $1 ]
+	then
+		SCRIPT=$1
+	else
+		SCRIPT=main.lua
+	fi
 else
 	SCRIPT=main.lua
 fi

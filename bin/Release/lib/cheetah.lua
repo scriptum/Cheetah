@@ -265,18 +265,23 @@ C.resLoader = function(dirname, recursive)
 	while libcheetah.isPointer(de) do
 		n = ffi.string(de.name)
 		s = dirname..'/'..n
-		if de.name[0] ~= 46 then
-			--~ print(s)
+		if de.name[0] ~= 46 then -- .
 			if libcheetah.isDir(s) and recursive then
 				t[n] = C.resLoader(s)
 			else
-				ext = s:gsub('^.*%.', '')
+				name, ext = n:match('^(.*)%.([^.]+)$')
 				if _exts.image[ext] then
-					name = n:gsub('%..*$','')
 					if t[name] then
 						libcheetah.myError('resLoader: resourse %s already exists (replaced by with %s)', name, n)
 					end
-					t[name] = C.newImage(s)
+					if not C.fileExists(dirname..'/'..name..'.fnt') then
+						t[name] = C.newImage(s)
+						--~ print('Loaded image: ' .. s, C.fileExists(name..'.fnt'), name..'.fnt')
+						
+					end
+				elseif ext == 'fnt' or ext == 'FNT' then
+					C.newFont(s)
+					--~ print('Loaded font: ' .. s)
 				end
 			end
 		end
@@ -311,6 +316,12 @@ end
 
 setmetatable(C, { __index = libcheetah})
 
+C.newImage = function(name, options)
+	local img = ffi.new('Image')
+	libcheetah.newImageOpt(img, name, options or '')
+	return img
+end
+
 ffi.metatype('Image', {
 	__index = {
 		draw = libcheetah.imageDraw,
@@ -331,7 +342,8 @@ C.newFont = function(name, scalable, codepage)
 		a = line:match('^textures: (.+)')
 		if a then
 			n = name:gsub('[^/]+$', a)
-			img = C.newImageOpt(n, 'i'..(scalable and '' or 'n'))
+			img = ffi.new('Image')
+			libcheetah.newImageOpt(img, n, 'i'..(scalable and '' or 'n'))
 			table.insert(fontTextures, img)
 		else
 			a, b, c = line:match('^([%w ]+) (%d+)(p[tx])$')
@@ -352,7 +364,7 @@ C.newFont = function(name, scalable, codepage)
 			end
 		end
 	end
-	print('Loaded font '..name..' ('..glyphs..' glyphs) in '..(C.getTicks()-millis)..' ms')
+	--~ print('Loaded font '..name..' ('..glyphs..' glyphs) in '..(C.getTicks()-millis)..' ms')
 end
 
 ffi.metatype('Font', {
