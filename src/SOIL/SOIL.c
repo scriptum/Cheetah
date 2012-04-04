@@ -155,17 +155,7 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 		int flags,
 		int loading_as_cubemap );
 /*	other functions	*/
-unsigned int
-	SOIL_internal_create_OGL_texture
-	(
-		const unsigned char *const data,
-		int width, int height, int channels,
-		unsigned int reuse_texture_ID,
-		unsigned int flags,
-		unsigned int opengl_texture_type,
-		unsigned int opengl_texture_target,
-		unsigned int texture_check_size_enum
-	);
+
 
 /*	and the code magic begins here [8^)	*/
 unsigned int

@@ -23,10 +23,10 @@ void main(void)
 local img = C.newImage('data/light.png')
 
 C.smooth(false)
-for i=1,50000 do
+for i=1,50 do
 	E:new(screen)
 	:image(img)
-	:move(i%800, math.floor(i/800)):size(1,1)
+	:move(i%800, math.floor(i/800))
 end
 
 E:new(screen):draw(function()
