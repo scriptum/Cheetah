@@ -227,8 +227,9 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		//~ glBindBuffer_(GL_ARRAY_BUFFER_ARB, vboTex);
 		//~ glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*4, (void*)tex, GL_STATIC_DRAW_ARB);
 		//~ glBindBuffer_(GL_ARRAY_BUFFER_ARB, 0);
-		//~ glEnableClientState(GL_VERTEX_ARRAY);
-		//~ glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
 	return 1;
 }
