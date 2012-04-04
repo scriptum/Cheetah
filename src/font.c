@@ -29,19 +29,19 @@ IN THE SOFTWARE.
 
 //~ Font * currentFont;
 
-/**
- * @descr Create new font.
- * @group font
- * @var Image object
- * @return Font object
- * */
-Font * newFont(Image * img) {
-	Font *ptr;
-	new(ptr, Font, 1);
-	ptr->image = img;
-	ptr->scale = 1.0f;
-	return ptr;
-}
+//~ /**
+ //~ * @descr Create new font.
+ //~ * @group font
+ //~ * @var Image object
+ //~ * @return Font object
+ //~ * */
+//~ Font * newFont(Image * img) {
+	//~ Font *ptr;
+	//~ new(ptr, Font, 1);
+	//~ ptr->image = img;
+	//~ ptr->scale = 1.0f;
+	//~ return ptr;
+//~ }
 
 /**
  * @descr Calculate width of string.
@@ -295,8 +295,6 @@ void fontSetGlyph(Font *ptr, unsigned int ch, float x1, float y1, float x2, floa
 	cy2 = cy1 + y2;
 	x2 = x1 + x2 / (float)ptr->image->w;
 	y2 = y1 + y2 / (float)ptr->image->h;
-	float vert[] = {cx1,cy1,cx1,cy2,cx2,cy2,cx2,cy1};
-	float tex[] = {x1,y1,x1,y2,x2,y2,x2,y1};
 	#ifdef NO_VBO
 	ptr->chars[ch].vertex = glGenLists(1);
 	glNewList(ptr->chars[ch].vertex, GL_COMPILE);
@@ -308,6 +306,8 @@ void fontSetGlyph(Font *ptr, unsigned int ch, float x1, float y1, float x2, floa
 	glEnd();
 	glEndList();
 	#else
+	float vert[] = {cx1,cy1,cx1,cy2,cx2,cy2,cx2,cy1};
+	float tex[] = {x1,y1,x1,y2,x2,y2,x2,y1};
 	glGenBuffersARB(1, &ptr->chars[ch].vertex);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, ptr->chars[ch].vertex);
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(vert), vert, GL_STATIC_DRAW_ARB);

@@ -46,12 +46,12 @@ const char * std_vertex_shader = "void main()\
 	//~ return data;
 //~ }
 
-int compile(GLuint shader, const char* name)
+static int compile(GLuint shader, const char* name)
 {
 	GLint compiled;
 	GLint blen = 0;
 	GLsizei slen = 0;
-	GLchar* compiler_log;
+	GLchar *compiler_log = NULL;
 	
 	glCompileShader_(shader);
 
@@ -71,31 +71,31 @@ int compile(GLuint shader, const char* name)
 	return 1;
 }
 
-Shader * newVertexFragmentShader(const char * ver, const char * pix) {
-	GLuint v, f, p, linked;
-	Shader *ptr;
+void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
+	GLuint v, f, p;
+	GLint linked;
 	if(!screen)
 	{
 		myError("Call init function before!");
-		return 0;
+		return;
 	}
-	new(ptr, Shader, 1);
+	//~ new(ptr, Shader, 1);
 	ptr->id = 0;
 	if(!supported.GLSL)
 	{
 		myError("Trying to create shader, but system doesn't support shaders.");
-		return ptr;
+		return;
 	}
 	v = glCreateShaderObject_(GL_VERTEX_SHADER);
 	f = glCreateShaderObject_(GL_FRAGMENT_SHADER);
 	glShaderSource_(v, 1, &ver, NULL);
 	glShaderSource_(f, 1, &pix, NULL);
 	if(!compile(v, "string_shader"))
-		return ptr;
+		return;
 	if(!compile(f, "string_shader"))
 	{
 		glDeleteObject_(v);
-		return ptr;
+		return;
 	}
 	p = glCreateProgramObject_();
 	glAttachObject_(p,v);
@@ -108,20 +108,22 @@ Shader * newVertexFragmentShader(const char * ver, const char * pix) {
 		myError("Error while linking shader\n");
 		glDeleteObject_(v);
 		glDeleteObject_(f);
-		return ptr;
+		return;
 	}
 	glDeleteObject_(v);
 	glDeleteObject_(f);
 	ptr->id = p;
-	return ptr;
 }
 
-Shader * newFragmentShader(const char * str) {
-	return newVertexFragmentShader(std_vertex_shader, str);
+void newFragmentShader(Shader * ptr, const char * frag) {
+	newFragmentVertexShader(ptr, frag, std_vertex_shader);
+}
+
+bool shaderCheck(Shader * ptr) {
+	return ptr->id;
 }
 
 void deleteShader(Shader * ptr) {
-	GLuint p;
 	if(ptr) {
 		if(supported.GLSL && ptr->id)
 			glDeleteObject_(ptr->id);
@@ -129,12 +131,12 @@ void deleteShader(Shader * ptr) {
 	else myError("Trying to free a null-shader. Maybe, you did it manually?");
 }
 
-void useShader(Shader * ptr) {
-	if(supported.GLSL)
+void shaderBind(Shader * ptr) {
+	if(supported.GLSL && ptr->id)
 		glUseProgramObject_(ptr->id);
 }
 
-void disableShader() {
+void shaderUnbind(Shader * ptr) {
 	if(supported.GLSL)
 		glUseProgramObject_(0);
 }

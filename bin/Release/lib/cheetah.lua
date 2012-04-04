@@ -132,7 +132,7 @@ C.mainLoop = function()
 			lasttime = time
 			if C.printFPS then 
 				print(C.FPS)
-				C.setCaption('FPS: ' .. C.FPS)
+				C.caption('FPS: ' .. C.FPS)
 			end
 			C.FPS = tostring(math.floor(FPS))
 		end
@@ -182,35 +182,6 @@ end
 
 C.getFps = function()
 	return FPS
-end
-
-local uniforms = {}
-C.newShader = function(ver, frag)
-	local shader, str
-	if frag then
-		shader = libcheetah.newVertexFragmentShader(ver, frag)
-		str = ver .. frag
-	else
-		shader = libcheetah.newFragmentShader(ver)
-		str = ver
-	end
-	local location, float
-	if shader then
-		uniforms[shader.id] = {}
-		for a, b in string.gmatch(str, "uniform[ \t]+([%a%d]+)[ \t]+([%a%d]+);") do
-			location = libcheetah.GetUniformLocation(shader.id, b)
-			--~ print(b, location)
-			if location then
-				if a == 'float' or a == 'vec2' or a == 'vec3' or a == 'vec4' then
-					float = true
-				else
-					float = false
-				end
-				uniforms[shader.id][b] = {location, float}
-			end
-		end
-	end
-	return shader
 end
 
 C.drawMultitexture = function(...)
@@ -317,15 +288,17 @@ end
 setmetatable(C, { __index = libcheetah})
 
 C.newImage = function(name, options)
-	local img = ffi.new('Image')
-	libcheetah.newImageOpt(img, name, options or '')
-	return img
+	local ptr = ffi.new('Image')
+	libcheetah.newImageOpt(ptr, name, options or '')
+	return ptr
 end
 
 ffi.metatype('Image', {
 	__index = {
 		draw = libcheetah.imageDraw,
+		drawxy = libcheetah.imageDrawxy,
 		drawq = libcheetah.imageDrawq,
+		drawqxy = libcheetah.imageDrawq,
 	}, 
 	__gc = libcheetah.deleteImage
 })
@@ -378,20 +351,67 @@ ffi.metatype('Font', {
 	--~ __gc = libcheetah.deleteFont
 })
 
+C.newFramebuffer = function(w, h, options)
+	local ptr = ffi.new('Framebuffer')
+	libcheetah.newFramebufferOpt(ptr, w, h, options or '')
+	return ptr
+end
+
 ffi.metatype('Framebuffer', {
 	__index = {
-		draw = libcheetah.framebufferDraw,
-		drawq = libcheetah.framebufferDrawq,
+		draw = function(s)
+			s.image:draw()
+		end,
+		drawxy = function(s, x, y)
+			s.image:drawxy(x, y)
+		end,
+		drawq = function(s, qx, qy, qw, qh)
+			s.image:drawq(qx, qy, qw, qh)
+		end,
+		drawqxy = function(s, x, y, w, h, qx, qy, qw, qh)
+			s.image:drawqxy(x, y, w, h, qx, qy, qw, qh)
+		end,
 		bind = libcheetah.framebufferBind,
-		unbind = function()libcheetah.framebufferUnbind()end
+		check = libcheetah.framebufferCheck,
+		unbind = libcheetah.framebufferUnbind
 	},
 	__gc = libcheetah.deleteFramebuffer
 })
 
+local uniforms = {}
+C.newShader = function(fragment, vertex)
+	local str
+	local shader = ffi.new('Shader')
+	if vertex then
+		libcheetah.newFragmentVertexShader(shader, fragment, vertex)
+		str = vertex .. fragment
+	else
+		libcheetah.newFragmentShader(shader, fragment)
+		str = fragment
+	end
+	local location, float
+	if shader:check() then
+		uniforms[shader.id] = {}
+		for a, b in string.gmatch(str, "uniform[ \t]+([%a%d]+)[ \t]+([%a%d]+);") do
+			location = libcheetah.GetUniformLocation(shader.id, b)
+			if location then
+				if a == 'float' or a == 'vec2' or a == 'vec3' or a == 'vec4' then
+					float = true
+				else
+					float = false
+				end
+				uniforms[shader.id][b] = {location, float}
+			end
+		end
+	end
+	return shader
+end
+
 ffi.metatype('Shader', {
 	__index = {
-		bind = libcheetah.useShader,
-		unbind = function()libcheetah.disableShader()end,
+		bind = libcheetah.shaderBind,
+		unbind = libcheetah.shaderUnbind,
+		check = libcheetah.shaderCheck,
 		--this method allows you to send uniforms to shader without thinking about its types
 		--type of uniform is detecting in C.newShader
 		set = function(shader, name, a, b, c, d)
