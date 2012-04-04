@@ -23,19 +23,19 @@ void main(void)
 local img = C.newImage('data/light.png')
 
 C.smooth(false)
---~ for i=1,2000 do
-	--~ E:new(screen)
-	--~ :point()
-	--~ :move(i,i)
---~ end
+for i=1,50000 do
+	E:new(screen)
+	:image(img)
+	:move(i%800, math.floor(i/800)):size(1,1)
+end
 
 E:new(screen):draw(function()
 	for i=1,50000 do
 		--~ C.reset()
 		--~ C.move(i%800, math.floor(i/800))
-		img:draw()
-		--~ img:drawxy(i%800, math.floor(i/800),1,1)
+		--~ img:draw()
+		img:drawxy(i%800, math.floor(i/800),1,1)
 	end
-end)
+end):hide()
 
 C.mainLoop()

@@ -460,38 +460,35 @@ function Entity:update(key, func)
 	return self --so we can chain methods
 end
 
-local stdTransDraw = function(s)
+local stdDrawTrans = function(s)
+	C.push()
 	C.translateObject(s.x, s.y, s.angle, s.w, s.h, s.ox, s.oy)
 	C.color(s.r or 255, s.g or 255, s.b or 255, s.a or 255)
 end
 
-local stdDraw = function(s)
+local stdDrawColor = function(s)
 	C.color(s.r or 255, s.g or 255, s.b or 255, s.a or 255)
 end
 
 function Entity:draw(callback)
 	--~ print(type(callback))
 	--~ if type(callback) == 'function' then
-		--~ if not self._draw then
-			--~ self._draw = callback
-		--~ else
-			--~ if type(self._draw) ~= 'table' then self._draw = {self._draw} end
-			--~ table.insert(self._draw, callback)
-		--~ end
 		if not self._draw then
-			self._draw = {stdDraw}
+			self._draw = callback
+		else
+			if type(self._draw) ~= 'table' then self._draw = {self._draw} end
+			table.insert(self._draw, callback)
 		end
-		table.insert(self._draw, callback)
+		--~ if not self._draw then
+			--~ self._draw = {}
+		--~ end
+		--~ table.insert(self._draw, callback)
 	--~ end
 	return self --so we can chain methods
 end
 
-function Entity:translate()
-	if not self._draw then
-		self._draw = {stdTransDraw}
-	else
-		self._draw[1] = stdTransDraw
-	end
+function Entity:translate(callback)
+	self._translate = callback or stdDrawTrans
 	return self --so we can chain methods
 end
 
@@ -649,20 +646,17 @@ local function process_entities(ent)
 			events(ent)
 		end
 		if ent._draw then
-			--~ C.setColor(ent.r or 255, ent.g or 255, ent.b or 255, ent.a or 255)
-			C.push()
-			--~ C.translateObject(ent.x, ent.y, ent.angle or 0, ent.w or 1, ent.h or 1, ent.ox or 0, ent.oy or 0)
-			--~ if ent.blendMode then C.setBlendMode(ent.blendMode) end
-			--~ if type(ent._draw) == 'function' then
-				--~ ent._draw(ent)
-			--~ else
-				for i = 1, #ent._draw do
-					ent._draw[i](ent)
+			if ent.r then C.setColor(ent.r or 255, ent.g or 255, ent.b or 255, ent.a or 255) end
+				if type(ent._draw) == 'function' then
+					ent._draw(ent)
+				else
+					for i = 1, #ent._draw do
+						ent._draw[i](ent)
+					end
 				end
-				--~ for _, v in ipairs(ent._draw) do v(ent) end
-			--~ end
-			--~ C.setBlendAlpha()
-			C.pop()
+			if ent._translate then 
+				C.pop()
+			end
 		end
 		if ent._child then 
 			for i = 1, #ent._child do

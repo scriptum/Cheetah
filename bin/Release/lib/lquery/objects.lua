@@ -72,7 +72,7 @@ end
 
 --image
 local image_draw = function(s)
-  s._image:draw()
+  s._image:drawxy(s.x,s.y,s.w,s.h)
 end
 local image_draw_quad = function(s)
   s._image:drawq(s.qx, s.qy, s.w, s.h)
@@ -86,7 +86,7 @@ function Entity:image(image, options)
     self.w = image.w
     self.h = image.h
     if options and options.quad and options.quad == true then 
-      self._draw = image_draw_quad
+      self:draw(image_draw_quad)
       self.qx = 0
       self.qy = 0
       self.qw = self.w
