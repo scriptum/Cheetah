@@ -25,10 +25,12 @@ IN THE SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <search.h>
 
 #include <SDL.h>
 #include <SDL_opengl.h>
-//~ #include "physfs.h"
+
+//~ #define MEMORY_TEST 1
 
 #ifndef __CHEETAH_H__
 #define __CHEETAH_H__
@@ -38,26 +40,53 @@ unsigned char * loadfile(const char * filename, unsigned int * length);
 SDL_Surface *screen;
 
 
-#define new(data, type, size) do {\
-	if(data){\
-		myError("variable %s already contains data: %x. Delete it before allocating", #data, data);\
-		exit(1);\
-	}\
-	data = (type*)malloc(sizeof(type)*size);\
-	/*initialize memory for small structures*/\
-	if(size == 1) memset(data, 0, sizeof(type));\
-	if(!data) {\
-		myError("cannot allocate %d bytes for %s", sizeof(type)*size, #data);\
-		exit(1);\
-	}\
-} while(0)
 
-#define delete(data) do {\
-	if(data) {\
-		free(data);\
-		data = NULL;\
-	}\
-} while(0)
+#ifdef MEMORY_TEST
+	#define new(var, type, size) do {\
+		if(var){\
+			myError("variable %s already contains data: %x. Delete it before allocating", #var, var);\
+			exit(1);\
+		}\
+		var = (type*)malloc(sizeof(type)*size);\
+		/*initialize memory for small structures*/\
+		if(size == 1) memset(var, 0, sizeof(type));\
+		if(!var) {\
+			myError("cannot allocate %d bytes for %s", sizeof(type)*size, #var);\
+			exit(1);\
+		}\
+		printf("Added: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var); \
+	} while(0)
+
+	#define delete(var) do {\
+		if(var) {\
+			free(var);\
+			printf("Removed: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var); \
+			var = NULL;\
+		}\
+	} while(0)
+#else
+	#define new(var, type, size) do {\
+		if(var){\
+			myError("variable %s already contains data: %x. Delete it before allocating", #var, var);\
+			exit(1);\
+		}\
+		var = (type*)malloc(sizeof(type)*size);\
+		/*initialize memory for small structures*/\
+		if(size == 1) memset(var, 0, sizeof(type));\
+		if(!var) {\
+			myError("cannot allocate %d bytes for %s", sizeof(type)*size, #var);\
+			exit(1);\
+		}\
+	} while(0)
+
+	#define delete(data) do {\
+		if(data) {\
+			free(data);\
+			data = NULL;\
+		}\
+	} while(0)
+#endif
+
 
 /*#define new(type) (type *)malloc(sizeof(type))*/
 
@@ -214,7 +243,6 @@ Resource *resShared;
 
 int resLoaderThread(void *unused);
 inline unsigned char * loadImageData(const char *name, int *width, int *height, int *channels);
-
 inline unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels);
 
 #endif //__CHEETAH_H__

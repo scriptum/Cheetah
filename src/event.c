@@ -28,11 +28,13 @@ SDL_Event event;
 
 unsigned int getEventType() {
 	Resource * r;
+	unsigned int millis;
 	if(resShared) {
 		r = resShared;
 		//~ printf("Get image %s %d\n", r->image->name, r->image->id);
+		millis = SDL_GetTicks();
 		r->image->id = loadImageTex(r->image->options, r->data, r->image->w, r->image->h, r->image->channels);
-		printf("Get image %s  %d\n", r->image->name, r->image->id);
+		printf("Delayed resource loader: loaded %s with %d ms\n", r->image->name, SDL_GetTicks() - millis);
 		delete(r->image->name);
 		delete(r->image->options);
 		resShared = 0;
@@ -64,9 +66,10 @@ unsigned int getEventType() {
 				glViewport( 0, 0, event.resize.w, event.resize.h );
 				glMatrixMode( GL_PROJECTION );
 				glLoadIdentity();
-				glOrtho( 0, event.resize.w, event.resize.h, 0, -1000, 1000 );
+				glOrtho( 0, event.resize.w, event.resize.h, 0, -1, 1 );
 				glMatrixMode( GL_MODELVIEW );
 				glLoadIdentity();
+				//~ SDL_GL_SwapBuffers();
 				return 6;
 			case SDL_VIDEOEXPOSE: return 7;
 			case SDL_ACTIVEEVENT: return 8;
@@ -75,11 +78,6 @@ unsigned int getEventType() {
 			case SDL_JOYHATMOTION:
 			case SDL_JOYBUTTONDOWN:
 			case SDL_JOYBUTTONUP: return 9;
-			case SDL_USEREVENT: {
-				//~ SDL_mutexP(resQueueMutex);
-				
-				//~ return 0;
-			}
 		}
 	}
 	return 0;

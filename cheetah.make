@@ -36,6 +36,7 @@ OBJECTS := \
 	$(OBJDIR)/shader.o \
 	$(OBJDIR)/font.o \
 	$(OBJDIR)/graphics.o \
+	$(OBJDIR)/framebuffer.o \
 	$(OBJDIR)/SOIL.o \
 	$(OBJDIR)/stb_image_aug.o \
 	$(OBJDIR)/image_DXT.o \
@@ -113,6 +114,11 @@ $(OBJDIR)/font.o: src/font.c
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/graphics.o: src/graphics.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/framebuffer.o: src/framebuffer.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
