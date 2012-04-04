@@ -204,7 +204,6 @@ void fontPrintf(Font *currentFont, register const char * str, float x, float y, 
 	}
 
 	imageBind(currentFont->image);
-	glEnable(GL_TEXTURE_2D);
 	if(maxw > .0)
 		PRINT_LINES(
 			ALIGN(w)
@@ -255,7 +254,6 @@ void fontPrintf(Font *currentFont, register const char * str, float x, float y, 
 				w += ch->w;
 			} while(*++str);
 	glPopMatrix();
-	glDisable(GL_TEXTURE_2D);
 }
 
 //~ static int Font_stringToLines() {

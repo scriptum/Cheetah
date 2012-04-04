@@ -69,10 +69,10 @@ float vertexCoord[8];
 
 #define TEXTURE_COORD(qx,qy,qw,qh,w,h) do {\
 	texCoord[0] = qx/w;\
-	texCoord[1] = qy/w;\
+	texCoord[1] = qy/h;\
 	texCoord[2] = texCoord[0];\
-	texCoord[3] = qh + qh/h;\
-	texCoord[4] = qw + qw/w;\
+	texCoord[3] = texCoord[1] + qh/h;\
+	texCoord[4] = texCoord[0] + qw/w;\
 	texCoord[5] = texCoord[3];\
 	texCoord[6] = texCoord[4];\
 	texCoord[7] = texCoord[1];\

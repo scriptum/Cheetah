@@ -463,7 +463,6 @@ end
 local stdDrawTrans = function(s)
 	C.push()
 	C.translateObject(s.x, s.y, s.angle, s.w, s.h, s.ox, s.oy)
-	C.color(s.r or 255, s.g or 255, s.b or 255, s.a or 255)
 end
 
 local stdDrawColor = function(s)
@@ -488,7 +487,7 @@ function Entity:draw(callback)
 end
 
 function Entity:translate(callback)
-	self._translate = callback or stdDrawTrans
+	self._translate = stdDrawTrans
 	return self --so we can chain methods
 end
 
@@ -646,14 +645,17 @@ local function process_entities(ent)
 			events(ent)
 		end
 		if ent._draw then
-			if ent.r then C.setColor(ent.r or 255, ent.g or 255, ent.b or 255, ent.a or 255) end
-				if type(ent._draw) == 'function' then
-					ent._draw(ent)
-				else
-					for i = 1, #ent._draw do
-						ent._draw[i](ent)
-					end
+			if ent.r then C.color(ent.r or 255, ent.g or 255, ent.b or 255, ent.a or 255) end
+			if ent._translate then 
+				ent._translate(ent)
+			end
+			if type(ent._draw) == 'function' then
+				ent._draw(ent)
+			else
+				for i = 1, #ent._draw do
+					ent._draw[i](ent)
 				end
+			end
 			if ent._translate then 
 				C.pop()
 			end
