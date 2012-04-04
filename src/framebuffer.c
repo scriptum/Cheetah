@@ -25,27 +25,7 @@ IN THE SOFTWARE.
 #include "render.h"
 
 
-/**
- * @descr Enable/disable smooth interpolation for image. Disabled filtering useful, if you want to fit image to pixel matrix. If this image will be scaled and/or rotated you must enable filtering (this is by defaults).
- * @group graphics/image
- * @var Image object
- * @var true means that filtering is enabled, false means that filtering is disabled
- * */
-void imageFiltering(Image * img, bool enabled) {
-	glBindTexture(GL_TEXTURE_2D, img->id);
-	if(!enabled)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	}
-	else
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	}
-}
-
-int checkFramebufferStatus()
+static int checkFramebufferStatus()
 {
 	GLenum status;
 	status = (GLenum) glCheckFramebufferStatus_(GL_FRAMEBUFFER_EXT);
@@ -91,28 +71,29 @@ int checkFramebufferStatus()
  *  * _4_ - create 32 bits (4 byte) per channel framebuffer (very SLOW), use only if you know, that you doing, not all systems support this
  * @return Framebuffer object
  * */
-Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char * options) {
+void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int height, const char * options) {
 	//unsigned int percision, bool alpha, bool interpolation, bool repeat) {
 	unsigned int percision = 8;
 	bool alpha = 0;
 	bool interpolation = 1;
 	bool repeat = 0;
-	Image *ptr;
-	Framebuffer *fboptr;
+	Image *ptr = NULL;
 	GLint current_fbo;
 	GLenum internal, format;
 	bool status;
 	char ch;
 	
+	fboptr->id = 0;
+	
 	if(!screen)
 	{
-		myError("Call init function before!");
-		return 0;
+		myError("framebuffer: call init function before!");
+		return;
 	}
 	
 	if(!supported.FBO) {
 		myError("Framebuffers are not supported on this machine. You'd better to check it in script (cheetah.supported)");
-		return 0;
+		return;
 	}
 	
 	while(*options)
@@ -145,7 +126,7 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING_EXT, &current_fbo);
 	
 	new(ptr, Image, 1);
-	new(fboptr, Framebuffer, 1);
+	//~ new(fboptr, Framebuffer, 1);
 	ptr->w = width;
 	ptr->h = height;
 	//~ GLuint depthbuffer;
@@ -192,15 +173,26 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char
 		
 	if (status) {
 		fboptr->image = ptr;
-		return fboptr;
+		return;
 	}
 	else {
 		glDeleteTextures(1, &ptr->id);
 		glDeleteFramebuffers_(1, &fboptr->id);
 		delete(ptr);
-		delete(fboptr);
-		return 0;
+		fboptr->id = 0;
+		//~ myError("Framebuffer is not initialized.");
+		//~ delete(fboptr);
+		return;
 	}
+}
+
+/**
+ * @descr Check, if framebuffer created without errors.
+ * @group graphics/framebuffer
+ * @var Framebuffer object
+ * */
+bool framebufferCheck(Framebuffer * ptr) {
+	return ptr->id;
 }
 
 /**
@@ -209,20 +201,23 @@ Framebuffer * newFramebuffer(unsigned int width, unsigned int height, const char
  * @var Framebuffer object
  * */
 void framebufferBind(Framebuffer * ptr) {
-	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, ptr->id);
-	glViewport( 0, 0, ptr->image->w, ptr->image->h );
-	glMatrixMode( GL_PROJECTION );
-	glLoadIdentity();
-	glOrtho( 0, ptr->image->w, 0, ptr->image->h, -1, 1 );
-	glMatrixMode( GL_MODELVIEW );
-	glLoadIdentity();
+	if(ptr->id) {
+		glBindFramebuffer_(GL_FRAMEBUFFER_EXT, ptr->id);
+		glViewport( 0, 0, ptr->image->w, ptr->image->h );
+		glMatrixMode( GL_PROJECTION );
+		glLoadIdentity();
+		glOrtho( 0, ptr->image->w, 0, ptr->image->h, -1, 1 );
+		glMatrixMode( GL_MODELVIEW );
+		glLoadIdentity();
+	}
+	//~ else myError("Framebuffer is not initialized.");
 }
 
 /**
  * @descr Unbind framebuffer object. Means, that now all graphics will be rendered to default screen. This function unbinds the current framebuffer object.
  * @group graphics/framebuffer
  * */
-void framebufferUnbind() {
+void framebufferUnbind(Framebuffer * ptr) {
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, 0);
 	glViewport( 0, 0, screen->w, screen->h );
 	glMatrixMode( GL_PROJECTION );
@@ -232,8 +227,9 @@ void framebufferUnbind() {
 	glLoadIdentity();
 }
 
+#if 0
 /**
- * @descr Draw framebuffer. Same as draw Image.
+ * @descr Draw framebuffer. Same as Image:draw.
  * @group graphics/framebuffer
  * @var Framebuffer object
  * @see imageDraw
@@ -243,7 +239,7 @@ void framebufferDraw(Framebuffer * ptr) {
 }
 
 /**
- * @descr Draw part of framebuffer with texture coordinates.
+ * @descr Draw part of framebuffer with texture coordinates. Same as Image:drawq.
  * @group graphics/framebuffer
  * @var Framebuffer object
  * @var x offset of framebuffer's texture
@@ -255,7 +251,7 @@ void framebufferDraw(Framebuffer * ptr) {
 void framebufferDrawq(Framebuffer * ptr, float qx, float qy, float qw, float qh) {
 	imageDrawq(ptr->image, qx, qy, qw, qh);
 }
-
+#endif
 /**
  * @descr Delete framebuffer and free memory.
  * @group graphics/framebuffer

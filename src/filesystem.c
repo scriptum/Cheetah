@@ -41,8 +41,8 @@ bool isPointer(void * ptr) {
 }
 
 unsigned char * loadfile(const char * filename, unsigned int * length) {
-	unsigned char * result;
-	unsigned int size = 0;
+	unsigned char * result = NULL;
+	size_t size = 0;
 	FILE *f = fopen(filename, "rb");
 	if (!f) {
 		myError("can't load file %s", filename);
@@ -51,8 +51,8 @@ unsigned char * loadfile(const char * filename, unsigned int * length) {
 	fseek(f, 0, SEEK_END);
 	size = ftell(f);
 	fseek(f, 0, SEEK_SET);
-	new(result, char, size);
-	if (size != fread(result, sizeof(char), size, f)) {
+	new(result, unsigned char, size);
+	if (size != fread(result, sizeof(unsigned char), size, f)) {
 		free(result);
 		myError("can't load file %s", filename);
 		return 0;
@@ -64,11 +64,13 @@ unsigned char * loadfile(const char * filename, unsigned int * length) {
 }
 
 #define filetime(var) int file ## var ## time(const char * filename) {\
-	struct stat buf;\
+	static struct stat buf;\
 	int result = stat( filename, &buf );\
-	if( result != 0 )\
+	if( result != 0 ) {\
 		myError("can't get information about file %s", filename);\
-	else\
+		return -1;\
+	}\
+	else \
 		return buf.st_ ## var ## time;\
 }
 

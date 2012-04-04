@@ -19,6 +19,7 @@ package.includepaths = {
 	"inc"
 }
 package.links = {"SDL", "SDLmain", "GL", --[["luajit",]]}
+package.buildoptions = { "-ffast-math -Wall" }
 --~ package.buildoptions = { "-ffast-math -mtune=generic -march=core2" }
 package.linkoptions = { "-s" }
 --~ package.buildoptions = { "-g" }

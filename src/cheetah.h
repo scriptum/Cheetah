@@ -39,7 +39,7 @@ typedef unsigned char bool;
 unsigned char * loadfile(const char * filename, unsigned int * length);
 SDL_Surface *screen;
 
-
+void myError(const char *fmt, ...);
 
 #ifdef MEMORY_TEST
 	#define new(var, type, size) do {\
@@ -135,7 +135,7 @@ typedef struct Image {
 	/* OpenGL texture id */
 	unsigned int id;
 	/* width and height of the original image */
-	int w, h;
+	float w, h;
 	int channels;
 	int queued;
 } Image;
@@ -245,4 +245,6 @@ int resLoaderThread(void *unused);
 inline unsigned char * loadImageData(const char *name, int *width, int *height, int *channels);
 inline unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels);
 
+inline void imageBind(Image * image);
+void initRenderer();
 #endif //__CHEETAH_H__

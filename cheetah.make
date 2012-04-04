@@ -14,7 +14,7 @@ ifeq ($(CONFIG),Release)
   OBJDIR := obj/Release
   OUTDIR := bin/Release
   CPPFLAGS := $(DEPFLAGS) -I "inc"
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g -O3 -fomit-frame-pointer
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g -O3 -fomit-frame-pointer -ffast-math -Wall
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s -L"lib" -lSDL -lSDLmain -lGL
   LDDEPS :=

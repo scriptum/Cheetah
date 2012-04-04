@@ -460,8 +460,12 @@ function Entity:update(key, func)
 	return self --so we can chain methods
 end
 
-local stdDraw = function(s)
+local stdTransDraw = function(s)
 	C.translateObject(s.x, s.y, s.angle, s.w, s.h, s.ox, s.oy)
+	C.color(s.r or 255, s.g or 255, s.b or 255, s.a or 255)
+end
+
+local stdDraw = function(s)
 	C.color(s.r or 255, s.g or 255, s.b or 255, s.a or 255)
 end
 
@@ -479,6 +483,15 @@ function Entity:draw(callback)
 		end
 		table.insert(self._draw, callback)
 	--~ end
+	return self --so we can chain methods
+end
+
+function Entity:translate()
+	if not self._draw then
+		self._draw = {stdTransDraw}
+	else
+		self._draw[1] = stdTransDraw
+	end
 	return self --so we can chain methods
 end
 

@@ -425,6 +425,17 @@ const char*
 		void
 	);
 
+unsigned int
+	SOIL_internal_create_OGL_texture
+	(
+		const unsigned char *const data,
+		int width, int height, int channels,
+		unsigned int reuse_texture_ID,
+		unsigned int flags,
+		unsigned int opengl_texture_type,
+		unsigned int opengl_texture_target,
+		unsigned int texture_check_size_enum
+	);
 
 #ifdef __cplusplus
 }
