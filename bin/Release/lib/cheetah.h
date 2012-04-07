@@ -13,7 +13,7 @@ typedef struct Image {
 	/* OpenGL texture id */
 	unsigned int id;
 	/* width and height of the original image */
-	float w, h;
+	int w, h;
 	int channels;
 	int queued;
 } Image;

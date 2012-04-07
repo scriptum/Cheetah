@@ -202,7 +202,6 @@ bool framebufferCheck(Framebuffer * ptr) {
  * */
 void framebufferBind(Framebuffer * ptr) {
 	if(ptr->id) {
-		printf("%d %d\n", (int)ptr->image->w, (int)ptr->image->h);
 		glBindFramebuffer_(GL_FRAMEBUFFER_EXT, ptr->id);
 		glViewport(0, 0, (GLsizei)ptr->image->w, (GLsizei)ptr->image->h);
 		glMatrixMode(GL_PROJECTION);
@@ -219,7 +218,6 @@ void framebufferBind(Framebuffer * ptr) {
  * @group graphics/framebuffer
  * */
 void framebufferUnbind(Framebuffer * ptr) {
-	printf("%d %d\n", screen->w, screen->h);
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, 0);
 	glViewport(0, 0, screen->w, screen->h);
 	glMatrixMode(GL_PROJECTION);
