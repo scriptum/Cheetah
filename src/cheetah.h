@@ -136,7 +136,7 @@ typedef struct Image {
 	/* OpenGL texture id */
 	unsigned int id;
 	/* width and height of the original image */
-	int w, h;
+	float w, h;
 	int channels;
 	int queued;
 } Image;
@@ -206,9 +206,11 @@ enum {
 	alignLeft = 1,
 	alignCenter,
 	alignRight,
+	alignJustify,
 	align_left = 1,
 	align_center,
-	align_right
+	align_right,
+	align_justify
 };
 
 struct {
