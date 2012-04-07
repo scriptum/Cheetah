@@ -111,9 +111,8 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		/* enable blending */
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
-		/* enable backface culling */
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
+		/* DO NOT TOUCH!!!*/
+		glDisable(GL_CULL_FACE); 
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_TEXTURE_2D);
 		//~ glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
