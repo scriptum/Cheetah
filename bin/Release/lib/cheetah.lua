@@ -341,6 +341,10 @@ C.newFont = function(name, scalable, codepage)
 	--~ print('Loaded font '..name..' ('..glyphs..' glyphs) in '..(C.getTicks()-millis)..' ms')
 end
 
+C.getFont = function(name, size)
+	return C.fonts[name][size]
+end
+
 ffi.metatype('Font', {
 	__index = {
 		print = function(font, text, x, y, width, align)
@@ -432,3 +436,5 @@ ffi.metatype('Shader', {
 	},
 	__gc = libcheetah.deleteShader
 })
+
+C.newPoints = ffi.typeof("Point[?]")

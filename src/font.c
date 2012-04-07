@@ -74,23 +74,6 @@ float fontHeight(Font *font) {
 	return font->height * font->scale;
 }
 
-#define ALIGN(width) do { \
-	if(align == alignCenter) \
-	glTranslatef(floor((maxw - width)*0.5), 0, 0);\
-	else if(align == alignRight) glTranslatef(floor((maxw - width)), 0, 0); \
-} while(0);
-
-#ifdef NO_VBO
-#define DRAW_CHAR glCallList(ch->vertex);
-#else
-#define DRAW_CHAR \
-glBindBufferARB(GL_ARRAY_BUFFER_ARB, ch->vertex); \
-glVertexPointer(2, GL_FLOAT, 0, (char *) NULL); \
-glBindBufferARB(GL_ARRAY_BUFFER_ARB, ch->tex); \
-glTexCoordPointer(2, GL_FLOAT, 0, (char *) NULL); \
-glDrawArrays(GL_QUADS, 0, 4); 
-#endif
-
 float Font_Width(Font *f, register const char *str)
 {
 	float width = 0;
@@ -153,40 +136,29 @@ float Font_Width(Font *f, register const char *str)
 	//~ #endif
 //~ }
 
-#define PRINT_LINES(A,B) \
-do { \
-	while(str[i]) {\
-			c = (unsigned char)str[i];\
-			switch(c)\
-			{\
-					case '\t':\
-							w += currentFont->chars[32].w * 8;\
-							last_space = i;\
-							break;\
-					case ' ':\
-							last_space = i;\
-					default:\
-							w += currentFont->chars[c].w;\
-			}\
-			if(w > maxw || c == '\n')\
-			{\
-					if(!last_space || c == '\n') last_space = i;\
-					A\
-					i = last_space;\
-					buf = last_space + 1;\
-					last_space = 0;\
-					w = 0;\
-			}\
-			i++;\
+#define ALIGN(width) do { \
+	if(align == alignCenter) {\
+		w = floor((maxw - width)*0.5);\
+		glTranslatef(w, 0, 0);\
 	}\
-	B\
-} while(0);
+	else if(align == alignRight) {\
+		w = floor(maxw - width);\
+		glTranslatef(w, 0, 0); \
+	}\
+	else w = 0;\
+} while(0)
+
+#define DRAW_CHAR glCallList(ch->vertex);
 
 void fontPrintf(Font *currentFont, register const char * str, float x, float y, float maxw, int align) {
 	FontChar *ch;
-	int i = 0, last_space = 0, buf = 0;
-	float w = 0;
+	int i = 0, last_space = 0, buf = 0, spaces = 0;
+	float w = 0, lastw = 0;
+	float justifyWidth = 0, justifyFrac = 0, justifyAdd = 0, justifyAddw;
+	float spacew = currentFont->chars[32].w;
 	unsigned char c;
+	bool end = 0;
+	bool justify = align == alignJustify;
 	bool scaled = screenScale.scaleX != 1.0;
 	maxw = maxw / currentFont->scale * screenScale.scaleX;
 	glPushMatrix();
@@ -205,36 +177,92 @@ void fontPrintf(Font *currentFont, register const char * str, float x, float y, 
 
 	imageBind(currentFont->image);
 	if(maxw > .0)
-		PRINT_LINES(
-			ALIGN(w)
-			w = 0;
-			while(buf < last_space) {
-				c = (unsigned char)str[buf];
-				if(c == '\t') {
-						glTranslatef(currentFont->chars[32].w * 8, 0, 0);
-						w += currentFont->chars[32].w * 8;
-						continue;
-				}
-				ch = &currentFont->chars[c];
-				DRAW_CHAR
-				glTranslatef(ch->w, 0, 0);
-				w += ch->w;
-				buf++;
+	{
+		while(1) {
+			c = (unsigned char)str[i];
+			switch(c)
+			{
+					case '\t':
+							w += spacew * 8;
+							last_space = i;
+							lastw = w;
+							break;
+					case '\0':
+							end = 1;
+							break;
+					case ' ':
+							last_space = i;
+							lastw = w;
+							spaces++;
+					default:
+							w += currentFont->chars[c].w;
 			}
-			glTranslatef(-w, currentFont->height, 0);
-		,
-			ALIGN(w)
-			while(buf < i) {
-				c = (unsigned char)str[buf];
-				if(c == '\t') {
-					glTranslatef(currentFont->chars[32].w * 8, 0, 0);
-					continue;
+			if(w > maxw || c == '\n' || end)
+			{
+				if(!last_space || c == '\n'|| end) {
+					last_space = i;
+					lastw = w;
 				}
-				ch = &currentFont->chars[c];
-				DRAW_CHAR
-				glTranslatef(ch->w, 0, 0);
-				buf++;
-		})
+				switch(align) {
+					case alignCenter:
+						w = floor((maxw - lastw)*0.5);
+						glTranslatef(w, 0, 0);
+						break;
+					case alignRight:
+						w = floor((maxw - lastw));
+						glTranslatef(w, 0, 0);
+						break;
+					case alignJustify:
+						if(c == '\n'|| end)
+							justifyWidth = spacew;
+						else 
+							justifyFrac = modff((maxw + spacew*spaces - lastw)/(float)spaces, &justifyWidth);
+						w = 0;
+						break;
+					default: w = 0;
+				}
+				while(buf < last_space) {
+					c = (unsigned char)str[buf];
+					buf++;
+					if(c == '\t')
+					{
+						glTranslatef(spacew * 8, 0, 0);
+						w += spacew * 8;
+					}
+					else if(c == ' ')
+					{
+						if(justify)
+						{
+							justifyAdd = modff(justifyFrac + justifyAdd, &justifyAddw);
+							glTranslatef(justifyWidth + justifyAddw, 0, 0);
+							w += justifyWidth + justifyAddw;
+						}
+						else
+						{
+							glTranslatef(spacew, 0, 0);
+							w += spacew;
+						}
+					}
+					else
+					{
+						ch = &currentFont->chars[c];
+						DRAW_CHAR
+						glTranslatef(ch->w, 0, 0);
+						w += ch->w;
+					}
+				}
+				if(end) break;
+				glTranslatef(-w, currentFont->height, 0);
+				i = last_space;
+				buf = last_space + 1;
+				last_space = 0;
+				w = 0;
+				spaces = 0;
+				justifyAdd = 0;
+			}
+			i++;
+		}
+	}
 	else
 		if(*str)
 			do {
@@ -244,8 +272,8 @@ void fontPrintf(Font *currentFont, register const char * str, float x, float y, 
 						w = 0;
 						continue;
 					case '\t':
-						glTranslatef(currentFont->chars[32].w * 8, 0, 0);
-						w += currentFont->chars[32].w * 8;
+						glTranslatef(spacew * 8, 0, 0);
+						w += spacew * 8;
 						continue;
 				}
 				ch = &currentFont->chars[(unsigned char)*str];
