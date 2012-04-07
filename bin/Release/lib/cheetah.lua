@@ -297,6 +297,7 @@ ffi.metatype('Image', {
 	__index = {
 		draw = libcheetah.imageDraw,
 		drawxy = libcheetah.imageDrawxy,
+		drawt = libcheetah.imageDrawt,
 		drawq = libcheetah.imageDrawq,
 		drawqxy = libcheetah.imageDrawq,
 	}, 
@@ -362,8 +363,8 @@ ffi.metatype('Framebuffer', {
 		draw = function(s)
 			s.image:draw()
 		end,
-		drawxy = function(s, x, y)
-			s.image:drawxy(x, y)
+		drawxy = function(s, x, y, w, h)
+			s.image:drawxy(x, y, w, h)
 		end,
 		drawq = function(s, qx, qy, qw, qh)
 			s.image:drawq(qx, qy, qw, qh)

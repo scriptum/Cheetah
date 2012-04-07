@@ -19,7 +19,9 @@ package.includepaths = {
 	"inc"
 }
 package.links = {"SDL", "SDLmain", "GL", --[["luajit",]]}
-package.buildoptions = { "-ffast-math -Wall" }
+package.buildoptions = { "-ffast-math -Wall -msse",
+--~ " -ftracer -fcx-limited-range -fgcse-las -fgcse-sm -fno-trapping-math -fpeel-loops -fsingle-precision-constant -funsafe-loop-optimizations" 
+}
 --~ package.buildoptions = { "-ffast-math -mtune=generic -march=core2" }
 package.linkoptions = { "-s" }
 --~ package.buildoptions = { "-g" }

@@ -162,4 +162,3 @@ void Uniform3f(unsigned int location, float var, float var1, float var2) {
 void Uniform4f(unsigned int location, float var, float var1, float var2, float var3) {
 	glUniform4f_(location, var, var1, var2, var3);
 }
-

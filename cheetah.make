@@ -14,7 +14,7 @@ ifeq ($(CONFIG),Release)
   OBJDIR := obj/Release
   OUTDIR := bin/Release
   CPPFLAGS := $(DEPFLAGS) -I "inc"
-  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g -O3 -fomit-frame-pointer -ffast-math -Wall
+  CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -fPIC -g -O3 -fomit-frame-pointer -ffast-math -Wall -msse
   CXXFLAGS += $(CFLAGS)
   LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -shared -s -L"lib" -lSDL -lSDLmain -lGL
   LDDEPS :=
@@ -37,6 +37,9 @@ OBJECTS := \
 	$(OBJDIR)/font.o \
 	$(OBJDIR)/graphics.o \
 	$(OBJDIR)/framebuffer.o \
+	$(OBJDIR)/vbo.o \
+	$(OBJDIR)/window.o \
+	$(OBJDIR)/image.o \
 	$(OBJDIR)/SOIL.o \
 	$(OBJDIR)/stb_image_aug.o \
 	$(OBJDIR)/image_DXT.o \
@@ -119,6 +122,21 @@ $(OBJDIR)/graphics.o: src/graphics.c
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/framebuffer.o: src/framebuffer.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/vbo.o: src/vbo.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/window.o: src/window.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/image.o: src/image.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"

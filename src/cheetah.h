@@ -37,7 +37,8 @@ IN THE SOFTWARE.
 
 typedef unsigned char bool;
 unsigned char * loadfile(const char * filename, unsigned int * length);
-SDL_Surface *screen;
+
+extern SDL_Surface *screen;
 
 void myError(const char *fmt, ...);
 

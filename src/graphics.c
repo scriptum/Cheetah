@@ -24,290 +24,23 @@ IN THE SOFTWARE.
 #include <math.h>
 #include <string.h>
 #include "cheetah.h"
-#include "SOIL/SOIL.h"
 #include "render.h"
-//~ void stackdumper(int param)
-//~ {
-	//~ void *array[10];
-	//~ size_t size;
-	//~ char **strings;
-	//~ size_t i;
-//~ 
-	//~ size = backtrace(array, 10);
-	//~ strings = backtrace_symbols (array, size);
-//~ 
-	//~ printf ("Obtained %zd stack frames.\n", size);
-//~ 
-	//~ for (i = 0; i < size; i++)
-		//~ printf ("%s\n", strings[i]);
-//~ 
-	//~ free (strings);
-//~ }
 
-//~ #if 0
 void colorMask(bool r, bool g, bool b, bool a) {
 	glColorMask(r,g,b,a);
 }
-//~ #endif
 
-GLuint quadlist, pointlist, null_texture, vboVer, vboTex;
+/***********************************GLOBALS************************************/
+
+GLuint quadlist, pointlist, null_texture, rect_texture, vboVer, vboTex;
+
+GLuint prevImageId = 0;
+
+bool antiAliasing = 1;
 
 const float texCoordQuad[] = {0,0,0,1,1,1,1,0};
-float texCoord[8];
-float vertexCoord[8];
-
-#define VERTEX_COORD(x,y,w,h) do {\
-	vertexCoord[0] = x;\
-	vertexCoord[1] = y;\
-	vertexCoord[2] = x;\
-	vertexCoord[3] = y + h;\
-	vertexCoord[4] = x + w;\
-	vertexCoord[5] = vertexCoord[3];\
-	vertexCoord[6] = vertexCoord[4];\
-	vertexCoord[7] = y;\
-} while(0)
-
-#define TEXTURE_COORD(qx,qy,qw,qh,w,h) do {\
-	texCoord[0] = qx/w;\
-	texCoord[1] = qy/h;\
-	texCoord[2] = texCoord[0];\
-	texCoord[3] = texCoord[1] + qh/h;\
-	texCoord[4] = texCoord[0] + qw/w;\
-	texCoord[5] = texCoord[3];\
-	texCoord[6] = texCoord[4];\
-	texCoord[7] = texCoord[1];\
-} while(0)
-
-#define DRAWQ do {\
-	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);\
-	glTexCoordPointer(2, GL_FLOAT, 0, texCoordQuad);\
-	glDrawArrays(GL_QUADS, 0, 4);\
-} while(0)
-
-#define DRAWQT do {\
-	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);\
-	glTexCoordPointer(2, GL_FLOAT, 0, texCoord);\
-	glDrawArrays(GL_QUADS, 0, 4);\
-} while(0)
-
-/**
- * @descr Create window and initialize all OpenGL's stuff. You MUST call this before any graphics function, e.g. cheetah.newImage. You may call this function again to re-size window, change application title, toggle fullscreen. Other options are ignored.
- * @group graphics/window
- * @var application's title shown in titlebar
- * @var width of the window
- * @var height of the window
- * @var bits per pixel (8, 16, 32, usually 32)
- * @var string of options. Supported options:
- *  * _f_ - fullscreen
- *  * _r_ - allow to re-size window
- *  * _l_ - use delayed resource loader
- *  * _v_ - enable vertical sync (recommend)
- *  * _d_ - enable depth buffer (usually 2D apps do not need this)
- *  * _s_ - enable stencil buffer (usually 2D apps do not need this)
- * @return true if success
- * */
-bool init(const char * appName, unsigned int width, unsigned int height, int bpp, const char * attr) {
-	bool fullscreen = 0;
-	bool resizable = 0;
-	int vsync = 0;
-	bool firstrun = 0;
-	bool depth = 0;
-	bool stencil = 0;
-	bool loader = 0;
-	char ch;
-	Uint32 flags = SDL_OPENGL;
-	
-	
-	while(*attr)
-	{
-		ch = *attr;
-		if(ch == 'f') fullscreen = 1;
-		if(ch == 'r') resizable = 1;
-		if(ch == 'v') vsync = 1;
-		if(ch == 'd') depth = 1;
-		if(ch == 's') stencil = 1;
-		if(ch == 'l') loader = 1;
-		attr++;
-	}
-	if (fullscreen) {
-		flags |= SDL_FULLSCREEN;
-	} else if (resizable) {
-		flags |= SDL_RESIZABLE;
-	}
-	
-	if(width < 1) width = 1;
-	if(height < 1) height = 1;
-	
-	if (screen == NULL) {
-		if ( SDL_Init ( SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER ) != 0 )
-			return 0;
-		atexit(SDL_Quit);
-		SDL_EnableUNICODE(1);
-		//~ SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
-		if(depth) SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-		if(stencil) SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-		firstrun = 1;
-		/*Set screen auto-scale properties*/
-		screenScale.origWidth = width;
-		screenScale.origHeight = height;
-		screenScale.autoScale = 1;
-		screenScale.autoScaleFont = 1;
-		screenScale.scaleX = 1.0f;
-		screenScale.scaleY = 1.0f;
-		screenScale.offsetX = 0.0f;
-		screenScale.offsetY = 0.0f;
-		screenScale.aspect = (float)width/height;
-	}
-	if(appName) SDL_WM_SetCaption (appName, appName);
-	screen = SDL_SetVideoMode(width, height, bpp, flags);
-	if (screen == NULL)
-		myError("couldn't set %dx%dx%d video mode: %s",
-								width, height, bpp, SDL_GetError());
-
-	if (firstrun) {
-		initRenderer();
-		/* set background color */
-		glClearColor( 0, 0, 0, 1);
-		/* set line antialiasing */
-		glEnable(GL_POINT_SMOOTH);
-		glEnable(GL_LINE_SMOOTH);
-		/* enable blending */
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_BLEND);
-		/* enable backface culling */
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_TEXTURE_2D);
-		//~ glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-		resLoaderQueue = NULL;
-		if(loader)
-		{
-			resLoaderQueue = newQueue();
-			resQueueMutex = SDL_CreateMutex();
-			resShared = 0;
-			SDL_CreateThread(resLoaderThread, (void *)NULL);
-			glGenTextures(1, &null_texture);
-			glBindTexture(GL_TEXTURE_2D, null_texture);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, "\0\0\0\0");
-		}
-	}
-
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, width, height, 0, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	//~ glDepthRange(-10000,10000);
-	if(firstrun) {
-		quadlist = glGenLists(1);
-		glNewList(quadlist, GL_COMPILE);
-		glBegin(GL_QUADS);
-		glTexCoord2f(0, 0); glVertex2f(0, 0);
-		glTexCoord2f(0, 1); glVertex2f(0, 1);
-		glTexCoord2f(1, 1); glVertex2f(1, 1);
-		glTexCoord2f(1, 0); glVertex2f(1, 0);
-		glEnd();
-		glEndList();
-		pointlist = glGenLists(1);
-		glNewList(pointlist, GL_COMPILE);
-		glBegin(GL_POINTS);
-		glVertex2f(0, 0);
-		glEnd();
-		glEndList();
-		
-		//~ static float tex[] = {0,0,0,1,1,1,1,0};
-		//~ static float ver[] = {0,0,0,1,1,1,1,0};
-		//~ glGenBuffers_(1, &vboVer);
-		//~ glBindBuffer_(GL_ARRAY_BUFFER_ARB, vboVer);
-		//~ glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*4, (void*)ver, GL_STATIC_DRAW_ARB);
-		//~ glGenBuffers_(1, &vboTex);
-		//~ glBindBuffer_(GL_ARRAY_BUFFER_ARB, vboTex);
-		//~ glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*4, (void*)tex, GL_STATIC_DRAW_ARB);
-		//~ glBindBuffer_(GL_ARRAY_BUFFER_ARB, 0);
-		
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	}
-	return 1;
-}
-
-/**
- * @descr Check, if screen exists. Useful if you have windowless version of y our application, e.g. server.
- * @group graphics/window
- * @return true if screen was initialized
- * */
-bool isInit() {
-	return screen != NULL;
-}
-
-/**
- * @descr Get window's width
- * @group graphics/window
- * @return width of the window
- * @see getWindowHeight
- * */
-int getWindowWidth() {
-	return screen->w;
-}
-
-/**
- * @descr Get window's height
- * @group graphics/window
- * @return height of the window
- * @see getWindowWidth
- * */
-int getWindowHeight() {
-	return screen->h;
-}
-
-/**
- * @descr Swap buffers and present graphics
- * @group graphics/window
- * */
-void swapBuffers() {
-	SDL_GL_SwapBuffers();
-}
-
-/**
- * @descr Set window's title
- * @group graphics/window
- * @var text to replace the caption
- * @see init
- * */
-void caption(const char * text) {
-	SDL_WM_SetCaption(text, text);
-}
-
-/**
- * @descr Get list of possible screen modes. You need this if you want to run application in fullscreen mode.
- * @group graphics/window
- * @return array of pointers to SDL_Rect structure.
- * */
-SDL_Rect ** getModes() {
-	SDL_Rect ** modes = SDL_ListModes(0, SDL_OPENGL | SDL_FULLSCREEN);
-	if(modes == (SDL_Rect **)0 || modes == (SDL_Rect **)-1)
-		return 0;
-	return modes;
-}
-
-/**
- * @descr Shows the cursor
- * @group graphics/window
- * */
-void showCursor() {
-	SDL_ShowCursor(SDL_ENABLE);
-}
-
-/**
- * @descr Hides the cursor
- * @group graphics/window
- * */
-void hideCursor() {
-	SDL_ShowCursor(SDL_DISABLE);
-}
+float *texCoord = NULL;
+float *vertexCoord = NULL;
 
 /**
  * @descr Enables depth test. Useless if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_DEPTH_TEST);
@@ -344,43 +77,6 @@ void enableStencilTest() {
 void disableStencilTest() {
 	glDisable(GL_STENCIL_TEST);
 }
-
-/**
- * @descr Gets the number of milliseconds past from the execution time. Equivalent to SDL_GetTicks();
- * @group graphics/timer
- * */
-unsigned int getTicks() {
-	return SDL_GetTicks();
-}
-
-/**
- * @descr Gets the time in seconds past from the execution time.
- * @group graphics/timer
- * */
-double getTime() {
-	return (double)SDL_GetTicks()/1000;
-}
-
-/**
- * @descr Do nothing some time.
- * @group graphics/timer
- * @var delay in milliseconds (1/1000 s)
- * @see sleep
- * */
-void delay(unsigned int ms) {
-	return SDL_Delay(ms);
-}
-
-/**
- * @descr Do nothing some time.
- * @group graphics/timer
- * @var delay in seconds
- * @see delay
- * */
-void sleep(unsigned int sec) {
-	return SDL_Delay(sec*1000);
-}
-
 
 //~ void translate(double translateX, double translateY) {
 	//~ glTranslated(translateX, translateY, 0);
@@ -432,12 +128,9 @@ void rotate(double angle) {
  * */
 void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y) {
 	if(x || y) glTranslated(x, y, 0);
-	//~ glTranslated(origin_x, origin_y, 0);
 	if(angle) glRotated(angle, 0, 0, 1);
 	if(width != 1.0 || height != 1.0) glScalef(width, height, 1);
 	if(origin_x || origin_y) glTranslated(-origin_x/width, -origin_y/height, 0);
-	
-	//glTranslated(ox, oy, 0);
 }
 
 /**
@@ -537,20 +230,17 @@ void line(double x1, double y1, double x2, double y2) {
  * @var is rectangle filled
  * @see color rectanglexy imageDraw framebufferDraw
  * */
-void rectangle(bool filled) {
-	if(filled)
-		glCallList(quadlist);
-	else
-	{
-		glBegin(GL_LINE_LOOP);
-		glVertex2f(0, 0);
-		glVertex2f(1, 0);
-		glVertex2f(1, 1);
-		glVertex2f(0, 1);
-		glEnd();
+void rectangle() {
+	if(prevImageId) {
+		glBindTexture(GL_TEXTURE_2D, 0);
+		prevImageId = 0;
 	}
+	glCallList(quadlist);
 }
 
+#define RECTBORDER 4
+#define RECTOFF1 0.5
+#define RECTOFF2 0.5
 /**
  * @descr Draw rectangle of given size at a given position. Note, if you bind texture or shader, filled rectangle may be shaded or textured.
  * @group graphics/drawing
@@ -561,25 +251,40 @@ void rectangle(bool filled) {
  * @var is rectangle filled
  * @see color rectangle imageDraw framebufferDraw
  * */
-void rectanglexy(float x, float y, float w, float h, bool filled) {
-	if(filled)
-	{
-		glBegin(GL_QUADS);
-		glVertex2f(x,   y);
-		glVertex2f(x+w, y);
-		glVertex2f(x+w, y+h);
-		glVertex2f(x,   y+h);
-		glEnd();
+void rectanglexy(float x, float y, float w, float h) {
+	const float t[20] = {0,0, RECTOFF1,RECTOFF1, 1,0, RECTOFF2,RECTOFF1, 1,1, RECTOFF2,RECTOFF2, 0,1, RECTOFF1,RECTOFF2, 0,0, RECTOFF1,RECTOFF1};
+	if(antiAliasing) {
+		vertexCoord[0] = x - RECTBORDER;
+		vertexCoord[1] = y - RECTBORDER;
+		vertexCoord[2] = x;
+		vertexCoord[3] = y;
+		vertexCoord[4] = x + w + RECTBORDER;
+		vertexCoord[5] = y - RECTBORDER;
+		vertexCoord[6] = x + w;
+		vertexCoord[7] = y;
+		vertexCoord[8] = x + w + RECTBORDER;
+		vertexCoord[9] = y + h + RECTBORDER;
+		vertexCoord[10] = x + w;
+		vertexCoord[11] = y + h;
+		vertexCoord[12] = x - RECTBORDER;
+		vertexCoord[13] = y + h + RECTBORDER;
+		vertexCoord[14] = x ;
+		vertexCoord[15] = y + h;
+		vertexCoord[16] = x - RECTBORDER;
+		vertexCoord[17] = y - RECTBORDER;
+		vertexCoord[18] = x;
+		vertexCoord[19] = y;
+		glBindTexture(GL_TEXTURE_2D, rect_texture);
+		glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
+		glTexCoordPointer(2, GL_FLOAT, 0, t);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 	}
-	else
-	{
-		glBegin(GL_LINE_LOOP);
-		glVertex2f(x,   y);
-		glVertex2f(x+w, y);
-		glVertex2f(x+w, y+h);
-		glVertex2f(x,   y+h);
-		glEnd();
+	if(prevImageId) {
+		glBindTexture(GL_TEXTURE_2D, 0);
+		prevImageId = 0;
 	}
+	VERTEX_COORD(x,y,w,h);
+	DRAWQ;
 }
 
 /**
@@ -650,238 +355,6 @@ void pointxy(float x, float y) {
 	glEnd();
 }
 
-
-
-inline unsigned char * loadImageData(const char *name, int *width, int *height, int *channels)
-{
-	unsigned int file_size;
-	unsigned char *img;
-	unsigned char *myBuf;
-	myBuf = loadfile(name, &file_size);
-	img = SOIL_load_image_from_memory(
-				myBuf, sizeof(unsigned char) * file_size,
-				width, height, channels,
-				0 );
-	delete(myBuf);
-	return img;
-}
-
-inline unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels)
-{
-	unsigned int tex_id;
-	tex_id = SOIL_internal_create_OGL_texture(
-			img, width, height, channels,
-			0, SOIL_FLAG_TEXTURE_REPEATS,
-			GL_TEXTURE_2D, GL_TEXTURE_2D,
-			GL_MAX_TEXTURE_SIZE);
-	//~ 
-	while(*options)
-	{
-		if(*options == 'n') {
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		}
-		options++;
-	}
-	SOIL_free_image_data(img);
-	return tex_id;
-}
-
-/**
- * @descr Load image from disc with specific options.
- * @group graphics/image
- * @var file name
- * @var string of options. This is depends on image loading module you use. Supported options:
- *  * _n_ - use nearest interpolation
- *  * _m_ - generate mip-maps (automatically sets mip-map interpolation)
- *  * _i_ - load instantly without delayed resource loader
- * @return Image object
- * */
-void newImageOpt(Image* ptr, const char *name, const char *options) {
-	int width, height, channels, instant = 0;
-	unsigned int tex_id;
-	unsigned char *img;
-	if(!screen)
-	{
-		myError("Call init function before!");
-		return;
-	}
-	while(*options)
-	{
-		if(*options == 'i') {instant = 1; break;}
-		options++;
-	}
-	if(!resLoaderQueue||instant)
-	{
-		img = loadImageData(name, &width, &height, &channels);
-		if(img == NULL)
-		{
-			myError("can't load image %s", name);
-			return;
-		}
-		tex_id = loadImageTex(options, img, width, height, channels);
-		//~ new(ptr, Image, 1);
-		ptr->id = tex_id;
-		ptr->w = (float)width;
-		ptr->h = (float)height;
-	}
-	else
-	{
-		//~ new(ptr, Image, 1);
-		new(ptr->name, char, strlen(name)+1);
-		new(ptr->options, char, strlen(options)+1);
-		memcpy(ptr->name, name, strlen(name)+1);
-		memcpy(ptr->options, options, strlen(options)+1);
-		ptr->id = null_texture;
-		ptr->w = 1;
-		ptr->h = 1;
-		ptr->queued = 0;
-	}
-}
-
-//~ /**
- //~ * @descr Load image from disc.
- //~ * @group graphics/image
- //~ * @var file name
- //~ * @return Image object
- //~ * */
-//~ Image *newImage(const char *name) {
-	//~ return newImageOpt(name, "");
-//~ }
-
-//~ #endif
-GLuint prevImageId = 0;
-/**
- * @descr Bind Image object. Equivalent to glBindTexture.
- * @group graphics/image
- * @var Image object
- * */
-inline void imageBind(Image * image) {
-	if(prevImageId == image->id) return;
-	if(resLoaderQueue&&image->id==null_texture&&!image->queued)
-	{
-		Resource r;
-		image->queued = 1;
-		r.image = image;
-		enqueue(resLoaderQueue, r);
-	}
-	glBindTexture(GL_TEXTURE_2D, image->id);
-	//~ glEnable(GL_TEXTURE_2D);
-	prevImageId = image->id;
-}
-
-/**
- * @descr Enable texturing. Equivalent to glEnable(GL_TEXTURE_2D).
- * @group graphics/image
- * */
-void enableTexture() {
-	glEnable(GL_TEXTURE_2D);
-}
-
-/**
- * @descr Disable texturing. Equivalent to glDisable(GL_TEXTURE_2D).
- * @group graphics/image
- * */
-void disableTexture() {
-	glDisable(GL_TEXTURE_2D);
-}
-
-/**
- * @descr Draw while image using 1x1 pixel quad. You may change quad size and position using transformations.
- * @group graphics/image
- * @var Image object
- * */
-void imageDraw(Image * image) {
-	imageBind(image);
-	glCallList(quadlist);
-}
-
-/**
- * @descr Draw image of given size at a given position.
- * @group graphics/image
- * @var Image object
- * */
-void imageDrawxy(Image * image, float x, float y, float w, float h) {
-	VERTEX_COORD(x,y,w,h);
-	imageBind(image);
-	DRAWQ;
-}
-
-/**
- * @descr Draw part of image using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
- * @group graphics/image
- * @var Image object
- * @var x offset of texture
- * @var y offset of texture
- * @var width of texture
- * @var height of texture
- * */
-void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
-	imageBind(image);
-	VERTEX_COORD(0,0,1,1);
-	TEXTURE_COORD(qx, qy, qw, qh, image->w, image->h);
-	DRAWQT;
-}
-
-/**
- * @descr Draw part of image of given size at a given position using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
- * @group graphics/image
- * @var Image object
- * @var position of left top corner
- * @var position of left top corner
- * @var width of quad
- * @var height of quad
- * @var x offset of texture
- * @var y offset of texture
- * @var width of texture
- * @var height of texture
- * */
-void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
-	imageBind(image);
-	VERTEX_COORD(x,y,w,h);
-	TEXTURE_COORD(qx, qy, qw, qh, image->w, image->h);
-	DRAWQT;
-}
-
-/**
- * @descr Set the current active texture for multitexturenig. Equivalent to glActiveTexture(GL_TEXTURE0 + i).
- * @group graphics/image
- * @var number of texture slot (min 0, max 7)
- * */
-void activeTexture(int i) {
-	glActiveTexture_(GL_TEXTURE0 + i);
-}
-
-//~ /**
- //~ * @descr Delete image and free memory. 
- //~ * @group graphics/image
- //~ * @var Image object
- //~ * */
-void deleteImage(Image * ptr) {
-	if(ptr) glDeleteTextures(1, &ptr->id);
-	else myError("Trying to free a null-image. Maybe, you did it manually?");
-}
-
-/**
- * @descr Enable/disable smooth interpolation for image. Disabled filtering useful, if you want to fit image to pixel matrix. If this image will be scaled and/or rotated you must enable filtering (this is by defaults).
- * @group graphics/image
- * @var Image object
- * @var true means that filtering is enabled, false means that filtering is disabled
- * */
-void imageFiltering(Image * img, bool enabled) {
-	glBindTexture(GL_TEXTURE_2D, img->id);
-	if(!enabled)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	}
-	else
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	}
-}
-
 /**
  * @descr Sets the current point size. Not all platforms support point size correctly.
  * @group graphics/drawing
@@ -933,13 +406,7 @@ double getLineWidth() {
  * @see line point
  * */
 void smooth(bool smooth) {
-	if(smooth) {
-		glEnable(GL_POINT_SMOOTH);
-		glEnable(GL_LINE_SMOOTH);
-	} else {
-		glDisable(GL_POINT_SMOOTH);
-		glDisable(GL_LINE_SMOOTH);
-	}
+	antiAliasing = smooth;
 }
 
 /**
@@ -1121,131 +588,4 @@ void drawToStencil() {
 void drawUsingStencil() {
 	glStencilFunc (GL_EQUAL, 0x1, 0x1);
 	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
-}
-
-Vbo * newVbo(Point * data, Point * tex, unsigned int count) {
-	Vbo *ptr = NULL;
-	new(ptr, Vbo, 1);
-	ptr->count = count;
-	glGenBuffers_(1, &ptr->id);
-	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
-	glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*4*count, (void*)data, GL_STATIC_DRAW_ARB);
-	glGenBuffers_(1, &ptr->tex);
-	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->tex);
-	glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*4*count, (void*)tex, GL_STATIC_DRAW_ARB);
-	return ptr;
-}
-
-void vboDraw(Vbo * ptr) {
-	//~ glEnable(GL_TEXTURE_2D);
-	glEnableClientState(GL_VERTEX_ARRAY); 
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY); 
-	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
-	glVertexPointer(2, GL_FLOAT, 0, (char *) NULL);
-	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->tex);
-	glTexCoordPointer(2, GL_FLOAT, 0, (char *) NULL);
-	glDrawArrays(GL_QUADS, 0, ptr->count*4); 
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	//~ glDisable(GL_TEXTURE_2D);
-}
-
-Vbo * newVboPoints(Point * data, unsigned int count) {
-	Vbo *ptr = NULL;
-	new(ptr, Vbo, 1);
-	ptr->count = count;
-	int i;
-	if(supported.PS)
-	{
-		if(supported.VBO)
-		{
-			glGenBuffers_(1, &ptr->id);
-			glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
-			glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*count, (void*)data, GL_STATIC_DRAW_ARB);
-		}
-		else
-		{
-			printf("No VBO support: rendering VBO's using lists.\n");
-			ptr->id = glGenLists(1);
-			glNewList(ptr->id, GL_COMPILE);
-			glBegin(GL_POINTS);
-			for (i = 0; i < count; i++)
-				glVertex2f(data[i].x, data[i].y);
-			glEnd();
-			glEndList();
-		}
-	}
-	else
-	{
-		ptr->data = data;
-		printf("No Point Sprite support: falling down to quads.\n");
-	}
-	
-	return ptr;
-}
-void vboDrawSprites(Vbo * ptr, Image * img, float size) {
-	int i;
-	//~ glEnable(GL_TEXTURE_2D);
-	imageBind(img);
-	if(supported.PS)
-	{
-		glPointSize(size);
-		glEnable(GL_POINT_SPRITE);
-		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-		
-		if(supported.VBO)
-		{
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
-			glVertexPointer(2, GL_FLOAT, 0, (char *) NULL);
-			glDrawArrays(GL_POINTS, 0, ptr->count); 
-			glDisableClientState(GL_VERTEX_ARRAY);
-		}
-		else
-			glCallList(ptr->id);
-	}
-	else
-	{
-		for (i = 0; i < ptr->count; i++)
-		{
-			glPushMatrix();
-			glTranslatef(ptr->data[i].x - size/2, ptr->data[i].y - size/2, 0.0);
-			glScalef(size, size, 1);
-			glCallList(quadlist);
-			glPopMatrix();
-		}
-	}
-	
-	//~ glDisable(GL_TEXTURE_2D);
-}
-
-Vbo * newVboPoints3(Point3 * data, unsigned int count) {
-	Vbo *ptr = NULL;
-	new(ptr, Vbo, 1);
-	ptr->count = count;
-	glGenBuffers_(1, &ptr->id);
-	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
-	glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point3)*count, (void*)data, GL_STATIC_DRAW_ARB);
-	return ptr;
-}
-void vboDrawSprites3(Vbo * ptr, Image * img, float size) {
-	//~ glEnable(GL_TEXTURE_2D);
-	imageBind(img);
-	glPointSize(size);
-	glEnable(GL_POINT_SPRITE);
-	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
-	glVertexPointer(3, GL_FLOAT, 0, (char *) NULL);
-	glDrawArrays(GL_POINTS, 0, ptr->count); 
-	glDisableClientState(GL_VERTEX_ARRAY);
-	
-	//~ glDisable(GL_TEXTURE_2D);
-}
-
-void deleteVbo(Vbo * ptr) {
-	if(ptr) {
-		glDeleteBuffers_(1, &ptr->id);
-	}
-	else myError("Trying to free a null-VBO. Maybe, you did it manually?");
 }
