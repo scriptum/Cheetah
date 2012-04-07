@@ -27,6 +27,69 @@ IN THE SOFTWARE.
 #include <SDL_opengl.h>
 
 
+/***********************************GLOBALS************************************/
+
+extern GLuint quadlist, pointlist, null_texture, rect_texture, vboVer, vboTex;
+
+extern GLuint prevImageId;
+
+extern bool antiAliasing;
+
+extern const float texCoordQuad[];
+extern float *texCoord;
+extern float *vertexCoord;
+
+/**********************************VERTEX OPS**********************************/
+
+#define VERTEX_COORD(x,y,w,h) do {\
+	vertexCoord[0] = x;\
+	vertexCoord[1] = y;\
+	vertexCoord[2] = x;\
+	vertexCoord[3] = y + h;\
+	vertexCoord[4] = x + w;\
+	vertexCoord[5] = y + h;\
+	vertexCoord[6] = x + w;\
+	vertexCoord[7] = y;\
+} while(0)
+
+#define VX(x,y) cosf(a)*(x-ox)-sinf(a)*(y-oy)
+#define VY(x,y) sinf(a)*(x-ox)+cosf(a)*(y-oy)
+
+#define VERTEX_COORD_TRANS(x,y,w,h,a,ox,oy) do {\
+	vertexCoord[0] = x + VX(0,0);\
+	vertexCoord[1] = y + VY(0,0);\
+	vertexCoord[2] = x + VX(0,h);\
+	vertexCoord[3] = y + VY(0,h);\
+	vertexCoord[4] = x + VX(w,h);\
+	vertexCoord[5] = y + VY(w,h);\
+	vertexCoord[6] = x + VX(w,0);\
+	vertexCoord[7] = y + VY(w,0);\
+} while(0)
+
+#define TEXTURE_COORD(qx,qy,qw,qh,w,h) do {\
+	texCoord[0] = qx/w;\
+	texCoord[1] = qy/h;\
+	texCoord[2] = texCoord[0];\
+	texCoord[3] = texCoord[1] + qh/h;\
+	texCoord[4] = texCoord[0] + qw/w;\
+	texCoord[5] = texCoord[3];\
+	texCoord[6] = texCoord[4];\
+	texCoord[7] = texCoord[1];\
+} while(0)
+
+#define DRAWQ do {\
+	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);\
+	glTexCoordPointer(2, GL_FLOAT, 0, texCoordQuad);\
+	glDrawArrays(GL_QUADS, 0, 4);\
+} while(0)
+
+#define DRAWQT do {\
+	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);\
+	glTexCoordPointer(2, GL_FLOAT, 0, texCoord);\
+	glDrawArrays(GL_QUADS, 0, 4);\
+} while(0)
+
+
 // GL_ARB_shading_language_100, GL_ARB_shader_objects, GL_ARB_fragment_shader, GL_ARB_vertex_shader
 extern PFNGLCREATEPROGRAMOBJECTARBPROC  glCreateProgramObject_;
 extern PFNGLDELETEOBJECTARBPROC         glDeleteObject_;

@@ -92,7 +92,7 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 	}
 	
 	if(!supported.FBO) {
-		myError("Framebuffers are not supported on this machine. You'd better to check it in script (cheetah.supported)");
+		myError("Framebuffers are not supported on this machine. You'd better to check it in script (if cheetah.supported.FBO)");
 		return;
 	}
 	
@@ -202,12 +202,13 @@ bool framebufferCheck(Framebuffer * ptr) {
  * */
 void framebufferBind(Framebuffer * ptr) {
 	if(ptr->id) {
+		printf("%d %d\n", (int)ptr->image->w, (int)ptr->image->h);
 		glBindFramebuffer_(GL_FRAMEBUFFER_EXT, ptr->id);
-		glViewport( 0, 0, ptr->image->w, ptr->image->h );
-		glMatrixMode( GL_PROJECTION );
+		glViewport(0, 0, (GLsizei)ptr->image->w, (GLsizei)ptr->image->h);
+		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho( 0, ptr->image->w, 0, ptr->image->h, -1, 1 );
-		glMatrixMode( GL_MODELVIEW );
+		glOrtho(0, (int)ptr->image->w, 0, (int)ptr->image->h, -1, 1);
+		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 	}
 	//~ else myError("Framebuffer is not initialized.");
@@ -218,12 +219,13 @@ void framebufferBind(Framebuffer * ptr) {
  * @group graphics/framebuffer
  * */
 void framebufferUnbind(Framebuffer * ptr) {
+	printf("%d %d\n", screen->w, screen->h);
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, 0);
-	glViewport( 0, 0, screen->w, screen->h );
-	glMatrixMode( GL_PROJECTION );
+	glViewport(0, 0, screen->w, screen->h);
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho( 0, screen->w, screen->h, 0, -1, 1 );
-	glMatrixMode( GL_MODELVIEW );
+	glOrtho(0, screen->w, screen->h, 0, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
 
