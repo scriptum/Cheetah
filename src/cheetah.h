@@ -57,6 +57,15 @@ void myError(const char *fmt, ...);
 		}\
 		printf("Added: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var); \
 	} while(0)
+	
+	#define renew(var, size) do {\
+		var = (type*)realloc(sizeof(type)*size);\
+		if(!var) {\
+			myError("cannot allocate %d bytes for %s", sizeof(type)*size, #var);\
+			exit(1);\
+		}\
+		printf("Reallocated: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var); \
+	} while(0)
 
 	#define delete(var) do {\
 		if(var) {\
@@ -77,6 +86,24 @@ void myError(const char *fmt, ...);
 		if(!var) {\
 			myError("cannot allocate %d bytes for %s", sizeof(type)*size, #var);\
 			exit(1);\
+		}\
+	} while(0)
+	
+	#define renew(var, size) do {\
+		var = (type*)realloc(sizeof(type)*size);\
+		if(!var) {\
+			myError("cannot allocate %d bytes for %s", sizeof(type)*size, #var);\
+			exit(1);\
+		}\
+	} while(0)
+	
+	#define renewif(condition, var, size) do {\
+		if(condition) {\
+			var = (type*)realloc(sizeof(type)*size);\
+			if(!var) {\
+				myError("cannot allocate %d bytes for %s", sizeof(type)*size, #var);\
+				exit(1);\
+			}\
 		}\
 	} while(0)
 
@@ -154,6 +181,7 @@ typedef struct FontChar
 	unsigned int vertex;
 	/* Width of char */
 	float w;
+	float v[8], t[8];
 } FontChar;
 
 typedef struct Font {
