@@ -25,7 +25,7 @@ IN THE SOFTWARE.
 #include "cheetah.h"
 #include "render.h"
 
-#define NO_VBO
+//~ #define NO_VBO
 
 //~ Font * currentFont;
 
@@ -135,18 +135,7 @@ float Font_Width(Font *f, register const char *str)
 	//~ glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	//~ #endif
 //~ }
-
-#define ALIGN(width) do { \
-	if(align == alignCenter) {\
-		w = floor((maxw - width)*0.5);\
-		glTranslatef(w, 0, 0);\
-	}\
-	else if(align == alignRight) {\
-		w = floor(maxw - width);\
-		glTranslatef(w, 0, 0); \
-	}\
-	else w = 0;\
-} while(0)
+//~ 
 
 #define DRAW_CHAR glCallList(ch->vertex);
 
@@ -334,12 +323,8 @@ void fontSetGlyph(Font *ptr, unsigned int ch, float x1, float y1, float x2, floa
 	#else
 	float vert[] = {cx1,cy1,cx1,cy2,cx2,cy2,cx2,cy1};
 	float tex[] = {x1,y1,x1,y2,x2,y2,x2,y1};
-	glGenBuffersARB(1, &ptr->chars[ch].vertex);
-	glBindBufferARB(GL_ARRAY_BUFFER_ARB, ptr->chars[ch].vertex);
-	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(vert), vert, GL_STATIC_DRAW_ARB);
-	glGenBuffersARB( 1, &ptr->chars[ch].tex );
-	glBindBufferARB(GL_ARRAY_BUFFER_ARB, ptr->chars[ch].tex);
-	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(tex), tex, GL_STATIC_DRAW_ARB);
+	memcpy(ptr->v, vert, sizeof(float)*8);
+	memcpy(ptr->t, tex, sizeof(float)*8);
 	#endif
 	ptr->chars[ch].w = w;
 	ptr->height = h;
