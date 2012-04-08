@@ -99,6 +99,7 @@ end
 
 ffi.cdef [[
 void printf(const char * str, ...);
+int sscanf ( const char * str, const char * format, ...);
 ]]
 
 local libcheetah = C.loadDLL 'cheetah'
@@ -308,37 +309,47 @@ local fntpat = '^(%d+)'..string.rep('%s(%d+)', 8)
 
 C.fonts = {}
 local fontTextures = {}
+
 C.newFont = function(name, scalable, codepage)
-	local a, b, c, font, img, c, x, y, cw, ch, cx, cy, w, h, n
+	local a, b, c, font, img
 	local millis = C.getTicks()
 	local glyphs = 0
+	local bytes = 0
+	local p = ffi.new('float[8]')
 	for line in io.lines(name) do
 		a = line:match('^textures: (.+)')
 		if a then
 			n = name:gsub('[^/]+$', a)
 			img = ffi.new('Image')
-			libcheetah.newImageOpt(img, n, 'i'..(scalable and '' or 'n'))
+			libcheetah.newImageOpt(img, n, 'in') --disable delayed loader
 			table.insert(fontTextures, img)
 		else
 			a, b, c = line:match('^([%w ]+) (%d+)(p[tx])$')
 			if a then
 				if c == 'px' then b = math.ceil(b * 72 / 96) end
+				if font then bytes = bytes + font.mem end
 				font = ffi.new('Font')
+				ffi.fill(font, ffi.sizeof('Font'))
 				font.image = img
-				font.scale = 1
+				font._scale = 1
+				font._interval = 1
 				font.scalable = scalable or false
 				if not C.fonts[a] then C.fonts[a] = {} end
 				C.fonts[a][tonumber(b)] = font
 			else
-				c,x,y,cw,ch,cx,cy,w,h = line:match(fntpat)
-				if c then
-					libcheetah.fontSetGlyph(font,tonumber(c),tonumber(x),tonumber(y),tonumber(cw),tonumber(ch),tonumber(cx),tonumber(cy),tonumber(w),tonumber(h))
-					glyphs = glyphs + 1
-				end
+				libcheetah.fontSetGlyph(font, line)
+				glyphs = glyphs + 1
 			end
 		end
 	end
-	--~ print('Loaded font '..name..' ('..glyphs..' glyphs) in '..(C.getTicks()-millis)..' ms')
+	if font then bytes = bytes + font.mem end
+	print('Loaded font '..name..' ('..glyphs..' glyphs, '..bytes..' bytes) in '..(C.getTicks()-millis)..' ms')
+end
+
+C.init = function(title, w, h, c, o)
+	libcheetah.init(title, w, h, c, o)
+	C.newFont('lib/font/DICE.fnt')
+	C.fonts.default = C.fonts.DICE[6]
 end
 
 C.getFont = function(name, size)
@@ -348,10 +359,12 @@ end
 ffi.metatype('Font', {
 	__index = {
 		print = function(font, text, x, y, width, align)
-			--~ font:select()
-			--~ size = math.ceil(size*libcheetah.screenScale.scaleX)
-			libcheetah.fontPrintf(font, text, x or 0, y or 0, width or 0, align or 0)
-		end
+			libcheetah.fontPrintf(font, text or 'undefined', x or 0, y or 0, width or 0, align or 0)
+		end,
+		interval = libcheetah.fontInterval,
+		scale = libcheetah.fontScale,
+		getInterval = libcheetah.fontGetInterval,
+		getScale = libcheetah.fontGetScale
 	},
 	--~ __gc = libcheetah.deleteFont
 })

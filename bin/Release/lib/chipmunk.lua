@@ -225,8 +225,8 @@ if lQuery then
 	end
 	local physDraw = function(s)
 		local b = s.body
+		C.push()
 		C.translateObject(b.p.x, b.p.y, b.a * 180 / math.pi, s.w, s.h, s.ox, s.oy)
-		C.setColor(s.r or 255, s.g or 255, s.b or 255, s.a or 255)
 	end
 	function Entity:physCircle(mass, friction, elasticity)
 		assert(cp.space, defSpaceErr)
@@ -240,11 +240,7 @@ if lQuery then
 		self.shape = cp.space:addShape(chipmunk.CircleShapeNew(self.body, self.R, cp.vzero))
 		self.shape:setFriction(friction or 0.5)
 		self.shape:setElasticity(elasticity or 0.5)
-		if self._draw then
-			self._draw[1] = physDraw
-		else
-			self._draw = {physDraw}
-		end
+		self:translate(physDraw)
 		self:bound(physBound)
 		
 		return self
@@ -261,17 +257,12 @@ if lQuery then
 		
 		if mass == math.huge then
 			self.shape = cp.space:addStaticShape(chipmunk.BoxShapeNew(self.body, self.w, self.h))
-			print('HUGE')
 		else
 			self.shape = cp.space:addShape(chipmunk.BoxShapeNew(self.body, self.w, self.h))
 		end
 		self.shape:setFriction(friction or 0.5)
 		self.shape:setElasticity(elasticity or 0.5)
-		if self._draw then
-			self._draw[1] = physDraw
-		else
-			self._draw = {physDraw}
-		end
+		self:translate(physDraw)
 		self:bound(physBound)
 		
 		return self

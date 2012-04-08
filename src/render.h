@@ -38,8 +38,17 @@ extern bool antiAliasing;
 extern const float texCoordQuad[];
 extern float *texCoord;
 extern float *vertexCoord;
-
+volatile int verAlloc;
 /**********************************VERTEX OPS**********************************/
+
+/* dynamic vertex array */
+#define VERTEX_QUERY(size) do {\
+	if((size) > verAlloc) {\
+		renew(vertexCoord, float, verAlloc * 2);\
+		renew(texCoord, float, verAlloc * 2);\
+		verAlloc *= 2;\
+	}\
+} while(0)
 
 #define VERTEX_COORD(x,y,w,h) do {\
 	vertexCoord[0] = x;\

@@ -153,8 +153,10 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		glEnd();
 		glEndList();
 		
-		new(texCoord, float, 1024);
-		new(vertexCoord, float, 1024);
+		/*two vertex buffers for 1024 quads*/
+		new(texCoord, float, 4096);
+		new(vertexCoord, float, 4096);
+		verAlloc = 4096;
 		
 		//~ static float tex[] = {0,0,0,1,1,1,1,0};
 		//~ static float ver[] = {0,0,0,1,1,1,1,0};

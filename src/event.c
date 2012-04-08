@@ -49,18 +49,21 @@ unsigned int getEventType() {
 			case SDL_MOUSEBUTTONDOWN: return 4;
 			case SDL_MOUSEBUTTONUP: return 5;
 			case SDL_VIDEORESIZE: 
-				screenScale.aspect = (float)event.resize.w/(float)event.resize.h;
-				if(screenScale.aspect > (float)4/3)
+				if(screenScale.autoScale)
 				{
-					screenScale.scaleX = screenScale.scaleY = event.resize.h/screenScale.origHeight;
-					screenScale.offsetX = floor((event.resize.w - screenScale.origWidth * screenScale.scaleX)*0.5);
-					screenScale.offsetY = 0;
-				}
-				else
-				{
-					screenScale.scaleX = screenScale.scaleY = event.resize.w/screenScale.origWidth;
-					screenScale.offsetY = floor((event.resize.h - screenScale.origHeight * screenScale.scaleY)*0.5);
-					screenScale.offsetX = 0;
+					screenScale.aspect = (float)event.resize.w/(float)event.resize.h;
+					if(screenScale.aspect > (float)4/3)
+					{
+						screenScale.scaleX = screenScale.scaleY = event.resize.h/screenScale.origHeight;
+						screenScale.offsetX = floor((event.resize.w - screenScale.origWidth * screenScale.scaleX)*0.5);
+						screenScale.offsetY = 0;
+					}
+					else
+					{
+						screenScale.scaleX = screenScale.scaleY = event.resize.w/screenScale.origWidth;
+						screenScale.offsetY = floor((event.resize.h - screenScale.origHeight * screenScale.scaleY)*0.5);
+						screenScale.offsetX = 0;
+					}
 				}
 				SDL_SetVideoMode(event.resize.w, event.resize.h, 32, screen->flags);
 				glViewport( 0, 0, event.resize.w, event.resize.h );

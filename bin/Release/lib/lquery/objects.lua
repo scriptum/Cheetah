@@ -35,7 +35,7 @@ function Entity:point(R)
 end
 --rect
 local rect_draw = function(s)
-  C.rectangle(true)
+  C.rectangle()
 end
 function Entity:rectangle()
   self:draw(rect_draw)

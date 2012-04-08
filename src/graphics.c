@@ -143,9 +143,12 @@ void autoScale(bool autoScale) {
 }
 
 void doAutoScale() {
-	glLoadIdentity();
-	glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
-	glScalef(screenScale.scaleX, screenScale.scaleY, 1);
+	if(screenScale.autoScale)
+	{
+		glLoadIdentity();
+		glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
+		glScalef(screenScale.scaleX, screenScale.scaleY, 1);
+	}
 }
 
 /**
