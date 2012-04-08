@@ -30,7 +30,7 @@ IN THE SOFTWARE.
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-//~ #define MEMORY_TEST 1
+//~ #define MEMORY_TEST
 
 #ifndef __CHEETAH_H__
 #define __CHEETAH_H__
@@ -48,23 +48,23 @@ void myError(const char *fmt, ...);
 			myError("variable %s already contains data: %x. Delete it before allocating", #var, var);\
 			exit(1);\
 		}\
-		var = (type*)malloc(sizeof(type)*size);\
+		var = (type*)malloc(sizeof(type)*(size));\
 		/*initialize memory for small structures*/\
 		if(size == 1) memset(var, 0, sizeof(type));\
 		if(!var) {\
-			myError("cannot allocate %d bytes for %s", sizeof(type)*size, #var);\
+			myError("cannot allocate %d bytes for %s", sizeof(type)*(size), #var);\
 			exit(1);\
 		}\
-		printf("Added: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var); \
+		printf("Added: %s %d %s (%x) %d bytes\n", __FILE__, __LINE__, #var, var, sizeof(type)*(size)); \
 	} while(0)
-	
-	#define renew(var, size) do {\
-		var = (type*)realloc(sizeof(type)*size);\
+
+	#define renew(var, type, size) do {\
+		var = (type*)realloc(var, sizeof(type)*(size));\
 		if(!var) {\
-			myError("cannot allocate %d bytes for %s", sizeof(type)*size, #var);\
+			myError("cannot re-allocate %d bytes for %s", sizeof(type)*(size), #var);\
 			exit(1);\
 		}\
-		printf("Reallocated: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var); \
+		printf("Reallocated: %s %d %s (%x) %d bytes\n", __FILE__, __LINE__, #var, var, sizeof(type)*(size)); \
 	} while(0)
 
 	#define delete(var) do {\
@@ -80,30 +80,20 @@ void myError(const char *fmt, ...);
 			myError("variable %s already contains data: %x. Delete it before allocating", #var, var);\
 			exit(1);\
 		}\
-		var = (type*)malloc(sizeof(type)*size);\
+		var = (type*)malloc(sizeof(type)*(size));\
 		/*initialize memory for small structures*/\
 		if(size == 1) memset(var, 0, sizeof(type));\
 		if(!var) {\
-			myError("cannot allocate %d bytes for %s", sizeof(type)*size, #var);\
+			myError("cannot allocate %d bytes for %s", sizeof(type)*(size), #var);\
 			exit(1);\
 		}\
 	} while(0)
-	
-	#define renew(var, size) do {\
-		var = (type*)realloc(sizeof(type)*size);\
+
+	#define renew(var, type, size) do {\
+		var = (type*)realloc(var, sizeof(type)*(size));\
 		if(!var) {\
-			myError("cannot allocate %d bytes for %s", sizeof(type)*size, #var);\
+			myError("cannot re-allocate %d bytes for %s (%x)", sizeof(type)*(size), #var, var);\
 			exit(1);\
-		}\
-	} while(0)
-	
-	#define renewif(condition, var, size) do {\
-		if(condition) {\
-			var = (type*)realloc(sizeof(type)*size);\
-			if(!var) {\
-				myError("cannot allocate %d bytes for %s", sizeof(type)*size, #var);\
-				exit(1);\
-			}\
 		}\
 	} while(0)
 
@@ -115,6 +105,15 @@ void myError(const char *fmt, ...);
 	} while(0)
 #endif
 
+#define renewif(condition, var, type, size) do {\
+	if(condition) {\
+		renew(var, type, size);\
+	}\
+} while(0)
+
+#define fill(var, character, type, size) do {\
+	memset(var, character, sizeof(type) * (size));\
+} while(0)
 
 /*#define new(type) (type *)malloc(sizeof(type))*/
 
@@ -181,14 +180,16 @@ typedef struct FontChar
 	unsigned int vertex;
 	/* Width of char */
 	float w;
-	float v[8], t[8];
+	float v[4], t[4];
 } FontChar;
 
 typedef struct Font {
 	Image *image;
-	float scale, height;
-	FontChar chars[255];
-	bool scalable;
+	float _scale, height, _interval, spacew;
+	FontChar ***chars;
+	int allocated;
+	int mem;
+	bool scalable, unicode;
 } Font;
 
 

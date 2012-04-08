@@ -8,15 +8,12 @@ local cp = require 'lib.chipmunk'
 --set space into cp.space with gravity 300, 3 steps per frame
 cp.defaultScape(300, 3)
 
-cp.space:setIterations(25)
+cp.space:setIterations(10)
 cp.space:setSleepTimeThreshold(1)
 cp.space:setCollisionSlop(0.5);
 --~ cp.space:useSpatialHash(10, 10000)
 C.printFPS = true
 cp.stepsPerFrame(1)
---borders around the screen
---~ cp.addFrame(0,0,800,600, 0.5, 1)
---~ cp.addBorder(0,500,800,600, 0.5, 1)
 
 
 E:new(screen):rectangle()
@@ -37,22 +34,24 @@ E:new(screen):rectangle()
 
 cp.mouseForce(5000)
 
-local img = C.newImage('data/ball.png')
-C.setBlendMode(0)
+local ball = C.newImage('data/ball.png')
+local ball_small = C.newImage('data/ball_small.png')
+local crate = C.newImage('data/crate.png')
 local function getSleep(s)
 	if (s.body.node_private.idleTime > cp.space.sleepTimeThreshold) then
-		C.Color(128,128,128,255)
+		C.color(128,128,128,255)
 	else
-		C.Color(255,255,255,255)
+		C.color(255,255,255,255)
 	end
 end
-E:new(screen):draw(function()C.rectangle(true)end):color('PeachPuff'):move(400,0):size(400,600)
-for i=1,33 do
-	for j=1,33 do
+E:new(screen):draw(function()C.rectangle()end)
+:color('PeachPuff'):move(400,0):size(400,600):translate()
+for i=1,20 do
+	for j=1,20 do
 		E:new(screen)
 		:draw(getSleep)
 		:radius(5)
-		:image('data/ball_small.png')
+		:draw(function()ball_small:draw()end)
 		:size(10,10)
 		:move(1+j*10,1+i*10)
 		:offset(5,5)
@@ -65,7 +64,8 @@ for i=1,2 do
 	E:new(screen)
 	:draw(getSleep)
 	:radius(63)
-	:image('data/ball.png')
+	:draw(function()ball:draw()end)
+	:size(128,128)
 	:move(300,i*64)
 	:offset(64,64)
 	:physCircle(10)
@@ -75,13 +75,13 @@ end
 for i=1,15 do
 	E:new(screen)
 	:draw(getSleep)
-	:image('data/crate.png')
+	:draw(function()crate:draw()end)
 	:move(500,i*32)
-	:offset(64,16)
-	:size(128,32)
+	:offset(32,32)
+	:size(64,64)
 	:physBox(1,0.9,0)
 	:physDraggable()
-	:size(128,32)
+	:size(64,64)
 end
 --~ 
 C.mainLoop()

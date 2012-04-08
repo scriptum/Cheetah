@@ -487,7 +487,7 @@ function Entity:draw(callback)
 end
 
 function Entity:translate(callback)
-	self._translate = stdDrawTrans
+	self._translate = callback or stdDrawTrans
 	return self --so we can chain methods
 end
 
