@@ -105,23 +105,15 @@ float Font_Width(Font *f, register const char *str)
 #define DRAW_CHAR \
 	do {\
 		VERTEX_QUERY(memstep + 8);\
-		texCoord[memstep] = ch->t[0];\
-		texCoord[memstep+1] = ch->t[1];\
-		texCoord[memstep+2] = ch->t[0];\
-		texCoord[memstep+3] = ch->t[3];\
-		texCoord[memstep+4] = ch->t[2];\
-		texCoord[memstep+5] = ch->t[3];\
-		texCoord[memstep+6] = ch->t[2];\
-		texCoord[memstep+7] = ch->t[1];\
+		texCoord[memstep] = texCoord[memstep+2] = ch->t[0];\
+		texCoord[memstep+1] = texCoord[memstep+7] = ch->t[1];\
+		texCoord[memstep+3] = texCoord[memstep+5] = ch->t[3];\
+		texCoord[memstep+4] = texCoord[memstep+6] = ch->t[2];\
 		w = ceil(x);\
-		vertexCoord[memstep] = ch->v[0] + w;\
-		vertexCoord[memstep+1] = ch->v[1] + h;\
-		vertexCoord[memstep+2] = ch->v[0] + w;\
-		vertexCoord[memstep+3] = ch->v[3] + h;\
-		vertexCoord[memstep+4] = ch->v[2] + w;\
-		vertexCoord[memstep+5] = ch->v[3] + h;\
-		vertexCoord[memstep+6] = ch->v[2] + w;\
-		vertexCoord[memstep+7] = ch->v[1] + h;\
+		vertexCoord[memstep] = vertexCoord[memstep+2] = ch->v[0] + w;\
+		vertexCoord[memstep+1] = vertexCoord[memstep+7] = ch->v[1] + h;\
+		vertexCoord[memstep+3] = vertexCoord[memstep+5] = ch->v[3] + h;\
+		vertexCoord[memstep+4] = vertexCoord[memstep+6] = ch->v[2] + w;\
 		memstep += 8;\
 		x += ch->w;\
 	}\
@@ -158,7 +150,7 @@ else if((a[i] & 0b11111000) == 0b11110000) {\
 
 void fontPrintf(Font *currentFont, register const unsigned char * str, float x, float y, float maxw, int align) {
 	FontChar *ch;
-	int i = 0, last_space = 0, buf = 0, spaces = 0, high = 0, low = 0, increment, incrementBuf, c;
+	int i = 0, last_space = 0, buf = 0, spaces = -1, high = 0, low = 0, increment, incrementBuf, c;
 	float w = 0, lastw = 0, h;
 	float justifyWidth = 0;
 	#ifdef NO_VBO
@@ -170,7 +162,10 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 	float fontHeight = currentFont->height * currentFont->_interval;
 	bool end = 0;
 	bool justify = align == alignJustify;
-	maxw = maxw / currentFont->_scale * screenScale.scaleX;
+	if(maxw > .0) {
+		maxw = maxw / currentFont->_scale * screenScale.scaleX;
+		if(maxw == .0) maxw = 0.0001;
+	}
 	glPushMatrix();
 	if(!currentFont->scalable)
 	{
@@ -204,7 +199,6 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 							lastw = w;
 							break;
 					case '\0':
-							
 							end = 1;
 							break;
 					case ' ':
@@ -242,10 +236,10 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 							justifyWidth = spacew;
 						else
 						#ifdef NO_VBO
-							justifyFrac = modff((maxw + spacew*(spaces-1) - lastw)/(float)(spaces-1), &justifyWidth);
+							justifyFrac = modff((maxw + spacew*(spaces) - lastw)/(float)(spaces), &justifyWidth);
 						w = 0;
 						#else
-							justifyWidth = (maxw + spacew*(spaces-1) - lastw)/(float)(spaces-1);
+							justifyWidth = (maxw + spacew*(spaces) - lastw)/(float)(spaces);
 						x = 0;
 						#endif
 						break;
@@ -255,6 +249,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 						default: x = 0;
 					#endif
 				}
+				if(buf == last_space) last_space++;
 				while(buf < last_space) {
 					UNICODE_TO_INT(str,buf,incrementBuf)
 					c = low | (high << 8);
@@ -317,7 +312,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 				}
 				last_space = 0;
 				w = 0;
-				spaces = 0;
+				spaces = -1;
 				#ifdef NO_VBO
 					justifyAdd = 0;
 				#endif
@@ -339,7 +334,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 						#endif
 						y += fontHeight;
 						h = ceil(y);
-						continue;
+						goto end_loop;
 					case '\t':
 						#ifdef NO_VBO
 							glTranslatef(spacew * 8, 0, 0);
@@ -347,18 +342,15 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 						#else 
 							x += spacew * 8;
 						#endif
-						continue;
+						goto end_loop;
 				}
+				
+				if(currentFont->allocated < high)
+					goto end_loop;
+				ch = currentFont->chars[high][low];
+				DRAW_CHAR;
+				end_loop:
 				i += increment;
-				if(currentFont->allocated < high || !currentFont->chars[high] || !currentFont->chars[high][low])
-				{
-					continue;
-				}
-				if(currentFont->chars[high])
-				{
-					ch = currentFont->chars[high][low];
-					if(ch) DRAW_CHAR;
-				}
 			}
 	#ifndef NO_VBO
 		glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
@@ -411,12 +403,13 @@ float fontGetInterval(Font *font) {
 
 void fontSetGlyph(Font *ptr, const char *line) {
 	static float cx2=0, cy2=0, x1=0, y1=0, x2=0, y2=0, cx1=0, cy1=0, w=0, h=0;
-	static unsigned int ch=0;
+	static unsigned int ch=0, ch2;
 	static unsigned char c[5];
 	int i = 0, high=0, low=0, increment = 0;
 	FontChar * fch;
 	if(sscanf(line, "%d %f %f %f %f %f %f %f %f", &ch, &x1, &y1, &x2, &y2, &cx1, &cy1, &w, &h) == -1)
 		return;
+	ch2 = ch;
 	while(ch) {
 		if(ch & 0xff000000)
 		{
@@ -428,7 +421,7 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	c[i] = 0;
 	UNICODE_TO_INT(c,0,increment)
 	else {
-		myError("character %s is out of range (high: %x, low: %x)", c, high, low);
+		myError("character %d is out of range (high: %x, low: %x)", ch2, high, low);
 		return;
 	}
 	if(!ptr->chars) {

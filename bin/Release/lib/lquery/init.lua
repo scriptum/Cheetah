@@ -35,11 +35,11 @@ lQuery.getMouseXY = cheetah.getMousePos
 
 cheetah.render = function()
 	mX, mY = lQuery.getMouseXY()
-	time = cheetah.getTime()
 	--events
+	
+	lQuery.process()
 	local e, a, b, c = cheetah.poll()
 	if e then lQuery.event(e,a,b,c) end
-	lQuery.process()
 end
  
 lQuery.MousePressed = false

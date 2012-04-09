@@ -24,21 +24,11 @@ IN THE SOFTWARE.
 #include "cheetah.h"
 #include "math.h"
 
-SDL_Event event;
+Uint32 rescaleTime = 0;
+Uint32 globalTime = 0;
+int resizeDelay = 100;
 
 unsigned int getEventType() {
-	Resource * r;
-	unsigned int millis;
-	if(resShared) {
-		r = resShared;
-		//~ printf("Get image %s %d\n", r->image->name, r->image->id);
-		millis = SDL_GetTicks();
-		r->image->id = loadImageTex(r->image->options, r->data, r->image->w, r->image->h, r->image->channels);
-		printf("Delayed resource loader: loaded %s with %d ms\n", r->image->name, SDL_GetTicks() - millis);
-		delete(r->image->name);
-		delete(r->image->options);
-		resShared = 0;
-	}
 	//В общем, тут идет дохрена ненужных нам событий (в основном mousemove), которые могут тормозить игру, их нужно пропускать.
 	while(SDL_PollEvent(&event)) {
 		//printf("%d\n", event.type);
@@ -49,29 +39,24 @@ unsigned int getEventType() {
 			case SDL_MOUSEBUTTONDOWN: return 4;
 			case SDL_MOUSEBUTTONUP: return 5;
 			case SDL_VIDEORESIZE: 
-				if(screenScale.autoScale)
+				screenScale.aspect = (float)event.resize.w/(float)event.resize.h;
+				if(screenScale.aspect > (float)4/3)
 				{
-					screenScale.aspect = (float)event.resize.w/(float)event.resize.h;
-					if(screenScale.aspect > (float)4/3)
-					{
-						screenScale.scaleX = screenScale.scaleY = event.resize.h/screenScale.origHeight;
-						screenScale.offsetX = floor((event.resize.w - screenScale.origWidth * screenScale.scaleX)*0.5);
-						screenScale.offsetY = 0;
-					}
-					else
-					{
-						screenScale.scaleX = screenScale.scaleY = event.resize.w/screenScale.origWidth;
-						screenScale.offsetY = floor((event.resize.h - screenScale.origHeight * screenScale.scaleY)*0.5);
-						screenScale.offsetX = 0;
-					}
+					screenScale.scaleX = screenScale.scaleY = event.resize.h/screenScale.origHeight;
+					screenScale.offsetX = floor((event.resize.w - screenScale.origWidth * screenScale.scaleX)*0.5);
+					screenScale.offsetY = 0;
 				}
-				SDL_SetVideoMode(event.resize.w, event.resize.h, 32, screen->flags);
-				glViewport( 0, 0, event.resize.w, event.resize.h );
-				glMatrixMode( GL_PROJECTION );
-				glLoadIdentity();
-				glOrtho( 0, event.resize.w, event.resize.h, 0, -1, 1 );
-				glMatrixMode( GL_MODELVIEW );
-				glLoadIdentity();
+				else
+				{
+					screenScale.scaleX = screenScale.scaleY = event.resize.w/screenScale.origWidth;
+					screenScale.offsetY = floor((event.resize.h - screenScale.origHeight * screenScale.scaleY)*0.5);
+					screenScale.offsetX = 0;
+				}
+				rescaleTime = globalTime + resizeDelay;
+				screen->w = event.resize.w;
+				screen->h = event.resize.h;
+				//~ glClear(GL_COLOR_BUFFER_BIT);
+				//~ SDL_UpdateRect(screen, 0,0,0,0);
 				//~ SDL_GL_SwapBuffers();
 				return 6;
 			case SDL_VIDEOEXPOSE: return 7;
@@ -118,6 +103,9 @@ unsigned int getEventResizeH() {
 	return event.resize.h;
 }
 
+void setResizeDelay(int delay) {
+	resizeDelay = delay;
+}
 int getMouseX() {
 	int x;
 	SDL_GetMouseState(&x, NULL);

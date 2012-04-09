@@ -142,15 +142,57 @@ void autoScale(bool autoScale) {
 	screenScale.autoScale = autoScale;
 }
 
-void doAutoScale() {
+void prepare() {
+	Resource * r;
+	unsigned int millis;
+	globalTime = SDL_GetTicks();
 	if(screenScale.autoScale)
 	{
 		glLoadIdentity();
 		glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
 		glScalef(screenScale.scaleX, screenScale.scaleY, 1);
 	}
+	if(resShared) {
+		r = resShared;
+		//~ printf("Get image %s %d\n", r->image->name, r->image->id);
+		millis = globalTime;
+		r->image->id = loadImageTex(r->image->options, r->data, r->image->w, r->image->h, r->image->channels);
+		printf("Delayed resource loader: loaded %s with %d ms\n", r->image->name, SDL_GetTicks() - millis);
+		delete(r->image->name);
+		delete(r->image->options);
+		resShared = 0;
+	}
+	if(rescaleTime && globalTime > rescaleTime)
+	{
+		SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
+		glViewport( 0, 0, screen->w, screen->h );
+		glMatrixMode( GL_PROJECTION );
+		glLoadIdentity();
+		glOrtho( 0, screen->w, screen->h, 0, -1, 1 );
+		glMatrixMode( GL_MODELVIEW );
+		glLoadIdentity();
+		glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
+		glScalef(screenScale.scaleX, screenScale.scaleY, 1);
+		rescaleTime = 0;
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
 }
 
+void end() {
+	if(rescaleTime && globalTime > rescaleTime)
+	{
+		SDL_GL_SwapBuffers();
+		SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
+		glViewport( 0, 0, screen->w, screen->h );
+		glMatrixMode( GL_PROJECTION );
+		glLoadIdentity();
+		glOrtho( 0, screen->w, screen->h, 0, -1, 1 );
+		glMatrixMode( GL_MODELVIEW );
+		glLoadIdentity();
+		rescaleTime = 0;
+		SDL_GL_SwapBuffers();
+	}
+}
 /**
  * @descr Enable or disable blending. Drawing without blending usually faster, but textures with alpha-channel will be poor. Blending is enabled by defaults.
  * @group graphics/drawing
