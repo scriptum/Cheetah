@@ -119,15 +119,16 @@ local done = 0
 local FPS = 60
 C.FPS = "60"
 C.printFPS = false
-local time = 0
+time = 0
 local lasttime = 0
 
 C.mainLoop = function()
 	while done == 0 do
 		time = libcheetah.getTime()
-		libcheetah.doAutoScale()
+		libcheetah.prepare()
 		if C.render then C.render() end
 		libcheetah.swapBuffers()
+		--~ libcheetah.doAutoScale()
 		FPS = (FPS + 1) / (1 + (libcheetah.getTime() - time));
 		if time - lasttime > 0.5 then
 			lasttime = time

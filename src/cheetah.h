@@ -279,4 +279,9 @@ inline unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 
 inline void imageBind(Image * image);
 void initRenderer();
+
+SDL_Event event;
+extern Uint32 rescaleTime;
+extern Uint32 globalTime;
+extern int resizeDelay;
 #endif //__CHEETAH_H__

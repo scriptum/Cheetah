@@ -51,7 +51,7 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 	bool stencil = 0;
 	bool loader = 0;
 	char ch;
-	Uint32 flags = SDL_OPENGL;
+	Uint32 flags = SDL_OPENGL | SDL_DOUBLEBUF;
 	
 	
 	while(*attr)
@@ -79,7 +79,7 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 			return 0;
 		atexit(SDL_Quit);
 		SDL_EnableUNICODE(1);
-		//~ SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
 		if(depth) SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 		if(stencil) SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
