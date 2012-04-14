@@ -166,19 +166,19 @@ void prepare() {
 	}
 	if(rescaleTime && globalTime > rescaleTime)
 	{
-		//~ SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
+		SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
 		glViewport( 0, 0, screen->w, screen->h );
-		//~ glMatrixMode( GL_PROJECTION );
-		//~ glLoadIdentity();
-		//~ glOrtho( 0, screen->w, screen->h, 0, -1, 1 );
-		//~ glMatrixMode( GL_MODELVIEW );
-		//~ glLoadIdentity();
-		//~ if(screenScale.autoScale)
-		//~ {
-			//~ glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
-			//~ glScalef(screenScale.scaleX, screenScale.scaleY, 1);
-		//~ }
-		//~ rescaleTime = 0;
+		glMatrixMode( GL_PROJECTION );
+		glLoadIdentity();
+		glOrtho( 0, screen->w, screen->h, 0, -1, 1 );
+		glMatrixMode( GL_MODELVIEW );
+		glLoadIdentity();
+		if(screenScale.autoScale)
+		{
+			glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
+			glScalef(screenScale.scaleX, screenScale.scaleY, 1);
+		}
+		rescaleTime = 0;
 		//~ glClear(GL_COLOR_BUFFER_BIT);
 	}
 	if(clearScreenFlag) glClear(GL_COLOR_BUFFER_BIT);
