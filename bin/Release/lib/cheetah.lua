@@ -100,6 +100,8 @@ end
 ffi.cdef [[
 void printf(const char * str, ...);
 int sscanf ( const char * str, const char * format, ...);
+
+
 ]]
 
 local libcheetah = C.loadDLL 'cheetah'

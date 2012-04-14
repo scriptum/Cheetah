@@ -123,6 +123,35 @@ typedef struct SDL_Rect {
 	unsigned short w, h;
 } SDL_Rect;
 
+
+struct {
+	unsigned int flags;				/**< Read-only */
+	void *format;		/**< Read-only */
+	int w, h;				/**< Read-only */
+	unsigned short pitch;				/**< Read-only */
+	void *pixels;				/**< Read-write */
+	int offset;				/**< Private */
+
+	/** Hardware-specific surface info */
+	struct private_hwdata *hwdata;
+
+	/** clipping information */
+	SDL_Rect clip_rect;			/**< Read-only */
+	unsigned int unused1;				/**< for binary compatibility */
+
+	/** Allow recursive locks */
+	unsigned int locked;				/**< Private */
+
+	/** info for fast blit mapping to other surfaces */
+	struct SDL_BlitMap *map;		/**< Private */
+
+	/** format version, bumped at every change to invalidate blit maps */
+	unsigned int format_version;		/**< Private */
+
+	/** Reference count -- used when freeing surface */
+	int refcount;				/**< Read-mostly */
+} screen;
+
 typedef struct __dirstream {
 } DIR;
 

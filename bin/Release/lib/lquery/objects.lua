@@ -149,3 +149,33 @@ function Entity:border_image(image, top, right, bottom, left)
   end
   return self
 end
+
+local end_camera = function()
+	C.pop()
+end
+local draw_camera = function(s)
+	C.push()
+	C.move(s.x,s.y)
+	C.scale(s.sx,s.sy)
+end
+function Entity:camera()
+	self.sx = 1
+	self.sy = 1
+	self:draw(draw_camera)
+	self:postprocess(end_camera)
+	self.zoom = Entity.scale
+	return self
+end
+
+
+
+local draw_fps = function(s)
+	local defFont = C.fonts.default
+	defFont._scale = 2
+	defFont:print('FPS: '..C.FPS, s.x, s.y)
+	defFont._scale = 1
+end
+
+function Entity:fps()
+	return self:draw(draw_fps)
+end
