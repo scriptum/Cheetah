@@ -491,6 +491,11 @@ function Entity:translate(callback)
 	return self --so we can chain methods
 end
 
+function Entity:postprocess(callback)
+	self._end = callback
+	return self --so we can chain methods
+end
+
 lQuery.drag_start = function(s, x, y)
 	s._drag_x = x - s.x
 	s._drag_y = y - s.y
@@ -608,7 +613,7 @@ local function events(v)
 		end
 		v._key = false
 	end
-	if v._bound and v._bound(v, mX, mY) then
+	if v._bound and v._bound(v, mX, mY) or v == screen then
 		if v._mousemove then 
 			v._mousemove(v, mX, mY)
 		end 
@@ -636,34 +641,37 @@ local function events(v)
 	end
 end
 
-local function process_entities(ent)
-	if ent._visible == true then 
-		if ent._animQueue then 
-			animate(ent) 
+local function process_entities(s)
+	if s._visible == true then 
+		if s._animQueue then 
+			animate(s) 
 		end
-		if ent._control then --if controlled
-			events(ent)
+		if s._control then --if controlled
+			events(s)
 		end
-		if ent._draw then
-			if ent.r then C.color(ent.r or 255, ent.g or 255, ent.b or 255, ent.a or 255) end
-			if ent._translate then 
-				ent._translate(ent)
+		if s._draw then
+			if s.r then C.color(s.r or 255, s.g or 255, s.b or 255, s.a or 255) end
+			if s._translate then 
+				s._translate(s)
 			end
-			if type(ent._draw) == 'function' then
-				ent._draw(ent)
+			if type(s._draw) == 'function' then
+				s._draw(s)
 			else
-				for i = 1, #ent._draw do
-					ent._draw[i](ent)
+				for i = 1, #s._draw do
+					s._draw[i](s)
 				end
 			end
-			if ent._translate then 
+			if s._translate then 
 				C.pop()
 			end
 		end
-		if ent._child then 
-			for i = 1, #ent._child do
-				process_entities(ent._child[i])
+		if s._child then 
+			for i = 1, #s._child do
+				process_entities(s._child[i])
 			end
+		end
+		if s._end then 
+			s:_end()
 		end
 	end
 end
