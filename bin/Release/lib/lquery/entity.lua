@@ -21,19 +21,20 @@ IN THE SOFTWARE.
 
 ******************************************************************************]]
 
-local easing = require("lib/lquery/easing")
+local easing = require 'lib.lquery.easing'
 
 local C = cheetah
 
-lQuery = {
+local _lQuery 
+_lQuery = {
 	fx = true,
 	hooks = {},
 	_onresize = {},
 	addhook = function(hook)
-		table.insert(lQuery.hooks, hook)
+		table.insert(_lQuery.hooks, hook)
 	end,
 	onresize = function(func)
-		table.insert(lQuery._onresize, func)
+		table.insert(_lQuery._onresize, func)
 	end,
 	_MousePressedOwner = false,
 	MousePressed = false,
@@ -42,7 +43,7 @@ lQuery = {
 	_last_clickY = -1,
 	dblclickInterval = 0.3
 }
-
+lQuery = _lQuery
 
 Entity = {} --Any object: box, circle, character etc
 E = Entity --short name
@@ -61,6 +62,7 @@ local EntityMetaUpdate = {
 	end
 }
 function Entity:new(parent)  -- constructor
+	--~ assert(parent, 'parent is nil')
 	local object = {
 		x = 0,   --x coord
 		y = 0,   --y coord
@@ -496,16 +498,16 @@ function Entity:postprocess(callback)
 	return self --so we can chain methods
 end
 
-lQuery.drag_start = function(s, x, y)
+_lQuery.drag_start = function(s, x, y)
 	s._drag_x = x - s.x
 	s._drag_y = y - s.y
-	lQuery._drag_object = s
+	_lQuery._drag_object = s
 end
-lQuery.drag_end = function(s)
-	lQuery._drag_object = nil
+_lQuery.drag_end = function(s)
+	_lQuery._drag_object = nil
 end
-lQuery.addhook(function()
-	local s = lQuery._drag_object
+_lQuery.addhook(function()
+	local s = _lQuery._drag_object
 	if s then
 		s.x = mX - s._drag_x
 		s.y = mY - s._drag_y
@@ -523,24 +525,22 @@ function Entity:draggable(options)
 	local o = options or {}
 	if o.bound then self._drag_bound = o.bound end --[[top, right, bottom, left]]
 	if o.callback then self._drag_callback = o.callback end
-	return self:mousepress(lQuery.drag_start):mouserelease(lQuery.drag_end)
+	return self:mousepress(_lQuery.drag_start):mouserelease(_lQuery.drag_end)
 end
 
 
 --delete object
 --how to remove object correctly and free memory:
 --a = a:delete()
---~ function Entity:delete()
-	--~ local i = 0
-	--~ for k, v in pairs(self._parent._child) do
-		--~ i = i + 1
-		--~ if v == self then
-			--~ table.remove(self._parent._child, i)
-			--~ return nil
-		--~ end
-	--~ end
-	--~ return nil
---~ end
+function Entity:delete()
+	for k, v in ipairs(self._parent._child) do
+		if v == self then
+			table.remove(self._parent._child, k)
+			return nil
+		end
+	end
+	return nil
+end
 
 --screen - parent entity for all entities. Drawing function recursively process all entities from it.
 screen = Entity:new()
@@ -563,7 +563,7 @@ local function animate(ent)
 				end
 			end
 			
-			if aq.lasttime + aq.speed <= time or lQuery.fx == false then
+			if aq.lasttime + aq.speed <= time or _lQuery.fx == false then
 				for k, v in pairs(aq._keys) do
 					ent[k] = v
 				end
@@ -588,13 +588,13 @@ end
 
 --some events
 local function events(v)
-	if lQuery.KeyPressed == true then 
+	if _lQuery.KeyPressed == true then 
 		if v._keypress then
-			if not v._key or v._key ~= lQuery.KeyPressedKey then
-				v._keypress(v, lQuery.KeyPressedKey, lQuery.KeyPressedUni)
+			if not v._key or v._key ~= _lQuery.KeyPressedKey then
+				v._keypress(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
 			end
 		end
-		if not v._key or v._key ~= lQuery.KeyPressedKey then
+		if not v._key or v._key ~= _lQuery.KeyPressedKey then
 			v._KeyPressedCounter = 1
 		end
 		if v._keyrepeat and (v._KeyPressedCounter == 1 or 
@@ -602,13 +602,13 @@ local function events(v)
 				 v._KeyPressedCounter > 2 and time - v._KeyPressedTime > 0.05) then 
 			v._KeyPressedTime = time
 			v._KeyPressedCounter = v._KeyPressedCounter + 1
-			v._keyrepeat(v, lQuery.KeyPressedKey, lQuery.KeyPressedUni)
+			v._keyrepeat(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
 		end
-		v._key = lQuery.KeyPressedKey
+		v._key = _lQuery.KeyPressedKey
 	else
 		if v._keyrelease then
 			if v._key and v._key == true then
-				v._keyrelease(v, lQuery.KeyPressedKey, lQuery.KeyPressedUni)
+				v._keyrelease(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
 			end
 		end
 		v._key = false
@@ -617,26 +617,26 @@ local function events(v)
 		if v._mousemove then 
 			v._mousemove(v, mX, mY)
 		end 
-		if lQuery.MouseButton == "wu" and lQuery.MousePressed == true then 
+		if _lQuery.MouseButton == "wu" and _lQuery.MousePressed == true then 
 			if v._wheel then
-				lQuery.MouseButton = nil
+				_lQuery.MouseButton = nil
 				v._wheel(v, mX, mY, "u")
 			end
-		elseif lQuery.MouseButton == "wd" and lQuery.MousePressed == true then 
+		elseif _lQuery.MouseButton == "wd" and _lQuery.MousePressed == true then 
 			if v._wheel then
-				lQuery.MouseButton = nil
+				_lQuery.MouseButton = nil
 				v._wheel(v, mX, mY, "d")
 			end
-		elseif lQuery.MousePressed == true and lQuery._MousePressedOwner == true then 
-			lQuery.MousePressedOwner = v
+		elseif _lQuery.MousePressed == true and _lQuery._MousePressedOwner == true then 
+			_lQuery.MousePressedOwner = v
 		end
-		lQuery.hover = v
+		_lQuery.hover = v
 	--~ else
-		--~ if lQuery._hover == v then 
-			--~ lQuery._hover = nil
-			--~ lQuery.hover = nil
+		--~ if _lQuery._hover == v then 
+			--~ _lQuery._hover = nil
+			--~ _lQuery.hover = nil
 			--~ if v._mouseout then v._mouseout(v, mX, mY) end
-			--if v == lQuery.MousePressedOwner then lQuery.MousePressedOwner = nil end
+			--if v == _lQuery.MousePressedOwner then _lQuery.MousePressedOwner = nil end
 		--~ end
 	end
 end
@@ -676,47 +676,47 @@ local function process_entities(s)
 	end
 end
 
-lQuery.event = function(e, a, b, c)
+_lQuery.event = function(e, a, b, c)
 	if e == "mp" then
-		lQuery.MousePressed = true
-		lQuery.MouseButton = c
-		lQuery._MousePressedOwner = true
+		_lQuery.MousePressed = true
+		_lQuery.MouseButton = c
+		_lQuery._MousePressedOwner = true
 	elseif e == "mr" then 
-		lQuery.MousePressed = false
-		lQuery.MouseButton = c
+		_lQuery.MousePressed = false
+		_lQuery.MouseButton = c
 		--click handler
-		local v = lQuery.MousePressedOwner
+		local v = _lQuery.MousePressedOwner
 		if v --[[and v._bound and v._bound(v, mX, mY)]] then
-			local v = lQuery.MousePressedOwner
+			local v = _lQuery.MousePressedOwner
 			if v._mouserelease then 
 				v._mouserelease(v, mX, mY, c)
 			end
 			if v._bound and v._bound(v, mX, mY) then 
-				if  lQuery._last_click_millis + lQuery.dblclickInterval > time 
-				and lQuery._last_clickX == mX and lQuery._last_clickY == mY then
+				if  _lQuery._last_click_millis + _lQuery.dblclickInterval > time 
+				and _lQuery._last_clickX == mX and _lQuery._last_clickY == mY then
 					if v._dblclick then v._dblclick(v, mX, mY, c) end
 				else
 					if v._click then v._click(v, mX, mY, c) end
 				end
-				lQuery._last_click_millis = time
-				lQuery._last_clickX = mX
-				lQuery._last_clickY = mY
-				if v._focus then lQuery.focus = v end
+				_lQuery._last_click_millis = time
+				_lQuery._last_clickX = mX
+				_lQuery._last_clickY = mY
+				if v._focus then _lQuery.focus = v end
 			end
 		end
-		lQuery.MousePressedOwner = nil
+		_lQuery.MousePressedOwner = nil
 	elseif e == "kp" then
-		lQuery.KeyPressed = true
-		lQuery.KeyPressedKey = a
-		lQuery.KeyPressedUni = b
+		_lQuery.KeyPressed = true
+		_lQuery.KeyPressedKey = a
+		_lQuery.KeyPressedUni = b
 	elseif e == "kr" then
-		lQuery.KeyPressed = false
+		_lQuery.KeyPressed = false
 	elseif e == "rz" then
 		screen_width = a
 		screen_height = b
-		if lQuery._onresize[1] then
-			for i = 1, #lQuery._onresize do
-				lQuery._onresize[i](a, b)
+		if _lQuery._onresize[1] then
+			for i = 1, #_lQuery._onresize do
+				_lQuery._onresize[i](a, b)
 			end
 		end
 	elseif e == "q" then
@@ -724,26 +724,26 @@ lQuery.event = function(e, a, b, c)
 	end
 end
 
-lQuery.process = function()
-	for _, v in pairs(lQuery.hooks) do v() end
-	lQuery.hover = nil
+_lQuery.process = function()
+	for _, v in pairs(_lQuery.hooks) do v() end
+	_lQuery.hover = nil
 	if screen then process_entities(screen) end
 	if Console then process_entities(Console) end
 	
 	--fix mousepress bug
-	local v = lQuery.MousePressedOwner
-	if v and lQuery._MousePressedOwner == true then
+	local v = _lQuery.MousePressedOwner
+	if v and _lQuery._MousePressedOwner == true then
 		if v._mousepress then 
-			v._mousepress(v, mX, mY, lQuery.MouseButton)
+			v._mousepress(v, mX, mY, _lQuery.MouseButton)
 		end
 	end
 	
-	local v = lQuery.lasthover
-	if v ~= lQuery.hover then
+	local v = _lQuery.lasthover
+	if v ~= _lQuery.hover then
 		if v and v._mouseout then v._mouseout(v, mX, mY) end --out MUST be before over
-		v = lQuery.hover
+		v = _lQuery.hover
 		if v and v._mouseover then v._mouseover(v, mX, mY) end
-		lQuery.lasthover = lQuery.hover
+		_lQuery.lasthover = _lQuery.hover
 	end
-	lQuery._MousePressedOwner = false
+	_lQuery._MousePressedOwner = false
 end
