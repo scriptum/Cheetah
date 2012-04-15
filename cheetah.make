@@ -40,6 +40,7 @@ OBJECTS := \
 	$(OBJDIR)/vbo.o \
 	$(OBJDIR)/window.o \
 	$(OBJDIR)/graphics.o \
+	$(OBJDIR)/generator.o \
 	$(OBJDIR)/stb_image_aug.o \
 	$(OBJDIR)/image_DXT.o \
 	$(OBJDIR)/image_helper.o \
@@ -137,6 +138,11 @@ $(OBJDIR)/window.o: src/window.c
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/graphics.o: src/graphics.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/generator.o: src/generator.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
