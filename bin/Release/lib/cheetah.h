@@ -157,6 +157,7 @@ void framebufferUnbind(Framebuffer * ptr);
 void framebufferDraw(Framebuffer * ptr);
 void framebufferDrawq(Framebuffer * ptr, float qx, float qy, float qw, float qh);
 void deleteFramebuffer(Framebuffer * ptr);
+void generateImage(Image *ptr, int w, int h, const char *imageType);
 void colorMask(bool r, bool g, bool b, bool a);
 void enableDepthTest();
 void disableDepthTest();

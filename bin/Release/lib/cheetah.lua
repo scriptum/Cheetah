@@ -291,6 +291,12 @@ end
 
 setmetatable(C, { __index = libcheetah})
 
+C.generate = function(w, h, imageType)
+	local ptr = ffi.new('Image')
+	libcheetah.generateImage(ptr, w, h, imageType)
+	return ptr
+end
+
 C.newImage = function(name, options)
 	local ptr = ffi.new('Image')
 	libcheetah.newImageOpt(ptr, name, options or '')
