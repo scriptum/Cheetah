@@ -47,6 +47,7 @@ inline int fastrand()
 	glTexImage2D(GL_TEXTURE_2D, 0, a?GL_RGBA:GL_RGB, w, h, 0, a?GL_RGBA:GL_RGB, GL_UNSIGNED_BYTE, buf);\
 	glBindTexture(GL_TEXTURE_2D, 0);\
 } while(0)
+
 void generateImage(Image *ptr, int w, int h, const char *imageType) {
 	char *buf = NULL;
 	GLuint bufid;
@@ -80,7 +81,11 @@ void generateImage(Image *ptr, int w, int h, const char *imageType) {
 		{
 			for(i = 0; i < w; i++)
 			{
-				c = 255-128*sqrt((float)(i - (w>>1))*(i - (w>>1))/(float)(w<<1) + (float)(j - (h>>1))*(j - (h>>1))/(float)(h<<1));
+				c = 255 - 2 * 255 *
+				sqrtf(
+					(i - w/2) * (float)(i - w/2) / (float)(w*w)+ 
+					(j - h/2) * (float)(j - h/2) / (float)(h*h)
+				);
 				if (c < 0) c = 0;
 				c = c | c << 8 | c << 16;
 				*((int*)(&buf[(j*h+i)*3])) = c;
@@ -94,7 +99,11 @@ void generateImage(Image *ptr, int w, int h, const char *imageType) {
 		{
 			for(i = 0; i < w; i++)
 			{
-				c = 255-64*((float)(i - (w>>1))*(i - (w>>1))/(float)(w<<1) + (float)(j - (h>>1))*(j - (h>>1))/(float)(h<<1));
+				c = 255 - 2 * 255 *
+				sqrtf(
+					(i - w/2) * (float)(i - w/2) / (float)(w*w)+ 
+					(j - h/2) * (float)(j - h/2) / (float)(h*h)
+				);
 				if (c < 0) c = 0;
 				c = 0xffffff | c<<24;
 				*((int*)(&buf[(j*h+i)*4])) = c;

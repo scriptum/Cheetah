@@ -3,9 +3,9 @@ require 'lib.lquery.init'
 local C = cheetah
 C.init('Test', 800, 600, 32, '')
 
-local img = C.generate(32,32,'light_alpha')
+local img = C.generate(16,16,'light_alpha')
 
---~ C.blendMode(1)
+C.blendMode(1)
 
 for i=1,4000 do
 	E:new(screen)
