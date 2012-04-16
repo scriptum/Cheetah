@@ -66,11 +66,11 @@ function Entity:new(parent)  -- constructor
 	local object = {
 		x = 0,   --x coord
 		y = 0,   --y coord
-		w = 1,
-		h = 1,
-		ox = 0,
-		oy = 0,
-		angle = 0,
+		--~ w = 1,
+		--~ h = 1,
+		--~ ox = 0,
+		--~ oy = 0,
+		--~ angle = 0,
 		_visible = true --visibility
 	}
 	setmetatable(object, EntityMeta)  -- Inheritance
@@ -588,30 +588,32 @@ end
 
 --some events
 local function events(v)
-	if _lQuery.KeyPressed == true then 
-		if v._keypress then
+	if v == screen or _lQuery.focus == v then
+		if _lQuery.KeyPressed == true then 
+			if v._keypress then
+				if not v._key or v._key ~= _lQuery.KeyPressedKey then
+					v._keypress(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
+				end
+			end
 			if not v._key or v._key ~= _lQuery.KeyPressedKey then
-				v._keypress(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
+				v._KeyPressedCounter = 1
 			end
-		end
-		if not v._key or v._key ~= _lQuery.KeyPressedKey then
-			v._KeyPressedCounter = 1
-		end
-		if v._keyrepeat and (v._KeyPressedCounter == 1 or 
-				 v._KeyPressedCounter == 2 and time - v._KeyPressedTime > 0.3 or
-				 v._KeyPressedCounter > 2 and time - v._KeyPressedTime > 0.05) then 
-			v._KeyPressedTime = time
-			v._KeyPressedCounter = v._KeyPressedCounter + 1
-			v._keyrepeat(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
-		end
-		v._key = _lQuery.KeyPressedKey
-	else
-		if v._keyrelease then
-			if v._key and v._key == true then
-				v._keyrelease(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
+			if v._keyrepeat and (v._KeyPressedCounter == 1 or 
+					 v._KeyPressedCounter == 2 and time - v._KeyPressedTime > 0.3 or
+					 v._KeyPressedCounter > 2 and time - v._KeyPressedTime > 0.05) then 
+				v._KeyPressedTime = time
+				v._KeyPressedCounter = v._KeyPressedCounter + 1
+				v._keyrepeat(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
 			end
+			v._key = _lQuery.KeyPressedKey
+		else
+			if v._keyrelease then
+				if v._key and v._key == true then
+					v._keyrelease(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
+				end
+			end
+			v._key = false
 		end
-		v._key = false
 	end
 	if v._bound and v._bound(v, mX, mY) or v == screen then
 		if v._mousemove then 

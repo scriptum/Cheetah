@@ -171,11 +171,12 @@ end
 
 local draw_fps = function(s)
 	local defFont = C.fonts.default
-	defFont._scale = 2
-	defFont:print('FPS: '..C.FPS, s.x, s.y)
-	defFont._scale = 1
+	defFont._scale = s.scale
+	defFont:print('FPS: '..C.FPS..'\nMEM: '..gcinfo(), s.x, s.y)
+	defFont._scale = s.scale
 end
 
-function Entity:fps()
+function Entity:fps(scale)
+	self.scale = scale or 2
 	return self:draw(draw_fps)
 end
