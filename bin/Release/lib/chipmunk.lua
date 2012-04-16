@@ -228,12 +228,19 @@ if lQuery then
 		C.push()
 		C.translateObject(b.p.x, b.p.y, b.a * 180 / math.pi, s.w, s.h, s.ox, s.oy)
 	end
+	--~ local physBodyInit = function(s)
+		--~ s.w = 1
+		--~ s.h = 1
+		--~ s.ox = 0
+		--~ s.oy = 0
+		--~ s.angle = 0
+	--~ end
 	function Entity:physCircle(mass, friction, elasticity)
 		assert(cp.space, defSpaceErr)
 		--~ if radius then self.R = radius end
 		assert(self.R, 'Set circle radius (.R or 2nd argument)')
 		assert(mass, 'Set circle mass (first argument)')
-		
+		--~ physBodyInit(self)
 		self.body = cp.space:addBody(chipmunk.BodyNew(mass, chipmunk.MomentForCircle(mass, 0, self.R, cp.vzero)))
 		self.body:setPos(chipmunk.v(self.x + self.ox, self.y + self.oy))
 		
@@ -248,6 +255,7 @@ if lQuery then
 	function Entity:physBox(mass, friction, elasticity)
 		assert(cp.space, defSpaceErr)
 		assert(mass, 'Set box mass (first argument)')
+		--~ physBodyInit(self)
 		if mass == math.huge then
 			self.body = chipmunk.BodyNewStatic()
 		else
