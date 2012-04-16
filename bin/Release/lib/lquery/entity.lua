@@ -464,7 +464,7 @@ end
 
 local stdDrawTrans = function(s)
 	C.push()
-	C.translateObject(s.x, s.y, s.angle, s.w, s.h, s.ox, s.oy)
+	C.translateObject(s.x, s.y, s.angle or 0, s.w or 1, s.h or 1, s.ox or 0, s.oy or 0)
 end
 
 local stdDrawColor = function(s)
