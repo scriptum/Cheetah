@@ -44,6 +44,10 @@ typedef struct Image {
 	int channels;
 	int queued;
 } Image;
+typedef struct ImageData {
+	int w, h, channels;
+	char *data;
+} ImageData;
 typedef struct Framebuffer {
 	unsigned int id;
 	Image *image;
@@ -157,6 +161,7 @@ void framebufferUnbind(Framebuffer * ptr);
 void framebufferDraw(Framebuffer * ptr);
 void framebufferDrawq(Framebuffer * ptr, float qx, float qy, float qw, float qh);
 void deleteFramebuffer(Framebuffer * ptr);
+void generateImageData(ImageData *ptr, int w, int h, const char *imageType);
 void generateImage(Image *ptr, int w, int h, const char *imageType);
 void colorMask(bool r, bool g, bool b, bool a);
 void enableDepthTest();

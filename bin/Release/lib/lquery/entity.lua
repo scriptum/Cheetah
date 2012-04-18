@@ -71,7 +71,7 @@ function Entity:new(parent)  -- constructor
 		--~ ox = 0,
 		--~ oy = 0,
 		--~ angle = 0,
-		_visible = true --visibility
+		--~ _hidden = true --visibility
 	}
 	setmetatable(object, EntityMeta)  -- Inheritance
 	if parent then parent:append(object) end
@@ -297,17 +297,17 @@ function Entity:opacity(a)
 end
 --hide entity (stop processing events and drawing) children will be hidden too
 function Entity:hide()
-	self._visible = false
+	self._hidden = true
 	return self --so we can chain methods
 end
 --show hidden entity
 function Entity:show()
-	self._visible = true
+	self._hidden = false
 	return self --so we can chain methods
 end
 --toggle entity
 function Entity:toggle()
-	self._visible = not self._visible
+	self._hidden = not self._hidden
 	return self --so we can chain methods
 end
 --append child
@@ -644,7 +644,7 @@ local function events(v)
 end
 
 local function process_entities(s)
-	if s._visible == true then 
+	if not s._hidden then 
 		if s._animQueue then 
 			animate(s) 
 		end
