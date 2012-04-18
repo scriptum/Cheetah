@@ -196,6 +196,11 @@ typedef struct Image {
 	int queued;
 } Image;
 
+typedef struct ImageData {
+	int w, h, channels;
+	char *data;
+} ImageData;
+
 /*==============================framebuffers==================================*/
 typedef struct Framebuffer {
 	unsigned int id;
