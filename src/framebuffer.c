@@ -139,22 +139,15 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 	glGenTextures(1, &ptr->id);
 	glBindTexture(GL_TEXTURE_2D, ptr->id);
 	
-	if(interpolation) {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
-	else {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	}
+	if(interpolation)
+		TEX_LINEAR;
+	else 
+		TEX_NEAREST;
 	
-	if(repeat) {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	} else {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	}
+	if(repeat)
+		TEX_REPEAT;
+	else 
+		TEX_CLAMP;
 	
 	glTexImage2D(GL_TEXTURE_2D, 0, internal, width, height, 0, GL_RGBA, format, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);

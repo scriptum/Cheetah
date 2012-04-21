@@ -727,7 +727,7 @@ _lQuery.event = function(e, a, b, c)
 end
 
 _lQuery.process = function()
-	for _, v in pairs(_lQuery.hooks) do v() end
+	for _, v in ipairs(_lQuery.hooks) do v() end
 	_lQuery.hover = nil
 	if screen then process_entities(screen) end
 	if Console then process_entities(Console) end

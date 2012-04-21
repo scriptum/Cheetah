@@ -169,10 +169,8 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		//~ glBindBuffer_(GL_ARRAY_BUFFER_ARB, 0);
 		glGenTextures(1, &rect_texture);
 		glBindTexture(GL_TEXTURE_2D, rect_texture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
+		TEX_CLAMP;
+		TEX_LINEAR;
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4, 4, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 		"\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0\377"
 		"\377\377\377\377\377\377\377\377\377\377\0\377\377\377\0\377\377\377\377"
@@ -218,9 +216,7 @@ int getWindowHeight() {
  * @descr Swap buffers and present graphics
  * @group graphics/window
  * */
-void swapBuffers() {
-	SDL_GL_SwapBuffers();
-}
+void (*swapBuffers)(void) = &SDL_GL_SwapBuffers;
 
 /**
  * @descr Set window's title
@@ -244,18 +240,5 @@ SDL_Rect ** getModes() {
 	return modes;
 }
 
-/**
- * @descr Shows the cursor
- * @group graphics/window
- * */
-void showCursor() {
-	SDL_ShowCursor(SDL_ENABLE);
-}
-
-/**
- * @descr Hides the cursor
- * @group graphics/window
- * */
-void hideCursor() {
-	SDL_ShowCursor(SDL_DISABLE);
-}
+int (*showCursor)(int mode) = &SDL_ShowCursor;
+int (*grabCursor)(int mode) = &SDL_WM_GrabInput;

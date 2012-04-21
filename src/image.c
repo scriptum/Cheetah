@@ -32,6 +32,11 @@ inline unsigned char * loadImageData(const char *name, int *width, int *height, 
 	unsigned char *img;
 	unsigned char *myBuf;
 	myBuf = loadfile(name, &file_size);
+	if(!myBuf)
+	{
+		myError("cannot load image: empty file %s", name);
+		return NULL;
+	}
 	img = SOIL_load_image_from_memory(
 				myBuf, sizeof(unsigned char) * file_size,
 				width, height, channels,
@@ -51,10 +56,7 @@ inline unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 	//~ 
 	while(*options)
 	{
-		if(*options == 'n') {
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		}
+		if(*options == 'n') TEX_NEAREST;
 		options++;
 	}
 	SOIL_free_image_data(img);
@@ -77,12 +79,17 @@ void newImageOpt(Image* ptr, const char *name, const char *options) {
 	unsigned char *img;
 	if(!screen)
 	{
-		myError("Call init function before!");
+		myError("newImage: call init function before!");
 		return;
 	}
-	while(*options)
+	if(!name)
 	{
-		if(*options == 'i') {instant = 1; break;}
+		myError("newImage: empty filename");
+		return;
+	}
+	if(options) while(*options)
+	{
+		if(*options == 'i') instant = 1;
 		options++;
 	}
 	if(!resLoaderQueue||instant)
@@ -90,7 +97,7 @@ void newImageOpt(Image* ptr, const char *name, const char *options) {
 		img = loadImageData(name, &width, &height, &channels);
 		if(img == NULL)
 		{
-			myError("can't load image %s", name);
+			myError("newImage: can't load image %s", name);
 			return;
 		}
 		tex_id = loadImageTex(options, img, width, height, channels);
@@ -140,7 +147,6 @@ inline void imageBind(Image * image) {
 		enqueue(resLoaderQueue, r);
 	}
 	glBindTexture(GL_TEXTURE_2D, image->id);
-	//~ glEnable(GL_TEXTURE_2D);
 	prevImageId = image->id;
 }
 
@@ -240,11 +246,6 @@ void activeTexture(int i) {
 	glActiveTexture_(GL_TEXTURE0 + i);
 }
 
-//~ /**
- //~ * @descr Delete image and free memory. 
- //~ * @group graphics/image
- //~ * @var Image object
- //~ * */
 void deleteImage(Image * ptr) {
 	if(ptr) glDeleteTextures(1, &ptr->id);
 	else myError("Trying to free a null-image. Maybe, you did it manually?");
@@ -259,13 +260,26 @@ void deleteImage(Image * ptr) {
 void imageFiltering(Image * img, bool enabled) {
 	glBindTexture(GL_TEXTURE_2D, img->id);
 	if(!enabled)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	}
+		TEX_NEAREST;
 	else
+		TEX_LINEAR;
+}
+
+void _newImageFromData(Image * ptr, ImageData * imgdata, const char *options) {
+	unsigned int tex_id;
+	if(!imgdata || !imgdata->data) myError("newImageFromData: invalid data");
+	ptr->w = (float)imgdata->w;
+	ptr->h = (float)imgdata->h;
+	ptr->channels = imgdata->channels;
+	tex_id = SOIL_internal_create_OGL_texture(
+			(unsigned char*)imgdata->data, ptr->w, ptr->h, ptr->channels,
+			0, SOIL_FLAG_TEXTURE_REPEATS,
+			GL_TEXTURE_2D, GL_TEXTURE_2D,
+			GL_MAX_TEXTURE_SIZE);
+	ptr->id = tex_id;
+	while(*options)
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		if(*options == 'n') TEX_NEAREST;
+		options++;
 	}
 }
