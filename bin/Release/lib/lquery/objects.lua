@@ -172,7 +172,7 @@ end
 local draw_fps = function(s)
 	local defFont = C.fonts.default
 	defFont._scale = s.scale
-	defFont:print('FPS: '..C.FPS..'\nMEM: '..gcinfo(), s.x, s.y)
+	defFont:print(C.FPS, s.x, s.y)
 	defFont._scale = s.scale
 end
 
