@@ -100,7 +100,7 @@ end
 ffi.cdef [[
 void printf(const char * str, ...);
 int sscanf ( const char * str, const char * format, ...);
-
+int (*grabCursor)(int mode);
 
 ]]
 
@@ -210,60 +210,6 @@ C.fileName = function(name)
 	return name:gsub('%..*', '')
 end
 
-local _exts = {
-	image = {
-		jpg = true,
-		png = true,
-		bmp = true,
-		dds = true,
-		JPG = true,
-		PNG = true,
-		BMP = true,
-		DDS = true
-	}
-}
-
---recursive resource loader
-C.resLoader = function(dirname, recursive)
-	local t = {}
-	if not dirname or type(dirname) ~= 'string' then
-		libcheetah.myError('resLoader: you must specify directory name')
-		return
-	end
-	local dir = libcheetah.openDir(dirname)
-	if not libcheetah.isPointer(dir) then
-		libcheetah.myError('resLoader: cannot open dir %s', dirname)
-		return
-	end
-	local de = libcheetah.readDir(dir)
-	local s, ext, n, name
-	while libcheetah.isPointer(de) do
-		n = ffi.string(de.name)
-		s = dirname..'/'..n
-		if de.name[0] ~= 46 then -- .
-			if libcheetah.isDir(s) and recursive then
-				t[n] = C.resLoader(s)
-			else
-				name, ext = n:match('^(.*)%.([^.]+)$')
-				if _exts.image[ext] then
-					if t[name] then
-						libcheetah.myError('resLoader: resourse %s already exists (replaced by with %s)', name, n)
-					end
-					if not C.fileExists(dirname..'/'..name..'.fnt') then
-						t[name] = C.newImage(s)
-						--~ print('Loaded image: ' .. s, C.fileExists(name..'.fnt'), name..'.fnt')
-						
-					end
-				elseif ext == 'fnt' or ext == 'FNT' then
-					C.newFont(s)
-					--~ print('Loaded font: ' .. s)
-				end
-			end
-		end
-		de = libcheetah.readDir(dir)
-	end
-	return t
-end
 
 --exec func for each file in directory
 C.fileEach = function(dirname, func)
@@ -314,11 +260,24 @@ ffi.metatype('Image', {
 	__gc = libcheetah.deleteImage
 })
 
-local fntpat = '^(%d+)'..string.rep('%s(%d+)', 8)
+C.newImageData = function(w, h, channels)
+	local ptr = ffi.new('ImageData')
+	ptr.w = w or 1
+	ptr.h = h or 1
+	ptr.channels = channels == 3 and 3 or 4
+	ptr.data = ffi.new('char[?]', w * h * channels)
+	return ptr
+end
 
+C.newImageFromData = function(data, options)
+	local ptr = ffi.new('Image')
+	libcheetah._newImageFromData(ptr, data, options or '')
+	return ptr
+end
+
+--~ local resLoadedImages
 C.fonts = {}
 local fontTextures = {}
-
 C.newFont = function(name, scalable, codepage)
 	local a, b, c, font, img
 	local millis = C.getTicks()
@@ -342,7 +301,7 @@ C.newFont = function(name, scalable, codepage)
 				font.image = img
 				font._scale = 1
 				font._interval = 1
-				font.scalable = scalable or false
+				font.scalable = scalable == true or false
 				if not C.fonts[a] then C.fonts[a] = {} end
 				C.fonts[a][tonumber(b)] = font
 			else
@@ -353,6 +312,74 @@ C.newFont = function(name, scalable, codepage)
 	end
 	if font then bytes = bytes + font.mem end
 	print('Loaded font '..name..' ('..glyphs..' glyphs, '..bytes..' bytes) in '..(C.getTicks()-millis)..' ms')
+end
+
+local resLoadImageCallback = function (path, t, dir, name, ext)
+	--~ if not resLoadedImages[path] then --avoid double-loadings
+	if not C.fileExists(dir..'/'..name..'.fnt') then
+		if t[name] then
+			libcheetah.myError('resLoader: resourse %s already exists (replaced by with %s)', name, n)
+		end
+		t[name] = C.newImage(path)
+		--~ resLoadedImages[path] = t[name]
+	end
+end
+
+local _exts = {
+	jpg = resLoadImageCallback,
+	png = resLoadImageCallback,
+	bmp = resLoadImageCallback,
+	dds = resLoadImageCallback,
+	JPG = resLoadImageCallback,
+	PNG = resLoadImageCallback,
+	BMP = resLoadImageCallback,
+	DDS = resLoadImageCallback,
+	fnt = C.newFont,
+	FNT = C.newFont,
+}
+
+C.resLoaderAddCallback = function(exts, callback)
+	if type(exts) == 'table' then
+		for _, v in ipairs(exts) do
+			_exts[v] = callback
+		end
+	else
+		_exts[ext] = callback
+	end
+end
+
+--recursive resource loader
+C.resLoader = function(dirname, recursive)
+	local t = {}
+	if not dirname or type(dirname) ~= 'string' then
+		libcheetah.myError('resLoader: you must specify directory name')
+		return
+	end
+	local dir = libcheetah.openDir(dirname)
+	if not libcheetah.isPointer(dir) then
+		libcheetah.myError('resLoader: cannot open dir %s', dirname)
+		return
+	end
+	local de = libcheetah.readDir(dir)
+	local s, ext, n, name, callback
+	--~ resLoadedImages = {}
+	while libcheetah.isPointer(de) do
+		n = ffi.string(de.name)
+		s = dirname..'/'..n
+		if de.name[0] ~= 46 then -- .
+			if libcheetah.isDir(s) and recursive then
+				t[n] = C.resLoader(s)
+			else
+				name, ext = n:match('^(.*)%.([^.]+)$')
+				callback = _exts[ext]
+				if callback then
+					callback(s, t, dirname, name, ext)
+				end
+			end
+		end
+		de = libcheetah.readDir(dir)
+	end
+	return t
 end
 
 C.init = function(title, w, h, c, o)

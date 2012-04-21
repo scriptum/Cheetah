@@ -221,6 +221,7 @@ void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, f
 void activeTexture(int i);
 void deleteImage(Image * ptr);
 void imageFiltering(Image * img, bool enabled);
+void _newImageFromData(Image * ptr, ImageData * imgdata, const char *options);
 void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver);
 void newFragmentShader(Shader * ptr, const char * frag);
 bool shaderCheck(Shader * ptr);
@@ -249,8 +250,8 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 bool isInit();
 int getWindowWidth();
 int getWindowHeight();
-void swapBuffers();
 void caption(const char * text);
 SDL_Rect ** getModes();
-void showCursor();
-void hideCursor();
+void (*swapBuffers)(void);
+int (*showCursor)(int mode);
+int (*grabCursor)(int mode);
