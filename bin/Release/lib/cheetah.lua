@@ -131,14 +131,14 @@ C.mainLoop = function()
 		if C.render then C.render() end
 		libcheetah.swapBuffers()
 		--~ libcheetah.doAutoScale()
-		FPS = (FPS + 1) / (1 + (libcheetah.getTime() - time));
+		--~ FPS = (FPS + 1) / (1 + (libcheetah.getTime() - time));
 		if time - lasttime > 0.5 then
 			lasttime = time
-			if C.printFPS then 
-				print(C.FPS)
-				C.caption('FPS: ' .. C.FPS)
-			end
-			C.FPS = tostring(math.floor(FPS))
+			--~ if C.printFPS then 
+				print(C.FPS..' '..gcinfo())
+				C.caption(C.FPS..' '..gcinfo())
+			--~ end
+			--~ C.FPS = tostring(math.floor(FPS))
 		end
 	end
 end
