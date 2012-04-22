@@ -53,15 +53,15 @@ src/CMakeFiles/chipmunk.dir/chipmunk.c.o: src/CMakeFiles/chipmunk.dir/flags.make
 src/CMakeFiles/chipmunk.dir/chipmunk.c.o: src/chipmunk.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/chipmunk.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/chipmunk.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/chipmunk.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/chipmunk.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/chipmunk.c
 
 src/CMakeFiles/chipmunk.dir/chipmunk.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/chipmunk.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/chipmunk.c > CMakeFiles/chipmunk.dir/chipmunk.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/chipmunk.c > CMakeFiles/chipmunk.dir/chipmunk.c.i
 
 src/CMakeFiles/chipmunk.dir/chipmunk.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/chipmunk.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/chipmunk.c -o CMakeFiles/chipmunk.dir/chipmunk.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/chipmunk.c -o CMakeFiles/chipmunk.dir/chipmunk.c.s
 
 src/CMakeFiles/chipmunk.dir/chipmunk.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/chipmunk.c.o.requires
@@ -76,15 +76,15 @@ src/CMakeFiles/chipmunk.dir/cpArbiter.c.o: src/CMakeFiles/chipmunk.dir/flags.mak
 src/CMakeFiles/chipmunk.dir/cpArbiter.c.o: src/cpArbiter.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_2)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpArbiter.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpArbiter.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpArbiter.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpArbiter.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpArbiter.c
 
 src/CMakeFiles/chipmunk.dir/cpArbiter.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpArbiter.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpArbiter.c > CMakeFiles/chipmunk.dir/cpArbiter.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpArbiter.c > CMakeFiles/chipmunk.dir/cpArbiter.c.i
 
 src/CMakeFiles/chipmunk.dir/cpArbiter.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpArbiter.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpArbiter.c -o CMakeFiles/chipmunk.dir/cpArbiter.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpArbiter.c -o CMakeFiles/chipmunk.dir/cpArbiter.c.s
 
 src/CMakeFiles/chipmunk.dir/cpArbiter.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpArbiter.c.o.requires
@@ -99,15 +99,15 @@ src/CMakeFiles/chipmunk.dir/cpArray.c.o: src/CMakeFiles/chipmunk.dir/flags.make
 src/CMakeFiles/chipmunk.dir/cpArray.c.o: src/cpArray.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_3)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpArray.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpArray.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpArray.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpArray.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpArray.c
 
 src/CMakeFiles/chipmunk.dir/cpArray.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpArray.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpArray.c > CMakeFiles/chipmunk.dir/cpArray.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpArray.c > CMakeFiles/chipmunk.dir/cpArray.c.i
 
 src/CMakeFiles/chipmunk.dir/cpArray.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpArray.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpArray.c -o CMakeFiles/chipmunk.dir/cpArray.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpArray.c -o CMakeFiles/chipmunk.dir/cpArray.c.s
 
 src/CMakeFiles/chipmunk.dir/cpArray.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpArray.c.o.requires
@@ -122,15 +122,15 @@ src/CMakeFiles/chipmunk.dir/cpBB.c.o: src/CMakeFiles/chipmunk.dir/flags.make
 src/CMakeFiles/chipmunk.dir/cpBB.c.o: src/cpBB.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_4)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpBB.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpBB.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBB.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpBB.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBB.c
 
 src/CMakeFiles/chipmunk.dir/cpBB.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpBB.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBB.c > CMakeFiles/chipmunk.dir/cpBB.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBB.c > CMakeFiles/chipmunk.dir/cpBB.c.i
 
 src/CMakeFiles/chipmunk.dir/cpBB.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpBB.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBB.c -o CMakeFiles/chipmunk.dir/cpBB.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBB.c -o CMakeFiles/chipmunk.dir/cpBB.c.s
 
 src/CMakeFiles/chipmunk.dir/cpBB.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpBB.c.o.requires
@@ -145,15 +145,15 @@ src/CMakeFiles/chipmunk.dir/cpBBTree.c.o: src/CMakeFiles/chipmunk.dir/flags.make
 src/CMakeFiles/chipmunk.dir/cpBBTree.c.o: src/cpBBTree.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_5)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpBBTree.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpBBTree.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBBTree.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpBBTree.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBBTree.c
 
 src/CMakeFiles/chipmunk.dir/cpBBTree.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpBBTree.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBBTree.c > CMakeFiles/chipmunk.dir/cpBBTree.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBBTree.c > CMakeFiles/chipmunk.dir/cpBBTree.c.i
 
 src/CMakeFiles/chipmunk.dir/cpBBTree.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpBBTree.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBBTree.c -o CMakeFiles/chipmunk.dir/cpBBTree.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBBTree.c -o CMakeFiles/chipmunk.dir/cpBBTree.c.s
 
 src/CMakeFiles/chipmunk.dir/cpBBTree.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpBBTree.c.o.requires
@@ -168,15 +168,15 @@ src/CMakeFiles/chipmunk.dir/cpBody.c.o: src/CMakeFiles/chipmunk.dir/flags.make
 src/CMakeFiles/chipmunk.dir/cpBody.c.o: src/cpBody.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_6)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpBody.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpBody.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBody.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpBody.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBody.c
 
 src/CMakeFiles/chipmunk.dir/cpBody.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpBody.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBody.c > CMakeFiles/chipmunk.dir/cpBody.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBody.c > CMakeFiles/chipmunk.dir/cpBody.c.i
 
 src/CMakeFiles/chipmunk.dir/cpBody.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpBody.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBody.c -o CMakeFiles/chipmunk.dir/cpBody.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpBody.c -o CMakeFiles/chipmunk.dir/cpBody.c.s
 
 src/CMakeFiles/chipmunk.dir/cpBody.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpBody.c.o.requires
@@ -191,15 +191,15 @@ src/CMakeFiles/chipmunk.dir/cpCollision.c.o: src/CMakeFiles/chipmunk.dir/flags.m
 src/CMakeFiles/chipmunk.dir/cpCollision.c.o: src/cpCollision.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_7)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpCollision.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpCollision.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpCollision.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpCollision.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpCollision.c
 
 src/CMakeFiles/chipmunk.dir/cpCollision.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpCollision.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpCollision.c > CMakeFiles/chipmunk.dir/cpCollision.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpCollision.c > CMakeFiles/chipmunk.dir/cpCollision.c.i
 
 src/CMakeFiles/chipmunk.dir/cpCollision.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpCollision.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpCollision.c -o CMakeFiles/chipmunk.dir/cpCollision.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpCollision.c -o CMakeFiles/chipmunk.dir/cpCollision.c.s
 
 src/CMakeFiles/chipmunk.dir/cpCollision.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpCollision.c.o.requires
@@ -214,15 +214,15 @@ src/CMakeFiles/chipmunk.dir/cpHashSet.c.o: src/CMakeFiles/chipmunk.dir/flags.mak
 src/CMakeFiles/chipmunk.dir/cpHashSet.c.o: src/cpHashSet.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_8)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpHashSet.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpHashSet.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpHashSet.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpHashSet.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpHashSet.c
 
 src/CMakeFiles/chipmunk.dir/cpHashSet.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpHashSet.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpHashSet.c > CMakeFiles/chipmunk.dir/cpHashSet.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpHashSet.c > CMakeFiles/chipmunk.dir/cpHashSet.c.i
 
 src/CMakeFiles/chipmunk.dir/cpHashSet.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpHashSet.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpHashSet.c -o CMakeFiles/chipmunk.dir/cpHashSet.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpHashSet.c -o CMakeFiles/chipmunk.dir/cpHashSet.c.s
 
 src/CMakeFiles/chipmunk.dir/cpHashSet.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpHashSet.c.o.requires
@@ -237,15 +237,15 @@ src/CMakeFiles/chipmunk.dir/cpPolyShape.c.o: src/CMakeFiles/chipmunk.dir/flags.m
 src/CMakeFiles/chipmunk.dir/cpPolyShape.c.o: src/cpPolyShape.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_9)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpPolyShape.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpPolyShape.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpPolyShape.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpPolyShape.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpPolyShape.c
 
 src/CMakeFiles/chipmunk.dir/cpPolyShape.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpPolyShape.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpPolyShape.c > CMakeFiles/chipmunk.dir/cpPolyShape.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpPolyShape.c > CMakeFiles/chipmunk.dir/cpPolyShape.c.i
 
 src/CMakeFiles/chipmunk.dir/cpPolyShape.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpPolyShape.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpPolyShape.c -o CMakeFiles/chipmunk.dir/cpPolyShape.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpPolyShape.c -o CMakeFiles/chipmunk.dir/cpPolyShape.c.s
 
 src/CMakeFiles/chipmunk.dir/cpPolyShape.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpPolyShape.c.o.requires
@@ -260,15 +260,15 @@ src/CMakeFiles/chipmunk.dir/cpShape.c.o: src/CMakeFiles/chipmunk.dir/flags.make
 src/CMakeFiles/chipmunk.dir/cpShape.c.o: src/cpShape.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_10)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpShape.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpShape.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpShape.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpShape.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpShape.c
 
 src/CMakeFiles/chipmunk.dir/cpShape.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpShape.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpShape.c > CMakeFiles/chipmunk.dir/cpShape.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpShape.c > CMakeFiles/chipmunk.dir/cpShape.c.i
 
 src/CMakeFiles/chipmunk.dir/cpShape.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpShape.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpShape.c -o CMakeFiles/chipmunk.dir/cpShape.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpShape.c -o CMakeFiles/chipmunk.dir/cpShape.c.s
 
 src/CMakeFiles/chipmunk.dir/cpShape.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpShape.c.o.requires
@@ -283,15 +283,15 @@ src/CMakeFiles/chipmunk.dir/cpSpace.c.o: src/CMakeFiles/chipmunk.dir/flags.make
 src/CMakeFiles/chipmunk.dir/cpSpace.c.o: src/cpSpace.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_11)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpSpace.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSpace.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpace.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSpace.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpace.c
 
 src/CMakeFiles/chipmunk.dir/cpSpace.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpSpace.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpace.c > CMakeFiles/chipmunk.dir/cpSpace.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpace.c > CMakeFiles/chipmunk.dir/cpSpace.c.i
 
 src/CMakeFiles/chipmunk.dir/cpSpace.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpSpace.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpace.c -o CMakeFiles/chipmunk.dir/cpSpace.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpace.c -o CMakeFiles/chipmunk.dir/cpSpace.c.s
 
 src/CMakeFiles/chipmunk.dir/cpSpace.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpSpace.c.o.requires
@@ -306,15 +306,15 @@ src/CMakeFiles/chipmunk.dir/cpSpaceComponent.c.o: src/CMakeFiles/chipmunk.dir/fl
 src/CMakeFiles/chipmunk.dir/cpSpaceComponent.c.o: src/cpSpaceComponent.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_12)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpSpaceComponent.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSpaceComponent.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceComponent.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSpaceComponent.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceComponent.c
 
 src/CMakeFiles/chipmunk.dir/cpSpaceComponent.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpSpaceComponent.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceComponent.c > CMakeFiles/chipmunk.dir/cpSpaceComponent.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceComponent.c > CMakeFiles/chipmunk.dir/cpSpaceComponent.c.i
 
 src/CMakeFiles/chipmunk.dir/cpSpaceComponent.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpSpaceComponent.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceComponent.c -o CMakeFiles/chipmunk.dir/cpSpaceComponent.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceComponent.c -o CMakeFiles/chipmunk.dir/cpSpaceComponent.c.s
 
 src/CMakeFiles/chipmunk.dir/cpSpaceComponent.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpSpaceComponent.c.o.requires
@@ -329,15 +329,15 @@ src/CMakeFiles/chipmunk.dir/cpSpaceHash.c.o: src/CMakeFiles/chipmunk.dir/flags.m
 src/CMakeFiles/chipmunk.dir/cpSpaceHash.c.o: src/cpSpaceHash.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_13)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpSpaceHash.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSpaceHash.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceHash.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSpaceHash.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceHash.c
 
 src/CMakeFiles/chipmunk.dir/cpSpaceHash.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpSpaceHash.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceHash.c > CMakeFiles/chipmunk.dir/cpSpaceHash.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceHash.c > CMakeFiles/chipmunk.dir/cpSpaceHash.c.i
 
 src/CMakeFiles/chipmunk.dir/cpSpaceHash.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpSpaceHash.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceHash.c -o CMakeFiles/chipmunk.dir/cpSpaceHash.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceHash.c -o CMakeFiles/chipmunk.dir/cpSpaceHash.c.s
 
 src/CMakeFiles/chipmunk.dir/cpSpaceHash.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpSpaceHash.c.o.requires
@@ -352,15 +352,15 @@ src/CMakeFiles/chipmunk.dir/cpSpaceQuery.c.o: src/CMakeFiles/chipmunk.dir/flags.
 src/CMakeFiles/chipmunk.dir/cpSpaceQuery.c.o: src/cpSpaceQuery.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_14)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpSpaceQuery.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSpaceQuery.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceQuery.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSpaceQuery.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceQuery.c
 
 src/CMakeFiles/chipmunk.dir/cpSpaceQuery.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpSpaceQuery.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceQuery.c > CMakeFiles/chipmunk.dir/cpSpaceQuery.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceQuery.c > CMakeFiles/chipmunk.dir/cpSpaceQuery.c.i
 
 src/CMakeFiles/chipmunk.dir/cpSpaceQuery.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpSpaceQuery.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceQuery.c -o CMakeFiles/chipmunk.dir/cpSpaceQuery.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceQuery.c -o CMakeFiles/chipmunk.dir/cpSpaceQuery.c.s
 
 src/CMakeFiles/chipmunk.dir/cpSpaceQuery.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpSpaceQuery.c.o.requires
@@ -375,15 +375,15 @@ src/CMakeFiles/chipmunk.dir/cpSpaceStep.c.o: src/CMakeFiles/chipmunk.dir/flags.m
 src/CMakeFiles/chipmunk.dir/cpSpaceStep.c.o: src/cpSpaceStep.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_15)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpSpaceStep.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSpaceStep.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceStep.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSpaceStep.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceStep.c
 
 src/CMakeFiles/chipmunk.dir/cpSpaceStep.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpSpaceStep.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceStep.c > CMakeFiles/chipmunk.dir/cpSpaceStep.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceStep.c > CMakeFiles/chipmunk.dir/cpSpaceStep.c.i
 
 src/CMakeFiles/chipmunk.dir/cpSpaceStep.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpSpaceStep.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceStep.c -o CMakeFiles/chipmunk.dir/cpSpaceStep.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpaceStep.c -o CMakeFiles/chipmunk.dir/cpSpaceStep.c.s
 
 src/CMakeFiles/chipmunk.dir/cpSpaceStep.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpSpaceStep.c.o.requires
@@ -398,15 +398,15 @@ src/CMakeFiles/chipmunk.dir/cpSpatialIndex.c.o: src/CMakeFiles/chipmunk.dir/flag
 src/CMakeFiles/chipmunk.dir/cpSpatialIndex.c.o: src/cpSpatialIndex.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_16)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpSpatialIndex.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSpatialIndex.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpatialIndex.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSpatialIndex.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpatialIndex.c
 
 src/CMakeFiles/chipmunk.dir/cpSpatialIndex.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpSpatialIndex.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpatialIndex.c > CMakeFiles/chipmunk.dir/cpSpatialIndex.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpatialIndex.c > CMakeFiles/chipmunk.dir/cpSpatialIndex.c.i
 
 src/CMakeFiles/chipmunk.dir/cpSpatialIndex.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpSpatialIndex.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpatialIndex.c -o CMakeFiles/chipmunk.dir/cpSpatialIndex.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSpatialIndex.c -o CMakeFiles/chipmunk.dir/cpSpatialIndex.c.s
 
 src/CMakeFiles/chipmunk.dir/cpSpatialIndex.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpSpatialIndex.c.o.requires
@@ -421,15 +421,15 @@ src/CMakeFiles/chipmunk.dir/cpSweep1D.c.o: src/CMakeFiles/chipmunk.dir/flags.mak
 src/CMakeFiles/chipmunk.dir/cpSweep1D.c.o: src/cpSweep1D.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_17)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpSweep1D.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSweep1D.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSweep1D.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpSweep1D.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSweep1D.c
 
 src/CMakeFiles/chipmunk.dir/cpSweep1D.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpSweep1D.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSweep1D.c > CMakeFiles/chipmunk.dir/cpSweep1D.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSweep1D.c > CMakeFiles/chipmunk.dir/cpSweep1D.c.i
 
 src/CMakeFiles/chipmunk.dir/cpSweep1D.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpSweep1D.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSweep1D.c -o CMakeFiles/chipmunk.dir/cpSweep1D.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpSweep1D.c -o CMakeFiles/chipmunk.dir/cpSweep1D.c.s
 
 src/CMakeFiles/chipmunk.dir/cpSweep1D.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpSweep1D.c.o.requires
@@ -444,15 +444,15 @@ src/CMakeFiles/chipmunk.dir/cpVect.c.o: src/CMakeFiles/chipmunk.dir/flags.make
 src/CMakeFiles/chipmunk.dir/cpVect.c.o: src/cpVect.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_18)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/cpVect.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpVect.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpVect.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/cpVect.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpVect.c
 
 src/CMakeFiles/chipmunk.dir/cpVect.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/cpVect.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpVect.c > CMakeFiles/chipmunk.dir/cpVect.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpVect.c > CMakeFiles/chipmunk.dir/cpVect.c.i
 
 src/CMakeFiles/chipmunk.dir/cpVect.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/cpVect.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpVect.c -o CMakeFiles/chipmunk.dir/cpVect.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/cpVect.c -o CMakeFiles/chipmunk.dir/cpVect.c.s
 
 src/CMakeFiles/chipmunk.dir/cpVect.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/cpVect.c.o.requires
@@ -467,15 +467,15 @@ src/CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.o: src/CMakeFiles/chipmun
 src/CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.o: src/constraints/cpConstraint.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_19)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpConstraint.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpConstraint.c
 
 src/CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpConstraint.c > CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpConstraint.c > CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.i
 
 src/CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpConstraint.c -o CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpConstraint.c -o CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.s
 
 src/CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/constraints/cpConstraint.c.o.requires
@@ -490,15 +490,15 @@ src/CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.o: src/CMakeFiles
 src/CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.o: src/constraints/cpDampedRotarySpring.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_20)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpDampedRotarySpring.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpDampedRotarySpring.c
 
 src/CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpDampedRotarySpring.c > CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpDampedRotarySpring.c > CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.i
 
 src/CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpDampedRotarySpring.c -o CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpDampedRotarySpring.c -o CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.s
 
 src/CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/constraints/cpDampedRotarySpring.c.o.requires
@@ -513,15 +513,15 @@ src/CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.o: src/CMakeFiles/chipm
 src/CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.o: src/constraints/cpDampedSpring.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_21)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpDampedSpring.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpDampedSpring.c
 
 src/CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpDampedSpring.c > CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpDampedSpring.c > CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.i
 
 src/CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpDampedSpring.c -o CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpDampedSpring.c -o CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.s
 
 src/CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/constraints/cpDampedSpring.c.o.requires
@@ -536,15 +536,15 @@ src/CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.o: src/CMakeFiles/chipmunk
 src/CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.o: src/constraints/cpGearJoint.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_22)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpGearJoint.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpGearJoint.c
 
 src/CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpGearJoint.c > CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpGearJoint.c > CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.i
 
 src/CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpGearJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpGearJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.s
 
 src/CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/constraints/cpGearJoint.c.o.requires
@@ -559,15 +559,15 @@ src/CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.o: src/CMakeFiles/chipmu
 src/CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.o: src/constraints/cpGrooveJoint.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_23)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpGrooveJoint.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpGrooveJoint.c
 
 src/CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpGrooveJoint.c > CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpGrooveJoint.c > CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.i
 
 src/CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpGrooveJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpGrooveJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.s
 
 src/CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/constraints/cpGrooveJoint.c.o.requires
@@ -582,15 +582,15 @@ src/CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.o: src/CMakeFiles/chipmunk.
 src/CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.o: src/constraints/cpPinJoint.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_24)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpPinJoint.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpPinJoint.c
 
 src/CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpPinJoint.c > CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpPinJoint.c > CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.i
 
 src/CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpPinJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpPinJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.s
 
 src/CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/constraints/cpPinJoint.c.o.requires
@@ -605,15 +605,15 @@ src/CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.o: src/CMakeFiles/chipmun
 src/CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.o: src/constraints/cpPivotJoint.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_25)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpPivotJoint.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpPivotJoint.c
 
 src/CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpPivotJoint.c > CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpPivotJoint.c > CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.i
 
 src/CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpPivotJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpPivotJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.s
 
 src/CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/constraints/cpPivotJoint.c.o.requires
@@ -628,15 +628,15 @@ src/CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.o: src/CMakeFiles/chipm
 src/CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.o: src/constraints/cpRatchetJoint.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_26)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpRatchetJoint.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpRatchetJoint.c
 
 src/CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpRatchetJoint.c > CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpRatchetJoint.c > CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.i
 
 src/CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpRatchetJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpRatchetJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.s
 
 src/CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/constraints/cpRatchetJoint.c.o.requires
@@ -651,15 +651,15 @@ src/CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.o: src/CMakeFiles/c
 src/CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.o: src/constraints/cpRotaryLimitJoint.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_27)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpRotaryLimitJoint.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpRotaryLimitJoint.c
 
 src/CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpRotaryLimitJoint.c > CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpRotaryLimitJoint.c > CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.i
 
 src/CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpRotaryLimitJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpRotaryLimitJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.s
 
 src/CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/constraints/cpRotaryLimitJoint.c.o.requires
@@ -674,15 +674,15 @@ src/CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.o: src/CMakeFiles/chipmu
 src/CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.o: src/constraints/cpSimpleMotor.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_28)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpSimpleMotor.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpSimpleMotor.c
 
 src/CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpSimpleMotor.c > CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpSimpleMotor.c > CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.i
 
 src/CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpSimpleMotor.c -o CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpSimpleMotor.c -o CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.s
 
 src/CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/constraints/cpSimpleMotor.c.o.requires
@@ -697,15 +697,15 @@ src/CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.o: src/CMakeFiles/chipmun
 src/CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.o: src/constraints/cpSlideJoint.c
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles $(CMAKE_PROGRESS_29)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object src/CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.o"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpSlideJoint.c
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.o   -c /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpSlideJoint.c
 
 src/CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.i"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpSlideJoint.c > CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.i
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpSlideJoint.c > CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.i
 
 src/CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.s"
-	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && i586-mingw32msvc-gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpSlideJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.s
+	cd /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src && /usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/src/constraints/cpSlideJoint.c -o CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.s
 
 src/CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.o.requires:
 .PHONY : src/CMakeFiles/chipmunk.dir/constraints/cpSlideJoint.c.o.requires

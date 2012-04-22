@@ -9,11 +9,11 @@ Dependencies:
 Installing:
 
 LINUX, BSD, etc:
-1. Download LuaJIT (http://luajit.org/download.html) and build it (or use 
+1. Download LuaJIT (http://luajit.org/download.html) and build it (you may use 
    thirdparty sources).
 2. Put file luajit into bin/Release/bin/<Your-system>/ directory. Be careful with 
    the architecture.
-3. Download SOIL (http://www.lonesock.net/soil.html) and build it  (or use 
+3. Download SOIL (http://www.lonesock.net/soil.html) and build it (you may use 
    thirdparty sources).
 4. Move libSOIL.so into bin/Release/bin/<Your-system>/ directory.
 5. Go to the cheetah's root directory and type 'make'.
@@ -21,9 +21,10 @@ LINUX, BSD, etc:
 7. Go to bin/Release and run run_linux.sh
 
 Optionally:
-1. Build SDL_mixer.
+1. Build SDL_mixer if you want sound support.
 2. If you want physics - build chipmunk from thirdparty directory - this is the 
-   version with ffi.
+   version with ffi. Chipmuk from offitial site DOES NOT WORK! Use Chipmunk from
+   thirdparty directory.
 Put all *.so to bin/Release/bin/<Your-system>.
 
 
