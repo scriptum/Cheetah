@@ -27,7 +27,7 @@ IN THE SOFTWARE.
 #ifndef __MACROS_H__
 #define __MACROS_H__
 
-
+/**********************************MEMOTY OPS**********************************/
 #ifdef MEMORY_TEST
 	#define new(var, type, size) do {\
 		if(var){\
@@ -101,6 +101,8 @@ IN THE SOFTWARE.
 	memset(var, character, sizeof(type) * (size));\
 } while(0)
 
+/*********************************TEXTURE OPS**********************************/
+
 #define TEX_LINEAR do {\
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);\
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);\
@@ -119,6 +121,65 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);\
 #define TEX_REPEAT do {\
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);\
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
+} while(0)
+
+/**********************************VERTEX OPS**********************************/
+
+/* dynamic vertex array */
+#define VERTEX_QUERY(size) do {\
+	if((size) > verAlloc) {\
+		renew(vertexCoord, float, verAlloc * 2);\
+		renew(texCoord, float, verAlloc * 2);\
+		verAlloc *= 2;\
+	}\
+} while(0)
+
+#define VERTEX_COORD(x,y,w,h) do {\
+	vertexCoord[0] = x;\
+	vertexCoord[1] = y;\
+	vertexCoord[2] = x;\
+	vertexCoord[3] = y + h;\
+	vertexCoord[4] = x + w;\
+	vertexCoord[5] = y + h;\
+	vertexCoord[6] = x + w;\
+	vertexCoord[7] = y;\
+} while(0)
+
+#define VX(x,y) cosf(a)*(x-ox)-sinf(a)*(y-oy)
+#define VY(x,y) sinf(a)*(x-ox)+cosf(a)*(y-oy)
+
+#define VERTEX_COORD_TRANS(x,y,w,h,a,ox,oy) do {\
+	vertexCoord[0] = x + VX(0,0);\
+	vertexCoord[1] = y + VY(0,0);\
+	vertexCoord[2] = x + VX(0,h);\
+	vertexCoord[3] = y + VY(0,h);\
+	vertexCoord[4] = x + VX(w,h);\
+	vertexCoord[5] = y + VY(w,h);\
+	vertexCoord[6] = x + VX(w,0);\
+	vertexCoord[7] = y + VY(w,0);\
+} while(0)
+
+#define TEXTURE_COORD(qx,qy,qw,qh,w,h) do {\
+	texCoord[0] = qx/w;\
+	texCoord[1] = qy/h;\
+	texCoord[2] = texCoord[0];\
+	texCoord[3] = texCoord[1] + qh/h;\
+	texCoord[4] = texCoord[0] + qw/w;\
+	texCoord[5] = texCoord[3];\
+	texCoord[6] = texCoord[4];\
+	texCoord[7] = texCoord[1];\
+} while(0)
+
+#define DRAWQ do {\
+	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);\
+	glTexCoordPointer(2, GL_FLOAT, 0, texCoordQuad);\
+	glDrawArrays(GL_QUADS, 0, 4);\
+} while(0)
+
+#define DRAWQT do {\
+	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);\
+	glTexCoordPointer(2, GL_FLOAT, 0, texCoord);\
+	glDrawArrays(GL_QUADS, 0, 4);\
 } while(0)
 
 #endif //__MACROS_H__
