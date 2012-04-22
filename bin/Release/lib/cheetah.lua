@@ -134,11 +134,11 @@ C.mainLoop = function()
 		--~ FPS = (FPS + 1) / (1 + (libcheetah.getTime() - time));
 		if time - lasttime > 0.5 then
 			lasttime = time
-			--~ if C.printFPS then 
+			if C.printFPS then 
 				print(C.FPS..' '..gcinfo())
 				C.caption(C.FPS..' '..gcinfo())
-			--~ end
-			--~ C.FPS = tostring(math.floor(FPS))
+			end
+			C.FPS = tostring(math.floor(FPS))
 		end
 	end
 end
