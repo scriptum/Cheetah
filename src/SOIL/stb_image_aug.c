@@ -65,6 +65,9 @@
 
 #include "stb_image_aug.h"
 
+#define STBI_NO_HDR
+#define STBI_NO_STDIO
+
 #ifndef STBI_NO_HDR
 #include <math.h>  // ldexp
 #include <string.h> // strcmp
