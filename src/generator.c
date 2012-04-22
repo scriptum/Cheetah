@@ -33,8 +33,7 @@ IN THE SOFTWARE.
 #define TEXPARAM(a) do {\
 	glGenTextures(1, &bufid);\
 	glBindTexture(GL_TEXTURE_2D, bufid);\
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);\
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);\
+	TEX_LINEAR;\
 	glTexImage2D( GL_TEXTURE_2D, \
 								0, \
 								(a) ? GL_RGBA : GL_RGB, \

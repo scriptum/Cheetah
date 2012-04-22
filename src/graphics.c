@@ -255,7 +255,9 @@ void pop() {
  * @group graphics/drawing
  * @see pop push
  * */
-void (*reset)(void) = &glLoadIdentity;
+void reset() {
+	glLoadIdentity();
+}
 
 /**
  * @descr Draw line.
@@ -432,7 +434,9 @@ double getPointSize() {
  * @var line size
  * @see line getLineWidth
  * */
-void (*lineWidth)(float width) = &glLineWidth;
+void lineWidth(float width) {
+	glLineWidth(width);
+}
 
 /**
  * @descr Gets the line width.
@@ -465,7 +469,9 @@ void smooth(bool smooth) {
  * @var alpha (0 - 255)
  * @see colorf
  * */
-void (*color)(unsigned char r, unsigned char g, unsigned char b, unsigned char a) = &glColor4ub;
+void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+	glColor4ub(r,g,b,a);
+}
 
 /**
  * @descr Sets the color, float.
@@ -476,7 +482,9 @@ void (*color)(unsigned char r, unsigned char g, unsigned char b, unsigned char a
  * @var alpha (0 - 1) float
  * @see colorf
  * */
-void (*colorf)(float r, float g, float b, float a) = &glColor4f;
+void colorf(float r, float g, float b, float a) {
+	glColor4f(r,g,b,a);
+}
 
 /**
  * @descr Sets the color for clear screen.
@@ -487,7 +495,9 @@ void (*colorf)(float r, float g, float b, float a) = &glColor4f;
  * @var alpha (0 - 1) float
  * @see clear
  * */
-void (*clearColor)(float r, float g, float b, float a) = &glClearColor;
+void clearColor(float r, float g, float b, float a) {
+	glClearColor(r,g,b,a);
+}
 
 /**
  * @descr Toggle auto-clear screen. Disable auto-clear if you want to do it manually or you have fullscreen background.
@@ -547,8 +557,9 @@ void blendMode(int mode) {
  *  * cheetah.GL_MIN
  *  * cheetah.GL_MAX
  * */
-void (*blendEquation)(int mode) = &glBlendEquation_;
-
+void blendEquation(int mode) {
+	glBlendEquation_(mode);
+}
 
 /**
  * @descr Specify pixel arithmetic. Equivalent to glBlendFunc(sourcefactor, destinationfactor);
@@ -573,7 +584,9 @@ void (*blendEquation)(int mode) = &glBlendEquation_;
  *  * cheetah.GL_DST_ALPHA
  *  * cheetah.GL_ONE_MINUS_DST_ALPHA
  * */
-void (*blendFunc)(int sourcefactor, int destinationfactor) = &glBlendFunc;
+void blendFunc(int sourcefactor, int destinationfactor) {
+	glBlendFunc(sourcefactor, destinationfactor);
+}
 
 /**
  * @descr Clear screen. Usually used in lQuery.addhook(cheetah.clear). Slow. Do not use it if you have in your game image background.
@@ -620,9 +633,13 @@ void clearStencil() {
 	glClear(GL_STENCIL_BUFFER_BIT);
 }
 
-void (*stencilFunc)(int func, int ref, unsigned int mask) = &glStencilFunc;
+void stencilFunc(int func, int ref, unsigned int mask) {
+	glStencilFunc(func, ref, mask);
+}
 
-void (*stencilOp)(int fail, int zfail, int zpass) = &glStencilOp;
+void stencilOp(int fail, int zfail, int zpass) {
+	glStencilOp(fail, zfail, zpass);
+}
 
 void drawToStencil() {
 	glStencilFunc (GL_NEVER, 0x0, 0x1);
