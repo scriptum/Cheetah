@@ -37,7 +37,6 @@ IN THE SOFTWARE.
 #include <SDL_opengl.h>
 #endif
 
-
 #include "macros.h"
 
 #ifndef __CHEETAH_H__

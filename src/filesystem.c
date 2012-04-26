@@ -29,12 +29,11 @@ IN THE SOFTWARE.
 void myError(const char *fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
-	fprintf(stderr, "error: ");
+	fputs("error: ", stderr);
 	vfprintf(stderr, fmt, args);
 	fprintf(stderr, "\n");
 	va_end(args);
 }
-
 
 bool isPointer(void * ptr) {
 	return ptr != NULL;

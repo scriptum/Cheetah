@@ -338,8 +338,12 @@ function Entity:animate(keys, options)
 	if keys then
 		if not self._animQueue then self._animQueue = {} end
 		self._anim = true
+		local keys_int = {}
 		for k, v in pairs(keys) do
-			assert(type(v) == 'number' and type(self[k]) == 'number', 'Animation key must be a number')
+			assert(type(v) == 'number' and type(self[k]) == 'number', 
+				'Animation key must be a number, got '..type(v)..', self - '..type(self[k]))
+			table.insert(keys_int, k)
+			table.insert(keys_int, v)
 		end
 		if not options then 
 			options = emptyArray
@@ -354,16 +358,15 @@ function Entity:animate(keys, options)
 			options = {loop = options}
 		end
 		local queue = options.queue or "main" --you can manage queues
-		--~ if options.queue then
-		--~ if not self._aQtbl then self._aQtbl = {} end
-		--~ if not self._aQtbl[queue] then
-			--~ self._aQtbl[queue] = #self._animQueue + 1
-			--~ self._animQueue[#self._animQueue + 1] = {}
-		--~ end
-		--~ queue = self._aQtbl[queue]
+
+		if not self._aQtbl then self._aQtbl = {} end
+		if not self._aQtbl[queue] then
+			self._aQtbl[queue] = #self._animQueue + 1
+		end
+		queue = self._aQtbl[queue]
 		if not self._animQueue[queue] then self._animQueue[queue] = {} end
 		table.insert(self._animQueue[queue], {
-			keys,--keys 1
+			keys_int,--keys 1
 			{}, --old 2
 			options.speed or 0.3, --speed 3
 			nil,  --lasttime 4
@@ -382,15 +385,26 @@ function Entity:delay(options)
 	return self:animate({}, options)
 end
 
+--delay between animations inn one queue
+function Entity:queueLength(queue)
+	if not self._animQueue then return 0 end
+	if not self._aQtbl then return 0 end
+	if not self._aQtbl[queue] then return 0 end
+	return #self._animQueue[self._aQtbl[queue]]
+end
+
 --stop animation
 --ent:stop() - stop all animations
 --ent:stop('anim_group_1') - stop all animatios in queue 'anim_group_1'
 function Entity:stop(queue)
 	if not self._animQueue then self._animQueue = {} end
-	if queue then
-		self._animQueue[queue] = {}
+	if not self._aQtbl then self._aQtbl = {} end
+	if self._aQtbl[queue] then
+		self._animQueue[self._aQtbl[queue]] = {}
 	else
-		self._animQueue = {}
+		for i = 1, #self._animQueue do
+			self._animQueue[i] = {}
+		end
 	end
 	return self --so we can chain methods
 end
@@ -568,8 +582,9 @@ screen = Entity:new()
 
 local function animate(ent)
 	local bool = true
+	local key
 	--~ print(1)
-	for i, j in pairs(ent._animQueue) do
+	for i, j in ipairs(ent._animQueue) do
 		if j[1] then 
 			bool = false
 			local aq = j[1]
@@ -582,14 +597,14 @@ local function animate(ent)
 			--~ end
 			if not aq[4] then
 				aq[4] = time --lasttime
-				for k, v in pairs(aq[1]) do
-					aq[2][k] = ent[k] --old
+				for k = 2, #aq[1], 2 do --old
+					aq[2][k] = ent[aq[1][k - 1]]
 				end
 			end
 			--[[speed]]
 			if aq[4] + aq[3] <= time or _lQuery.fx == false then
-				for k, v in pairs(aq[1]) do
-					ent[k] = v
+				for k = 1, #aq[1] - 1, 2 do
+					ent[aq[1][k]] = aq[1][k + 1]
 				end
 				if aq[6] == true then --loop
 					--~ aq[10] = nil
@@ -598,20 +613,23 @@ local function animate(ent)
 					table.insert(j, aq) 
 				end
 				table.remove(j, 1)
-				if #j == 0 then
+				--~ if #j == 0 then
 					--~ ent._animQueue[i] = nil
 					--~ if next(ent._animQueue) == nil then
 						--~ ent._animQueue = nil
 					--~ end
-				end
+				--~ end
 				if aq[7] then aq[7](ent) end --callback
 				
 				--~ animate(ent)
 			else
-				for k, v in pairs(aq[1]) do
+				for k = 2, #aq[1], 2 do
 					--easing
-					if ent[k] then
-						ent[k] = aq[5](time - aq[4], aq[2][k], v - aq[2][k], aq[3], aq[8], aq[9])
+					key = aq[1][k-1]
+					if ent[key] then
+						ent[key] = aq[5](time - aq[4], aq[2][k], 
+						aq[1][k] - 
+						aq[2][k], aq[3], aq[8], aq[9])
 					end
 				end
 			end --if aq.lasttime + vv.speed <= time

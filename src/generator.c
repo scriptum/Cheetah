@@ -164,6 +164,8 @@ void generateImageData(ImageData *ptr, int w, int h, const char *imageType) {
 void generateImage(Image *ptr, int w, int h, const char *imageType) {
 	static ImageData imageData;
 	GLuint bufid = 0;
+	ptr->id = 0;
+	NEDED_INIT;
 	if(ptr) {
 		imageData.data = NULL;
 		generateImageData(&imageData, w, h, imageType);
