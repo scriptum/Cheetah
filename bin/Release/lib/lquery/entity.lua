@@ -22,8 +22,11 @@ IN THE SOFTWARE.
 ******************************************************************************]]
 
 local easing = require 'lib.lquery.easing'
-
+local mX, mY
 local C = cheetah
+
+local mHover
+local mPressOwn = false
 
 local _lQuery 
 _lQuery = {
@@ -36,7 +39,6 @@ _lQuery = {
 	onresize = function(func)
 		table.insert(_lQuery._onresize, func)
 	end,
-	_MousePressedOwner = false,
 	MousePressed = false,
 	_last_click_millis = 0,
 	_last_clickX = -1,
@@ -47,8 +49,11 @@ lQuery = _lQuery
 
 Entity = {} --Any object: box, circle, character etc
 E = Entity --short name
+
+local EntityInt = E --internal usage
+
 local EntityMeta = {
-	__index = Entity
+	__index = EntityInt
 }
 --special metatable for objects that have update callbacks
 local EntityMetaUpdate = {
@@ -66,12 +71,12 @@ function Entity:new(parent)  -- constructor
 	local object = {
 		x = 0,   --x coord
 		y = 0,   --y coord
-		--~ w = 1,
-		--~ h = 1,
+		w = 1,
+		h = 1,
 		--~ ox = 0,
 		--~ oy = 0,
 		--~ angle = 0,
-		--~ _hidden = true --visibility
+		_hidden = false --visibility, works faster if defined!
 	}
 	setmetatable(object, EntityMeta)  -- Inheritance
 	if parent then parent:append(object) end
@@ -295,6 +300,11 @@ function Entity:opacity(a)
 	self.a = a or self.a or 255
 	return self --so we can chain methods
 end
+--Sets blending mode of entity
+function Entity:blend(blendMode)
+	self._blend = blendMode
+	return self --so we can chain methods
+end
 --hide entity (stop processing events and drawing) children will be hidden too
 function Entity:hide()
 	self._hidden = true
@@ -327,6 +337,10 @@ local emptyArray={}
 function Entity:animate(keys, options)
 	if keys then
 		if not self._animQueue then self._animQueue = {} end
+		self._anim = true
+		for k, v in pairs(keys) do
+			assert(type(v) == 'number' and type(self[k]) == 'number', 'Animation key must be a number')
+		end
 		if not options then 
 			options = emptyArray
 		--each option has different type
@@ -340,17 +354,24 @@ function Entity:animate(keys, options)
 			options = {loop = options}
 		end
 		local queue = options.queue or "main" --you can manage queues
+		--~ if options.queue then
+		--~ if not self._aQtbl then self._aQtbl = {} end
+		--~ if not self._aQtbl[queue] then
+			--~ self._aQtbl[queue] = #self._animQueue + 1
+			--~ self._animQueue[#self._animQueue + 1] = {}
+		--~ end
+		--~ queue = self._aQtbl[queue]
 		if not self._animQueue[queue] then self._animQueue[queue] = {} end
 		table.insert(self._animQueue[queue], {
-			keys = keys,
-			old = {},
-			speed = options.speed or 0.3,
-			lasttime = nil, 
-			easing = easing[options.easing] or easing.swing,
-			loop = options.loop or false,
-			callback = options.callback or options.cb,
-			a = options.a,
-			b = options.b
+			keys,--keys 1
+			{}, --old 2
+			options.speed or 0.3, --speed 3
+			nil,  --lasttime 4
+			easing[options.easing] or easing.swing, --easing 5
+			options.loop or false, --loop 6
+			options.callback or options.cb, --callback 7
+			options.a, --a 8
+			options.b --b 9
 		})
 	end
 	return self --so we can chain methods
@@ -396,7 +417,7 @@ end
 
 --до сих пор охреневаю как я это сделал. Куча методов в пяти строчках кода
 --callbacks
-for k, v in pairs({'click', 'dblclick', 'mousepress', 'mouserelease', 'mouseover', 'mouseout', 'mousemove', 'keypress', 'keyrelease', 'keyrepeat', 'wheel'}) do
+for k, v in ipairs({'click', 'dblclick', 'mousepress', 'mouserelease', 'mouseover', 'mouseout', 'mousemove', 'keypress', 'keyrelease', 'keyrepeat', 'wheel'}) do
 	Entity[v] = function (self, callback, a, b, c)
 		if callback and type(callback) == 'function' then
 			if not self._bound then self._bound = Entity.bounds.rectangle end
@@ -546,43 +567,57 @@ end
 screen = Entity:new()
 
 local function animate(ent)
+	local bool = true
+	--~ print(1)
 	for i, j in pairs(ent._animQueue) do
 		if j[1] then 
-			aq = j[1]
-			if not aq._keys then
-				if type(aq.keys) == 'function' then
-					aq._keys = aq.keys()
-				else
-					aq._keys = aq.keys
+			bool = false
+			local aq = j[1]
+			--~ if not aq[10] then --keys copy
+				--~ if type(aq.keys) == 'function' then
+					--~ aq._keys = aq.keys()
+				--~ else
+					--~ aq[10] = aq[1] --keys
+				--~ end
+			--~ end
+			if not aq[4] then
+				aq[4] = time --lasttime
+				for k, v in pairs(aq[1]) do
+					aq[2][k] = ent[k] --old
 				end
 			end
-			if not aq.lasttime then
-				aq.lasttime = time
-				for k, v in pairs(aq._keys) do
-					aq.old[k] = ent[k]
-				end
-			end
-			
-			if aq.lasttime + aq.speed <= time or _lQuery.fx == false then
-				for k, v in pairs(aq._keys) do
+			--[[speed]]
+			if aq[4] + aq[3] <= time or _lQuery.fx == false then
+				for k, v in pairs(aq[1]) do
 					ent[k] = v
 				end
-				if aq.loop == true then
-					aq._keys = nil
-					aq.lasttime = nil
-					aq.old = {}
+				if aq[6] == true then --loop
+					--~ aq[10] = nil
+					aq[4] = nil
+					aq[2] = {}
 					table.insert(j, aq) 
 				end
 				table.remove(j, 1)
-				if aq.callback then aq.callback(ent) end
-				animate(ent)
+				if #j == 0 then
+					--~ ent._animQueue[i] = nil
+					--~ if next(ent._animQueue) == nil then
+						--~ ent._animQueue = nil
+					--~ end
+				end
+				if aq[7] then aq[7](ent) end --callback
+				
+				--~ animate(ent)
 			else
-				for k, v in pairs(aq._keys) do
-					if ent[k] and type(ent[k]) == 'number' then ent[k] = aq.easing(time - aq.lasttime, aq.old[k], v - aq.old[k], aq.speed, aq.a, aq.b) end
+				for k, v in pairs(aq[1]) do
+					--easing
+					if ent[k] then
+						ent[k] = aq[5](time - aq[4], aq[2][k], v - aq[2][k], aq[3], aq[8], aq[9])
+					end
 				end
 			end --if aq.lasttime + vv.speed <= time
 		end --if j[1]
-	end --for
+	end --for 
+	if bool then ent._anim = false end
 end
 
 
@@ -629,14 +664,14 @@ local function events(v)
 				_lQuery.MouseButton = nil
 				v._wheel(v, mX, mY, "d")
 			end
-		elseif _lQuery.MousePressed == true and _lQuery._MousePressedOwner == true then 
+		elseif _lQuery.MousePressed == true and mPressOwn == true then 
 			_lQuery.MousePressedOwner = v
 		end
-		_lQuery.hover = v
+		mHover = v
 	--~ else
 		--~ if _lQuery._hover == v then 
 			--~ _lQuery._hover = nil
-			--~ _lQuery.hover = nil
+			--~ mHover = nil
 			--~ if v._mouseout then v._mouseout(v, mX, mY) end
 			--if v == _lQuery.MousePressedOwner then _lQuery.MousePressedOwner = nil end
 		--~ end
@@ -645,7 +680,7 @@ end
 
 local function process_entities(s)
 	if not s._hidden then 
-		if s._animQueue then 
+		if s._anim then 
 			animate(s) 
 		end
 		if s._control then --if controlled
@@ -653,6 +688,7 @@ local function process_entities(s)
 		end
 		if s._draw then
 			if s.r then C.color(s.r or 255, s.g or 255, s.b or 255, s.a or 255) end
+			if s._blend then C.blendMode(s._blend) end
 			if s._translate then 
 				s._translate(s)
 			end
@@ -663,6 +699,7 @@ local function process_entities(s)
 					s._draw[i](s)
 				end
 			end
+			if s._blend then C.blendMode(0) end
 			if s._translate then 
 				C.pop()
 			end
@@ -682,7 +719,7 @@ _lQuery.event = function(e, a, b, c)
 	if e == "mp" then
 		_lQuery.MousePressed = true
 		_lQuery.MouseButton = c
-		_lQuery._MousePressedOwner = true
+		mPressOwn = true
 	elseif e == "mr" then 
 		_lQuery.MousePressed = false
 		_lQuery.MouseButton = c
@@ -726,26 +763,26 @@ _lQuery.event = function(e, a, b, c)
 	end
 end
 
-_lQuery.process = function()
+_lQuery.process = function(x, y)
+	mX, mY = x, y
 	for _, v in ipairs(_lQuery.hooks) do v() end
-	_lQuery.hover = nil
+	mHover = nil
 	if screen then process_entities(screen) end
-	if Console then process_entities(Console) end
 	
 	--fix mousepress bug
 	local v = _lQuery.MousePressedOwner
-	if v and _lQuery._MousePressedOwner == true then
+	if v and mPressOwn == true then
 		if v._mousepress then 
 			v._mousepress(v, mX, mY, _lQuery.MouseButton)
 		end
 	end
 	
 	local v = _lQuery.lasthover
-	if v ~= _lQuery.hover then
+	if v ~= mHover then
 		if v and v._mouseout then v._mouseout(v, mX, mY) end --out MUST be before over
-		v = _lQuery.hover
+		v = mHover
 		if v and v._mouseover then v._mouseover(v, mX, mY) end
-		_lQuery.lasthover = _lQuery.hover
+		_lQuery.lasthover = mHover
 	end
-	_lQuery._MousePressedOwner = false
+	mPressOwn = false
 end

@@ -53,7 +53,6 @@ inline unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 			0, SOIL_FLAG_TEXTURE_REPEATS,
 			GL_TEXTURE_2D, GL_TEXTURE_2D,
 			GL_MAX_TEXTURE_SIZE);
-	//~ 
 	while(*options)
 	{
 		if(*options == 'n') TEX_NEAREST;
@@ -74,7 +73,7 @@ inline unsigned int loadImageTex(const char *options, unsigned char *img, int wi
  * @return Image object
  * */
 void newImageOpt(Image* ptr, const char *name, const char *options) {
-	int width, height, channels, instant = 0;
+	int width, height, channels, instant = 0, i = 0;
 	unsigned int tex_id;
 	unsigned char *img;
 	if(!screen)
@@ -87,10 +86,10 @@ void newImageOpt(Image* ptr, const char *name, const char *options) {
 		myError("newImage: empty filename");
 		return;
 	}
-	if(options) while(*options)
+	if(options) while(options[i])
 	{
-		if(*options == 'i') instant = 1;
-		options++;
+		if(options[i] == 'i') instant = 1;
+		i++;
 	}
 	if(!resLoaderQueue||instant)
 	{

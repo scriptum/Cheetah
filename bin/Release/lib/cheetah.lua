@@ -131,7 +131,7 @@ C.mainLoop = function()
 		if C.render then C.render() end
 		libcheetah.swapBuffers()
 		--~ libcheetah.doAutoScale()
-		--~ FPS = (FPS + 1) / (1 + (libcheetah.getTime() - time));
+		FPS = (FPS + 1) / (1 + (libcheetah.getTime() - time));
 		if time - lasttime > 0.5 then
 			lasttime = time
 			if C.printFPS then 
@@ -487,3 +487,5 @@ ffi.metatype('Shader', {
 })
 
 C.newPoints = ffi.typeof("Point[?]")
+
+math.randomseed(os.time())
