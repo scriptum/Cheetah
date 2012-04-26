@@ -35,7 +35,7 @@ inline unsigned char * loadImageData(const char *name, int *width, int *height, 
 	myBuf = loadfile(name, &file_size);
 	if(!myBuf)
 	{
-		myError("cannot load image: empty file %s", name);
+		MYERROR("cannot load image: empty file %s", name);
 		return NULL;
 	}
 	img = SOIL_load_image_from_memory(
@@ -81,7 +81,7 @@ void newImageOpt(Image* ptr, const char *name, const char *options) {
 	NEDED_INIT;
 	if(!name)
 	{
-		myError("newImage: empty filename");
+		MYERROR("empty filename");
 		return;
 	}
 	if(options) while(options[i])
@@ -94,7 +94,7 @@ void newImageOpt(Image* ptr, const char *name, const char *options) {
 		img = loadImageData(name, &width, &height, &channels);
 		if(img == NULL)
 		{
-			myError("newImage: can't load image %s", name);
+			MYERROR("can't load image %s", name);
 			return;
 		}
 		tex_id = loadImageTex(options, img, width, height, channels);
@@ -244,8 +244,8 @@ void activeTexture(int i) {
 }
 
 void deleteImage(Image * ptr) {
-	if(ptr) glDeleteTextures(1, &ptr->id);
-	else myError("Trying to free a null-image. Maybe, you did it manually?");
+	if(ptr && ptr->id > 1) glDeleteTextures(1, &ptr->id);
+	else MYERROR("Trying to free a null-image. Maybe, you did it manually?");
 }
 
 /**
@@ -264,7 +264,7 @@ void imageFiltering(Image * img, bool enabled) {
 
 void _newImageFromData(Image * ptr, ImageData * imgdata, const char *options) {
 	unsigned int tex_id;
-	if(!imgdata || !imgdata->data) myError("newImageFromData: invalid data");
+	if(!imgdata || !imgdata->data) MYERROR("invalid data");
 	ptr->w = (float)imgdata->w;
 	ptr->h = (float)imgdata->h;
 	ptr->channels = imgdata->channels;

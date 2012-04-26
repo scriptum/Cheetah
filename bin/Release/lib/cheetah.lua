@@ -125,6 +125,7 @@ time = 0
 local lasttime = 0
 
 C.mainLoop = function()
+	assert(libcheetah.isInit(), 'You forgot about cheetah.init')
 	while done == 0 do
 		time = libcheetah.getTime()
 		libcheetah.prepare()
