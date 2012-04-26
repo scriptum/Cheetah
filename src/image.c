@@ -31,6 +31,7 @@ inline unsigned char * loadImageData(const char *name, int *width, int *height, 
 	unsigned int file_size;
 	unsigned char *img;
 	unsigned char *myBuf;
+	NEDED_INIT;
 	myBuf = loadfile(name, &file_size);
 	if(!myBuf)
 	{
@@ -48,6 +49,7 @@ inline unsigned char * loadImageData(const char *name, int *width, int *height, 
 inline unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels)
 {
 	unsigned int tex_id;
+	NEDED_INIT;
 	tex_id = SOIL_internal_create_OGL_texture(
 			img, width, height, channels,
 			0, SOIL_FLAG_TEXTURE_REPEATS,
@@ -76,11 +78,7 @@ void newImageOpt(Image* ptr, const char *name, const char *options) {
 	int width, height, channels, instant = 0, i = 0;
 	unsigned int tex_id;
 	unsigned char *img;
-	if(!screen)
-	{
-		myError("newImage: call init function before!");
-		return;
-	}
+	NEDED_INIT;
 	if(!name)
 	{
 		myError("newImage: empty filename");

@@ -182,4 +182,25 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
 	glDrawArrays(GL_QUADS, 0, 4);\
 } while(0)
 
+/**********************************DEBUG STUFF*********************************/
+
+#define DEBUG_MSG_FORMAT "%s (%d) - %s: "
+
+#define LOCATION __FILE__, __LINE__, __FUNCTION__
+
+#define MYERROR(fmt, ...) fprintf(stderr, DEBUG_MSG_FORMAT fmt "\n", LOCATION, __VA_ARGS__)
+
+#define vard(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
+#define vars(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
+#define varf(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
+
+/**********************************INIT ASSERT*********************************/
+#define NEDED_INIT do {\
+	if(!screen)\
+	{\
+		MYERROR("call init function before!", 0);\
+		return;\
+	}\
+} while(0)
+
 #endif //__MACROS_H__
