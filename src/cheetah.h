@@ -27,8 +27,16 @@ IN THE SOFTWARE.
 #include <stdarg.h>
 #include <search.h>
 
+
+#ifdef __ANDROID_API__
+#define GL_GLEXT_PROTOTYPES
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#else
 #include <SDL.h>
 #include <SDL_opengl.h>
+#endif
+
 
 #include "macros.h"
 

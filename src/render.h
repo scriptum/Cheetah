@@ -24,8 +24,14 @@ IN THE SOFTWARE.
 
 #ifndef __RENDER_H_
 #define __RENDER_H_
-#include <SDL_opengl.h>
 
+#ifdef __ANDROID_API__
+#define GL_GLEXT_PROTOTYPES
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#else
+#include <SDL_opengl.h>
+#endif
 
 /***********************************GLOBALS************************************/
 
