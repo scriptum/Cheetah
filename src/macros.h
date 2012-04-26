@@ -188,7 +188,7 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
 
 #define LOCATION __FILE__, __LINE__, __FUNCTION__
 
-#define MYERROR(fmt, ...) fprintf(stderr, DEBUG_MSG_FORMAT fmt "\n", LOCATION, __VA_ARGS__)
+#define MYERROR(fmt, ...) fprintf(stderr, DEBUG_MSG_FORMAT fmt "\n", LOCATION, ##__VA_ARGS__)
 
 #define vard(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
 #define vars(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
@@ -198,7 +198,7 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
 #define NEDED_INIT do {\
 	if(!screen)\
 	{\
-		MYERROR("call init function before!", 0);\
+		MYERROR("call init function before!");\
 		return;\
 	}\
 } while(0)
