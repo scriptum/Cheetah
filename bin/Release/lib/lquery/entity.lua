@@ -389,6 +389,7 @@ end
 function Entity:queueLength(queue)
 	if not self._animQueue then return 0 end
 	if not self._aQtbl then return 0 end
+	if not queue then queue = 'main' end
 	if not self._aQtbl[queue] then return 0 end
 	return #self._animQueue[self._aQtbl[queue]]
 end

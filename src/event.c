@@ -124,3 +124,7 @@ int getMouseY() {
 		return (int)(((float)y - screenScale.offsetY) / screenScale.scaleY);
 	return y;
 }
+
+char *getKeyState() {
+	return SDL_GetKeyState(NULL);
+}

@@ -21,8 +21,6 @@ IN THE SOFTWARE.
 
 ******************************************************************************]]
 
-local ffi = require 'ffi'
-
 local key = {}
 
 key[0] = "unknown"

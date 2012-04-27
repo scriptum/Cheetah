@@ -114,6 +114,7 @@ require "lib.gl"
 --~ local gl = GL
 
 local lua_keys = require 'lib.keys'
+local keys_reverse = require 'lib.keys_reverse'
 local button_names = {"l","m","r","wu","wd"}
 local lua_events = {"q","kp","kr","mp","mr","rz"}
 
@@ -237,6 +238,15 @@ C.fileEach = function(dirname, func)
 end
 
 setmetatable(C, { __index = libcheetah})
+
+local keyState = libcheetah.getKeyState()
+
+C.isKeyPressed = function(key)
+	if key and keys_reverse[key] then
+		return keyState[keys_reverse[key]] == 1
+	end
+	return false
+end
 
 C.generate = function(w, h, imageType)
 	local ptr = ffi.new('Image')

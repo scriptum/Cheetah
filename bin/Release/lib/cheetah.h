@@ -134,6 +134,7 @@ unsigned int getEventResizeH();
 void setResizeDelay(int delay);
 int getMouseX();
 int getMouseY();
+char *getKeyState();
 void myError(const char *fmt, ...);
 bool isPointer(void * ptr);
 unsigned char * loadfile(const char * filename, unsigned int * length);
