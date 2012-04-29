@@ -36,7 +36,8 @@ void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 	// prepare
 	
 	// here maybe crash
-	memset(tmpMap, 0, MAX_MAP_SIZE * MAX_MAP_SIZE *sizeof(char))
+	for (iw = 0; iw < MAX_MAP_SIZE; iw++)
+		memset(tmpMap[iw], 0, MAX_MAP_SIZE *sizeof(char))
 	
 	calculateIndexes(t, tw, th, imgw, imgh);
 	iw = ih = 0;
@@ -78,20 +79,25 @@ void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 			t->map[iw][ih] = tmpMap[iw][ih];
 }
 
-void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, imgh) {
-	int w = imgw / tw;
-	int h = imgh / th;
-	int iw, ih, i = 0;
+void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh)
+{
+	int w = imgw / tw; // image width in tiles
+	int h = imgh / th; // image height in tiles
+	int iw, ih, i = 0; // just counters for loops
 	
 	for (iw  = 0; iw < w; iw++) {
 		for (ih = 0; ih < h; ih++) {
 			t->index[i][0] = iw * tw;
 			t->index[i][1] = ih * th;
-			t->index[i][0] = (iw + 1) * tw;
-			t->index[i][1] = (ih + 1) * th;
+			t->index[i][2] = (iw + 1) * tw;
+			t->index[i][3] = (ih + 1) * th;
 			
 			i++;
 		}
 	}
+}
+
+void drawTilemap(Tilemap *t) {
+	
 }
 
