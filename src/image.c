@@ -243,11 +243,6 @@ void activeTexture(int i) {
 	glActiveTexture_(GL_TEXTURE0 + i);
 }
 
-void deleteImage(Image * ptr) {
-	if(ptr && ptr->id > 1) glDeleteTextures(1, &ptr->id);
-	else MYERROR("Trying to free a null-image. Maybe, you did it manually?");
-}
-
 /**
  * @descr Enable/disable smooth interpolation for image. Disabled filtering useful, if you want to fit image to pixel matrix. If this image will be scaled and/or rotated you must enable filtering (this is by defaults).
  * @group graphics/image
@@ -279,4 +274,9 @@ void _newImageFromData(Image * ptr, ImageData * imgdata, const char *options) {
 		if(*options == 'n') TEX_NEAREST;
 		options++;
 	}
+}
+
+void deleteImage(Image * ptr) {
+	if(ptr && ptr->id > 1) glDeleteTextures(1, &ptr->id);
+	//~ else MYERROR("Trying to free a null-image. Maybe, you did it manually?");
 }
