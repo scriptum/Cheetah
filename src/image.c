@@ -277,6 +277,7 @@ void _newImageFromData(Image * ptr, ImageData * imgdata, const char *options) {
 }
 
 void deleteImage(Image * ptr) {
+	//~ printf("%d\n", same_type_p(typeof(ptr)) == INTEGER_TYPE);
 	if(ptr && ptr->id > 1) glDeleteTextures(1, &ptr->id);
 	//~ else MYERROR("Trying to free a null-image. Maybe, you did it manually?");
 }
