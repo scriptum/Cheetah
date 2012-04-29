@@ -12,36 +12,31 @@ typedef struct _Tilemap {
 
 void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, imgh);
 
-Tilemap *loadTileMap(char *name) {
+void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 	static unsigned char tmpMap[MAX_MAP_SIZE][MAX_MAP_SIZE];
 	static char tmpStr[MAX_MAP_SIZE * 4];
-	char timg[1024];
 	int tw, th;     // tile size (we get it from file header)
 	int iw, ih;     // just indexes for loops
 	int w, h;       // map size in tiles (we get it after index map reading)
-	int imgw, imgh; // image size (we DONT GET IT!!!)
 	int id;         // storage for incoming index from file (while reading)
 	
 	if (name == NULL)
-		myError("Can't load tilemap without name");
+		MYERROR("Can't load tilemap without name");
+	
+	if (t == NULL)
+		MYERROR("Map %s not initialised", name)
 	
 	FILE *f = fopen(name, "r");
 	if (f == NULL)
-		myError("Can't open tilemap %s", name);
+		MYERROR("Can't open tilemap %s", name);
 	
-	if (fscanf(f, "%s %d %d", &timg, &tw, &th) != 3)
-		myError("Can't read tilemap's image and size from %s", name);
-	
-	// allocate mem
-	
-	Tilemap *t = NULL;
-	new(t, Tilemap, 1);
+	if (fscanf(f, "%s %d %d", &tmpStr, &tw, &th) != 3)
+		MYERROR("Can't read tilemap's image and size from %s", name);
 	
 	// prepare
 	
-	for (iw = 0; iw < MAX_MAP_SIZE; iw ++)
-		for (ih = 0; ih < MAX_MAP_SIZE; ih++)
-			tmpMap[iw][ih] = 0;
+	// here maybe crash
+	memset(tmpMap, 0, MAX_MAP_SIZE * MAX_MAP_SIZE *sizeof(char))
 	
 	calculateIndexes(t, tw, th, imgw, imgh);
 	iw = ih = 0;
@@ -56,7 +51,7 @@ Tilemap *loadTileMap(char *name) {
 		// read all numbers in string
 		while (sscanf(pos, "%d\t", &id) == 1) {
 			if (id < 0 || id > 255)
-				myError("Worng tilemap index from %s", name);
+				MYERROR("Worng tilemap index from %s", name);
 			
 			tmpMap[iw][ih] = id;
 			
@@ -81,5 +76,22 @@ Tilemap *loadTileMap(char *name) {
 	for (iw = 0; iw < w; iw ++)
 		for (ih = 0; ih < h; ih++)
 			t->map[iw][ih] = tmpMap[iw][ih];
+}
+
+void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, imgh) {
+	int w = imgw / tw;
+	int h = imgh / th;
+	int iw, ih, i = 0;
+	
+	for (iw  = 0; iw < w; iw++) {
+		for (ih = 0; ih < h; ih++) {
+			t->index[i][0] = iw * tw;
+			t->index[i][1] = ih * th;
+			t->index[i][0] = (iw + 1) * tw;
+			t->index[i][1] = (ih + 1) * th;
+			
+			i++;
+		}
+	}
 }
 
