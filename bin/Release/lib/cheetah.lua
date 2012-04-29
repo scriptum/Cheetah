@@ -118,7 +118,7 @@ local keys_reverse = require 'lib.keys_reverse'
 local button_names = {"l","m","r","wu","wd"}
 local lua_events = {"q","kp","kr","mp","mr","rz"}
 
-local done = 0
+local done = false
 local FPS = 60
 C.FPS = "60"
 C.printFPS = false
@@ -127,7 +127,7 @@ local lasttime = 0
 
 C.mainLoop = function()
 	assert(libcheetah.isInit(), 'You forgot about cheetah.init')
-	while done == 0 do
+	while done == false do
 		time = libcheetah.getTime()
 		libcheetah.prepare()
 		if C.render then C.render() end
@@ -143,6 +143,10 @@ C.mainLoop = function()
 			C.FPS = tostring(math.floor(FPS))
 		end
 	end
+end
+
+C.quit = function()
+	done = true
 end
 
 --~ --first time when you try to load an image this function autoloads SOIL library
@@ -167,7 +171,7 @@ C.poll = function()
 	local e = lua_events[libcheetah.getEventType()]
 	local a, b, c
 	if e == 'q' then
-		done = 1
+		done = true
 	elseif e == 'kp' or e == 'kr' then 
 		a = libcheetah.getEventKey()
 		a, b = lua_keys[a] or 'key_' .. a, libcheetah.getEventKeyUnicode()

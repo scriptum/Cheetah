@@ -119,6 +119,14 @@ function Entity:offset(ox, oy)
 	self.oy = oy or self.oy or 0
 	return self --so we can chain methods
 end
+--Sets width and height of entity with center offset
+function Entity:sizeoffset(w, h)
+	self.w = w or self.w or 0
+	self.h = h or self.h or 0
+	self.ox = self.w / 2
+	self.oy = self.h / 2
+	return self --so we can chain methods
+end
 --Sets angle (rotation) of entity
 function Entity:rotate(angle)
 	self.angle = angle or self.angle or 0
@@ -521,6 +529,16 @@ function Entity:draw(callback)
 		--~ end
 		--~ table.insert(self._draw, callback)
 	--~ end
+	return self --so we can chain methods
+end
+
+function Entity:drawPrepend(callback)
+	if not self._draw then
+		self._draw = callback
+	else
+		if type(self._draw) ~= 'table' then self._draw = {self._draw} end
+		table.insert(self._draw, 1, callback)
+	end
 	return self --so we can chain methods
 end
 

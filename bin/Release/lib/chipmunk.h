@@ -743,7 +743,7 @@ void cpSpaceSetDefaultCollisionHandler(
  cpCollisionSeparateFunc separate,
  void *data
 );
-void cpSpaceAddCollisionHandler(
+void spaceAddCollisionHandler(
  cpSpace *space,
  cpCollisionType a, cpCollisionType b,
  cpCollisionBeginFunc begin,
@@ -751,7 +751,7 @@ void cpSpaceAddCollisionHandler(
  cpCollisionPostSolveFunc postSolve,
  cpCollisionSeparateFunc separate,
  void *data
-);
+) asm("cpSpaceAddCollisionHandler");
 void SpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b) asm("cpSpaceRemoveCollisionHandler");
 cpShape* SpaceAddShape(cpSpace *space, cpShape *shape) asm("cpSpaceAddShape");
 cpShape* SpaceAddStaticShape(cpSpace *space, cpShape *shape) asm("cpSpaceAddStaticShape");

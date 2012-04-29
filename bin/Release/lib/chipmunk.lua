@@ -164,6 +164,7 @@ ffi.metatype('cpSpace', {
 		reindexShapesForBody = chipmunk.SpaceReindexShapesForBody,
 		useSpatialHash = chipmunk.SpaceUseSpatialHash,
 		step = chipmunk.SpaceStep,
+		addCollisionHandler = chipmunk.spaceAddCollisionHandler,
 	},
 	__gc = chipmunk.SpaceFree
 })
@@ -188,7 +189,7 @@ cp.defaultScape = function(gravity, steps)
 			for i = 1, maxStepsPerFrame do 
 				cp.space:step(1/C.FPS/maxStepsPerFrame)
 			end
-			mPoint = chipmunk.v(mX, mY)
+			mPoint = chipmunk.v(lQuery.mX, lQuery.mY)
 			mouseShape = chipmunk.SpacePointQueryFirst(cp.space, mPoint, 1, 1)
 			--~ if lQuery.mousePressed then
 				local newPoint = cp.vlerp(mouseBody.p, mPoint, 0.25)
@@ -225,8 +226,9 @@ if lQuery then
 	end
 	local physDraw = function(s)
 		local b = s.body
-		C.push()
-		C.translateObject(b.p.x, b.p.y, b.a * 180 / math.pi, s.w, s.h, s.ox, s.oy)
+		s.x, s.y, s.angle = b.p.x, b.p.y, b.a
+		--~ C.push()
+		--~ C.translateObject(b.p.x, b.p.y, b.a * 180 / math.pi, s.w, s.h, s.ox, s.oy)
 	end
 	--~ local physBodyInit = function(s)
 		--~ s.w = 1
@@ -235,20 +237,23 @@ if lQuery then
 		--~ s.oy = 0
 		--~ s.angle = 0
 	--~ end
+	local function physEntInt(self, friction, elasticity)
+		self.shape:setFriction(friction or 0.5)
+		self.shape:setElasticity(elasticity or 0.5)
+		self:drawPrepend(physDraw)
+		self:bound(physBound)
+	end
 	function Entity:physCircle(mass, friction, elasticity)
 		assert(cp.space, defSpaceErr)
 		--~ if radius then self.R = radius end
-		assert(self.R, 'Set circle radius (.R or 2nd argument)')
+		assert(self.R, 'Set circle radius (.R or :radius)')
 		assert(mass, 'Set circle mass (first argument)')
 		--~ physBodyInit(self)
 		self.body = cp.space:addBody(chipmunk.BodyNew(mass, chipmunk.MomentForCircle(mass, 0, self.R, cp.vzero)))
 		self.body:setPos(chipmunk.v(self.x + self.ox, self.y + self.oy))
 		
 		self.shape = cp.space:addShape(chipmunk.CircleShapeNew(self.body, self.R, cp.vzero))
-		self.shape:setFriction(friction or 0.5)
-		self.shape:setElasticity(elasticity or 0.5)
-		self:translate(physDraw)
-		self:bound(physBound)
+		physEntInt(self, friction, elasticity)
 		
 		return self
 	end
@@ -268,10 +273,7 @@ if lQuery then
 		else
 			self.shape = cp.space:addShape(chipmunk.BoxShapeNew(self.body, self.w, self.h))
 		end
-		self.shape:setFriction(friction or 0.5)
-		self.shape:setElasticity(elasticity or 0.5)
-		self:translate(physDraw)
-		self:bound(physBound)
+		physEntInt(self, friction, elasticity)
 		
 		return self
 	end

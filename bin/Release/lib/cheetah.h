@@ -220,9 +220,9 @@ void imageDrawt(Image * image, float x, float y, float w, float h, float a, floa
 void imageDrawq(Image * image, float qx, float qy, float qw, float qh);
 void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
 void activeTexture(int i);
-void deleteImage(Image * ptr);
 void imageFiltering(Image * img, bool enabled);
 void _newImageFromData(Image * ptr, ImageData * imgdata, const char *options);
+void deleteImage(Image * ptr);
 void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver);
 void newFragmentShader(Shader * ptr, const char * frag);
 bool shaderCheck(Shader * ptr);
