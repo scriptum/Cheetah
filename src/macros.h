@@ -191,7 +191,7 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
 #define MYERROR(fmt, ...) fprintf(stderr, DEBUG_MSG_FORMAT fmt "\n", LOCATION, ##__VA_ARGS__)
 
 #define vard(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
-#define vars(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
+#define vars(v) printf(DEBUG_MSG_FORMAT " %s = %s\n", LOCATION, #v, v);
 #define varf(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
 
 /**********************************INIT ASSERT*********************************/
@@ -202,5 +202,7 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
 		return;\
 	}\
 } while(0)
+
+
 
 #endif //__MACROS_H__
