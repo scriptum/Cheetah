@@ -290,6 +290,17 @@ C.newImageFromData = function(data, options)
 	return ptr
 end
 
+C.newTilemap = function(file)
+
+end
+
+--~ ffi.metatype('Tilemap', {
+	--~ __index = {
+		--~ draw = libcheetah.tilemapDraw,
+	--~ }, 
+	--~ __gc = libcheetah.deleteTilemap
+--~ })
+
 --~ local resLoadedImages
 C.fonts = {}
 local fontTextures = {}
