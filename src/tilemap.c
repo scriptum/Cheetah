@@ -16,11 +16,7 @@ void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh);
 
 void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 	static unsigned char tmpMap[MAX_MAP_SIZE][MAX_MAP_SIZE];
-<<<<<<< HEAD
 	static char tmpStr[MAX_MAP_SIZE * 4];
-=======
-	static char tmpStr[MAX_MAP_SIZE*4];
->>>>>>> 22e5bb13c747a02ebc0dfbeb75ddc83439ffb879
 	int tw, th;     // tile size (we get it from file header)
 	int iw, ih;     // just indexes for loops
 	int w, h;       // map size in tiles (we get it after index map reading)
@@ -36,11 +32,7 @@ void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 	if (f == NULL)
 		MYERROR("Can't open tilemap %s", name);
 	
-<<<<<<< HEAD
 	if (fscanf(f, "%s %d %d\n", tmpStr, &tw, &th) != 3)
-=======
-	if (fscanf(f, "%s %d %d", tmpStr, &tw, &th) != 3)
->>>>>>> 22e5bb13c747a02ebc0dfbeb75ddc83439ffb879
 		MYERROR("Can't read tilemap's image and size from %s", name);
 	
 	// prepare
