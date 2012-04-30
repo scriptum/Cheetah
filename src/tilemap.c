@@ -109,7 +109,7 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 	printf("== %s: %d\n", __FILE__, __LINE__);
 }
 
-void drawTilemap(Tilemap *t, float x, float y, float r, float z) {
+void tilemapDraw(Tilemap *t, float x, float y, float r, float z) {
 	int i, j, k = 0;
 	int x1, y1, x2, y2; // coords of visible part of tilemap (in tiles)
 	
@@ -160,3 +160,6 @@ void drawTilemap(Tilemap *t, float x, float y, float r, float z) {
 	glDrawArrays(GL_QUADS, 0, k);
 }
 
+void deleteTilemap(Tilemap *t) {
+	
+}

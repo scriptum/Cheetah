@@ -302,12 +302,12 @@ C.newTilemap = function(file)
 	return ptr
 end
 
---~ ffi.metatype('Tilemap', {
-	--~ __index = {
-		--~ draw = libcheetah.tilemapDraw,
-	--~ }, 
-	--~ __gc = libcheetah.deleteTilemap
---~ })
+ffi.metatype('Tilemap', {
+	__index = {
+		draw = libcheetah.tilemapDraw,
+	}, 
+	__gc = libcheetah.deleteTilemap
+})
 
 --~ local resLoadedImages
 C.fonts = {}
