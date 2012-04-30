@@ -16,7 +16,7 @@ void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh);
 
 void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 	static unsigned char tmpMap[MAX_MAP_SIZE][MAX_MAP_SIZE];
-	//~ static char *tmpStr;
+	static char tmpStr[MAX_MAP_SIZE * 4];
 	int tw, th;     // tile size (we get it from file header)
 	int iw, ih;     // just indexes for loops
 	int w, h;       // map size in tiles (we get it after index map reading)
@@ -32,8 +32,8 @@ void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 	if (f == NULL)
 		MYERROR("Can't open tilemap %s", name);
 	
-	//~ if (fscanf(f, "%s %d %d", tmpStr, &tw, &th) != 3)
-		//~ MYERROR("Can't read tilemap's image and size from %s", name);
+	if (fscanf(f, "%s %d %d\n", tmpStr, &tw, &th) != 3)
+		MYERROR("Can't read tilemap's image and size from %s", name);
 	
 	// prepare
 	
@@ -99,7 +99,7 @@ void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh)
 	}
 }
 
-void drawTilemap(Tilemap *t, float x, float y) {
+void drawTilemap(Tilemap *t, float x, float y, float r, float z) {
 	int i, j, k;
 	int x1, y1, x2, y2; // coords of visible part of tilemap (in tiles)
 	
