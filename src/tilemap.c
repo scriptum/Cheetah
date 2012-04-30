@@ -14,7 +14,7 @@ typedef struct _Tilemap {
 */
 #define MAX_MAP_SIZE 256
 
-void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh)
+static inline void calculateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh)
 {
 	int w = imgw / tw; // image width in tiles
 	int h = imgh / th; // image height in tiles
@@ -33,6 +33,7 @@ void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh)
 }
 
 void newTilmapInternal(Tilemap *t, const char *name) {
+	printf("== %s: %d\n", __FILE__, __LINE__);
 	static unsigned char tmpMap[MAX_MAP_SIZE][MAX_MAP_SIZE];
 	static char tmpStr[MAX_MAP_SIZE * 4];
 	int tw, th;     // tile size (we get it from file header)
@@ -46,31 +47,31 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 	}
 	int imgw = t->img->w;
 	int imgh = t->img->h;
-	
+	printf("== %s: %d\n", __FILE__, __LINE__);
 	if (name == NULL)
 		MYERROR("Can't load tilemap without name");
 	
 	if (t == NULL)
 		MYERROR("Map %s not initialised", name);
-	
+	printf("== %s: %d\n", __FILE__, __LINE__);
 	FILE *f = fopen(name, "r");
 	if (f == NULL)
 		MYERROR("Can't open tilemap %s", name);
-	
+	printf("== %s: %d\n", __FILE__, __LINE__);
 	if (fscanf(f, "%s %d %d\n", tmpStr, &tw, &th) != 3)
 		MYERROR("Can't read tilemap's image and size from %s", name);
-	
+	printf("== %s: %d\n", __FILE__, __LINE__);
 	// prepare
-	
+	printf("== %s: %d\n", __FILE__, __LINE__);
 	// here maybe crash
 	for (iw = 0; iw < MAX_MAP_SIZE; iw++)
-		memset(tmpMap[iw], 0, MAX_MAP_SIZE *sizeof(char));
-	
+		memset(tmpMap[iw], 0, MAX_MAP_SIZE * sizeof(char));
+	printf("== %s: %d\n", __FILE__, __LINE__);
 	calculateIndexes(t, tw, th, imgw, imgh);
 	iw = ih = 0;
-	
+	printf("== %s: %d\n", __FILE__, __LINE__);
 	// read index map to temp map (we don't know sizes)
-	
+	printf("== %s: %d\n", __FILE__, __LINE__);
 	// read string
 	while (fgets(tmpStr, MAX_MAP_SIZE * 4, f) != NULL) {
 		char *pos = tmpStr;
@@ -91,7 +92,7 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 		w = iw;
 		if (h < ih) h = ih;
 	}
-	
+	printf("== %s: %d\n", __FILE__, __LINE__);
 	// copy temp map to our tilemap
 	
 	t->map = NULL;
@@ -100,10 +101,11 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 		t->map[iw] = NULL;
 		new(t->map[iw], unsigned char, h);
 	}
-	
+	printf("== %s: %d\n", __FILE__, __LINE__);
 	for (iw = 0; iw < w; iw ++)
 		for (ih = 0; ih < h; ih++)
 			t->map[iw][ih] = tmpMap[iw][ih];
+	printf("== %s: %d\n", __FILE__, __LINE__);
 }
 
 void drawTilemap(Tilemap *t, float x, float y, float r, float z) {
