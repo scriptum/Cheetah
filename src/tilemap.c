@@ -7,6 +7,7 @@ typedef struct _Tilemap {
 	float index[256][4]; // texture coords index
 	unsigned char **map; // tile indexes map
 	int scalable;        // should tilemap be scaled to screen size or drawed per-pixel
+	Image *img;
 } Tilemap;
 */
 
@@ -97,7 +98,46 @@ void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh)
 	}
 }
 
-void drawTilemap(Tilemap *t) {
+void drawTilemap(Tilemap *t, float x, float y) {
+	int i, j, k;
+	int x1, y1, x2, y2; // coords of visible part of tilemap (in tiles)
 	
+	glEnable(GL_TEXTURE_2D);
+	
+	int camx_i = (int)x / t->tw; // we look at this tile
+	int camy_i = (int)y / t->th; // we look at this tile
+	
+	i = screen->w / t->tw / 2; // half screen width in tiles
+	j = screen->h / t->th / 2; // half screen height in tiles
+	/*
+	i = (float)i / tilemap.camzoom + 2; // apply zoom
+	j = (float)j / tilemap.camzoom + 2; // apply zoom
+	*/
+	x1 = camx_i - i; // get left drawing edge in tiles
+	x1 = x1 > 0 ? x1 : 0; // check if we draw from negative index
+	x1 = x1 < t->w - 1 ? x1 : t->w - 1; // check if we draw from owerflow index
+	
+	x2 = camx_i + i;
+	x2 = x2 > 0 ? x2 : 0;
+	x2 = x2 < t->w - 1 ? x2 : t->w - 1;
+	
+	y1 = camy_i - j;
+	y1 = y1 > 0 ? y1 : 0;
+	y1 = y1 < t->h - 1 ? y1 : t->h - 1;
+	
+	y2 = camy_i + j;
+	y2 = y2 > 0 ? y2 : 0;
+	y2 = y2 < t->h - 1 ? y2 : t->h - 1;
+	
+	// draw bottom tiles
+	for (i = x1; i < x2; i++) {
+		for (j = y1; j < y2; j++) {
+			VERTEX_COORD(x,y,w,h);
+			TEXTURE_COORD();
+		}
+	}
+	
+	imageBind(image);
+	DRAWQT;
 }
 
