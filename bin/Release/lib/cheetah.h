@@ -71,6 +71,14 @@ typedef struct Font {
 typedef struct Shader {
 	unsigned int id;
 } Shader;
+typedef struct _Tilemap {
+	int w, h;            // size in tiles
+	int tw, th;          // single tile size
+	float index[256][4]; // texture coords index
+	unsigned char **map; // tile indexes map
+	int scalable;        // should tilemap be scaled to screen size or drawed per-pixel
+	Image *img;
+} Tilemap;
 typedef struct Point {
 	float x, y;
 } Point;
@@ -240,6 +248,8 @@ unsigned int getTicks();
 double getTime();
 void delay(unsigned int ms);
 void sleep(unsigned int sec);
+void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh);
+void drawTilemap(Tilemap *t, float x, float y);
 Vbo * newVbo(Point * data, Point * tex, unsigned int count);
 void vboDraw(Vbo * ptr);
 Vbo * newVboPoints(Point * data, unsigned int count);
