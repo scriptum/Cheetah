@@ -356,12 +356,7 @@ local _exts = {
 	png = resLoadImageCallback,
 	bmp = resLoadImageCallback,
 	dds = resLoadImageCallback,
-	JPG = resLoadImageCallback,
-	PNG = resLoadImageCallback,
-	BMP = resLoadImageCallback,
-	DDS = resLoadImageCallback,
 	fnt = C.newFont,
-	FNT = C.newFont,
 }
 
 C.resLoaderAddCallback = function(exts, callback)
@@ -397,6 +392,7 @@ C.resLoader = function(dirname, recursive)
 				t[n] = C.resLoader(s)
 			else
 				name, ext = n:match('^(.*)%.([^.]+)$')
+				ext = ext:lower()
 				callback = _exts[ext]
 				if callback then
 					callback(s, t, dirname, name, ext)
