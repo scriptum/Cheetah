@@ -16,7 +16,7 @@ void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh);
 
 void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 	static unsigned char tmpMap[MAX_MAP_SIZE][MAX_MAP_SIZE];
-	//~ static char *tmpStr;
+	static char tmpStr[MAX_MAP_SIZE*4];
 	int tw, th;     // tile size (we get it from file header)
 	int iw, ih;     // just indexes for loops
 	int w, h;       // map size in tiles (we get it after index map reading)
