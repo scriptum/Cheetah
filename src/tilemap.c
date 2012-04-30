@@ -84,7 +84,8 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 			printf("== %s: %d\n", __FILE__, __LINE__);
 			tmpMap[iw][ih] = id;
 			printf("== %s: %d\n", __FILE__, __LINE__);
-			pos = strstr(pos, " ");
+			pos = strstr(pos, "\t");
+			if (pos == NULL) break;
 			ih++;
 		}
 		printf("== %s: %d\n", __FILE__, __LINE__);
