@@ -32,14 +32,14 @@ void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 	if (f == NULL)
 		MYERROR("Can't open tilemap %s", name);
 	
-	//~ if (fscanf(f, "%s %d %d", tmpStr, &tw, &th) != 3)
-		//~ MYERROR("Can't read tilemap's image and size from %s", name);
+	if (fscanf(f, "%s %d %d", tmpStr, &tw, &th) != 3)
+		MYERROR("Can't read tilemap's image and size from %s", name);
 	
 	// prepare
 	
 	// here maybe crash
 	for (iw = 0; iw < MAX_MAP_SIZE; iw++)
-		memset(tmpMap[iw], 0, MAX_MAP_SIZE *sizeof(char))
+		memset(tmpMap[iw], 0, MAX_MAP_SIZE *sizeof(char));
 	
 	calculateIndexes(t, tw, th, imgw, imgh);
 	iw = ih = 0;
