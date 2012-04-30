@@ -1,4 +1,4 @@
-#include "tilemap.h"
+#include "cheetah.h"
 
 /*
 typedef struct _Tilemap {
@@ -10,12 +10,13 @@ typedef struct _Tilemap {
 	Image *img;
 } Tilemap;
 */
+#define MAX_MAP_SIZE 256
 
-void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, imgh);
+void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh);
 
 void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 	static unsigned char tmpMap[MAX_MAP_SIZE][MAX_MAP_SIZE];
-	static char tmpStr[MAX_MAP_SIZE * 4];
+	//~ static char *tmpStr;
 	int tw, th;     // tile size (we get it from file header)
 	int iw, ih;     // just indexes for loops
 	int w, h;       // map size in tiles (we get it after index map reading)
@@ -25,14 +26,14 @@ void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 		MYERROR("Can't load tilemap without name");
 	
 	if (t == NULL)
-		MYERROR("Map %s not initialised", name)
+		MYERROR("Map %s not initialised", name);
 	
 	FILE *f = fopen(name, "r");
 	if (f == NULL)
 		MYERROR("Can't open tilemap %s", name);
 	
-	if (fscanf(f, "%s %d %d", &tmpStr, &tw, &th) != 3)
-		MYERROR("Can't read tilemap's image and size from %s", name);
+	//~ if (fscanf(f, "%s %d %d", tmpStr, &tw, &th) != 3)
+		//~ MYERROR("Can't read tilemap's image and size from %s", name);
 	
 	// prepare
 	
@@ -102,7 +103,7 @@ void drawTilemap(Tilemap *t, float x, float y) {
 	int i, j, k;
 	int x1, y1, x2, y2; // coords of visible part of tilemap (in tiles)
 	
-	glEnable(GL_TEXTURE_2D);
+	//~ glEnable(GL_TEXTURE_2D);
 	
 	int camx_i = (int)x / t->tw; // we look at this tile
 	int camy_i = (int)y / t->th; // we look at this tile
@@ -130,14 +131,14 @@ void drawTilemap(Tilemap *t, float x, float y) {
 	y2 = y2 < t->h - 1 ? y2 : t->h - 1;
 	
 	// draw bottom tiles
-	for (i = x1; i < x2; i++) {
-		for (j = y1; j < y2; j++) {
-			VERTEX_COORD(x,y,w,h);
-			TEXTURE_COORD();
-		}
-	}
+	//~ for (i = x1; i < x2; i++) {
+		//~ for (j = y1; j < y2; j++) {
+			//~ VERTEX_COORD(x,y,w,h);
+			//~ TEXTURE_COORD();
+		//~ }
+	//~ }
 	
-	imageBind(image);
-	DRAWQT;
+	//~ imageBind(image);
+	//~ DRAWQT;
 }
 

@@ -41,6 +41,7 @@ OBJECTS := \
 	$(OBJDIR)/window.o \
 	$(OBJDIR)/graphics.o \
 	$(OBJDIR)/generator.o \
+	$(OBJDIR)/tilemap.o \
 	$(OBJDIR)/stb_image_aug.o \
 	$(OBJDIR)/image_DXT.o \
 	$(OBJDIR)/image_helper.o \
@@ -143,6 +144,11 @@ $(OBJDIR)/graphics.o: src/graphics.c
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/generator.o: src/generator.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/tilemap.o: src/tilemap.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"

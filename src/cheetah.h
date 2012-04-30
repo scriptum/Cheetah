@@ -142,6 +142,16 @@ typedef struct Shader {
 	unsigned int id;
 } Shader;
 
+/*================================tilemap=====================================*/
+typedef struct _Tilemap {
+	int w, h;            // size in tiles
+	int tw, th;          // single tile size
+	float index[256][4]; // texture coords index
+	unsigned char **map; // tile indexes map
+	int scalable;        // should tilemap be scaled to screen size or drawed per-pixel
+	Image *img;
+} Tilemap;
+
 /*==================================VBO=======================================*/
 typedef struct Point {
 	float x, y;
