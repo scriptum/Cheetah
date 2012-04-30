@@ -81,9 +81,9 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 		while (sscanf(pos, "%d\t", &id) == 1) {
 			if (id < 0 || id > 255)
 				MYERROR("Worng tilemap index from %s", name);
-			printf("== %s: %d\n", __FILE__, __LINE__);
+			//~ printf("== %s: %d\n", __FILE__, __LINE__);
 			tmpMap[iw][ih] = id;
-			printf("== %s: %d\n", __FILE__, __LINE__);
+			//~ printf("== %s: %d\n", __FILE__, __LINE__);
 			pos = strstr(pos, "\t");
 			if (pos == NULL) break;
 			ih++;
