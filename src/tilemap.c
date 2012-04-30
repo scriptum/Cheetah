@@ -1,4 +1,6 @@
 #include "cheetah.h"
+#include "render.h"
+#include "macros.h"
 
 /*
 typedef struct _Tilemap {
@@ -12,7 +14,23 @@ typedef struct _Tilemap {
 */
 #define MAX_MAP_SIZE 256
 
-void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh);
+void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh)
+{
+	int w = imgw / tw; // image width in tiles
+	int h = imgh / th; // image height in tiles
+	int iw, ih, i = 0; // just counters for loops
+	
+	for (iw  = 0; iw < w; iw++) {
+		for (ih = 0; ih < h; ih++) {
+			t->index[i][0] = iw * tw;
+			t->index[i][1] = ih * th;
+			t->index[i][2] = (iw + 1) * tw;
+			t->index[i][3] = (ih + 1) * th;
+			
+			i++;
+		}
+	}
+}
 
 void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 	static unsigned char tmpMap[MAX_MAP_SIZE][MAX_MAP_SIZE];
@@ -81,29 +99,11 @@ void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh) {
 			t->map[iw][ih] = tmpMap[iw][ih];
 }
 
-void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh)
-{
-	int w = imgw / tw; // image width in tiles
-	int h = imgh / th; // image height in tiles
-	int iw, ih, i = 0; // just counters for loops
-	
-	for (iw  = 0; iw < w; iw++) {
-		for (ih = 0; ih < h; ih++) {
-			t->index[i][0] = iw * tw;
-			t->index[i][1] = ih * th;
-			t->index[i][2] = (iw + 1) * tw;
-			t->index[i][3] = (ih + 1) * th;
-			
-			i++;
-		}
-	}
-}
-
 void drawTilemap(Tilemap *t, float x, float y, float r, float z) {
-	int i, j, k;
+	int i, j, k = 0;
 	int x1, y1, x2, y2; // coords of visible part of tilemap (in tiles)
 	
-	//~ glEnable(GL_TEXTURE_2D);
+	x1 = y1 = 0; x2 = t->w; y2 = t->h;
 	
 	int camx_i = (int)x / t->tw; // we look at this tile
 	int camy_i = (int)y / t->th; // we look at this tile
@@ -114,7 +114,7 @@ void drawTilemap(Tilemap *t, float x, float y, float r, float z) {
 	i = (float)i / tilemap.camzoom + 2; // apply zoom
 	j = (float)j / tilemap.camzoom + 2; // apply zoom
 	*/
-	x1 = camx_i - i; // get left drawing edge in tiles
+	/*x1 = camx_i - i; // get left drawing edge in tiles
 	x1 = x1 > 0 ? x1 : 0; // check if we draw from negative index
 	x1 = x1 < t->w - 1 ? x1 : t->w - 1; // check if we draw from owerflow index
 	
@@ -128,17 +128,25 @@ void drawTilemap(Tilemap *t, float x, float y, float r, float z) {
 	
 	y2 = camy_i + j;
 	y2 = y2 > 0 ? y2 : 0;
-	y2 = y2 < t->h - 1 ? y2 : t->h - 1;
+	y2 = y2 < t->h - 1 ? y2 : t->h - 1;*/
 	
+	VERTEX_QUERY((x2 - x1) * (y2 - y1) * 4);
+	move(x, y);
+	rotate(r);
+	scale(z);
 	// draw bottom tiles
-	//~ for (i = x1; i < x2; i++) {
-		//~ for (j = y1; j < y2; j++) {
-			//~ VERTEX_COORD(x,y,w,h);
-			//~ TEXTURE_COORD();
-		//~ }
-	//~ }
+	for (i = x1; i < x2; i++) {
+		for (j = y1; j < y2; j++) {
+			VERTEX_COORD(i * t->tw, j * t->th, (i + 1) * t->tw, (j + 1) * t->th);
+			memcpy(texCoord + k, t->index[t->map[i][j]], 8);
+			k += 4;
+		}
+	}
 	
-	//~ imageBind(image);
-	//~ DRAWQT;
+	glEnable(GL_TEXTURE_2D);
+	imageBind(t->img);
+	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
+	glTexCoordPointer(2, GL_FLOAT, 0, texCoordQuad);
+	glDrawArrays(GL_QUADS, 0, k);
 }
 
