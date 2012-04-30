@@ -145,18 +145,18 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
 	vertexCoord[7] = y;\
 } while(0)
 
-#define VX(x,y) cosf(a)*(x-ox)-sinf(a)*(y-oy)
-#define VY(x,y) sinf(a)*(x-ox)+cosf(a)*(y-oy)
+#define VERTEX_ROT_X(x,y) cosf(a)*(x-ox)-sinf(a)*(y-oy)
+#define VERTEX_ROT_Y(x,y) sinf(a)*(x-ox)+cosf(a)*(y-oy)
 
 #define VERTEX_COORD_TRANS(x,y,w,h,a,ox,oy) do {\
-	vertexCoord[0] = x + VX(0,0);\
-	vertexCoord[1] = y + VY(0,0);\
-	vertexCoord[2] = x + VX(0,h);\
-	vertexCoord[3] = y + VY(0,h);\
-	vertexCoord[4] = x + VX(w,h);\
-	vertexCoord[5] = y + VY(w,h);\
-	vertexCoord[6] = x + VX(w,0);\
-	vertexCoord[7] = y + VY(w,0);\
+	vertexCoord[0] = x + VERTEX_ROT_X(0,0);\
+	vertexCoord[1] = y + VERTEX_ROT_Y(0,0);\
+	vertexCoord[2] = x + VERTEX_ROT_X(0,h);\
+	vertexCoord[3] = y + VERTEX_ROT_Y(0,h);\
+	vertexCoord[4] = x + VERTEX_ROT_X(w,h);\
+	vertexCoord[5] = y + VERTEX_ROT_Y(w,h);\
+	vertexCoord[6] = x + VERTEX_ROT_X(w,0);\
+	vertexCoord[7] = y + VERTEX_ROT_Y(w,0);\
 } while(0)
 
 #define TEXTURE_COORD(qx,qy,qw,qh,w,h) do {\
