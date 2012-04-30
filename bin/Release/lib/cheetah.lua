@@ -291,7 +291,14 @@ C.newImageFromData = function(data, options)
 end
 
 C.newTilemap = function(file)
-
+	local f = assert(io.open(file))
+	local image, w, h = f:read('*l'):match('([^ ]+) (%d+) (%d+)')
+	assert(h and w and image, 'Invalid tilemap file')
+	local ptr = ffi.new('Tilemap')
+	ptr.img = C.newImage(image)
+	ptr.tw, ptr.th = w, h
+	libcheetah.newTilemapInternal(ptr, file)
+	return ptr
 end
 
 --~ ffi.metatype('Tilemap', {
