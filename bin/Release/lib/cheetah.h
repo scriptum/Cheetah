@@ -249,7 +249,7 @@ double getTime();
 void delay(unsigned int ms);
 void sleep(unsigned int sec);
 void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh);
-void drawTilemap(Tilemap *t, float x, float y);
+void drawTilemap(Tilemap *t, float x, float y, float r, float z);
 Vbo * newVbo(Point * data, Point * tex, unsigned int count);
 void vboDraw(Vbo * ptr);
 Vbo * newVboPoints(Point * data, unsigned int count);
