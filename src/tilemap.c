@@ -32,13 +32,18 @@ void calcuateIndexes(Tilemap *t, int tw, int th, int imgw, int imgh)
 	}
 }
 
-void newTilmapInternal(Tilemap *t, char *name) {
+void newTilmapInternal(Tilemap *t, const char *name) {
 	static unsigned char tmpMap[MAX_MAP_SIZE][MAX_MAP_SIZE];
 	static char tmpStr[MAX_MAP_SIZE * 4];
 	int tw, th;     // tile size (we get it from file header)
 	int iw, ih;     // just indexes for loops
 	int w, h;       // map size in tiles (we get it after index map reading)
 	int id;         // storage for incoming index from file (while reading)
+	if(!t->img->id)
+	{
+		MYERROR("Cannot get image for tile map");
+		return;
+	}
 	int imgw = t->img->w;
 	int imgh = t->img->h;
 	

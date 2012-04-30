@@ -296,8 +296,8 @@ C.newTilemap = function(file)
 	assert(h and w and image, 'Invalid tilemap file')
 	local ptr = ffi.new('Tilemap')
 	ptr.img = C.newImage(image)
-	ptr.tw, ptr.th = w, h
-	libcheetah.newTilemapInternal(ptr, file)
+	ptr.tw, ptr.th = tonumber(w), tonumber(h)
+	libcheetah.newTilmapInternal(ptr, file)
 	return ptr
 end
 

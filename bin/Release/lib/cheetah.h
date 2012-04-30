@@ -248,7 +248,7 @@ unsigned int getTicks();
 double getTime();
 void delay(unsigned int ms);
 void sleep(unsigned int sec);
-void newTilmapInternal(Tilemap *t, char *name, int imgw, int imgh);
+void newTilmapInternal(Tilemap *t, const char *name);
 void drawTilemap(Tilemap *t, float x, float y, float r, float z);
 Vbo * newVbo(Point * data, Point * tex, unsigned int count);
 void vboDraw(Vbo * ptr);
