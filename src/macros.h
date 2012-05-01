@@ -203,12 +203,12 @@ int vertex_accum_shift;
 #define ACCUM_TEXTURE(qx,qy,qw,qh,w,h) do {\
 	texCoord[vertex_accum_shift + 0] = qx/w;\
 	texCoord[vertex_accum_shift + 1] = qy/h;\
-	texCoord[vertex_accum_shift + 2] = texCoord[0];\
-	texCoord[vertex_accum_shift + 3] = texCoord[1] + qh/h;\
-	texCoord[vertex_accum_shift + 4] = texCoord[0] + qw/w;\
-	texCoord[vertex_accum_shift + 5] = texCoord[3];\
-	texCoord[vertex_accum_shift + 6] = texCoord[4];\
-	texCoord[vertex_accum_shift + 7] = texCoord[1];\
+	texCoord[vertex_accum_shift + 2] = texCoord[vertex_accum_shift + 0];\
+	texCoord[vertex_accum_shift + 3] = texCoord[vertex_accum_shift + 1] + qh/h;\
+	texCoord[vertex_accum_shift + 4] = texCoord[vertex_accum_shift + 0] + qw/w;\
+	texCoord[vertex_accum_shift + 5] = texCoord[vertex_accum_shift + 3];\
+	texCoord[vertex_accum_shift + 6] = texCoord[vertex_accum_shift + 4];\
+	texCoord[vertex_accum_shift + 7] = texCoord[vertex_accum_shift + 1];\
 } while(0)
 
 #define ACCUM_TEXTURE_ARRAY(x) do {\
