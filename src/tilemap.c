@@ -123,7 +123,7 @@ void tilemapDraw(Tilemap *t, double x, double y, double r, double z) {
 	// draw bottom tiles
 	for (i = x1; i < x2; i++) {
 		for (j = y1; j < y2; j++) {
-			ACCUM_VERTEX(i * t->tw, j * t->th, (i + 1) * t->tw, (j + 1) * t->th);
+			ACCUM_VERTEX(i * t->tw, j * t->th, t->tw, t->th);
 			ACCUM_TEXTURE_ARRAY(t->index[t->map[i][j]]);
 			ACCUM_ADD();
 			k += 4;
