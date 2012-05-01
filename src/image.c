@@ -169,7 +169,6 @@ void disableTexture() {
  * @var Image object
  * */
 void imageDraw(Image * image) {
-	glEnable(GL_TEXTURE_2D);
 	imageBind(image);
 	glCallList(quadlist);
 }
@@ -180,7 +179,6 @@ void imageDraw(Image * image) {
  * @var Image object
  * */
 void imageDrawxy(Image * image, float x, float y, float w, float h) {
-	glEnable(GL_TEXTURE_2D);
 	VERTEX_COORD(x,y,w,h);
 	imageBind(image);
 	DRAWQ;
@@ -192,7 +190,6 @@ void imageDrawxy(Image * image, float x, float y, float w, float h) {
  * @var Image object
  * */
 void imageDrawt(Image * image, float x, float y, float w, float h, float a, float ox, float oy) {
-	glEnable(GL_TEXTURE_2D);
 	VERTEX_COORD_TRANS(x,y,w,h,a,ox,oy);
 	imageBind(image);
 	DRAWQ;
