@@ -36,14 +36,26 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 	if (fscanf(f, "%s %d %d %d %d\n", tmpStr, &t->w, &t->h, &t->tw, &t->th) != 5)
 		MYERROR("Can't read tilemap's image and size from %s", name);
 	
+	// get mem for index
+	t->index = NULL;
+	new(t->index, float *, t->img->w / t->tw * t->img->h / t->th);
+	for (i = 0; i < t->w; i++) {
+		t->index[i] = NULL;
+		new(t->index[i], float, 8);
+	}
+	
 	// calculate indexes' texture coords
 	i = 0;
-	for (iw  = 0; iw < t->w; iw++) {
-		for (ih = 0; ih < t->h; ih++) {
-			t->index[i][0] = iw * t->tw;
-			t->index[i][1] = ih * t->th;
-			t->index[i][2] = (iw + 1) * t->tw;
-			t->index[i][3] = (ih + 1) * t->th;
+	for (iw  = 0; iw < t->img->w / t->tw; iw++) {
+		for (ih = 0; ih < t->img->h / t->th; ih++) {
+			t->index[i][0] = (iw * t->tw) / t->img->w;
+			t->index[i][1] = (ih * t->th) / t->img->h;
+			t->index[i][2] = t->index[i][0];
+			t->index[i][3] = t->index[i][1] + t->th / t->img->h;
+			t->index[i][4] = t->index[i][0] + t->tw / t->img->w;
+			t->index[i][5] = t->index[i][3];
+			t->index[i][6] = t->index[i][4];
+			t->index[i][7] = t->index[i][1];
 			
 			i++;
 		}
