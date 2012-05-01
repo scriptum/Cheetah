@@ -182,6 +182,50 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
 	glDrawArrays(GL_QUADS, 0, 4);\
 } while(0)
 
+/******************************VERTEX ACCUMULATOR******************************/
+int vertex_accum_shift;
+#define ACCUM_START(x) do {\
+	vertex_accum_shift = 0;\
+	VERTEX_QUERY(x);\
+} while(0)
+
+#define ACCUM_VERTEX(x,y,w,h) do {\
+	vertexCoord[vertex_accum_shift + 0] = x;\
+	vertexCoord[vertex_accum_shift + 1] = y;\
+	vertexCoord[vertex_accum_shift + 2] = x;\
+	vertexCoord[vertex_accum_shift + 3] = y + h;\
+	vertexCoord[vertex_accum_shift + 4] = x + w;\
+	vertexCoord[vertex_accum_shift + 5] = y + h;\
+	vertexCoord[vertex_accum_shift + 6] = x + w;\
+	vertexCoord[vertex_accum_shift + 7] = y;\
+} while(0)
+
+#define ACCUM_TEXTURE(qx,qy,qw,qh,w,h) do {\
+	texCoord[vertex_accum_shift + 0] = qx/w;\
+	texCoord[vertex_accum_shift + 1] = qy/h;\
+	texCoord[vertex_accum_shift + 2] = texCoord[0];\
+	texCoord[vertex_accum_shift + 3] = texCoord[1] + qh/h;\
+	texCoord[vertex_accum_shift + 4] = texCoord[0] + qw/w;\
+	texCoord[vertex_accum_shift + 5] = texCoord[3];\
+	texCoord[vertex_accum_shift + 6] = texCoord[4];\
+	texCoord[vertex_accum_shift + 7] = texCoord[1];\
+} while(0)
+
+#define ACCUM_TEXTURE_ARRAY(x) do {\
+	memcpy(texCoord + vertex_accum_shift, x, 32);\
+} while(0)
+
+#define ACCUM_ADD() do {\
+	vertex_accum_shift += 8;\
+} while(0)
+
+#define ACCUM_DRAW() do {\
+	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);\
+	glTexCoordPointer(2, GL_FLOAT, 0, texCoord);\
+	glDrawArrays(GL_QUADS, 0, vertex_accum_shift << 1);\
+	vertex_accum_shift = 0;\
+} while(0)
+
 /**********************************DEBUG STUFF*********************************/
 
 #define DEBUG_MSG_FORMAT "%s (%d) - %s: "
