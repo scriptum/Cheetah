@@ -292,19 +292,21 @@ end
 
 C.newTilemap = function(file)
 	local f = assert(io.open(file))
-	local image, w, h = f:read('*l'):match('([^ ]+) (%d+) (%d+)')
+	local image, w, h, tw, th = f:read('*l'):match('([^ ]+) (%d+) (%d+) (%d+) (%d+)')
 	assert(h and w and image, 'Invalid tilemap file')
 	local ptr = ffi.new('Tilemap')
 	image = file:gsub('[^/]+$', image)
 	ptr.img = C.newImage(image)
-	ptr.tw, ptr.th = tonumber(w), tonumber(h)
+	ptr.w, ptr.h, ptr.tw, ptr.th = tonumber(w), tonumber(h), tonumber(tw), tonumber(th)
 	libcheetah.newTilmapInternal(ptr, file)
 	return ptr
 end
 
 ffi.metatype('Tilemap', {
 	__index = {
-		draw = libcheetah.tilemapDraw,
+		draw = function(x,y,angle,zoom)
+			libcheetah.tilemapDraw(x or 0, y or 0, angle or 0, zoom or 1)
+		end
 	}, 
 	__gc = libcheetah.deleteTilemap
 })
