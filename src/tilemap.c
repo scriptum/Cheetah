@@ -12,7 +12,7 @@ typedef struct _Tilemap {
 	Image *img;
 } Tilemap;
 */
-
+#define INDEX_COUNT ((int)(t->img->w / t->tw) * (int)(t->img->h / t->th))
 void newTilmapInternal(Tilemap *t, const char *name) {
 	int iw, ih, i = 0;  // just indexes for loops
 	char tmpStr[256];
@@ -24,22 +24,34 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 	}
 	
 	if (name == NULL)
+	{
 		MYERROR("Can't load tilemap without name");
+		return;
+	}
 	
 	if (t == NULL)
+	{
 		MYERROR("Map %s not initialised", name);
+		return;
+	}
 	
 	FILE *f = fopen(name, "r");
 	if (f == NULL)
+	{
 		MYERROR("Can't open tilemap %s", name);
+		return;
+	}
 	
 	if (fscanf(f, "%s %d %d %d %d\n", tmpStr, &t->w, &t->h, &t->tw, &t->th) != 5)
+	{
 		MYERROR("Can't read tilemap's image and size from %s", name);
+		return;
+	}
 	
 	// get mem for index
 	t->index = NULL;
-	new(t->index, float *, t->img->w / t->tw * t->img->h / t->th);
-	for (i = 0; i < t->w; i++) {
+	new(t->index, float *, INDEX_COUNT);
+	for (i = 0; i < INDEX_COUNT; i++) {
 		t->index[i] = NULL;
 		new(t->index[i], float, 8);
 	}
@@ -138,7 +150,7 @@ void tilemapDraw(Tilemap *t, double x, double y, double r, double z) {
 
 void deleteTilemap(Tilemap *t) {
 	int i;
-	for (i = 0; i < t->w; i++) delete(t->index[i]);
+	for (i = 0; i < INDEX_COUNT; i++) delete(t->index[i]);
 	delete(t->index);
 	
 	for (i = 0; i < t->w; i++) delete(t->map[i]);
