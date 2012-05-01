@@ -67,19 +67,18 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 	}
 	
 	fclose(f);
-printf("== %s: %d\n", __FILE__, __LINE__);
 }
 
-void tilemapDraw(Tilemap *t, float x, float y, float r, float z) {
-printf("== %s: %d\n", __FILE__, __LINE__);
+//void tilemapDraw(Tilemap *t, float x, float y, float r, float z) {
+void tilemapDraw(Tilemap *t, double x, double y, double r, double z) {
 	int i, j, k = 0;
 	int x1, y1, x2, y2; // coords of visible part of tilemap (in tiles)
-printf("== %s: %d\n", __FILE__, __LINE__);
+	
 	x1 = y1 = 0; x2 = t->w; y2 = t->h;
-printf("== %s: %d\n", __FILE__, __LINE__);
+	
 	int camx_i = (int)x / t->tw; // we look at this tile
 	int camy_i = (int)y / t->th; // we look at this tile
-printf("== %s: %d\n", __FILE__, __LINE__);
+	
 	i = screen->w / t->tw / 2; // half screen width in tiles
 	j = screen->h / t->th / 2; // half screen height in tiles
 	/*
@@ -101,12 +100,14 @@ printf("== %s: %d\n", __FILE__, __LINE__);
 	y2 = camy_i + j;
 	y2 = y2 > 0 ? y2 : 0;
 	y2 = y2 < t->h - 1 ? y2 : t->h - 1;*/
-printf("== %s: %d\n", __FILE__, __LINE__);
+	
 	VERTEX_QUERY((x2 - x1) * (y2 - y1) * 4);
-	move(x, y);
-	rotate(r);
-	scale(z);
-printf("== %s: %d\n", __FILE__, __LINE__);
+	
+	glPushMatrix();
+	glTranslated(x, y, 0);
+	glRotated(r, 0, 0, 1);
+	glScaled(z, z, 1);
+	
 	// draw bottom tiles
 	for (i = x1; i < x2; i++) {
 		for (j = y1; j < y2; j++) {
@@ -115,13 +116,13 @@ printf("== %s: %d\n", __FILE__, __LINE__);
 			k += 4;
 		}
 	}
-printf("== %s: %d\n", __FILE__, __LINE__);
+	
 	glEnable(GL_TEXTURE_2D);
 	imageBind(t->img);
 	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
 	glTexCoordPointer(2, GL_FLOAT, 0, texCoordQuad);
 	glDrawArrays(GL_QUADS, 0, k);
-printf("== %s: %d\n", __FILE__, __LINE__);
+	glPopMatrix();
 }
 
 void deleteTilemap(Tilemap *t) {
