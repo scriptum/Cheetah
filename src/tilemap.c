@@ -101,7 +101,7 @@ void tilemapDraw(Tilemap *t, double x, double y, double r, double z) {
 	y2 = y2 > 0 ? y2 : 0;
 	y2 = y2 < t->h - 1 ? y2 : t->h - 1;*/
 	
-	VERTEX_QUERY((x2 - x1) * (y2 - y1) * 4);
+	ACCUM_START((x2 - x1) * (y2 - y1) * 4);
 	
 	glPushMatrix();
 	glTranslated(x, y, 0);
@@ -111,17 +111,16 @@ void tilemapDraw(Tilemap *t, double x, double y, double r, double z) {
 	// draw bottom tiles
 	for (i = x1; i < x2; i++) {
 		for (j = y1; j < y2; j++) {
-			VERTEX_COORD(i * t->tw, j * t->th, (i + 1) * t->tw, (j + 1) * t->th);
-			memcpy(texCoord + k, t->index[t->map[i][j]], 8);
+			ACCUM_VERTEX(i * t->tw, j * t->th, (i + 1) * t->tw, (j + 1) * t->th);
+			ACCUM_TEXTURE_ARRAY(t->index[t->map[i][j]]);
+			ACCUM_ADD();
 			k += 4;
 		}
 	}
 	
 	glEnable(GL_TEXTURE_2D);
 	imageBind(t->img);
-	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
-	glTexCoordPointer(2, GL_FLOAT, 0, texCoordQuad);
-	glDrawArrays(GL_QUADS, 0, k);
+	ACCUM_DRAW();
 	glPopMatrix();
 }
 
