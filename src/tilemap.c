@@ -137,5 +137,9 @@ void tilemapDraw(Tilemap *t, double x, double y, double r, double z) {
 }
 
 void deleteTilemap(Tilemap *t) {
+	for (i = 0; i < t->w; i++) delete(t->index[i]);
+	delete(t->index);
 	
+	for (i = 0; i < t->w; i++) delete(t->map[i]);
+	delete(t->map);
 }
