@@ -47,12 +47,15 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 			i++;
 		}
 	}
-	printf("== %s: %d\n", __FILE__, __LINE__);
+	
 	// get memory
+	t->map = NULL;
 	new(t->map, unsigned char, t->w);
-	for (i = 0; i < t->w; i++)
+	for (i = 0; i < t->w; i++) {
+		t->map[i] = NULL;
 		new(t->map[i], unsigned char, t->h);
-	printf("== %s: %d\n", __FILE__, __LINE__);
+	}
+	
 	// read index map
 	for (iw = 0; iw < t->w; iw++) {
 		for (ih = 0; ih < t->h; ih++) {
@@ -61,8 +64,9 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 			t->map[iw][ih] = (unsigned char)i;
 		}
 	}
-	printf("== %s: %d\n", __FILE__, __LINE__);
+	
 	fclose(f);
+	printf("== %s: %d\n", __FILE__, __LINE__);
 }
 
 void tilemapDraw(Tilemap *t, float x, float y, float r, float z) {
