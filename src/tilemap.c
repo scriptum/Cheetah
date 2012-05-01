@@ -37,6 +37,7 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 		MYERROR("Can't read tilemap's image and size from %s", name);
 	
 	// calculate indexes' texture coords
+	i = 0;
 	for (iw  = 0; iw < t->w; iw++) {
 		for (ih = 0; ih < t->h; ih++) {
 			t->index[i][0] = iw * t->tw;
