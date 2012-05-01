@@ -290,13 +290,16 @@ C.newImageFromData = function(data, options)
 	return ptr
 end
 
+local texturesArchive = {}
 C.newTilemap = function(file)
 	local f = assert(io.open(file))
 	local image, w, h, tw, th = f:read('*l'):match('([^ ]+) (%d+) (%d+) (%d+) (%d+)')
 	assert(h and w and image, 'Invalid tilemap file')
 	local ptr = ffi.new('Tilemap')
 	image = file:gsub('[^/]+$', image)
-	ptr.img = C.newImage(image)
+	local img = C.newImage(image)
+	ptr.img = img
+	table.insert(texturesArchive, img)
 	ptr.w, ptr.h, ptr.tw, ptr.th = tonumber(w), tonumber(h), tonumber(tw), tonumber(th)
 	libcheetah.newTilmapInternal(ptr, file)
 	return ptr
@@ -313,7 +316,6 @@ ffi.metatype('Tilemap', {
 
 --~ local resLoadedImages
 C.fonts = {}
-local fontTextures = {}
 C.newFont = function(name, scalable, codepage)
 	local a, b, c, font, img
 	local millis = C.getTicks()
@@ -326,7 +328,7 @@ C.newFont = function(name, scalable, codepage)
 			n = name:gsub('[^/]+$', a)
 			img = ffi.new('Image')
 			libcheetah.newImageOpt(img, n, 'in') --disable delayed loader
-			table.insert(fontTextures, img)
+			table.insert(texturesArchive, img)
 		else
 			a, b, c = line:match('^([%w ]+) (%d+)(p[tx])$')
 			if a then
