@@ -233,7 +233,12 @@ int vertex_accum_shift;
 #define LOCATION __FILE__, __LINE__, __FUNCTION__
 
 #define MYERROR(fmt, ...) fprintf(stderr, DEBUG_MSG_FORMAT fmt "\n", LOCATION, ##__VA_ARGS__)
-
+#define MYASSERT(condition, fmt, ...) do {\
+	if(!(condition)) { \
+		fprintf(stderr, DEBUG_MSG_FORMAT fmt "\n", LOCATION, ##__VA_ARGS__);\
+		return;\
+	}\
+} while(0)
 #define vard(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
 #define vars(v) printf(DEBUG_MSG_FORMAT " %s = %s\n", LOCATION, #v, v);
 #define varf(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);

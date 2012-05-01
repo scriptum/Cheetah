@@ -41,12 +41,7 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 		MYERROR("Can't open tilemap %s", name);
 		return;
 	}
-	
-	if (fscanf(f, "%s %d %d %d %d\n", tmpStr, &t->w, &t->h, &t->tw, &t->th) != 5)
-	{
-		MYERROR("Can't read tilemap's image and size from %s", name);
-		return;
-	}
+	do {} while(fgetc(f) != '\n');
 	
 	// get mem for index
 	t->index = NULL;
@@ -72,6 +67,8 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 			i++;
 		}
 	}
+	vard(t->w);
+	vard(t->h);
 	
 	// get memory
 	t->map = NULL;
@@ -85,7 +82,10 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 	for (iw = 0; iw < t->w; iw++) {
 		for (ih = 0; ih < t->h; ih++) {
 			if (fscanf(f, "%d", &i) != 1)
+			{
 				MYERROR("Can't read tilemap from %s", name);
+				return;
+			}
 			t->map[iw][ih] = (unsigned char)i;
 		}
 	}
