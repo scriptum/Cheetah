@@ -80,7 +80,7 @@ unsigned int getTicks() {
 }
 
 /**
- * @descr Gets the time in seconds past from the execution time. This function returns the time with 
+ * @descr Gets the time in seconds past from the execution time. This function returns the time in view of game speed!
  * @group graphics/timer
  * */
 double getTime() {
@@ -88,7 +88,7 @@ double getTime() {
 }
 
 /**
- * @descr Gets the time in seconds past from the execution time.
+ * @descr Gets the time in seconds past from the execution time. Returns "pure" time (no game speed).
  * @group graphics/timer
  * */
 double getRealTime() {
