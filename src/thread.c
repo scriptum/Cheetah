@@ -80,11 +80,19 @@ unsigned int getTicks() {
 }
 
 /**
- * @descr Gets the time in seconds past from the execution time.
+ * @descr Gets the time in seconds past from the execution time. This function returns the time with 
  * @group graphics/timer
  * */
 double getTime() {
-	return (double)SDL_GetTicks()/1000;
+	return globalTimed;
+}
+
+/**
+ * @descr Gets the time in seconds past from the execution time.
+ * @group graphics/timer
+ * */
+double getRealTime() {
+	return SDL_GetTicks() / 1000.0;
 }
 
 /**

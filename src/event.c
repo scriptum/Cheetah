@@ -26,6 +26,9 @@ IN THE SOFTWARE.
 
 Uint32 rescaleTime = 0;
 Uint32 globalTime = 0;
+double globalTimed = 0;
+double globalTimeOffsetd = 0;
+double globalGameSpeed = 1;
 int resizeDelay = 100;
 
 unsigned int getEventType() {
@@ -127,4 +130,8 @@ int getMouseY() {
 
 char *getKeyState() {
 	return SDL_GetKeyState(NULL);
+}
+
+char gameSpeed(double speed) {
+	globalGameSpeed = speed;
 }
