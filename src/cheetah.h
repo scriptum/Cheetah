@@ -237,5 +237,8 @@ void initRenderer();
 SDL_Event event;
 extern Uint32 rescaleTime;
 extern Uint32 globalTime;
+extern double globalTimed;
+extern double globalTimeOffsetd;
+extern double globalGameSpeed;
 extern int resizeDelay;
 #endif //__CHEETAH_H__

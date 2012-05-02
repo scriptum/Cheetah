@@ -3,7 +3,7 @@ require 'lib.lquery.init'
 local C = cheetah
 C.init('Test', 512, 512, 32, '')
 C.printFPS = true
-local img = C.newImage('background_.jpg')
+local img = C.newImage('data/crate.png')
 
 local polar = C.newShader([[#version 120
 uniform float time;

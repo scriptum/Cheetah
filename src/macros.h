@@ -241,7 +241,7 @@ int vertex_accum_shift;
 } while(0)
 #define vard(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
 #define vars(v) printf(DEBUG_MSG_FORMAT " %s = %s\n", LOCATION, #v, v);
-#define varf(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
+#define varf(v) printf(DEBUG_MSG_FORMAT " %s = %f\n", LOCATION, #v, v);
 
 /**********************************INIT ASSERT*********************************/
 #define NEDED_INIT do {\
