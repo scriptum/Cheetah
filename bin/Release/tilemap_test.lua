@@ -7,9 +7,10 @@ C.printFPS = true
 t = C.newTilemap("data/tilemap_test.map")
 
 e = E:new(screen):draw(function(s)
-	t:draw(math.floor(s.x), math.floor(s.y), s.angle, 1)
+	t:draw(math.floor(s.x), math.floor(s.y), s.angle, 1, math.floor(s.ox), math.floor(s.oy))
 end)
 :rotate(0)
+--:sizeoffset()
 :animate({x = 200, y = 200, angle = 180}, 1)
 :size(192, 128)
 :draggable()

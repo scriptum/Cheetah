@@ -93,7 +93,7 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 }
 
 //void tilemapDraw(Tilemap *t, float x, float y, float r, float z) {
-void tilemapDraw(Tilemap *t, double x, double y, double r, double z) {
+void tilemapDraw(Tilemap *t, double x, double y, double r, double z, double ox, double oy) {
 	int i, j, k = 0;
 	int x1, y1, x2, y2; // coords of visible part of tilemap (in tiles)
 	
@@ -129,6 +129,7 @@ void tilemapDraw(Tilemap *t, double x, double y, double r, double z) {
 	glPushMatrix();
 	glTranslated(x, y, 0);
 	glRotated(r, 0, 0, 1);
+	glTranslated(ox, oy, 0);
 	glScaled(z, z, 1);
 	
 	// draw bottom tiles
