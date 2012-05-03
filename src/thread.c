@@ -44,7 +44,8 @@ int resLoaderThread(void *unused)
 	//~ unsigned char *myBuf;
 	//~ bool empty;
 	int width, height;
-	while(1){
+	while(1)
+	{
 		//~ SDL_mutexP(resQueueMutex);
 		//~ empty = QEMPTY(resLoaderQueue)
 		//~ SDL_mutexV(resQueueMutex);

@@ -22,7 +22,9 @@ IN THE SOFTWARE.
 ******************************************************************************]]
 
 
-local ffi = require "ffi"
+local ffi = require 'ffi'
+require 'lib.table'
+require 'lib.string'
 
 cheetah = {}
 
