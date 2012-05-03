@@ -15,7 +15,6 @@ typedef struct _Tilemap {
 #define INDEX_COUNT ((int)(t->img->w / t->tw) * (int)(t->img->h / t->th))
 void newTilmapInternal(Tilemap *t, const char *name) {
 	int iw, ih, i = 0;  // just indexes for loops
-	char tmpStr[256];
 	
 	if(!t->img->id)
 	{
@@ -23,24 +22,26 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 		return;
 	}
 	
-	if (name == NULL)
+	if(name == NULL)
 	{
 		MYERROR("Can't load tilemap without name");
 		return;
 	}
 	
-	if (t == NULL)
+	if(t == NULL)
 	{
 		MYERROR("Map %s not initialised", name);
 		return;
 	}
 	
 	FILE *f = fopen(name, "r");
-	if (f == NULL)
+	if(f == NULL)
 	{
 		MYERROR("Can't open tilemap %s", name);
 		return;
 	}
+	
+	//easy way to skip line
 	do {} while(fgetc(f) != '\n');
 	
 	// get mem for index
