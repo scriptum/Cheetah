@@ -44,7 +44,8 @@ int resLoaderThread(void *unused)
 	//~ unsigned char *myBuf;
 	//~ bool empty;
 	int width, height;
-	while(1){
+	while(1)
+	{
 		//~ SDL_mutexP(resQueueMutex);
 		//~ empty = QEMPTY(resLoaderQueue)
 		//~ SDL_mutexV(resQueueMutex);
@@ -80,11 +81,19 @@ unsigned int getTicks() {
 }
 
 /**
- * @descr Gets the time in seconds past from the execution time.
+ * @descr Gets the time in seconds past from the execution time. This function returns the time in view of game speed!
  * @group graphics/timer
  * */
 double getTime() {
-	return (double)SDL_GetTicks()/1000;
+	return globalTimed;
+}
+
+/**
+ * @descr Gets the time in seconds past from the execution time. Returns "pure" time (no game speed).
+ * @group graphics/timer
+ * */
+double getRealTime() {
+	return SDL_GetTicks() / 1000.0;
 }
 
 /**

@@ -2,7 +2,7 @@ require 'lib.cheetah'
 --~ require 'lib.mixer'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Test', 512, 512, 32, 'v')
+C.init('Test', 512, 512, 32, '')
 C.printFPS = true
 t = C.newTilemap("data/tilemap_test.map")
 

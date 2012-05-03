@@ -147,7 +147,12 @@ void autoScale(bool autoScale) {
 void prepare() {
 	Resource * r;
 	unsigned int millis;
+	unsigned int delta = globalTime;
 	globalTime = SDL_GetTicks();
+	delta = globalTime - delta;
+	globalTimeOffsetd += (1.0 - globalGameSpeed) * delta / 1000.0;
+	varf(globalTimeOffsetd);
+	globalTimed = globalTime / 1000.0 - globalTimeOffsetd;
 	if(screenScale.autoScale)
 	{
 		glLoadIdentity();

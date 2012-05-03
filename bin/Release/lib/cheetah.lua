@@ -22,7 +22,9 @@ IN THE SOFTWARE.
 ******************************************************************************]]
 
 
-local ffi = require "ffi"
+local ffi = require 'ffi'
+require 'lib.table'
+require 'lib.string'
 
 cheetah = {}
 
@@ -124,16 +126,17 @@ C.FPS = "60"
 C.printFPS = false
 time = 0
 local lasttime = 0
-
+local realtime
 C.mainLoop = function()
 	assert(libcheetah.isInit(), 'You forgot about cheetah.init')
 	while done == false do
 		time = libcheetah.getTime()
+		realtime = libcheetah.getRealTime()
 		libcheetah.prepare()
 		if C.render then C.render() end
 		libcheetah.swapBuffers()
 		--~ libcheetah.doAutoScale()
-		FPS = (FPS + 1) / (1 + (libcheetah.getTime() - time));
+		FPS = (FPS + 1) / (1 + (libcheetah.getRealTime() - realtime));
 		if time - lasttime > 0.5 then
 			lasttime = time
 			if C.printFPS then 
