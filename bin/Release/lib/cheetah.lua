@@ -310,7 +310,7 @@ end
 
 ffi.metatype('Tilemap', {
 	__index = {
-		draw = function(s, x,y,angle,zoom)
+		draw = function(s, x, y, angle, zoom, ox, oy)
 			libcheetah.tilemapDraw(s, x or 0, y or 0, angle or 0, zoom or 1, ox or 0, oy or 0)
 		end
 	}, 
