@@ -106,11 +106,11 @@ void tilemapDraw(Tilemap *t, double x, double y, double r, double z) {
 	
 	i = screen->w / t->tw / 2; // half screen width in tiles
 	j = screen->h / t->th / 2; // half screen height in tiles
-	/*
-	i = (float)i / tilemap.camzoom + 2; // apply zoom
-	j = (float)j / tilemap.camzoom + 2; // apply zoom
-	*/
-	/*x1 = camx_i - i; // get left drawing edge in tiles
+	i = j = (i > j ? i : j); // i = j = max(i, j)
+	
+	i = j = (float)i / z + 2; // apply zoom
+	
+	x1 = camx_i - i; // get left drawing edge in tiles
 	x1 = x1 > 0 ? x1 : 0; // check if we draw from negative index
 	x1 = x1 < t->w - 1 ? x1 : t->w - 1; // check if we draw from owerflow index
 	
@@ -124,7 +124,7 @@ void tilemapDraw(Tilemap *t, double x, double y, double r, double z) {
 	
 	y2 = camy_i + j;
 	y2 = y2 > 0 ? y2 : 0;
-	y2 = y2 < t->h - 1 ? y2 : t->h - 1;*/
+	y2 = y2 < t->h - 1 ? y2 : t->h - 1;
 	
 	ACCUM_START((x2 - x1) * (y2 - y1) * 4);
 	
