@@ -127,10 +127,10 @@ void tilemapDraw(Tilemap *t, double x, double y, double r, double z, double ox, 
 	ACCUM_START((x2 - x1) * (y2 - y1) * 4);
 	
 	glPushMatrix();
-	if(x || y) glTranslated(x, y, 0);
-	if(r) glRotated(r, 0, 0, 1);
-	if(z) glScalef(z, z, 1);
-	if(ox || oy) glTranslated(-ox / z, -oy / z, 0);
+	if (x || y) glTranslated(x, y, 0);
+	if (r) glRotated(r, 0, 0, 1);
+	if (z) glScalef(z, z, 1);
+	if (ox || oy) glTranslated(-ox / z, -oy / z, 0);
 	
 	// draw bottom tiles
 	for (i = x1; i < x2; i++) {
