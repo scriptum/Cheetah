@@ -68,8 +68,6 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 			i++;
 		}
 	}
-	vard(t->w);
-	vard(t->h);
 	
 	// get memory
 	t->map = NULL;

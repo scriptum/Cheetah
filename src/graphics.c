@@ -151,7 +151,7 @@ void prepare() {
 	globalTime = SDL_GetTicks();
 	delta = globalTime - delta;
 	globalTimeOffsetd += (1.0 - globalGameSpeed) * delta / 1000.0;
-	varf(globalTimeOffsetd);
+	//~ varf(globalTimeOffsetd);
 	globalTimed = globalTime / 1000.0 - globalTimeOffsetd;
 	if(screenScale.autoScale)
 	{
