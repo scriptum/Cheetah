@@ -348,8 +348,9 @@ function Entity:animate(keys, options)
 		self._anim = true
 		local keys_int = {}
 		for k, v in pairs(keys) do
+			if not self[k] then self[k] = 0 end
 			assert(type(v) == 'number' and type(self[k]) == 'number', 
-				'Animation key must be a number, got '..type(v)..', self - '..type(self[k]))
+				'Animation key must be a number, got '..type(v)..', self['..k..'] = '..type(self[k]))
 			table.insert(keys_int, k)
 			table.insert(keys_int, v)
 		end
