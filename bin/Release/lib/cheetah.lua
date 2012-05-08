@@ -293,6 +293,33 @@ C.newImageFromData = function(data, options)
 	return ptr
 end
 
+C.newAtlas = function(image, x, y, w, h)
+	local p = ffi.new('Atlas')
+	p.image = image
+	p.w, p.h = w, h
+	p.tex[0] = x
+	p.tex[1] = y
+	p.tex[2] = x
+	p.tex[3] = y + h
+	p.tex[4] = x + w
+	p.tex[5] = y + h
+	p.tex[6] = x + w
+	p.tex[7] = y
+	return p
+end
+
+ffi.metatype('Atlas', {
+	__index = {
+		draw = function(s, x, y, w, h, angle, ox, oy)
+			if angle then
+				libcheetah.atlasDrawt(s, x or 0, y or 0, w or s.aw, h or s.ah, angle or 0, ox or 0, oy or 0)
+			else
+				libcheetah.atlasDrawxy(s, x or 0, y or 0, w or s.aw, h or s.ah)
+			end
+		end
+	}
+})
+
 local texturesArchive = {}
 C.newTilemap = function(file)
 	local f = assert(io.open(file))
@@ -356,13 +383,71 @@ C.newFont = function(name, scalable, codepage)
 end
 
 local resLoadImageCallback = function (path, t, dir, name, ext)
-	--~ if not resLoadedImages[path] then --avoid double-loadings
-	if not C.fileExists(dir..'/'..name..'.fnt') then
+	local buf = dir..'/'..name
+	if not C.fileExists(buf..'.fnt') and not C.fileExists(buf..'.atlas') then
 		if t[name] then
-			libcheetah.myError('resLoader: resourse %s already exists (replaced by with %s)', name, n)
+			libcheetah.myError('resLoader: resourse %s already exists (replaced with %s)', name, n)
 		end
 		t[name] = C.newImage(path)
-		--~ resLoadedImages[path] = t[name]
+	end
+end
+
+local resLoadAtlasCallback = function (path, t, dir, name, ext)
+	local img, imgname, x1, y1, x2, y2, cx, cy, w, h, r, p, a, buf
+	for line in io.lines(path) do
+		imgname = line:match('^textures?: (.+)')
+		if imgname then
+			img = ffi.new('Image')
+			libcheetah.newImageOpt(img, dir..'/'..imgname, '')
+			table.insert(texturesArchive, img)
+		else
+			imgname, x1, y1, x2, y2, cx, cy, w, h, r = 
+					line:match('(.+)\t'..string.rep('(%d+)\t', 8)..'(r?)')
+			if h then
+				p = ffi.new('Atlas')
+				p.image = img
+				p.x, p.y = tonumber(cx), tonumber(cy)
+				p.w, p.h = tonumber(w), tonumber(h)
+				p.aw, p.ah = tonumber(x2), tonumber(y2)
+				p.tex[0] = tonumber(x1) / img.w
+				p.tex[1] = tonumber(y1) / img.h
+				p.tex[2] = tonumber(x1) / img.w
+				p.tex[3] = (tonumber(y1) + tonumber(y2)) / img.h
+				p.tex[4] = (tonumber(x1) + tonumber(x2)) / img.w
+				p.tex[5] = (tonumber(y1) + tonumber(y2)) / img.h
+				p.tex[6] = (tonumber(x1) + tonumber(x2)) / img.w
+				p.tex[7] = tonumber(y1) / img.h
+				if r =='r' then
+					p.x, p.y = p.y, p.w - p.x - p.aw
+					p.aw, p.ah = p.ah, p.aw
+					p.tex[0], p.tex[1], p.tex[2], p.tex[3], p.tex[4], p.tex[5], p.tex[6], p.tex[7] = 
+					p.tex[6], p.tex[7], p.tex[0], p.tex[1], p.tex[2], p.tex[3], p.tex[4], p.tex[5]
+				end
+				a = t
+				buf = nil
+				for v in imgname:gmatch('[^/]+') do
+					if buf then
+						if not a[buf] then a[buf] = {} end
+						a = a[buf]
+					end
+					print(buf, v)
+					buf = tonumber(v)
+					if tostring(buf) ~= v then
+						buf = v
+					end
+				end
+				print(buf)
+				imgname = buf:match('^(.*)%.[^.]+$')
+				buf = tonumber(imgname)
+				if tostring(buf) == imgname then
+					imgname = buf
+				end
+				if a[imgname] then
+					libcheetah.myError('resLoader: resourse %s already exists, replacing', imgname)
+				end
+				a[imgname] = p
+			end
+		end
 	end
 end
 
@@ -372,6 +457,7 @@ local _exts = {
 	bmp = resLoadImageCallback,
 	dds = resLoadImageCallback,
 	fnt = C.newFont,
+	atlas = resLoadAtlasCallback,
 }
 
 C.resLoaderAddCallback = function(exts, callback)

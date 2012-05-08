@@ -39,7 +39,7 @@ typedef struct Image {
 	char *options;
 	/* OpenGL texture id */
 	unsigned int id;
-	/* width and height of the original image */
+	/* width and height */
 	float w, h;
 	int channels;
 	int queued;
@@ -48,6 +48,17 @@ typedef struct ImageData {
 	int w, h, channels;
 	char *data;
 } ImageData;
+typedef struct Atlas {
+	Image * image;
+	/* original width and height */
+	float w, h;
+	/* atlas width and height */
+	float aw, ah;
+	/* offset on atlas*/
+	float x, y;
+	/*texture coordinates*/
+	float tex[8];
+} Atlas;
 typedef struct Framebuffer {
 	unsigned int id;
 	Image *image;
@@ -131,6 +142,8 @@ typedef struct Resource {
 	char *options;
 	int len;
 } Resource;
+void atlasDrawxy(Atlas *p, float x, float y, float w, float h);
+void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox, float oy);
 unsigned int getEventType();
 unsigned int getEventKey();
 unsigned int getEventKeyUnicode();
@@ -251,7 +264,7 @@ double getRealTime();
 void delay(unsigned int ms);
 void sleep(unsigned int sec);
 void newTilmapInternal(Tilemap *t, const char *name);
-void tilemapDraw(Tilemap *t, double x, double y, double r, double z);
+void tilemapDraw(Tilemap *t, double x, double y, double r, double z, double ox, double oy);
 void deleteTilemap(Tilemap *t);
 Vbo * newVbo(Point * data, Point * tex, unsigned int count);
 void vboDraw(Vbo * ptr);

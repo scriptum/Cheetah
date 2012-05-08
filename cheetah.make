@@ -30,22 +30,23 @@ endif
 
 OBJECTS := \
 	$(OBJDIR)/render.o \
-	$(OBJDIR)/font.o \
-	$(OBJDIR)/graphics.o \
-	$(OBJDIR)/shader.o \
-	$(OBJDIR)/thread.o \
-	$(OBJDIR)/vbo.o \
-	$(OBJDIR)/event.o \
 	$(OBJDIR)/filesystem.o \
+	$(OBJDIR)/font.o \
 	$(OBJDIR)/framebuffer.o \
-	$(OBJDIR)/generator.o \
 	$(OBJDIR)/image.o \
-	$(OBJDIR)/tilemap.o \
+	$(OBJDIR)/shader.o \
+	$(OBJDIR)/vbo.o \
 	$(OBJDIR)/window.o \
+	$(OBJDIR)/generator.o \
+	$(OBJDIR)/event.o \
+	$(OBJDIR)/graphics.o \
+	$(OBJDIR)/thread.o \
+	$(OBJDIR)/tilemap.o \
+	$(OBJDIR)/atlas.o \
+	$(OBJDIR)/stb_image_aug.o \
 	$(OBJDIR)/image_DXT.o \
 	$(OBJDIR)/image_helper.o \
 	$(OBJDIR)/SOIL.o \
-	$(OBJDIR)/stb_image_aug.o \
 
 MKDIR_TYPE := msdos
 CMD := $(subst \,\\,$(ComSpec)$(COMSPEC))
@@ -93,37 +94,12 @@ $(OBJDIR)/render.o: src/render.c
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/font.o: src/font.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/graphics.o: src/graphics.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/shader.o: src/shader.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/thread.o: src/thread.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/vbo.o: src/vbo.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/event.o: src/event.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
 $(OBJDIR)/filesystem.o: src/filesystem.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/font.o: src/font.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
@@ -133,12 +109,42 @@ $(OBJDIR)/framebuffer.o: src/framebuffer.c
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
+$(OBJDIR)/image.o: src/image.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/shader.o: src/shader.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/vbo.o: src/vbo.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/window.o: src/window.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
 $(OBJDIR)/generator.o: src/generator.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/image.o: src/image.c
+$(OBJDIR)/event.o: src/event.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/graphics.o: src/graphics.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/thread.o: src/thread.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
@@ -148,7 +154,12 @@ $(OBJDIR)/tilemap.o: src/tilemap.c
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/window.o: src/window.c
+$(OBJDIR)/atlas.o: src/atlas.c
+	-@$(CMD_MKOBJDIR)
+	@echo $(notdir $<)
+	@$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/stb_image_aug.o: src/SOIL/stb_image_aug.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
@@ -164,11 +175,6 @@ $(OBJDIR)/image_helper.o: src/SOIL/image_helper.c
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/SOIL.o: src/SOIL/SOIL.c
-	-@$(CMD_MKOBJDIR)
-	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/stb_image_aug.o: src/SOIL/stb_image_aug.c
 	-@$(CMD_MKOBJDIR)
 	@echo $(notdir $<)
 	@$(CC) $(CFLAGS) -o "$@" -c "$<"

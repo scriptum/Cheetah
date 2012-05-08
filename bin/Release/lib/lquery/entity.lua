@@ -119,6 +119,7 @@ function Entity:offset(ox, oy)
 	self.oy = oy or self.oy or 0
 	return self --so we can chain methods
 end
+Entity.origin = Entity.offset
 --Sets width and height of entity with center offset
 function Entity:sizeoffset(w, h)
 	self.w = w or self.w or 0
@@ -127,6 +128,7 @@ function Entity:sizeoffset(w, h)
 	self.oy = self.h / 2
 	return self --so we can chain methods
 end
+Entity.sizeorigin = Entity.sizeoffset
 --Sets angle (rotation) of entity
 function Entity:rotate(angle)
 	self.angle = angle or self.angle or 0
