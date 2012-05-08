@@ -100,7 +100,7 @@ typedef struct Image {
 	char *options;
 	/* OpenGL texture id */
 	unsigned int id;
-	/* width and height of the original image */
+	/* width and height */
 	float w, h;
 	int channels;
 	int queued;
@@ -110,6 +110,19 @@ typedef struct ImageData {
 	int w, h, channels;
 	char *data;
 } ImageData;
+
+/*=================================atlas======================================*/
+typedef struct Atlas {
+	Image * image;
+	/* original width and height */
+	float w, h;
+	/* atlas width and height */
+	float aw, ah;
+	/* offset on atlas*/
+	float x, y;
+	/*texture coordinates*/
+	float tex[8];
+} Atlas;
 
 /*==============================framebuffers==================================*/
 typedef struct Framebuffer {

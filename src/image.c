@@ -136,7 +136,8 @@ void newImageOpt(Image* ptr, const char *name, const char *options) {
  * */
 inline void imageBind(Image * image) {
 	//~ if(prevImageId == image->id) return;
-	if(resLoaderQueue&&image->id==null_texture&&!image->queued)
+	if(!image) return;
+	if(resLoaderQueue && image->id == null_texture && !image->queued)
 	{
 		Resource r;
 		image->queued = 1;
