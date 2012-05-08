@@ -66,6 +66,21 @@ local EntityMetaUpdate = {
 		if t.upd[k] then t.upd[k](t, v) end
 	end
 }
+--[[
+@descr Create new Entity. In Cheetah engine Entities represents all objects in your game merged into one big tree.
+@group entity
+@var(entity) entity, that will be parent of this entity. If you want to create top-level entity, use "screen" keyword as parent
+@example
+	local myEntity = Entity:new(screen) --create new top-level entity
+@example
+	--unnamed entity. Garbage collector will not delete it, but you can find this entity only in screen._child table.
+	Entity:new(screen)
+@example
+	--top-level entity
+	local parentEntity = Entity:new(screen)
+	--childEntity will be child of parentEntity
+	local childEntity = Entity:new(parentEntity)
+]]
 function Entity:new(parent)  -- constructor
 	--~ assert(parent, 'parent is nil')
 	local object = {
@@ -83,37 +98,96 @@ function Entity:new(parent)  -- constructor
 	return object
 end
 
---Sets vars of entity
+--[[
+@descr Set/initialize fields of entity. You may initialize as many fields as you want using this function. Warning: do not use this function in big loops, it is slow and memory-hungry!
+@group entity
+@var(table) table of pairs key-value that will be copied into entity
+@example
+	--initialize new field of entity - health and assign value 100
+	local player = Entity:new(screen)
+	:set({health = 100})
+	--the same code:
+	local player = Entity:new(screen)
+	player.health = 100
+@example
+	--BAD example!
+	Entity:new(screen)
+	:set({x = 15, y = 10})
+	--use this instead:
+	Entity:new(screen)
+	:move(15, 10)
+]]
 function Entity:set(vars)
 	for k, v in pairs(vars) do
 		self[k] = v
 	end
 	return self --so we can chain methods
 end
---Sets x and y position of entity
+--[[
+@descr Set x and y position of entity in pixels.
+@group entity
+@var(number) x coord
+@var(number) y coord
+@example
+	Entity:new(screen)
+	:move(15, 10)
+]]
 function Entity:move(x, y)
 	self.x = x or self.x or 0
 	self.y = y or self.y or 0
 	return self --so we can chain methods
 end
---Sets x scale and y scale
+--[[
+@descr Set x scale and y scale (multiplication). Deprecated! This function sets .sx and .sy fields of entity, but these fields are not used by engine. You may use them for your own purposes.
+@group entity
+@var(number) x scale
+@var(number) y scale
+@example
+	Entity:new(screen)
+	:scale(2, 2) --X2
+]]
 function Entity:scale(sx, sy)
 	self.sx = sx or 1
 	self.sy = sy or 1
 	return self --so we can chain methods
 end
---Sets radius of entity
+--[[
+@descr Set radius of entity in pixels (used for points, circles and round boundaries). Note that this function sets .R field, not .r (red color component)
+@group entity
+@var(number) radius
+@example
+	Entity:new(screen)
+	:radius(15)
+]]
 function Entity:radius(R)
 	self.R = R or self.R or 0
 	return self --so we can chain methods
 end
---Sets width and height of entity
+--[[
+@descr Set width and height of entity in pixels. Affects on images and mouse events (resizes bounding box).
+@group entity
+@var(number) width
+@var(number) height
+@example
+	Entity:new(screen)
+	:size(120, 60)
+]]
 function Entity:size(w, h)
 	self.w = w or self.w or 0
 	self.h = h or self.h or 0
 	return self --so we can chain methods
 end
---Sets the origin of entity
+--[[
+@descr Set the origin of entity in pixels. Origin - the main transformation point of entity, default is (0, 0).
+@group entity
+@var(number) x position
+@var(number) y position
+@example
+	Entity:new(screen)
+	:offset(120, 60)
+@alias origin
+@see sizeoffset
+]]
 function Entity:offset(ox, oy)
 	self.ox = ox or self.ox or 0
 	self.oy = oy or self.oy or 0
@@ -121,6 +195,16 @@ function Entity:offset(ox, oy)
 end
 Entity.origin = Entity.offset
 --Sets width and height of entity with center offset
+--[[
+@descr Set width and height of entity with central origin (use this for physical objects).
+@group entity
+@var(number) width
+@var(number) height
+@example
+	Entity:new(screen)
+	:sizeoffset(120, 60)
+@see offset
+]]
 function Entity:sizeoffset(w, h)
 	self.w = w or self.w or 0
 	self.h = h or self.h or 0
