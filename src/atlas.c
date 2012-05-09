@@ -34,11 +34,11 @@ IN THE SOFTWARE.
 void atlasDrawxy(Atlas *p, float x, float y, float w, float h) {
 	float scalex = w/p->w;
 	float scaley = h/p->h;
-	VERTEX_COORD((x + p->x)*scalex, (y + p->y) * scaley, p->aw * scalex, p->ah * scaley);
+	VERTEX_COORD(x + p->x * scalex, y + p->y * scaley, p->aw * scalex, p->ah * scaley);
 	ATLAS_DRAW;
 }
 
 void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox, float oy) {
-	VERTEX_COORD_TRANS(x + p->x, y + p->y, w, h, a, ox, oy);
+	VERTEX_COORD_TRANS(x + p->x * scalex, y + p->y * scaley, p->aw * scalex, p->ah * scaley, a, ox, oy);
 	ATLAS_DRAW;
 }
