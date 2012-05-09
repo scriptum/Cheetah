@@ -32,7 +32,9 @@ IN THE SOFTWARE.
 	glDrawArrays(GL_QUADS, 0, 4)
 
 void atlasDrawxy(Atlas *p, float x, float y, float w, float h) {
-	VERTEX_COORD(x + p->x, y + p->y, w, h);
+	float scalex = w/p->w;
+	float scaley = h/p->h;
+	VERTEX_COORD((x + p->x)*scalex, (y + p->y) * scaley, p->aw * scalex, p->ah * scaley);
 	ATLAS_DRAW;
 }
 

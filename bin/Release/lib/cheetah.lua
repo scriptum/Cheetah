@@ -312,9 +312,9 @@ ffi.metatype('Atlas', {
 	__index = {
 		draw = function(s, x, y, w, h, angle, ox, oy)
 			if angle then
-				libcheetah.atlasDrawt(s, x or 0, y or 0, w or s.aw, h or s.ah, angle or 0, ox or 0, oy or 0)
+				libcheetah.atlasDrawt(s, x or 0, y or 0, w or s.w, h or s.h, angle or 0, ox or 0, oy or 0)
 			else
-				libcheetah.atlasDrawxy(s, x or 0, y or 0, w or s.aw, h or s.ah)
+				libcheetah.atlasDrawxy(s, x or 0, y or 0, w or s.w, h or s.h)
 			end
 		end
 	}
@@ -418,7 +418,7 @@ local resLoadAtlasCallback = function (path, t, dir, name, ext)
 				p.tex[6] = (tonumber(x1) + tonumber(x2)) / img.w
 				p.tex[7] = tonumber(y1) / img.h
 				if r =='r' then
-					p.x, p.y = p.y, p.w - p.x - p.aw
+					p.x, p.y = p.y, p.h - p.x - p.aw
 					p.aw, p.ah = p.ah, p.aw
 					p.tex[0], p.tex[1], p.tex[2], p.tex[3], p.tex[4], p.tex[5], p.tex[6], p.tex[7] = 
 					p.tex[6], p.tex[7], p.tex[0], p.tex[1], p.tex[2], p.tex[3], p.tex[4], p.tex[5]
@@ -430,13 +430,11 @@ local resLoadAtlasCallback = function (path, t, dir, name, ext)
 						if not a[buf] then a[buf] = {} end
 						a = a[buf]
 					end
-					print(buf, v)
 					buf = tonumber(v)
 					if tostring(buf) ~= v then
 						buf = v
 					end
 				end
-				print(buf)
 				imgname = buf:match('^(.*)%.[^.]+$')
 				buf = tonumber(imgname)
 				if tostring(buf) == imgname then
