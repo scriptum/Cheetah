@@ -114,6 +114,10 @@ bool mkDir(const char * path) {
 	return 0;
 }
 
+char * getDirentName(struct dirent * de) {
+	return de->d_name;
+}
+
 //~ const char * fileExt(const char * name) {
 	//~ int i, pos = 0;
 	//~ char ch;
