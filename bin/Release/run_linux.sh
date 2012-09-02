@@ -26,11 +26,11 @@ Linux)
   ;;
 esac
 
-if [ $1 ]
+if [ "$1" ]
 then
-	if [ -f $1 ]
+	if [ -f "$1" ]
 	then
-		SCRIPT=$1
+		SCRIPT="$1"
 	else
 		SCRIPT=main.lua
 	fi
@@ -49,7 +49,7 @@ fi
 if [ -x ${DIR}/bin/${SYSTEM_NAME}${MACHINE_NAME}/luajit ]
 then
   cd ${DIR}
-  ./bin/${SYSTEM_NAME}${MACHINE_NAME}/luajit $SCRIPT $*
+  ./bin/${SYSTEM_NAME}${MACHINE_NAME}/luajit "$SCRIPT" $*
 else
   $MSG "Your platform does not have a pre-compiled Cheetah engine."
   exit 1
