@@ -120,31 +120,59 @@ float Font_Width(Font *f, register const char *str)
 	while(0)
 #endif
 
+//~ #define UNICODE_TO_INT(a,i,increment) \
+//~ high = low = 0;\
+//~ if((a[i] & 0b10000000) == 0) {\
+	//~ low = a[i];\
+	//~ increment = 1;\
+//~ }\
+//~ else if((a[i] & 0b11100000) == 0b11000000) {\
+	//~ low = a[i+1] & 0b00111111;\
+	//~ low |= (a[i] & 0b00000011) << 6;\
+	//~ high = (a[i] & 0b00011111) >> 2;\
+	//~ increment = 2;\
+//~ }\
+//~ else if((a[i] & 0b11110000) == 0b11100000) {\
+	//~ low = a[i+2] & 0b00111111;\
+	//~ low |= (a[i+1] & 0b00000011) << 6;\
+	//~ high = (a[i+1] & 0b00111111) >> 2;\
+	//~ high |= (a[i] & 0b00001111) << 4;\
+	//~ increment = 3;\
+//~ }\
+//~ else if((a[i] & 0b11111000) == 0b11110000) {\
+	//~ low = a[i+3] & 0b00111111;\
+	//~ low |= (a[i+2] & 0b00000011) << 6;\
+	//~ high = (a[i+2] & 0b00111111) >> 2;\
+	//~ high |= (a[i+1] & 0b00111111) << 4;\
+	//~ high |= (a[i] & 0b00000111) << 10;\
+	//~ increment = 4;\
+//~ }
+
 #define UNICODE_TO_INT(a,i,increment) \
 high = low = 0;\
-if((a[i] & 0b10000000) == 0) {\
+if((a[i] & 0x80) == 0) {\
 	low = a[i];\
 	increment = 1;\
 }\
-else if((a[i] & 0b11100000) == 0b11000000) {\
-	low = a[i+1] & 0b00111111;\
-	low |= (a[i] & 0b00000011) << 6;\
-	high = (a[i] & 0b00011111) >> 2;\
+else if((a[i] & 0xe0) == 0xc0) {\
+	low = a[i+1] & 0x3f;\
+	low |= (a[i] & 0x03) << 6;\
+	high = (a[i] & 0x1f) >> 2;\
 	increment = 2;\
 }\
-else if((a[i] & 0b11110000) == 0b11100000) {\
-	low = a[i+2] & 0b00111111;\
-	low |= (a[i+1] & 0b00000011) << 6;\
-	high = (a[i+1] & 0b00111111) >> 2;\
-	high |= (a[i] & 0b00001111) << 4;\
+else if((a[i] & 0xf0) == 0xe0) {\
+	low = a[i+2] & 0x3f;\
+	low |= (a[i+1] & 0x03) << 6;\
+	high = (a[i+1] & 0x3f) >> 2;\
+	high |= (a[i] & 0x0f) << 4;\
 	increment = 3;\
 }\
-else if((a[i] & 0b11111000) == 0b11110000) {\
-	low = a[i+3] & 0b00111111;\
-	low |= (a[i+2] & 0b00000011) << 6;\
-	high = (a[i+2] & 0b00111111) >> 2;\
-	high |= (a[i+1] & 0b00111111) << 4;\
-	high |= (a[i] & 0b00000111) << 10;\
+else if((a[i] & 0xf8) == 0xf0) {\
+	low = a[i+3] & 0x3f;\
+	low |= (a[i+2] & 0x03) << 6;\
+	high = (a[i+2] & 0x3f) >> 2;\
+	high |= (a[i+1] & 0x3f) << 4;\
+	high |= (a[i] & 0x07) << 10;\
 	increment = 4;\
 }
 
