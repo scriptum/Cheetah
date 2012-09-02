@@ -80,6 +80,24 @@ void disableStencilTest() {
 	glDisable(GL_STENCIL_TEST);
 }
 
+/**
+ * @descr Enables alpha test. Equivalent to glEnable(GL_ALPHA_TEST);
+ * @group graphics/drawing
+ * @see disableAlphaTest
+ * */
+void enableAlphaTest() {
+	glEnable(GL_ALPHA_TEST);
+}
+
+/**
+ * @descr Disables alpha test. Equivalent to glDisable(GL_ALPHA_TEST);
+ * @group graphics/drawing
+ * @see enableAlphaTest
+ * */
+void disableAlphaTest() {
+	glDisable(GL_ALPHA_TEST);
+}
+
 //~ void translate(double translateX, double translateY) {
 	//~ glTranslated(translateX, translateY, 0);
 //~ }
