@@ -508,14 +508,16 @@ end
 --bounding functions
 Entity.bounds = {
 	rectangle = function(ent, mouseX, mouseY)
-		return  ent.w and ent.h
-						and ent.x < mouseX 
-						and ent.y < mouseY 
-						and ent.x + ent.w > mouseX 
-						and ent.y + ent.h > mouseY
+		local x, y = ent.x - (ent.ox or 0), ent.y - (ent.oy or 0)
+		return ent.w and ent.h
+						and x < mouseX 
+						and y < mouseY 
+						and x + ent.w > mouseX 
+						and y + ent.h > mouseY
 	end,
 	circle = function(ent, mouseX, mouseY)
-		return ent.R and (math.pow(mouseX-ent.x, 2)+math.pow(mouseY-ent.y, 2) < ent.R*ent.R)
+		local x, y = mouseX - ent.x + (ent.ox or 0), mouseY - ent.y + (ent.oy or 0)
+		return ent.R and ((x*x + y*y) < ent.R*ent.R)
 	end
 }
 
