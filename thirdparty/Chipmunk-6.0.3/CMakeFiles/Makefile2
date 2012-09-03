@@ -16,7 +16,7 @@ preinstall:
 #=============================================================================
 # Special targets provided by cmake.
 
-# Disable implicit rules so canoncical targets will work.
+# Disable implicit rules so canonical targets will work.
 .SUFFIXES:
 
 # Remove some rules from gmake that .SUFFIXES does not remove.
@@ -111,7 +111,7 @@ clean: src/CMakeFiles/chipmunk.dir/clean
 src/CMakeFiles/chipmunk_static.dir/all:
 	$(MAKE) -f src/CMakeFiles/chipmunk_static.dir/build.make src/CMakeFiles/chipmunk_static.dir/depend
 	$(MAKE) -f src/CMakeFiles/chipmunk_static.dir/build.make src/CMakeFiles/chipmunk_static.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles  30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles  52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80
 	@echo "Built target chipmunk_static"
 .PHONY : src/CMakeFiles/chipmunk_static.dir/all
 
@@ -137,6 +137,56 @@ src/CMakeFiles/chipmunk_static.dir/clean:
 
 # clean rule for target.
 clean: src/CMakeFiles/chipmunk_static.dir/clean
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory Demo
+
+# Convenience name for "all" pass in the directory.
+Demo/all: Demo/CMakeFiles/chipmunk_demos.dir/all
+.PHONY : Demo/all
+
+# Convenience name for "clean" pass in the directory.
+Demo/clean: Demo/CMakeFiles/chipmunk_demos.dir/clean
+.PHONY : Demo/clean
+
+# Convenience name for "preinstall" pass in the directory.
+Demo/preinstall:
+.PHONY : Demo/preinstall
+
+#=============================================================================
+# Target rules for target Demo/CMakeFiles/chipmunk_demos.dir
+
+# All Build rule for target.
+Demo/CMakeFiles/chipmunk_demos.dir/all: src/CMakeFiles/chipmunk_static.dir/all
+	$(MAKE) -f Demo/CMakeFiles/chipmunk_demos.dir/build.make Demo/CMakeFiles/chipmunk_demos.dir/depend
+	$(MAKE) -f Demo/CMakeFiles/chipmunk_demos.dir/build.make Demo/CMakeFiles/chipmunk_demos.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles  30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51
+	@echo "Built target chipmunk_demos"
+.PHONY : Demo/CMakeFiles/chipmunk_demos.dir/all
+
+# Include target in all.
+all: Demo/CMakeFiles/chipmunk_demos.dir/all
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+Demo/CMakeFiles/chipmunk_demos.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles 51
+	$(MAKE) -f CMakeFiles/Makefile2 Demo/CMakeFiles/chipmunk_demos.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/rpg/Игры/cheetah/thirdparty/Chipmunk-6.0.3/CMakeFiles 0
+.PHONY : Demo/CMakeFiles/chipmunk_demos.dir/rule
+
+# Convenience name for target.
+chipmunk_demos: Demo/CMakeFiles/chipmunk_demos.dir/rule
+.PHONY : chipmunk_demos
+
+# clean rule for target.
+Demo/CMakeFiles/chipmunk_demos.dir/clean:
+	$(MAKE) -f Demo/CMakeFiles/chipmunk_demos.dir/build.make Demo/CMakeFiles/chipmunk_demos.dir/clean
+.PHONY : Demo/CMakeFiles/chipmunk_demos.dir/clean
+
+# clean rule for target.
+clean: Demo/CMakeFiles/chipmunk_demos.dir/clean
 .PHONY : clean
 
 #=============================================================================

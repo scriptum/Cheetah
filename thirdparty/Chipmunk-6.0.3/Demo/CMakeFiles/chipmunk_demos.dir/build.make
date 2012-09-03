@@ -4,7 +4,7 @@
 #=============================================================================
 # Special targets provided by cmake.
 
-# Disable implicit rules so canoncical targets will work.
+# Disable implicit rules so canonical targets will work.
 .SUFFIXES:
 
 # Remove some rules from gmake that .SUFFIXES does not remove.
@@ -606,15 +606,15 @@ Demo/chipmunk_demos: Demo/CMakeFiles/chipmunk_demos.dir/Tank.c.o
 Demo/chipmunk_demos: Demo/CMakeFiles/chipmunk_demos.dir/TheoJansen.c.o
 Demo/chipmunk_demos: Demo/CMakeFiles/chipmunk_demos.dir/Tumble.c.o
 Demo/chipmunk_demos: src/libchipmunk.a
-Demo/chipmunk_demos: /usr/lib/libglut.so
-Demo/chipmunk_demos: /usr/lib/libXmu.so
-Demo/chipmunk_demos: /usr/lib/i386-linux-gnu/libXi.so
-Demo/chipmunk_demos: /usr/lib/i386-linux-gnu/libGLU.so
-Demo/chipmunk_demos: /usr/lib/i386-linux-gnu/libGL.so
-Demo/chipmunk_demos: /usr/lib/i386-linux-gnu/libSM.so
-Demo/chipmunk_demos: /usr/lib/i386-linux-gnu/libICE.so
-Demo/chipmunk_demos: /usr/lib/i386-linux-gnu/libX11.so
-Demo/chipmunk_demos: /usr/lib/i386-linux-gnu/libXext.so
+Demo/chipmunk_demos: /usr/lib64/libglut.so
+Demo/chipmunk_demos: /usr/lib64/libXmu.so
+Demo/chipmunk_demos: /usr/lib64/libXi.so
+Demo/chipmunk_demos: /usr/lib64/libGLU.so
+Demo/chipmunk_demos: /usr/lib64/libGL.so
+Demo/chipmunk_demos: /usr/lib64/libSM.so
+Demo/chipmunk_demos: /usr/lib64/libICE.so
+Demo/chipmunk_demos: /usr/lib64/libX11.so
+Demo/chipmunk_demos: /usr/lib64/libXext.so
 Demo/chipmunk_demos: Demo/CMakeFiles/chipmunk_demos.dir/build.make
 Demo/chipmunk_demos: Demo/CMakeFiles/chipmunk_demos.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking C executable chipmunk_demos"

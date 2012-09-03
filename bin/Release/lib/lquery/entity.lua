@@ -43,7 +43,11 @@ _lQuery = {
 	_last_click_millis = 0,
 	_last_clickX = -1,
 	_last_clickY = -1,
-	dblclickInterval = 0.3
+	dblclickInterval = 0.3,
+	_globalFocus = false,
+	setGlogalFocus = function(focus)
+		_lQuery._globalFocus = focus or false
+	end
 }
 lQuery = _lQuery
 
@@ -568,8 +572,14 @@ Entity.mouseMove = Entity.mousemove
 
 
 --object can get focus
-function Entity:focus(f)
-	self._focus = f or true
+function Entity:focus()
+	self._focus = true
+	return self
+end
+
+function Entity:unfocus()
+	self._focus = false
+	return self
 end
 
 --special event: calls when parameter key was changed
@@ -749,7 +759,7 @@ end
 
 --some events
 local function events(v)
-	if v == screen or _lQuery.focus == v then
+	if v == screen or v._focus or _lQuery._globalFocus == false then
 		if _lQuery.KeyPressed == true then 
 			if v._keypress then
 				if not v._key or v._key ~= _lQuery.KeyPressedKey then
@@ -866,7 +876,7 @@ _lQuery.event = function(e, a, b, c)
 				_lQuery._last_click_millis = time
 				_lQuery._last_clickX = mX
 				_lQuery._last_clickY = mY
-				if v._focus then _lQuery.focus = v end
+				--~ if v._focus then _lQuery.focus = v end
 			end
 		end
 		_lQuery.MousePressedOwner = nil

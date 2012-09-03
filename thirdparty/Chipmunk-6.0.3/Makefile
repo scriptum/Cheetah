@@ -8,7 +8,7 @@ default_target: all
 #=============================================================================
 # Special targets provided by cmake.
 
-# Disable implicit rules so canoncical targets will work.
+# Disable implicit rules so canonical targets will work.
 .SUFFIXES:
 
 # Remove some rules from gmake that .SUFFIXES does not remove.
@@ -165,6 +165,19 @@ chipmunk_static/fast:
 	$(MAKE) -f src/CMakeFiles/chipmunk_static.dir/build.make src/CMakeFiles/chipmunk_static.dir/build
 .PHONY : chipmunk_static/fast
 
+#=============================================================================
+# Target rules for targets named chipmunk_demos
+
+# Build rule for target.
+chipmunk_demos: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 chipmunk_demos
+.PHONY : chipmunk_demos
+
+# fast build rule for target.
+chipmunk_demos/fast:
+	$(MAKE) -f Demo/CMakeFiles/chipmunk_demos.dir/build.make Demo/CMakeFiles/chipmunk_demos.dir/build
+.PHONY : chipmunk_demos/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -179,6 +192,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... chipmunk"
 	@echo "... chipmunk_static"
+	@echo "... chipmunk_demos"
 .PHONY : help
 
 
