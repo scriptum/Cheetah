@@ -238,7 +238,7 @@ C.fileEach = function(dirname, func)
 	local de = libcheetah.readDir(dir)
 	local s, ext, n, name
 	while libcheetah.isPointer(de) do
-		func(ffi.string(de.name))
+		func(ffi.string(libcheetah.getDirentName(de)))
 		de = libcheetah.readDir(dir)
 	end
 	return t
@@ -255,7 +255,7 @@ C.isKeyPressed = function(key)
 	return false
 end
 
-C.generate = function(w, h, imageType)
+C.generate = function(imageType, w, h)
 	local ptr = ffi.new('Image')
 	libcheetah.generateImage(ptr, w, h, imageType)
 	return ptr
@@ -470,7 +470,7 @@ end
 
 --recursive resource loader
 C.resLoader = function(dirname, recursive)
-	local t = {}
+	local res_tree = {}
 	if not dirname or type(dirname) ~= 'string' then
 		libcheetah.myError('resLoader: you must specify directory name')
 		return
@@ -481,26 +481,38 @@ C.resLoader = function(dirname, recursive)
 		return
 	end
 	local de = libcheetah.readDir(dir)
+	
 	local s, ext, n, name, callback
 	--~ resLoadedImages = {}
 	while libcheetah.isPointer(de) do
-		n = ffi.string(de.name)
+		local raw_n = libcheetah.getDirentName(de)
+		n = ffi.string(raw_n)
 		s = dirname..'/'..n
-		if de.name[0] ~= 46 then -- .
-			if libcheetah.isDir(s) and recursive then
-				t[n] = C.resLoader(s)
+		if raw_n[0] ~= 46 then -- "."
+			if libcheetah.isDir(s) then
+				if recursive then
+					local n_num = tonumber(n)
+					if tostring(n_num) == n then
+						res_tree[n_num] = C.resLoader(s)
+					else
+						res_tree[n] = C.resLoader(s)
+					end
+				end
 			else
 				name, ext = n:match('^(.*)%.([^.]+)$')
-				ext = ext:lower()
-				callback = _exts[ext]
-				if callback then
-					callback(s, t, dirname, name, ext)
+				if ext then
+					ext = ext:lower()
+					--~ if not ext then print(name) end
+					callback = _exts[ext]
+					if callback then
+						callback(s, res_tree, dirname, name, ext)
+					end
 				end
 			end
 		end
 		de = libcheetah.readDir(dir)
 	end
-	return t
+	return res_tree
 end
 
 C.init = function(title, w, h, c, o)
@@ -590,16 +602,19 @@ ffi.metatype('Shader', {
 		--this method allows you to send uniforms to shader without thinking about its types
 		--type of uniform is detecting in C.newShader
 		set = function(shader, name, a, b, c, d)
-			local buf = uniforms[shader.id][name]
-			if buf and buf[1] >= 0 then
-				if d then
-					libcheetah.Uniform4f(buf[1], a, b, c, d)
-				elseif c then
-					libcheetah.Uniform3f(buf[1], a, b, c)
-				elseif b then
-					libcheetah.Uniform2f(buf[1], a, b)
-				elseif a then
-					if buf[2] then libcheetah.Uniform1f(buf[1], a) else libcheetah.Uniform1i(buf[1], a) end
+			local buf = uniforms[shader.id]
+			if buf then
+				buf = buf[name]
+				if buf and buf[1] >= 0 then
+					if d then
+						libcheetah.Uniform4f(buf[1], a, b, c, d)
+					elseif c then
+						libcheetah.Uniform3f(buf[1], a, b, c)
+					elseif b then
+						libcheetah.Uniform2f(buf[1], a, b)
+					elseif a then
+						if buf[2] then libcheetah.Uniform1f(buf[1], a) else libcheetah.Uniform1i(buf[1], a) end
+					end
 				end
 			end
 		end

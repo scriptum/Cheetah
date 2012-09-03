@@ -124,10 +124,13 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 			resShared = 0;
 			SDL_CreateThread(resLoaderThread, (void *)NULL);
 			glGenTextures(1, &null_texture);
-			TEX_CLAMP;
-			TEX_LINEAR;
+			glBindTexture(GL_TEXTURE_2D, null_texture);
+			//~ TEX_CLAMP;
+			//~ TEX_LINEAR;
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, "\0\0\0\0");
 		}
+		//~ glEnable(GL_ALPHA_TEST);
+		//~ glAlphaFunc(GL_GREATER,0.1f);
 	}
 
 	glViewport(0, 0, width, height);
