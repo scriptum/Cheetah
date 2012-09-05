@@ -43,3 +43,5 @@ cheetah.render = function()
 end
  
 lQuery.MousePressed = false
+lQuery.KeyPressed = false
+lQuery.KeyReleased = false

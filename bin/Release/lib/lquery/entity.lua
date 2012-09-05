@@ -776,12 +776,11 @@ local function events(v)
 				v._KeyPressedCounter = v._KeyPressedCounter + 1
 				v._keyrepeat(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
 			end
-			v._key = _lQuery.KeyPressedKey
-		else
+			--v._key = _lQuery.KeyPressedKey
+		end
+		if _lQuery.KeyReleased == true then 
 			if v._keyrelease then
-				if v._key and v._key == true then
-					v._keyrelease(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
-				end
+				v._keyrelease(v, _lQuery.KeyReleasedKey, _lQuery.KeyReleasedUni)
 			end
 			v._key = false
 		end
@@ -885,7 +884,9 @@ _lQuery.event = function(e, a, b, c)
 		_lQuery.KeyPressedKey = a
 		_lQuery.KeyPressedUni = b
 	elseif e == "kr" then
-		_lQuery.KeyPressed = false
+		_lQuery.KeyReleased = true
+		_lQuery.KeyReleasedKey = a
+		_lQuery.KeyReleasedUni = b
 	elseif e == "rz" then
 		screen_width = a
 		screen_height = b
@@ -901,6 +902,7 @@ end
 
 _lQuery.process = function(x, y)
 	mX, mY = x, y
+	
 	for _, v in ipairs(_lQuery.hooks) do v() end
 	mHover = nil
 	if screen then process_entities(screen) end
@@ -921,4 +923,6 @@ _lQuery.process = function(x, y)
 		_lQuery.lasthover = mHover
 	end
 	mPressOwn = false
+	_lQuery.KeyPressed = false
+	_lQuery.KeyReleased = false
 end

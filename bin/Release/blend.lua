@@ -37,7 +37,7 @@ E:new(screen):draw(function()
 	for i, u in ipairs(blend1) do
 		C.push()
 		for j, v in ipairs(blend2) do
-			C.setBlendFunc(u, v)
+			C.blendFunc(u, v)
 			--~ C.setBlendMode(C.blendMask)
 			
 			img1:draw()
@@ -50,15 +50,15 @@ E:new(screen):draw(function()
 	for i, u in ipairs(blend1) do
 		C.push()
 		for j, v in ipairs(blend2) do
-			C.setBlendFunc(u, v)
+			C.blendFunc(u, v)
 			img:draw()
 			C.move(1, 0)
 		end
 		C.pop()
 		C.move(0, 1)
 	end
-	C.setBlendEquation(cheetah.GL_FUNC_ADD)
-	C.setBlendMode(0)
+	C.blendEquation(cheetah.GL_FUNC_ADD)
+	C.blendMode(0)
 end):size(64, 64)
 
 C.mainLoop()
