@@ -46,10 +46,24 @@ else
 	MSG=echo
 fi
 
-if [ -x ${DIR}/bin/${SYSTEM_NAME}${MACHINE_NAME}/luajit ]
+DIRNAME=`dirname "$SCRIPT"`
+BASENAME=`basename "$SCRIPT"`
+LUAJIT=${DIR}/bin/${SYSTEM_NAME}${MACHINE_NAME}/luajit
+if [ -x $LUAJIT ]
 then
-  cd ${DIR}
-  ./bin/${SYSTEM_NAME}${MACHINE_NAME}/luajit "$SCRIPT" $*
+  if [ "$DIRNAME" ]
+  then
+		if [ ! -d "$DIRNAME/bin/" ]
+		then
+			ln -s ${DIR}/bin "$DIRNAME"
+		fi
+		if [ ! -d "$DIRNAME/lib/" ]
+		then
+			ln -s ${DIR}/lib "$DIRNAME"
+		fi
+		cd "$DIRNAME"
+	fi
+  $LUAJIT "$BASENAME" $*
 else
   $MSG "Your platform does not have a pre-compiled Cheetah engine."
   exit 1
