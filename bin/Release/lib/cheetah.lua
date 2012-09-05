@@ -269,7 +269,15 @@ end
 
 ffi.metatype('Image', {
 	__index = {
-		draw = libcheetah.imageDraw,
+		draw = function(s, x, y, w, h, angle, ox, oy)
+			if angle then
+				libcheetah.imageDrawt(s, x or 0, y or 0, w or s.w, h or s.h, angle or 0, ox or 0, oy or 0)
+			elseif x then
+				libcheetah.imageDrawxy(s, x or 0, y or 0, w or s.w, h or s.h)
+			else
+				libcheetah.imageDraw(s)
+			end
+		end,
 		drawxy = libcheetah.imageDrawxy,
 		drawt = libcheetah.imageDrawt,
 		drawq = libcheetah.imageDrawq,
