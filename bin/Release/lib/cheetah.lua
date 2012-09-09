@@ -281,7 +281,7 @@ ffi.metatype('Image', {
 		drawxy = libcheetah.imageDrawxy,
 		drawt = libcheetah.imageDrawt,
 		drawq = libcheetah.imageDrawq,
-		drawqxy = libcheetah.imageDrawq,
+		drawqxy = libcheetah.imageDrawqxy,
 	}, 
 	__gc = libcheetah.deleteImage
 })

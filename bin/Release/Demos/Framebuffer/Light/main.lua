@@ -1,29 +1,42 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-local scr_w, scr_h = 512, 512
-C.init('Test', scr_w, scr_h, 32, 'v')
+--set window width and height
+local scr_w, scr_h = 800, 600
+C.init('Lights', scr_w, scr_h, 32, '')
+--print fps
+C.printFPS = true
 --landscape texture
 local landImg = C.newImage('landscape.jpg')
 --lighting texture
 local lightImg = C.newImage('light.png')
---draw landscape first
-E:new(screen):image(landImg)
 --create new framebuffer - light layer
 local lightFbo = C.newFramebuffer(scr_w, scr_h, '')
---new entity for lighting
+--generate different light sources
+local lights = {}
+local lightsCount = 3
+for i = 1, lightsCount do
+	lights[i] = {math.random(0,1000),math.random(0,1000),math.random(0.6,2),math.random(0.6,2),math.random(64,512)}
+end
+
+--new entity just for rendering
 E:new(screen)
 :draw(function()
+	--draw background
+	landImg:drawqxy(0,0,scr_w,scr_h,0,0,scr_w,scr_h)
 	--draw to framebuffer now
 	lightFbo:bind()
 	--fill with black
 	C.clear()
 	--add one by one few light sources
 	C.blendMode(C.blendAdditive)
-	lightImg:drawxy((math.sin(time)+1)*(512-128)*0.5, (math.sin(time*1.2)+1)*(512-128)*0.5, 128, 128)
-	lightImg:drawxy((math.sin(time*1.5+10)+1)*(512-128)*0.5, (math.sin(time*1.2-5)+1)*(512-128)*0.5, 128, 128)
-	lightImg:drawxy((math.sin(-time*0.9+6)+1)*(512-128)*0.5, (math.sin(time*0.7+9)+1)*(512-128)*0.5, 128, 128)
-	lightImg:drawxy((math.sin(-time*0.5+2)+1)*(512-256)*0.5, (math.sin(time*0.2-1)+1)*(512-256)*0.5, 256, 256)
+	--scale light to gray (gray = 100% lightness in detail blending mode)
+	C.color(128,128,128,255)
+	for i = 1, lightsCount do
+		lightImg:drawxy((math.sin(time*lights[i][3]+lights[i][1])+1)*(scr_w-lights[i][5])*0.5, (math.sin(time*lights[i][4]+lights[i][2])+1)*(scr_h-lights[i][5])*0.5, lights[i][5], lights[i][5])
+	end
+	--restore color
+	C.color(255,255,255,255)
 	--disable drawing to framebuffer
 	lightFbo:unbind()
 	--new blend mode - detail -- is perfect for light effects
