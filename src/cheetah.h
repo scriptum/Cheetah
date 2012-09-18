@@ -106,10 +106,17 @@ typedef struct Image {
 	int queued;
 } Image;
 
+typedef Image* pImage;
+
 typedef struct ImageData {
 	int w, h, channels;
 	char *data;
 } ImageData;
+
+typedef struct Multitexture {
+	float w, h;
+	Image **images;
+} Multitexture;
 
 /*=================================atlas======================================*/
 typedef struct Atlas {

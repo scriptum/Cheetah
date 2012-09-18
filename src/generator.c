@@ -33,7 +33,10 @@ IN THE SOFTWARE.
 #define TEXPARAM(a) do {\
 	glGenTextures(1, &bufid);\
 	glBindTexture(GL_TEXTURE_2D, bufid);\
-	TEX_LINEAR;\
+	if(linear)\
+		TEX_LINEAR;\
+	else \
+		TEX_NEAREST;\
 	glTexImage2D( GL_TEXTURE_2D, \
 								0, \
 								(a) ? GL_RGBA : GL_RGB, \
@@ -161,16 +164,22 @@ void generateImageData(ImageData *ptr, int w, int h, const char *imageType) {
 	ptr->data = buf;
 }
 
-void generateImage(Image *ptr, int w, int h, const char *imageType) {
+void generateImage(Image *ptr, int w, int h, const char *imageType, const char *options) {
 	static ImageData imageData;
 	GLuint bufid = 0;
 	ptr->id = 0;
+	bool linear = 1;
 	NEDED_INIT;
 	if(ptr) {
 		imageData.data = NULL;
 		generateImageData(&imageData, w, h, imageType);
 		if(imageData.data)
 		{
+			while(*options)
+			{
+				if(*options == 'n') linear = 0;
+				options++;
+			}
 			TEXPARAM(imageData.channels == 4 ? 1 : 0);
 			ptr->w = (float)w;
 			ptr->h = (float)h;
