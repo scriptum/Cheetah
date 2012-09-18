@@ -222,6 +222,7 @@ void end() {
 		SDL_GL_SwapBuffers();
 	}
 }
+
 /**
  * @descr Enable or disable blending. Drawing without blending usually faster, but textures with alpha-channel will be poor. Blending is enabled by defaults.
  * @group graphics/drawing
@@ -503,7 +504,7 @@ void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
  * @var green (0 - 1) float
  * @var blue (0 - 1) float
  * @var alpha (0 - 1) float
- * @see colorf
+ * @see color
  * */
 void colorf(float r, float g, float b, float a) {
 	glColor4f(r,g,b,a);
@@ -516,7 +517,7 @@ void colorf(float r, float g, float b, float a) {
  * @var green (0 - 1) float
  * @var blue (0 - 1) float
  * @var alpha (0 - 1) float
- * @see clear
+ * @see clear color colorf
  * */
 void clearColor(float r, float g, float b, float a) {
 	glClearColor(r,g,b,a);
