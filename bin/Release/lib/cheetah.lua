@@ -81,29 +81,10 @@ C.loadDLL = function(filename)
 end
 C.module = C.loadDLL
 
---stupid win api
-if ffi.os == "Windows" then
-	ffi.cdef[[struct dirent {
-		long		ino;		/* Always zero. */
-		unsigned short	reclen;	/* Always zero. */
-		unsigned short	namlen;	/* Length of name in name. */
-		char		name[256]; /* File name. */
-	};]]
-else
-	ffi.cdef[[struct dirent {
-		unsigned int ino;
-		unsigned int off;
-		unsigned short int reclen;
-		unsigned char type;
-		char name[256];
-	};]]
-end
-
 ffi.cdef [[
 void printf(const char * str, ...);
 int sscanf ( const char * str, const char * format, ...);
 int (*grabCursor)(int mode);
-
 ]]
 
 local libcheetah = C.loadDLL 'cheetah'
@@ -197,19 +178,19 @@ C.getFps = function()
 	return FPS
 end
 
-C.drawMultitexture = function(...)
-	if #arg < 2 then
-		libcheetah.myError 'drawMultitexture: pass at least 2 images.'
-	end
-	libcheetah.enableTexture2D()
-	for i, v in ipairs(arg) do
-		libcheetah.activeTexture(i-1)
-		libcheetah.bindTexture(v.id)
-	end
-	libcheetah.activeTexture(0)
-	libcheetah.rectangle(true)
-	libcheetah.disableTexture2D()
-end
+--~ C.drawMultitexture = function(...)
+	--~ if #arg < 2 then
+		--~ libcheetah.myError 'drawMultitexture: pass at least 2 images.'
+	--~ end
+	--~ libcheetah.enableTexture2D()
+	--~ for i, v in ipairs(arg) do
+		--~ libcheetah.activeTexture(i-1)
+		--~ libcheetah.bindTexture(v.id)
+	--~ end
+	--~ libcheetah.activeTexture(0)
+	--~ libcheetah.rectangle(true)
+	--~ libcheetah.disableTexture2D()
+--~ end
 
 C.fileExt = function(name)
 	return name:gsub('^.*%.', '')
@@ -255,9 +236,9 @@ C.isKeyPressed = function(key)
 	return false
 end
 
-C.generate = function(imageType, w, h)
+C.generate = function(imageType, w, h, opt)
 	local ptr = ffi.new('Image')
-	libcheetah.generateImage(ptr, w, h, imageType)
+	libcheetah.generateImage(ptr, w, h, imageType, opt or '')
 	return ptr
 end
 
@@ -300,6 +281,43 @@ C.newImageFromData = function(data, options)
 	libcheetah._newImageFromData(ptr, data, options or '')
 	return ptr
 end
+
+C.newMultitexture = function(...)
+	local arg = {...}
+	if #arg < 2 then
+		libcheetah.myError 'drawMultitexture: pass at least 2 images.'
+		if arg[1] then return arg[1]
+		else return nil end
+	end
+	p = ffi.new('Multitexture')
+	p.w = arg[1].w
+	p.h = arg[1].h
+	p.images = ffi.new('Image*[?]', #arg+1)
+	for i, v in ipairs(arg) do
+		p.images[i-1] = arg[i]
+	end
+	p.images[#arg] = nil
+	return p
+end
+
+ffi.metatype('Multitexture', {
+	__index = {
+		draw = function(s, x, y, w, h, angle, ox, oy)
+			if angle then
+				libcheetah.multitextureDrawt(s, x or 0, y or 0, w or s.w, h or s.h, angle or 0, ox or 0, oy or 0)
+			elseif x then
+				libcheetah.multitextureDrawxy(s, x or 0, y or 0, w or s.w, h or s.h)
+			else
+				libcheetah.multitextureDraw(s)
+			end
+		end,
+		drawxy = libcheetah.multitextureDrawxy,
+		drawt = libcheetah.multitextureDrawt,
+		--~ drawq = libcheetah.multitextureDrawq,
+		--~ drawqxy = libcheetah.multitextureDrawqxy,
+	}, 
+	__gc = libcheetah.deleteImage
+})
 
 C.newAtlas = function(image, x, y, w, h)
 	local p = ffi.new('Atlas')
@@ -587,7 +605,7 @@ C.newShader = function(fragment, vertex)
 	local location, float
 	if shader:check() then
 		uniforms[shader.id] = {}
-		for a, b in string.gmatch(str, "uniform[ \t]+([%a%d]+)[ \t]+([%a%d]+);") do
+		for a, b in string.gmatch(str, "uniform[ \t]+([^ ]+)[ \t]+([^ ;]+);") do
 			location = libcheetah.GetUniformLocation(shader.id, b)
 			if location then
 				if a == 'float' or a == 'vec2' or a == 'vec3' or a == 'vec4' then

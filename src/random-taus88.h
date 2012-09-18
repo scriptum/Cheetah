@@ -53,7 +53,7 @@
 #ifndef __RANDOM_TAUS88_H__
 #define __RANDOM_TAUS88_H__
 
-#include <endian.h>
+//#include <endian.h>
 #include <math.h>
 
 static inline uint32_t hash_uint32 (uint32_t hash)

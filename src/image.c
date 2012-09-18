@@ -129,6 +129,16 @@ void newImageOpt(Image* ptr, const char *name, const char *options) {
 
 //~ #endif
 
+inline void imageCheckResLoader(Image * image) {
+	if(resLoaderQueue && image->id == null_texture && !image->queued)
+	{
+		Resource r;
+		image->queued = 1;
+		r.image = image;
+		enqueue(resLoaderQueue, r);
+	}
+}
+
 /**
  * @descr Bind Image object. Equivalent to glBindTexture.
  * @group graphics/image
@@ -137,13 +147,7 @@ void newImageOpt(Image* ptr, const char *name, const char *options) {
 inline void imageBind(Image * image) {
 	//~ if(prevImageId == image->id) return;
 	if(!image) return;
-	if(resLoaderQueue && image->id == null_texture && !image->queued)
-	{
-		Resource r;
-		image->queued = 1;
-		r.image = image;
-		enqueue(resLoaderQueue, r);
-	}
+	imageCheckResLoader(image);
 	glBindTexture(GL_TEXTURE_2D, image->id);
 	prevImageId = image->id;
 }
@@ -193,6 +197,53 @@ void imageDrawxy(Image * image, float x, float y, float w, float h) {
 void imageDrawt(Image * image, float x, float y, float w, float h, float a, float ox, float oy) {
 	VERTEX_COORD_TRANS(x,y,w,h,a,ox,oy);
 	imageBind(image);
+	DRAWQ;
+}
+
+inline void multitextureBind(Multitexture * multitexture) {
+	//~ if(prevImageId == image->id) return;
+	int i = 0;
+	Image * image = multitexture->images[i];
+	while(image)
+	{
+		glActiveTexture_(GL_TEXTURE0 + i);
+		imageCheckResLoader(image);
+		glBindTexture(GL_TEXTURE_2D, image->id);
+		i++;
+		image = multitexture->images[i];
+	}
+	glActiveTexture_(GL_TEXTURE0);
+}
+
+/**
+ * @descr Draw while multitexture using 1x1 pixel quad. You may change quad size and position using transformations.
+ * @group graphics/image
+ * @var Multitexture object
+ * */
+void multitextureDraw(Multitexture * multitexture) {
+	multitextureBind(multitexture);
+	glCallList(quadlist);
+}
+
+/**
+ * @descr Draw multitexture of given size at a given position.
+ * @group graphics/image
+ * @var Multitexture object
+ * */
+void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, float h) {
+	VERTEX_COORD(x,y,w,h);
+	multitextureBind(multitexture);
+	DRAWQ;
+}
+
+/**
+ * @descr Draw multitexture with full translation.
+ * @group graphics/image
+ * @var Multitexture object
+ * */
+void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy) {
+	VERTEX_COORD_TRANS(x,y,w,h,a,ox,oy);
+	multitextureBind(multitexture);
 	DRAWQ;
 }
 
