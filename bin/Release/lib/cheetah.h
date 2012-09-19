@@ -48,6 +48,10 @@ typedef struct ImageData {
 	int w, h, channels;
 	char *data;
 } ImageData;
+typedef struct Multitexture {
+	float w, h;
+	Image **images;
+} Multitexture;
 typedef struct Atlas {
 	Image * image;
 	/* original width and height */
@@ -186,7 +190,7 @@ void framebufferDraw(Framebuffer * ptr);
 void framebufferDrawq(Framebuffer * ptr, float qx, float qy, float qw, float qh);
 void deleteFramebuffer(Framebuffer * ptr);
 void generateImageData(ImageData *ptr, int w, int h, const char *imageType);
-void generateImage(Image *ptr, int w, int h, const char *imageType);
+void generateImage(Image *ptr, int w, int h, const char *imageType, const char *options);
 void colorMask(bool r, bool g, bool b, bool a);
 void enableDepthTest();
 void disableDepthTest();
@@ -236,12 +240,17 @@ void stencilOp(int fail, int zfail, int zpass);
 void drawToStencil();
 void drawUsingStencil();
 void newImageOpt(Image* ptr, const char *name, const char *options);
+inline void imageCheckResLoader(Image * image);
 inline void imageBind(Image * image);
 void enableTexture();
 void disableTexture();
 void imageDraw(Image * image);
 void imageDrawxy(Image * image, float x, float y, float w, float h);
 void imageDrawt(Image * image, float x, float y, float w, float h, float a, float ox, float oy);
+inline void multitextureBind(Multitexture * multitexture);
+void multitextureDraw(Multitexture * multitexture);
+void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, float h);
+void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy);
 void imageDrawq(Image * image, float qx, float qy, float qw, float qh);
 void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
 void activeTexture(int i);

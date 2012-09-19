@@ -10,7 +10,7 @@ OBJECTS := $(SOURCES:.c=.o)
 all : $(TARGET)
  
 $(TARGET) : $(OBJECTS)
-	$(CC) -o $@ $(OBJECTS) $(LDFLAGS)
+	$(CC) -o $@ $(OBJECTS) $(CFLAGS) $(LDFLAGS)
 
 %.o : %.c
 	$(CC) $(CFLAGS) $(RESFLAGS) -o "$@" -c "$<"
