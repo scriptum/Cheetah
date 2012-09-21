@@ -26,7 +26,7 @@ void main() {
 	vec3 normal = texture2D(normal_tex, gl_TexCoord[0].st).rgb * 2.0 - 1.0;  
 
 	// Calculate the lighting diffuse value  
-	float diffuse = dot(normal, normalize(vec3(light_pos.xy - gl_FragCoord.xy, 100.0)));  
+	float diffuse = dot(normal, normalize(vec3(light_pos.xy - vec2(gl_FragCoord.x, ]]..scr_h..[[-gl_FragCoord.y), 100.0)));  
 	float spec = 0.;//specular * pow(diffuse, shininess);
 	vec4 texc = texture2D(tex, gl_TexCoord[0].st);
 
@@ -39,7 +39,7 @@ E:new(screen):draw(function(s)
 	shader:bind()
 	shader:set('tex', 0)
 	shader:set('normal_tex', 1)
-	shader:set('light_pos', lQuery.mX, scr_h-lQuery.mY, 250)
+	shader:set('light_pos', lQuery.mX, lQuery.mY, 250)
 	multi:drawxy(0,0,1024,1024)
 end)
 
