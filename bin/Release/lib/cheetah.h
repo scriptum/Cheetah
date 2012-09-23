@@ -50,6 +50,7 @@ typedef struct ImageData {
 } ImageData;
 typedef struct Multitexture {
 	float w, h;
+	int size;
 	Image **images;
 } Multitexture;
 typedef struct Atlas {
@@ -247,10 +248,14 @@ void disableTexture();
 void imageDraw(Image * image);
 void imageDrawxy(Image * image, float x, float y, float w, float h);
 void imageDrawt(Image * image, float x, float y, float w, float h, float a, float ox, float oy);
+void initMultitexture(Multitexture * multitexture);
+void deleteMultitexture(Multitexture * multitexture);
 inline void multitextureBind(Multitexture * multitexture);
 void multitextureDraw(Multitexture * multitexture);
 void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, float h);
 void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy);
+void multitextureDrawq(Multitexture * multitexture, float qx, float qy, float qw, float qh);
+void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
 void imageDrawq(Image * image, float qx, float qy, float qw, float qh);
 void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
 void activeTexture(int i);
