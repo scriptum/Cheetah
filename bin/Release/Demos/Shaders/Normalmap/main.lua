@@ -40,7 +40,7 @@ E:new(screen):draw(function(s)
 	shader:set('tex', 0)
 	shader:set('normal_tex', 1)
 	shader:set('light_pos', lQuery.mX, lQuery.mY, 250)
-	multi:drawxy(0,0,1024,1024)
+	multi:draw(0,0,1024,1024)
 end)
 
 --do not forget about main loop!
