@@ -6,3 +6,6 @@
 obj*
 luajit
 *devel_art*
+*.xcf
+bin/*
+!bin/Release*
