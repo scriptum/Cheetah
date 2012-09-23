@@ -200,17 +200,24 @@ void imageDrawt(Image * image, float x, float y, float w, float h, float a, floa
 	DRAWQ;
 }
 
+void initMultitexture(Multitexture * multitexture) {
+	new(multitexture->images, Image*, multitexture->size);
+}
+
+void deleteMultitexture(Multitexture * multitexture) {
+	delete(multitexture->images);
+}
+
 inline void multitextureBind(Multitexture * multitexture) {
 	//~ if(prevImageId == image->id) return;
-	int i = 0;
-	Image * image = multitexture->images[i];
-	while(image)
+	Image * image;
+	int i;
+	for(i = 0; i < multitexture->size; i++)
 	{
+		image = multitexture->images[i];
 		glActiveTexture_(GL_TEXTURE0 + i);
 		imageCheckResLoader(image);
-		glBindTexture(GL_TEXTURE_2D, image->id);
-		i++;
-		image = multitexture->images[i];
+		if (image->id) glBindTexture(GL_TEXTURE_2D, image->id);
 	}
 	glActiveTexture_(GL_TEXTURE0);
 }
@@ -245,6 +252,42 @@ void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, f
 	VERTEX_COORD_TRANS(x,y,w,h,a,ox,oy);
 	multitextureBind(multitexture);
 	DRAWQ;
+}
+
+/**
+ * @descr Draw part of multitexture using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
+ * @group graphics/multitexture
+ * @var Image object
+ * @var x offset of texture
+ * @var y offset of texture
+ * @var width of texture
+ * @var height of texture
+ * */
+void multitextureDrawq(Multitexture * multitexture, float qx, float qy, float qw, float qh) {
+	multitextureBind(multitexture);
+	VERTEX_COORD(0,0,1,1);
+	TEXTURE_COORD(qx, qy, qw, qh, multitexture->w, multitexture->h);
+	DRAWQT;
+}
+
+/**
+ * @descr Draw part of multitexture of given size at a given position using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
+ * @group graphics/multitexture
+ * @var Image object
+ * @var position of left top corner
+ * @var position of left top corner
+ * @var width of quad
+ * @var height of quad
+ * @var x offset of texture
+ * @var y offset of texture
+ * @var width of texture
+ * @var height of texture
+ * */
+void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
+	multitextureBind(multitexture);
+	VERTEX_COORD(x,y,w,h);
+	TEXTURE_COORD(qx, qy, qw, qh, multitexture->w, multitexture->h);
+	DRAWQT;
 }
 
 /**
@@ -327,6 +370,10 @@ void _newImageFromData(Image * ptr, ImageData * imgdata, const char *options) {
 
 void deleteImage(Image * ptr) {
 	//~ printf("%d\n", same_type_p(typeof(ptr)) == INTEGER_TYPE);
+	#ifdef MEMORY_TEST
+		printf("Freeing Image %d\n", ptr->id);
+	#endif
 	if(ptr && ptr->id > 1) glDeleteTextures(1, &ptr->id);
+	
 	//~ else MYERROR("Trying to free a null-image. Maybe, you did it manually?");
 }

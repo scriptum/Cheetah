@@ -292,11 +292,11 @@ C.newMultitexture = function(...)
 	p = ffi.new('Multitexture')
 	p.w = arg[1].w
 	p.h = arg[1].h
-	p.images = ffi.new('Image*[?]', #arg+1)
+	p.size = #arg
+	libcheetah.initMultitexture(p)
 	for i, v in ipairs(arg) do
 		p.images[i-1] = arg[i]
 	end
-	p.images[#arg] = nil
 	return p
 end
 
@@ -313,10 +313,10 @@ ffi.metatype('Multitexture', {
 		end,
 		drawxy = libcheetah.multitextureDrawxy,
 		drawt = libcheetah.multitextureDrawt,
-		--~ drawq = libcheetah.multitextureDrawq,
-		--~ drawqxy = libcheetah.multitextureDrawqxy,
+		drawq = libcheetah.multitextureDrawq,
+		drawqxy = libcheetah.multitextureDrawqxy,
 	}, 
-	__gc = libcheetah.deleteImage
+	__gc = libcheetah.deleteMultitexture
 })
 
 C.newAtlas = function(image, x, y, w, h)
@@ -595,7 +595,13 @@ local uniforms = {}
 C.newShader = function(fragment, vertex)
 	local str
 	local shader = ffi.new('Shader')
+	if C.fileExists(fragment) then
+		fragment = C.getFile(fragment)
+	end
 	if vertex then
+		if C.fileExists(vertex) then
+			vertex = C.getFile(vertex)
+		end
 		libcheetah.newFragmentVertexShader(shader, fragment, vertex)
 		str = vertex .. fragment
 	else

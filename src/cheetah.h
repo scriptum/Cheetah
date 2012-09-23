@@ -115,6 +115,7 @@ typedef struct ImageData {
 
 typedef struct Multitexture {
 	float w, h;
+	int size;
 	Image **images;
 } Multitexture;
 
