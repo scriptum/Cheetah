@@ -1,15 +1,11 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
-local C = cheetah
---set window width and height
-local scr_w, scr_h = 800, 600
-C.init('Lights', scr_w, scr_h, 32, '')
---print fps
-C.printFPS = true
---landscape texture
-local landImg = C.newImage('landscape.jpg')
---lighting texture
-local lightImg = C.newImage('light.png')
+local C = cheetah --assign cheetah to C (short alias)
+local scr_w, scr_h = 1024, 768 --set window width and height
+C.init('Lights', scr_w, scr_h, 32, 'v') --init screen
+C.printFPS = true --print fps
+local landImg = C.newImage('landscape.jpg') --background texture
+local lightImg = C.newImage('light.png') --lighting texture
 --create new framebuffer - light layer
 local lightFbo = C.newFramebuffer(scr_w, scr_h, '')
 --generate different light sources
