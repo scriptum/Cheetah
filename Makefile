@@ -1,20 +1,21 @@
 TARGET := libcheetah.so
 CFLAGS += -fPIC -O3 -fomit-frame-pointer -ffast-math -Wall
-LDFLAGS += -shared -s -L"lib" -lSDL -lGL
+LDFLAGS += -shared -L"lib" -lSDL -lGL -s
 RESFLAGS := -I"inc"
+SOURCEDIR := src src/SOIL
 
-SOURCEDIR := src
-SOURCES := $(wildcard $(addsuffix /*.c*, src src/SOIL))
+SOURCES := $(wildcard $(addsuffix /*.c*, $(SOURCEDIR)))
 OBJECTS := $(SOURCES:.c=.o)
-
+INCLUDES := $(wildcard $(addsuffix /*.h*, $(SOURCEDIR)))
 all : $(TARGET)
  
 $(TARGET) : $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS) $(CFLAGS) $(LDFLAGS)
 
-%.o : %.c
+
+%.o : %.c $(INCLUDES)
 	$(CC) $(CFLAGS) $(RESFLAGS) -o "$@" -c "$<"
- 
+
 .PHONY : clean
  
 clean :
