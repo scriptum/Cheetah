@@ -29,22 +29,6 @@ IN THE SOFTWARE.
 
 //~ #define NO_VBO
 
-//~ Font * currentFont;
-
-//~ /**
- //~ * @descr Create new font.
- //~ * @group font
- //~ * @var Image object
- //~ * @return Font object
- //~ * */
-//~ Font * newFont(Image * img) {
-	//~ Font *ptr;
-	//~ new(ptr, Font, 1);
-	//~ ptr->image = img;
-	//~ ptr->scale = 1.0f;
-	//~ return ptr;
-//~ }
-
 /**
  * @descr Calculate width of string.
  * @group font
@@ -120,34 +104,6 @@ float Font_Width(Font *f, register const char *str)
 	while(0)
 #endif
 
-//~ #define UNICODE_TO_INT(a,i,increment) \
-//~ high = low = 0;\
-//~ if((a[i] & 0b10000000) == 0) {\
-	//~ low = a[i];\
-	//~ increment = 1;\
-//~ }\
-//~ else if((a[i] & 0b11100000) == 0b11000000) {\
-	//~ low = a[i+1] & 0b00111111;\
-	//~ low |= (a[i] & 0b00000011) << 6;\
-	//~ high = (a[i] & 0b00011111) >> 2;\
-	//~ increment = 2;\
-//~ }\
-//~ else if((a[i] & 0b11110000) == 0b11100000) {\
-	//~ low = a[i+2] & 0b00111111;\
-	//~ low |= (a[i+1] & 0b00000011) << 6;\
-	//~ high = (a[i+1] & 0b00111111) >> 2;\
-	//~ high |= (a[i] & 0b00001111) << 4;\
-	//~ increment = 3;\
-//~ }\
-//~ else if((a[i] & 0b11111000) == 0b11110000) {\
-	//~ low = a[i+3] & 0b00111111;\
-	//~ low |= (a[i+2] & 0b00000011) << 6;\
-	//~ high = (a[i+2] & 0b00111111) >> 2;\
-	//~ high |= (a[i+1] & 0b00111111) << 4;\
-	//~ high |= (a[i] & 0b00000111) << 10;\
-	//~ increment = 4;\
-//~ }
-
 #define UNICODE_TO_INT(a,i,increment) \
 high = low = 0;\
 if((a[i] & 0x80) == 0) {\
@@ -209,8 +165,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 	h = y = 0;
 
 	imageBind(currentFont->image);
-	if(maxw > .0)
-	{
+	if(maxw > .0) {
 		while(1) {
 			UNICODE_TO_INT(str,i, increment)
 			c = low | (high << 8);
