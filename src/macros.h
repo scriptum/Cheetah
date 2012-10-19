@@ -147,42 +147,6 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
 #define VERTEX_ROT_X(x,y,a,ox,oy) cosf(a)*(x-ox)-sinf(a)*(y-oy)
 #define VERTEX_ROT_Y(x,y,a,ox,oy) sinf(a)*(x-ox)+cosf(a)*(y-oy)
 
-#define VERTEX_COORD_TRANS(x,y,w,h,a,ox,oy) do {\
-	vertexCoord[0] = x + VERTEX_ROT_X(0,0,a,ox,oy);\
-	vertexCoord[1] = y + VERTEX_ROT_Y(0,0,a,ox,oy);\
-	vertexCoord[2] = x + VERTEX_ROT_X(0,h,a,ox,oy);\
-	vertexCoord[3] = y + VERTEX_ROT_Y(0,h,a,ox,oy);\
-	vertexCoord[4] = x + VERTEX_ROT_X(w,h,a,ox,oy);\
-	vertexCoord[5] = y + VERTEX_ROT_Y(w,h,a,ox,oy);\
-	vertexCoord[6] = x + VERTEX_ROT_X(w,0,a,ox,oy);\
-	vertexCoord[7] = y + VERTEX_ROT_Y(w,0,a,ox,oy);\
-} while(0)
-
-#define VERTEX_COORD(x,y,w,h) VERTEX_COORD_TRANS(x,y,w,h,0,0,0)
-
-#define TEXTURE_COORD(qx,qy,qw,qh,w,h) do {\
-	texCoord[0] = qx/w;\
-	texCoord[1] = qy/h;\
-	texCoord[2] = texCoord[0];\
-	texCoord[3] = texCoord[1] + qh/h;\
-	texCoord[4] = texCoord[0] + qw/w;\
-	texCoord[5] = texCoord[3];\
-	texCoord[6] = texCoord[4];\
-	texCoord[7] = texCoord[1];\
-} while(0)
-
-
-
-#define DRAW_QUAD(v, t) do {\
-	glVertexPointer(2, GL_FLOAT, 0, v);\
-	glTexCoordPointer(2, GL_FLOAT, 0, t);\
-	glDrawArrays(GL_QUADS, 0, 4);\
-} while(0)
-
-#define DRAWQ DRAW_QUAD(vertexCoord, texCoordQuad)
-
-#define DRAWQT DRAW_QUAD(vertexCoord, texCoord)
-
 /******************************VERTEX ACCUMULATOR******************************/
 #define FLUSH_BUFFER() do {\
 	if(vertexCounter) {\
@@ -225,48 +189,12 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,0};
 	vertexCounter += 8;\
 } while(0)
 
-
-
-#define ACCUM_START(x) do {\
-	vertexCounter = 0;\
-	VERTEX_QUERY(x);\
-} while(0)
-
-#define ACCUM_VERTEX(x,y,w,h) do {\
-	vertexCoord[vertexCounter + 0] = x;\
-	vertexCoord[vertexCounter + 1] = y;\
-	vertexCoord[vertexCounter + 2] = x;\
-	vertexCoord[vertexCounter + 3] = y + h;\
-	vertexCoord[vertexCounter + 4] = x + w;\
-	vertexCoord[vertexCounter + 5] = y + h;\
-	vertexCoord[vertexCounter + 6] = x + w;\
-	vertexCoord[vertexCounter + 7] = y;\
-} while(0)
-
-#define ACCUM_TEXTURE(qx,qy,qw,qh,w,h) do {\
-	texCoord[vertexCounter + 0] = qx/w;\
-	texCoord[vertexCounter + 1] = qy/h;\
-	texCoord[vertexCounter + 2] = texCoord[vertexCounter + 0];\
-	texCoord[vertexCounter + 3] = texCoord[vertexCounter + 1] + qh/h;\
-	texCoord[vertexCounter + 4] = texCoord[vertexCounter + 0] + qw/w;\
-	texCoord[vertexCounter + 5] = texCoord[vertexCounter + 3];\
-	texCoord[vertexCounter + 6] = texCoord[vertexCounter + 4];\
-	texCoord[vertexCounter + 7] = texCoord[vertexCounter + 1];\
-} while(0)
-
-#define ACCUM_TEXTURE_ARRAY(x) do {\
-	memcpy(texCoord + vertexCounter, x, 32);\
-} while(0)
-
-#define ACCUM_ADD() do {\
-	vertexCounter += 8;\
-} while(0)
-
-#define ACCUM_DRAW() do {\
-	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);\
-	glTexCoordPointer(2, GL_FLOAT, 0, texCoord);\
-	glDrawArrays(GL_QUADS, 0, vertexCounter << 1);\
-	vertexCounter = 0;\
+#define TEXTURE_BIND(tex) do {\
+	if(prevImageId != tex) {\
+		FLUSH_BUFFER();\
+		glBindTexture(GL_TEXTURE_2D, tex);\
+		prevImageId = tex;\
+	}\
 } while(0)
 
 /**********************************DEBUG STUFF*********************************/

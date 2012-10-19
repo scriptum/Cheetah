@@ -26,19 +26,14 @@ IN THE SOFTWARE.
 #include "SOIL/SOIL.h"
 #include "render.h"
 
-#define ATLAS_DRAW imageBind(p->image);\
-	DRAW_QUAD(vertexCoord, p->tex)
-
-void atlasDrawxy(Atlas *p, float x, float y, float w, float h) {
-	float scalex = w/p->w;
-	float scaley = h/p->h;
-	VERTEX_COORD(x + p->x * scalex, y + p->y * scaley, p->aw * scalex, p->ah * scaley);
-	ATLAS_DRAW;
-}
-
 void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox, float oy) {
 	float scalex = w/p->w;
 	float scaley = h/p->h;
-	VERTEX_COORD_TRANS(x + p->x * scalex, y + p->y * scaley, p->aw * scalex, p->ah * scaley, a, ox, oy);
-	ATLAS_DRAW;
+	imageBind(p->image);
+	PUSH_QUAD(x + p->x * scalex, y + p->y * scaley, p->aw * scalex, p->ah * scaley, a, ox, oy);
 }
+
+void atlasDrawxy(Atlas *p, float x, float y, float w, float h) {
+	atlasDrawt(p, x, y, w, h,0,0,0);
+}
+
