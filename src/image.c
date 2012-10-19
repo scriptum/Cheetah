@@ -140,29 +140,14 @@ inline void imageCheckResLoader(Image * image) {
 }
 
 /**
- * @descr Bind texture. Equivalent to glBindTexture.
- * @group graphics/image
- * @var texture id
- * */
-inline void textureBind(GLuint tex) {
-	if(prevImageId == tex) return;
-	FLUSH_BUFFER();
-	glBindTexture(GL_TEXTURE_2D, tex);
-	prevImageId = tex;
-}
-
-/**
  * @descr Bind Image object. Equivalent to glBindTexture.
  * @group graphics/image
  * @var Image object
  * */
 inline void imageBind(Image * image) {
-	if(prevImageId == image->id) return;
 	if(!image) return;
 	imageCheckResLoader(image);
-	FLUSH_BUFFER();
-	glBindTexture(GL_TEXTURE_2D, image->id);
-	prevImageId = image->id;
+	TEXTURE_BIND(image->id);
 }
 
 /**
@@ -197,9 +182,8 @@ void imageDraw(Image * image) {
  * @var Image object
  * */
 void imageDrawxy(Image * image, float x, float y, float w, float h) {
-	glBindTexture(GL_TEXTURE_2D, image->id);
+	imageBind(image);
 	PUSH_QUAD(x,y,w,h,0,0,0);
-	FLUSH_BUFFER();
 }
 
 /**

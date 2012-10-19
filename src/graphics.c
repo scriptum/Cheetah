@@ -111,6 +111,7 @@ void disableAlphaTest() {
  * @see scale rotate translateObject
  * */
 void move(double translateX, double translateY) {
+	FLUSH_BUFFER();
 	glTranslated(translateX, translateY, 0);
 }
 
@@ -122,6 +123,7 @@ void move(double translateX, double translateY) {
  * @see move rotate translateObject
  * */
 void scale(double scaleX, double scaleY) {
+	FLUSH_BUFFER();
 	glScaled(scaleX, scaleY, 1);
 }
 
@@ -132,6 +134,7 @@ void scale(double scaleX, double scaleY) {
  * @see move scale translateObject
  * */
 void rotate(double angle) {
+	FLUSH_BUFFER();
 	glRotated(angle, 0, 0, 1);
 }
 
@@ -148,6 +151,7 @@ void rotate(double angle) {
  * @see move scale rotate
  * */
 void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y) {
+	FLUSH_BUFFER();
 	if(x || y) glTranslated(x, y, 0);
 	if(angle) glRotated(angle, 0, 0, 1);
 	if(width != 1.0 || height != 1.0) glScalef(width, height, 1);
@@ -231,6 +235,7 @@ void end() {
  * @see enableBlend disableBlend
  * */
 void blend(bool blend) {
+	FLUSH_BUFFER();
 	if(blend) glEnable(GL_BLEND);
 	else glDisable(GL_BLEND);
 }
@@ -241,6 +246,7 @@ void blend(bool blend) {
  * @see blend
  * */
 void enableBlend() {
+	FLUSH_BUFFER();
 	glEnable(GL_BLEND);
 }
 
@@ -250,6 +256,7 @@ void enableBlend() {
  * @see blend
  * */
 void disableBlend() {
+	FLUSH_BUFFER();
 	glDisable(GL_BLEND);
 }
 
@@ -259,6 +266,7 @@ void disableBlend() {
  * @see pop reset
  * */
 void push() {
+	FLUSH_BUFFER();
 	glPushMatrix();
 	if (glGetError() == GL_STACK_OVERFLOW)
 		myError("No more free slots to save the view.");
@@ -270,6 +278,7 @@ void push() {
  * @see push reset
  * */
 void pop() {
+	FLUSH_BUFFER();
 	glPopMatrix();
 	if (glGetError() == GL_STACK_UNDERFLOW)
 		myError("No saved view was found.");
@@ -281,6 +290,7 @@ void pop() {
  * @see pop push
  * */
 void reset() {
+	FLUSH_BUFFER();
 	glLoadIdentity();
 }
 
@@ -330,6 +340,7 @@ void rectangle() {
 void rectanglexy(float x, float y, float w, float h) {
 	const float t[20] = {0,0, RECTOFF1,RECTOFF1, 1,0, RECTOFF2,RECTOFF1, 1,1, RECTOFF2,RECTOFF2, 0,1, RECTOFF1,RECTOFF2, 0,0, RECTOFF1,RECTOFF1};
 	if(antiAliasing) {
+		FLUSH_BUFFER();
 		vertexCoord[0] = x - RECTBORDER;
 		vertexCoord[1] = y - RECTBORDER;
 		vertexCoord[2] = x;
@@ -350,17 +361,16 @@ void rectanglexy(float x, float y, float w, float h) {
 		vertexCoord[17] = y - RECTBORDER;
 		vertexCoord[18] = x;
 		vertexCoord[19] = y;
+		memcpy(texCoord, t, sizeof(float) * 20);
 		glBindTexture(GL_TEXTURE_2D, rect_texture);
-		glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
-		glTexCoordPointer(2, GL_FLOAT, 0, t);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 	}
+	FLUSH_BUFFER();
 	if(prevImageId) {
 		glBindTexture(GL_TEXTURE_2D, 0);
 		prevImageId = 0;
 	}
-	VERTEX_COORD(x,y,w,h);
-	DRAWQ;
+	PUSH_QUAD(x,y,w,h,0,0,0);
 }
 
 /**
