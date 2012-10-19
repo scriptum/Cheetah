@@ -27,9 +27,7 @@ IN THE SOFTWARE.
 #include "render.h"
 
 #define ATLAS_DRAW imageBind(p->image);\
-	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);\
-	glTexCoordPointer(2, GL_FLOAT, 0, p->tex);\
-	glDrawArrays(GL_QUADS, 0, 4)
+	DRAW_QUAD(vertexCoord, p->tex)
 
 void atlasDrawxy(Atlas *p, float x, float y, float w, float h) {
 	float scalex = w/p->w;

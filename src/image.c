@@ -140,14 +140,27 @@ inline void imageCheckResLoader(Image * image) {
 }
 
 /**
+ * @descr Bind texture. Equivalent to glBindTexture.
+ * @group graphics/image
+ * @var texture id
+ * */
+inline void textureBind(GLuint tex) {
+	if(prevImageId == tex) return;
+	FLUSH_BUFFER();
+	glBindTexture(GL_TEXTURE_2D, tex);
+	prevImageId = tex;
+}
+
+/**
  * @descr Bind Image object. Equivalent to glBindTexture.
  * @group graphics/image
  * @var Image object
  * */
 inline void imageBind(Image * image) {
-	//~ if(prevImageId == image->id) return;
+	if(prevImageId == image->id) return;
 	if(!image) return;
 	imageCheckResLoader(image);
+	FLUSH_BUFFER();
 	glBindTexture(GL_TEXTURE_2D, image->id);
 	prevImageId = image->id;
 }
@@ -175,7 +188,7 @@ void disableTexture() {
  * */
 void imageDraw(Image * image) {
 	imageBind(image);
-	glCallList(quadlist);
+	PUSH_QUAD(0,0,1,1,0,0,0);
 }
 
 /**
@@ -184,9 +197,9 @@ void imageDraw(Image * image) {
  * @var Image object
  * */
 void imageDrawxy(Image * image, float x, float y, float w, float h) {
-	VERTEX_COORD(x,y,w,h);
-	imageBind(image);
-	DRAWQ;
+	glBindTexture(GL_TEXTURE_2D, image->id);
+	PUSH_QUAD(x,y,w,h,0,0,0);
+	FLUSH_BUFFER();
 }
 
 /**
@@ -195,9 +208,8 @@ void imageDrawxy(Image * image, float x, float y, float w, float h) {
  * @var Image object
  * */
 void imageDrawt(Image * image, float x, float y, float w, float h, float a, float ox, float oy) {
-	VERTEX_COORD_TRANS(x,y,w,h,a,ox,oy);
 	imageBind(image);
-	DRAWQ;
+	PUSH_QUAD(x,y,w,h,a,ox,oy);
 }
 
 void initMultitexture(Multitexture * multitexture) {
@@ -210,6 +222,7 @@ void deleteMultitexture(Multitexture * multitexture) {
 
 inline void multitextureBind(Multitexture * multitexture) {
 	//~ if(prevImageId == image->id) return;
+	FLUSH_BUFFER();
 	Image * image;
 	int i;
 	for(i = 0; i < multitexture->size; i++)
@@ -229,7 +242,7 @@ inline void multitextureBind(Multitexture * multitexture) {
  * */
 void multitextureDraw(Multitexture * multitexture) {
 	multitextureBind(multitexture);
-	glCallList(quadlist);
+	PUSH_QUAD(0,0,1,1,0,0,0);
 }
 
 /**
@@ -238,9 +251,8 @@ void multitextureDraw(Multitexture * multitexture) {
  * @var Multitexture object
  * */
 void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, float h) {
-	VERTEX_COORD(x,y,w,h);
 	multitextureBind(multitexture);
-	DRAWQ;
+	PUSH_QUAD(x,y,w,h,0,0,0);
 }
 
 /**
@@ -249,9 +261,8 @@ void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, 
  * @var Multitexture object
  * */
 void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy) {
-	VERTEX_COORD_TRANS(x,y,w,h,a,ox,oy);
 	multitextureBind(multitexture);
-	DRAWQ;
+	PUSH_QUAD(x,y,w,h,a,ox,oy);
 }
 
 /**
@@ -265,9 +276,7 @@ void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, f
  * */
 void multitextureDrawq(Multitexture * multitexture, float qx, float qy, float qw, float qh) {
 	multitextureBind(multitexture);
-	VERTEX_COORD(0,0,1,1);
-	TEXTURE_COORD(qx, qy, qw, qh, multitexture->w, multitexture->h);
-	DRAWQT;
+	PUSH_QUADT(0,0,1,1,0,0,0,qx, qy, qw, qh, multitexture->w, multitexture->h);
 }
 
 /**
@@ -285,9 +294,7 @@ void multitextureDrawq(Multitexture * multitexture, float qx, float qy, float qw
  * */
 void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
 	multitextureBind(multitexture);
-	VERTEX_COORD(x,y,w,h);
-	TEXTURE_COORD(qx, qy, qw, qh, multitexture->w, multitexture->h);
-	DRAWQT;
+	PUSH_QUADT(x,y,w,h,0,0,0,qx, qy, qw, qh, multitexture->w, multitexture->h);
 }
 
 /**
@@ -301,9 +308,7 @@ void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w,
  * */
 void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
 	imageBind(image);
-	VERTEX_COORD(0,0,1,1);
-	TEXTURE_COORD(qx, qy, qw, qh, image->w, image->h);
-	DRAWQT;
+	PUSH_QUADT(0,0,1,1,0,0,0,qx, qy, qw, qh, image->w, image->h);
 }
 
 /**
@@ -321,9 +326,49 @@ void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
  * */
 void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
 	imageBind(image);
-	VERTEX_COORD(x,y,w,h);
-	TEXTURE_COORD(qx, qy, qw, qh, image->w, image->h);
-	DRAWQT;
+	PUSH_QUADT(x,y,w,h,0,0,0,qx, qy, qw, qh, image->w, image->h);
+}
+
+/**
+ * @descr Draw part of image of given size at a given position using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
+ * @group graphics/image
+ * @var Image object
+ * @var position of left top corner
+ * @var position of left top corner
+ * @var width of quad
+ * @var height of quad
+ * @var angle
+ * @var origin x
+ * @var origin y
+ * @var x offset of texture
+ * @var y offset of texture
+ * @var width of texture
+ * @var height of texture
+ * */
+void imageDrawqt(Image * image, float x, float y, float w, float h, float a, float ox, float oy, float qx, float qy, float qw, float qh) {
+	imageBind(image);
+	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, image->w, image->h);
+}
+
+/**
+ * @descr Draw part of multitexture of given size at a given position using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
+ * @group graphics/multitexture
+ * @var Multitexture object
+ * @var position of left top corner
+ * @var position of left top corner
+ * @var width of quad
+ * @var height of quad
+ * @var angle
+ * @var origin x
+ * @var origin y
+ * @var x offset of texture
+ * @var y offset of texture
+ * @var width of texture
+ * @var height of texture
+ * */
+void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy, float qx, float qy, float qw, float qh) {
+	multitextureBind(multitexture);
+	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, multitexture->w, multitexture->h);
 }
 
 /**
