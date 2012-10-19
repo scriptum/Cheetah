@@ -12,10 +12,15 @@ e = E:new(screen):draw(function(s)
 	for i = 0, 1024/8, 2 do
 		for j = 0, 1024/8 do
 			img1:draw(i*8, j*8, 8, 8)
-			img2:draw(i*8+8, j*8, 8, 8)
+		end
+	end
+	for i = 1, 1024/8, 2 do
+		for j = 0, 1024/8 do
+			img2:draw(i*8, j*8, 8, 8)
 		end
 	end
 end)
+
 
 C.mainLoop()
 
