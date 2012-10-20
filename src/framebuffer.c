@@ -195,6 +195,7 @@ bool framebufferCheck(Framebuffer * ptr) {
  * */
 void framebufferBind(Framebuffer * ptr) {
 	if(ptr->id) {
+		FLUSH_BUFFER();
 		glBindFramebuffer_(GL_FRAMEBUFFER_EXT, ptr->id);
 		glViewport(0, 0, (GLsizei)ptr->image->w, (GLsizei)ptr->image->h);
 		glMatrixMode(GL_PROJECTION);
@@ -211,6 +212,7 @@ void framebufferBind(Framebuffer * ptr) {
  * @group graphics/framebuffer
  * */
 void framebufferUnbind(Framebuffer * ptr) {
+	FLUSH_BUFFER();
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, 0);
 	glViewport(0, 0, screen->w, screen->h);
 	glMatrixMode(GL_PROJECTION);
@@ -245,6 +247,7 @@ void framebufferDrawq(Framebuffer * ptr, float qx, float qy, float qw, float qh)
 	imageDrawq(ptr->image, qx, qy, qw, qh);
 }
 #endif
+
 /**
  * @descr Delete framebuffer and free memory.
  * @group graphics/framebuffer
