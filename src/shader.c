@@ -133,18 +133,25 @@ void deleteShader(Shader * ptr) {
 
 void shaderBind(Shader * ptr) {
 	if(supported.GLSL && ptr->id)
+	{
+		FLUSH_BUFFER();
 		glUseProgramObject_(ptr->id);
+	}
 }
 
 void shaderUnbind(Shader * ptr) {
 	if(supported.GLSL)
+	{
+		FLUSH_BUFFER();
 		glUseProgramObject_(0);
+	}
 }
 
 unsigned int GetUniformLocation(unsigned int program, const char * name) {
 	return glGetUniformLocation_(program, name);
 }
 void UseProgramObject(unsigned int program) {
+	FLUSH_BUFFER();
 	glUseProgramObject_(program);
 }
 void Uniform1i(unsigned int location, int var) {
