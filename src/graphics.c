@@ -505,6 +505,7 @@ void smooth(bool smooth) {
  * @see colorf
  * */
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+	FLUSH_BUFFER();
 	glColor4ub(r,g,b,a);
 }
 
@@ -518,6 +519,7 @@ void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
  * @see color
  * */
 void colorf(float r, float g, float b, float a) {
+	FLUSH_BUFFER();
 	glColor4f(r,g,b,a);
 }
 
@@ -557,6 +559,7 @@ void clearScreen(bool enabled) {
  *  * cheetah.blendDetail - interesting effect, allows to use gray detail textures
  * */
 void blendMode(int mode) {
+	FLUSH_BUFFER();
 	switch(mode) {
 		case blend_alpha:
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -593,6 +596,7 @@ void blendMode(int mode) {
  *  * cheetah.GL_MAX
  * */
 void blendEquation(int mode) {
+	FLUSH_BUFFER();
 	glBlendEquation_(mode);
 }
 
@@ -620,6 +624,7 @@ void blendEquation(int mode) {
  *  * cheetah.GL_ONE_MINUS_DST_ALPHA
  * */
 void blendFunc(int sourcefactor, int destinationfactor) {
+	FLUSH_BUFFER();
 	glBlendFunc(sourcefactor, destinationfactor);
 }
 
