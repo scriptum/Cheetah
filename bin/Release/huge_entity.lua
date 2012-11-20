@@ -1,13 +1,13 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Test', 800, 600, 32, 'v')
+C.init('Test', 800, 600, 32, '')
 C.printFPS = true
-local img = C.generate(8,8,'light_alpha')
+local img = C.generate('light', 4, 4)
 
 C.blendMode(1)
-C.gameSpeed(5)
-for i=1,4000 do
+--~ C.gameSpeed(5)
+for i=1,10000 do
 	E:new(screen)
 	:image(img)
 	:move(400,300)
