@@ -148,6 +148,11 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
 #define VERTEX_ROT_Y(x,y,a,ox,oy) sinf(a)*(x-ox)+cosf(a)*(y-oy)
 
 /******************************VERTEX ACCUMULATOR******************************/
+
+#if 1
+
+#define VERTICLES_PER_SPRITE 4 * 2
+
 #define FLUSH_BUFFER() do {\
 	if(vertexCounter) {\
 		glDrawArrays(GL_QUADS, 0, vertexCounter / 2);\
@@ -168,25 +173,58 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,0};
 	vertexCoord[vertexCounter + 7] = vy + VERTEX_ROT_Y(vw, 0,  a, ox, oy);\
 } while(0)
 
+
 #define PUSH_QUADT(vx, vy, vw, vh, a, ox, oy, tx, ty, tw, th, w, h) do {\
-	if(vertexCounter >= VERTEX_BUFFER_LIMIT * 8) { FLUSH_BUFFER(); }\
+	if(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE) { FLUSH_BUFFER(); }\
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy); \
-	texCoord[vertexCounter + 0] = tx / w;\
-	texCoord[vertexCounter + 1] = ty / h;\
-	texCoord[vertexCounter + 2] = texCoord[vertexCounter + 0];\
-	texCoord[vertexCounter + 3] = texCoord[vertexCounter + 1] + th / h;\
-	texCoord[vertexCounter + 4] = texCoord[vertexCounter + 0] + tw / w;\
-	texCoord[vertexCounter + 5] = texCoord[vertexCounter + 3];\
-	texCoord[vertexCounter + 6] = texCoord[vertexCounter + 4];\
-	texCoord[vertexCounter + 7] = texCoord[vertexCounter + 1];\
-	vertexCounter += 8;\
+	texCoord[vertexCounter + 2] = texCoord[vertexCounter + 0] = tx / w;\
+	texCoord[vertexCounter + 7] = texCoord[vertexCounter + 1] = ty / h;\
+	texCoord[vertexCounter + 5] = texCoord[vertexCounter + 3] = texCoord[vertexCounter + 1] + th / h;\
+	texCoord[vertexCounter + 6] = texCoord[vertexCounter + 4] = texCoord[vertexCounter + 0] + tw / w;\
+	vertexCounter += VERTICLES_PER_SPRITE;\
 } while(0)
 
-#define PUSH_QUAD(vx, vy, vw, vh, a, ox, oy) do {\
-	if(vertexCounter >= VERTEX_BUFFER_LIMIT * 8) { FLUSH_BUFFER(); }\
+#else
+
+#define VERTICLES_PER_SPRITE 6 * 2
+
+#define FLUSH_BUFFER() do {\
+	if(vertexCounter) {\
+		glDrawArrays(GL_TRIANGLES, 0, vertexCounter / 2);\
+		vertexCounter = 0;\
+	}\
+} while(0)
+
+static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
+
+#define PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy) do {\
+	vertexCoord[vertexCounter + 10] = vertexCoord[vertexCounter + 0] = vx + VERTEX_ROT_X(0,  0,  a, ox, oy);\
+	vertexCoord[vertexCounter + 11] = vertexCoord[vertexCounter + 1] = vy + VERTEX_ROT_Y(0,  0,  a, ox, oy);\
+	vertexCoord[vertexCounter + 2] = vx + VERTEX_ROT_X(0,  vh, a, ox, oy);\
+	vertexCoord[vertexCounter + 3] = vy + VERTEX_ROT_Y(0,  vh, a, ox, oy);\
+	vertexCoord[vertexCounter + 6] = vertexCoord[vertexCounter + 4] = vx + VERTEX_ROT_X(vw, vh, a, ox, oy);\
+	vertexCoord[vertexCounter + 7] = vertexCoord[vertexCounter + 5] = vy + VERTEX_ROT_Y(vw, vh, a, ox, oy);\
+	vertexCoord[vertexCounter + 8] = vx + VERTEX_ROT_X(vw, 0,  a, ox, oy);\
+	vertexCoord[vertexCounter + 9] = vy + VERTEX_ROT_Y(vw, 0,  a, ox, oy);\
+} while(0)
+
+#define PUSH_QUADT(vx, vy, vw, vh, a, ox, oy, tx, ty, tw, th, w, h) do {\
+	if(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE) { FLUSH_BUFFER(); }\
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy); \
-	memcpy(texCoord + vertexCounter, DEFAULT_QUAD_TEX, sizeof(float) * 8); \
-	vertexCounter += 8;\
+	texCoord[vertexCounter + 10] = texCoord[vertexCounter + 2] = texCoord[vertexCounter + 0] = tx / w;\
+	texCoord[vertexCounter + 11] = texCoord[vertexCounter + 9] = texCoord[vertexCounter + 1] = ty / h;\
+	texCoord[vertexCounter + 7] = texCoord[vertexCounter + 5] = texCoord[vertexCounter + 3] = texCoord[vertexCounter + 1] + th / h;\
+	texCoord[vertexCounter + 8] = texCoord[vertexCounter + 6] = texCoord[vertexCounter + 4] = texCoord[vertexCounter + 0] + tw / w;\
+	vertexCounter += VERTICLES_PER_SPRITE;\
+} while(0)
+
+#endif
+
+#define PUSH_QUAD(vx, vy, vw, vh, a, ox, oy) do {\
+	if(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE) { FLUSH_BUFFER(); }\
+	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy); \
+	memcpy(texCoord + vertexCounter, DEFAULT_QUAD_TEX, sizeof(float) * VERTICLES_PER_SPRITE); \
+	vertexCounter += VERTICLES_PER_SPRITE;\
 } while(0)
 
 #define TEXTURE_BIND(tex) do {\
