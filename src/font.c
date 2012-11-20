@@ -149,6 +149,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 		maxw = maxw / currentFont->_scale * screenScale.scaleX;
 		if(maxw == .0) maxw = 0.0001;
 	}
+	FLUSH_BUFFER();
 	glPushMatrix();
 	if(!currentFont->scalable)
 	{
@@ -386,7 +387,7 @@ float fontGetInterval(Font *font) {
 void fontSetGlyph(Font *ptr, const char *line) {
 	static float cx2=0, cy2=0, x1=0, y1=0, x2=0, y2=0, cx1=0, cy1=0, w=0, h=0;
 	static unsigned int ch=0, ch2;
-	static unsigned char c[5];
+	static unsigned char char_string_buffer[9];
 	int i = 0, high=0, low=0, increment = 0;
 	FontChar * fch;
 	if(sscanf(line, "%d %f %f %f %f %f %f %f %f", &ch, &x1, &y1, &x2, &y2, &cx1, &cy1, &w, &h) == -1)
@@ -395,13 +396,13 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	while(ch) {
 		if(ch & 0xff000000)
 		{
-			c[i] = (ch & 0xff000000) >> 24;
+			char_string_buffer[i] = (ch & 0xff000000) >> 24;
 			i++;
 		}
 		ch <<= 8;
 	}
-	c[i] = 0;
-	UNICODE_TO_INT(c,0,increment)
+	char_string_buffer[i] = 0;
+	UNICODE_TO_INT(char_string_buffer, 0, increment)
 	else {
 		myError("character %d is out of range (high: %x, low: %x)", ch2, high, low);
 		return;

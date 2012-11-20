@@ -160,8 +160,8 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		
 		/*two vertex buffers*/
 		vertexCounter = 0;
-		new(texCoord, float, VERTEX_BUFFER_LIMIT * 8);
-		new(vertexCoord, float, VERTEX_BUFFER_LIMIT * 8);
+		new(texCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
+		new(vertexCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
 		verAlloc = VERTEX_BUFFER_LIMIT;
 		
 		//~ static float tex[] = {0,0,0,1,1,1,1,0};
