@@ -17,7 +17,7 @@ C.autoScale(false)
 E:new(screen):draw(function(s)
 	f:print(str,0,15, C.getWindowWidth())
 	f1:scale(2)
-	f1:print('FPS: '..C.FPS..'\n123123\n12312313123\n')
+	f1:print('FPS: '..C.FPS)
 	--~ f:scale(1)
 end)
 
