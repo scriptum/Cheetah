@@ -147,8 +147,8 @@ typedef struct Resource {
 	char *options;
 	int len;
 } Resource;
-void atlasDrawxy(Atlas *p, float x, float y, float w, float h);
 void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox, float oy);
+void atlasDrawxy(Atlas *p, float x, float y, float w, float h);
 unsigned int getEventType();
 unsigned int getEventKey();
 unsigned int getEventKeyUnicode();
@@ -258,6 +258,8 @@ void multitextureDrawq(Multitexture * multitexture, float qx, float qy, float qw
 void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
 void imageDrawq(Image * image, float qx, float qy, float qw, float qh);
 void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
+void imageDrawqt(Image * image, float x, float y, float w, float h, float a, float ox, float oy, float qx, float qy, float qw, float qh);
+void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy, float qx, float qy, float qw, float qh);
 void activeTexture(int i);
 void imageFiltering(Image * img, bool enabled);
 void _newImageFromData(Image * ptr, ImageData * imgdata, const char *options);
@@ -294,8 +296,8 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 bool isInit();
 int getWindowWidth();
 int getWindowHeight();
+void swapBuffers();
 void caption(const char * text);
 SDL_Rect ** getModes();
-void (*swapBuffers)(void);
 int (*showCursor)(int mode);
 int (*grabCursor)(int mode);
