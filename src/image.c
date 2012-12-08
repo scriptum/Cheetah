@@ -65,6 +65,155 @@ inline unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 }
 
 /**
+ * Threaded image loader
+ * */
+
+inline queue newQueue()
+{
+	node q = malloc(sizeof(node_t));
+	q->next = q->prev = 0;
+	return q;
+}
+
+inline void enqueue(queue q, QDATA n)
+{
+	//~ printf("%s\n", n.image->name);
+	//~ SDL_mutexP(resQueueMutex);
+	node nd = malloc(sizeof(node_t));
+	nd->val = n;
+	if (!QHEAD(q)) QHEAD(q) = nd;
+	nd->prev = QTAIL(q);
+	if (nd->prev) nd->prev->next = nd;
+	QTAIL(q) = nd;
+	nd->next = 0;
+	//~ printf("%d\n", QEMPTY(resLoaderQueue));
+	//~ SDL_mutexV(resQueueMutex);
+}
+ 
+inline int dequeue(queue q, QDATA *val)
+{
+	//~ SDL_mutexP(resQueueMutex);
+	node tmp = QHEAD(q);
+	if (!tmp) return 0;
+	*val = tmp->val;
+	//~ printf("%s\n", tmp->val.image->name);
+	QHEAD(q) = tmp->next;
+	if (QTAIL(q) == tmp) QTAIL(q) = 0;
+	free(tmp);
+	//~ SDL_mutexV(resQueueMutex);
+	return 1;
+}
+
+//TODO
+/**
+ * Separate thread to load images
+ * */
+int resLoaderThread(void *unused)
+{
+	Resource r;
+	//~ SDL_Event e;
+	unsigned char *img;
+	//~ unsigned char *myBuf;
+	//~ bool empty;
+	int width, height;
+	while(1)
+	{
+		//~ SDL_mutexP(resQueueMutex);
+		//~ empty = QEMPTY(resLoaderQueue)
+		//~ SDL_mutexV(resQueueMutex);
+		SDL_Delay(10);
+		//~ if(QEMPTY(resLoaderQueue)) printf(": %d\n", QEMPTY(resLoaderQueue));
+		if(!resShared&&!QEMPTY(resLoaderQueue))
+		{
+			//~ printf("Queue: %d\n", QEMPTY(resLoaderQueue));
+			//~ SDL_mutexP(resQueueMutex);
+			dequeue(resLoaderQueue, &r);
+			img = loadImageData(r.image->name, &width, &height, &r.image->channels);
+			r.image->w = (float)width;
+			r.image->h = (float)height;
+			r.data = img;
+			//~ printf("%s\n", r.image->name);
+			resShared = &r;
+			//~ SDL_Delay(5);
+			//~ new(e, SDL_Event, 1);
+			//~ e.type = SDL_USEREVENT;
+			//~ e.user.code = 0;
+			//~ e.user.data1 = (void*)&r;
+			//~ SDL_PushEvent(&e);
+		}
+	}
+}
+
+/**
+ * Runt in the mainthread to just copy image to GPU
+ * */
+void resLoaderMainThread()
+{
+	Resource * r;
+	//~ unsigned int millis;
+	if(resShared) {
+		r = resShared;
+		//~ millis = globalTime;
+		r->image->id = loadImageTex(r->image->options, r->data, r->image->w, r->image->h, r->image->channels);
+		//~ printf("Delayed resource loader: loaded %s with %d ms\n", r->image->name, SDL_GetTicks() - millis);
+		delete(r->image->name);
+		delete(r->image->options);
+		resShared = NULL;
+	}
+}
+
+static unsigned char * loadImageMask(const unsigned char * img, const char *name, int width, int height, int channels)
+{
+	char *mask_name;
+	const int masklen = 5;
+	unsigned char *mask_img;
+	unsigned char *new_img;
+	int img_len = width * height;
+	int mask_w, mask_h, mask_channels;
+	int mask_step, img_step;
+	int x, y, j, i;
+	/* gen mask name */
+	char *pch = strrchr(name, '.');
+	mask_name = (char*)malloc(strlen(name) + masklen + 1);
+	strncpy(mask_name, name, pch - name);
+	strcpy(mask_name + (pch - name), "_mask");
+	strcpy(mask_name + (pch - name) + masklen, pch);
+	/* try to load mask */
+	mask_img = loadImageData(mask_name, &mask_w, &mask_h, &mask_channels);
+	if(mask_img)
+	{
+		new_img = (unsigned char *)malloc(sizeof(unsigned char) * img_len * 4);
+		if(!new_img)
+		{
+			MYERROR("Cannot create mask image!");
+			return NULL;
+		}
+		for(x = y = i = j = mask_step = img_step = 0; i < img_len; i++)
+		{
+			new_img[j++] = img[img_step++];
+			new_img[j++] = img[img_step++];
+			new_img[j++] = img[img_step++];
+			if(channels == 4) img_step++;
+			new_img[j++] = 0xff - mask_img[(y * mask_h + x) * mask_channels];
+			x++;
+			if(x >= mask_h) x = 0;
+			mask_step++;
+			if(mask_step >= width)
+			{
+				x = mask_step = 0;
+				y++;
+				if(y >= mask_h) y = 0;
+			}
+		}
+		free(mask_img);
+		free(mask_name);
+		return new_img;
+	}
+	free(mask_name);
+	return NULL;
+}
+
+/**
  * @descr Load image from disc with specific options.
  * @group graphics/image
  * @var file name
@@ -75,9 +224,11 @@ inline unsigned int loadImageTex(const char *options, unsigned char *img, int wi
  * @return Image object
  * */
 void newImageOpt(Image* ptr, const char *name, const char *options) {
-	int width, height, channels, instant = 0, i = 0;
+	int width, height, channels, i = 0;
+	bool mask = 0, instant = 0;
 	unsigned int tex_id;
 	unsigned char *img;
+	unsigned char *img_mask;
 	NEDED_INIT;
 	if(!name)
 	{
@@ -87,6 +238,7 @@ void newImageOpt(Image* ptr, const char *name, const char *options) {
 	if(options) while(options[i])
 	{
 		if(options[i] == 'i') instant = 1;
+		if(options[i] == 'm') mask = 1;
 		i++;
 	}
 	if(!resLoaderQueue||instant)
@@ -96,6 +248,16 @@ void newImageOpt(Image* ptr, const char *name, const char *options) {
 		{
 			MYERROR("can't load image %s", name);
 			return;
+		}
+		if(mask)
+		{
+			img_mask = loadImageMask(img, name, width, height, channels);
+			if(img_mask)
+			{
+				channels = 4;
+				free(img);
+				img = img_mask;
+			}
 		}
 		tex_id = loadImageTex(options, img, width, height, channels);
 		//~ new(ptr, Image, 1);

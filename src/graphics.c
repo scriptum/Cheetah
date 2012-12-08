@@ -26,6 +26,8 @@ IN THE SOFTWARE.
 #include "cheetah.h"
 #include "render.h"
 
+extern void resLoaderMainThread();
+
 bool clearScreenFlag = 1;
 
 void colorMask(bool r, bool g, bool b, bool a) {
@@ -82,12 +84,31 @@ void disableStencilTest() {
 }
 
 /**
+ * @descr Enables scissor test. Equivalent to glEnable(GL_SCISSOR_TEST);
+ * @group graphics/drawing
+ * @see disableStencilTest
+ * */
+void enableScissorTest() {
+	glEnable(GL_SCISSOR_TEST);
+}
+
+/**
+ * @descr Disables scissor test. Equivalent to glDisable(GL_SCISSOR_TEST);
+ * @group graphics/drawing
+ * @see enableStencilTest
+ * */
+void disableScissorTest() {
+	glDisable(GL_SCISSOR_TEST);
+}
+
+/**
  * @descr Enables alpha test. Equivalent to glEnable(GL_ALPHA_TEST);
  * @group graphics/drawing
  * @see disableAlphaTest
  * */
 void enableAlphaTest() {
 	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_EQUAL,1.f);
 }
 
 /**
@@ -168,8 +189,6 @@ void autoScale(bool autoScale) {
 }
 
 void prepare() {
-	Resource * r;
-	unsigned int millis;
 	unsigned int delta = globalTime;
 	globalTime = SDL_GetTicks();
 	delta = globalTime - delta;
@@ -182,16 +201,7 @@ void prepare() {
 		glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
 		glScalef(screenScale.scaleX, screenScale.scaleY, 1);
 	}
-	if(resShared) {
-		r = resShared;
-		//~ printf("Get image %s %d\n", r->image->name, r->image->id);
-		millis = globalTime;
-		r->image->id = loadImageTex(r->image->options, r->data, r->image->w, r->image->h, r->image->channels);
-		printf("Delayed resource loader: loaded %s with %d ms\n", r->image->name, SDL_GetTicks() - millis);
-		delete(r->image->name);
-		delete(r->image->options);
-		resShared = 0;
-	}
+	resLoaderMainThread();
 	if(rescaleTime && globalTime > rescaleTime)
 	{
 		SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
@@ -682,8 +692,8 @@ void stencilOp(int fail, int zfail, int zpass) {
 }
 
 void drawToStencil() {
-	glStencilFunc (GL_NEVER, 0x0, 0x1);
-	glStencilOp(GL_REPLACE,GL_KEEP,GL_REPLACE);
+	glStencilFunc (GL_ALWAYS, 0x0, 0x1);
+	glStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
 }
 
 void drawUsingStencil() {

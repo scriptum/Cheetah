@@ -220,11 +220,15 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
 
 #endif
 
-#define PUSH_QUAD(vx, vy, vw, vh, a, ox, oy) do {\
+#define PUSH_QUAD_TEXTURE(vx, vy, vw, vh, a, ox, oy, texture) do {\
 	if(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE) { FLUSH_BUFFER(); }\
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy); \
-	memcpy(texCoord + vertexCounter, DEFAULT_QUAD_TEX, sizeof(float) * VERTICLES_PER_SPRITE); \
+	memcpy(texCoord + vertexCounter, texture, sizeof(float) * VERTICLES_PER_SPRITE); \
 	vertexCounter += VERTICLES_PER_SPRITE;\
+} while(0)
+
+#define PUSH_QUAD(vx, vy, vw, vh, a, ox, oy) do {\
+	PUSH_QUAD_TEXTURE(vx, vy, vw, vh, a, ox, oy, DEFAULT_QUAD_TEX);\
 } while(0)
 
 #define TEXTURE_BIND(tex) do {\
