@@ -110,7 +110,7 @@ enum{
 	SOIL_CAPABILITY_NONE = 0,
 	SOIL_CAPABILITY_PRESENT = 1
 };
-static int has_cubemap_capability = SOIL_CAPABILITY_UNKNOWN;
+//~ static int has_cubemap_capability = SOIL_CAPABILITY_UNKNOWN;
 //~ int query_cubemap_capability( void );
 #define SOIL_TEXTURE_WRAP_R					0x8072
 #define SOIL_CLAMP_TO_EDGE					0x812F
@@ -1100,10 +1100,10 @@ unsigned int
 		//~ }
 	//~ }
 	/*	does the user want me to scale the colors into the NTSC safe RGB range?	*/
-	if( flags & SOIL_FLAG_NTSC_SAFE_RGB )
-	{
-		scale_image_RGB_to_NTSC_safe( img, width, height, channels );
-	}
+	//~ if( flags & SOIL_FLAG_NTSC_SAFE_RGB )
+	//~ {
+		//~ scale_image_RGB_to_NTSC_safe( img, width, height, channels );
+	//~ }
 	//~ /*	does the user want me to convert from straight to pre-multiplied alpha?
 		//~ (and do we even _have_ alpha?)	*/
 	//~ if( flags & SOIL_FLAG_MULTIPLY_ALPHA )
@@ -1207,14 +1207,14 @@ unsigned int
 		height = new_height;
 	}
 	/*	does the user want us to use YCoCg color space?	*/
-	if( flags & SOIL_FLAG_CoCg_Y )
-	{
-		/*	this will only work with RGB and RGBA images */
-		convert_RGB_to_YCoCg( img, width, height, channels );
-		/*
-		save_image_as_DDS( "CoCg_Y.dds", width, height, channels, img );
-		*/
-	}
+	//~ if( flags & SOIL_FLAG_CoCg_Y )
+	//~ {
+		//~ /*	this will only work with RGB and RGBA images */
+		//~ convert_RGB_to_YCoCg( img, width, height, channels );
+		//~ /*
+		//~ save_image_as_DDS( "CoCg_Y.dds", width, height, channels, img );
+		//~ */
+	//~ }
 	/*	create the OpenGL texture ID handle
     	(note: allowing a forced texture ID lets me reload a texture)	*/
     tex_id = reuse_texture_ID;
@@ -1653,7 +1653,7 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 	width = header.dwWidth;
 	height = header.dwHeight;
 	uncompressed = 1 - (header.sPixelFormat.dwFlags & DDPF_FOURCC) / DDPF_FOURCC;
-	cubemap = (header.sCaps.dwCaps2 & DDSCAPS2_CUBEMAP) / DDSCAPS2_CUBEMAP;
+	//~ cubemap = (header.sCaps.dwCaps2 & DDSCAPS2_CUBEMAP) / DDSCAPS2_CUBEMAP;
 	if( uncompressed )
 	{
 		S3TC_type = GL_RGB;
