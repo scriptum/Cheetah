@@ -33,7 +33,10 @@ local function linear(t, b, c, d)
   return c * t / d + b
 end
 local function swing(t, b, c, d)
-	return ((-cos(pi * t / d) / 2) + 0.5) * c + b
+	local x = t / d
+	local xx = x * x
+	local xxx = xx * x
+	return (3 * xx - 2 * xxx) * c + b
 end
 local function inQuad(t, b, c, d)
   t = t / d
