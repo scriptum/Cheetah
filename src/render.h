@@ -41,11 +41,14 @@ extern GLuint prevImageId;
 
 extern bool antiAliasing;
 
+extern int vertexCounter;
 extern const float texCoordQuad[];
 extern float *texCoord;
 extern float *vertexCoord;
 volatile int verAlloc;
 
+
+#ifndef __ANDROID_API__
 
 // GL_ARB_shading_language_100, GL_ARB_shader_objects, GL_ARB_fragment_shader, GL_ARB_vertex_shader
 extern PFNGLCREATEPROGRAMOBJECTARBPROC  glCreateProgramObject_;
@@ -118,10 +121,14 @@ extern PFNGLBLITFRAMEBUFFEREXTPROC         glBlitFramebuffer_;
 
 //~ extern PFNGLBLENDFUNCSEPARATEEXTPROC glBlendFuncSeparate_;
 
+#endif /* __ANDROID_API__ */
+
 #define GL_COMPILE_STATUS                 0x8B81
 #define GL_VERTEX_SHADER                  0x8B31
 #define GL_FRAGMENT_SHADER                0x8B30
 #define GL_INFO_LOG_LENGTH                0x8B84
 #define GL_LINK_STATUS                    0x8B82
+
+
 
 #endif /* __RENDER_H_ */

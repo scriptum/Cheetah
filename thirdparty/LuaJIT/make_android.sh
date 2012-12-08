@@ -1,5 +1,5 @@
 #!/bin/sh
-NDK=/home/rpg/android-ndk-r7b
+NDK=/home/rpg/android-ndk-r8b
 NDKABI=8
 NDKVER=$NDK/toolchains/arm-linux-androideabi-4.4.3
 NDKP=$NDKVER/prebuilt/linux-x86/bin/arm-linux-androideabi-

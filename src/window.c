@@ -23,6 +23,7 @@ IN THE SOFTWARE.
 
 #include "cheetah.h"
 #include "render.h"
+#include "config.h"
 
 SDL_Surface *screen = NULL;
 
@@ -79,7 +80,7 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 			return 0;
 		atexit(SDL_Quit);
 		SDL_EnableUNICODE(1);
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		//~ SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
 		if(depth) SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 		if(stencil) SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
@@ -157,10 +158,11 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		glEnd();
 		glEndList();
 		
-		/*two vertex buffers for 1024 quads*/
-		new(texCoord, float, 4096);
-		new(vertexCoord, float, 4096);
-		verAlloc = 4096;
+		/*two vertex buffers*/
+		vertexCounter = 0;
+		new(texCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
+		new(vertexCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
+		verAlloc = VERTEX_BUFFER_LIMIT;
 		
 		//~ static float tex[] = {0,0,0,1,1,1,1,0};
 		//~ static float ver[] = {0,0,0,1,1,1,1,0};
@@ -182,6 +184,9 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		"\377\377\377\0");
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		// fix vertex pointers to one memory area
+		glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
+		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
 		//~ glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	return 1;
@@ -220,7 +225,10 @@ int getWindowHeight() {
  * @descr Swap buffers and present graphics
  * @group graphics/window
  * */
-void (*swapBuffers)(void) = &SDL_GL_SwapBuffers;
+void swapBuffers() {
+	FLUSH_BUFFER();
+	SDL_GL_SwapBuffers();
+}
 
 /**
  * @descr Set window's title

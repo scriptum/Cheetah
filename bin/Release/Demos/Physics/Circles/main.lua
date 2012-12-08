@@ -34,15 +34,15 @@ E:new(screen):rectangle()
 
 cp.mouseForce(5000)
 
-local ball = C.newImage('data/ball.png')
-local ball_small = C.newImage('data/ball_small.png')
-local crate = C.newImage('data/crate.png')
+local ball = C.newImage('ball.png')
+local ball_small = C.newImage('ball_small.png')
+local crate = C.newImage('crate.png')
 local function getSleep(s)
-	--~ if (s.body.node_private.idleTime > cp.space.sleepTimeThreshold) then
-		--~ C.color(128,128,128,255)
-	--~ else
-		--~ C.color(255,255,255,255)
-	--~ end
+	if (s.body.node_private.idleTime > cp.space.sleepTimeThreshold) then
+		C.color(128,128,128,255)
+	else
+		C.color(255,255,255,255)
+	end
 end
 E:new(screen):draw(function()C.rectangle()end)
 :color('PeachPuff'):move(400,0):size(400,600):translate()
@@ -63,15 +63,16 @@ end
 
 for i=1,2 do
 	E:new(screen)
-	--~ :draw(getSleep)
-	--~ :radius(63)
+	:draw(getSleep)
+	:radius(63)
 	:draw(function()ball:draw()end)
-	--~ :image(ball)
+	:image(ball)
 	:size(128,128)
 	:move(300,i*64)
-	--~ :offset(64,64)
-	--~ :physCircle(10)
-	--~ :physDraggable()
+	:offset(64,64)
+	:physCircle(10)
+	:physDraggable()
+		:translate()
 end
 
 for i=1,15 do

@@ -2,21 +2,27 @@ require 'lib.cheetah'
 --~ require 'lib.mixer'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Test', 1024, 1024, 32, '')
+
+local scr = 512
+C.init('Test', scr, scr, 32, '')
 C.printFPS = true
 
-local img1 = C.generate('noise', 8, 8, 'n')
-local img2 = C.generate('noise', 8, 8, 'n')
+local size = 2
+
+print("Drawing ".. (scr*scr/size/size) .. " quads, fixed fillrate")
+
+local img1 = C.generate('noise', size, size)
+local img2 = C.generate('noise', size, size)
 
 e = E:new(screen):draw(function(s)
-	for i = 0, 1024/8, 2 do
-		for j = 0, 1024/8 do
-			img1:draw(i*8, j*8, 8, 8)
+	for i = 0, scr/size, 2 do
+		for j = 0, scr/size do
+			img1:draw(i*size + time/10, j*size, size, size)
 		end
 	end
-	for i = 1, 1024/8, 2 do
-		for j = 0, 1024/8 do
-			img2:draw(i*8, j*8, 8, 8)
+	for i = 1, scr/size, 2 do
+		for j = 0, scr/size do
+			img2:draw(i*size + time/10, j*size, size, size)
 		end
 	end
 end)
