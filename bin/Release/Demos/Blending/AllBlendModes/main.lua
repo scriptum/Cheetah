@@ -1,12 +1,12 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Test', 1024, 512+64, 32, '')
+C.init('Test', 1024, 512+64, 32, 'v')
 C.printFPS = true
-local img = C.newImage('data/light.png')
-local img1 = C.newImage('data/28.png')
+local img = C.generate('light', 32, 32)
+local img1 = C.newImage('sprite.png')
 lQuery.addhook(C.clear)
-E:new(screen):image('data/brick.png')
+E:new(screen):image('brick.jpg')
 :size(1024, 1024)
 local blend1 = {
 	cheetah.GL_ZERO,
@@ -31,7 +31,7 @@ local blend2 = {
 }
 E:new(screen):draw(function()
 	C.move(0, 0)
-	C.color(255,255,255,(math.sin(time)+1)*128)
+	C.color(255,255,255,255)
 	--~ C.setBlendEquation(cheetah.GL_MAX)
 	
 	for i, u in ipairs(blend1) do
@@ -59,6 +59,6 @@ E:new(screen):draw(function()
 	end
 	C.blendEquation(cheetah.GL_FUNC_ADD)
 	C.blendMode(0)
-end):size(64, 64)
+end):size(64, 64):translate()
 
 C.mainLoop()

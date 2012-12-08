@@ -9,7 +9,7 @@ C.printFPS = true
 --landscape texture
 local landImg = C.newImage('tex.jpg')
 --lighting texture
-local lightImg = C.newImage('tex_n.jpg')
+local lightImg = C.newImage('spherenorm.png')
 
 local multi = C.newMultitexture(landImg, lightImg)
 
@@ -40,7 +40,7 @@ E:new(screen):draw(function(s)
 	shader:set('tex', 0)
 	shader:set('normal_tex', 1)
 	shader:set('light_pos', lQuery.mX, lQuery.mY, 250)
-	multi:draw(0,0,1024,1024)
+	multi:draw(0,0,128,128)
 end)
 
 --do not forget about main loop!

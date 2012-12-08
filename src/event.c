@@ -32,7 +32,7 @@ double globalGameSpeed = 1;
 int resizeDelay = 100;
 
 unsigned int getEventType() {
-	//В общем, тут идет дохрена ненужных нам событий (в основном mousemove), которые могут тормозить игру, их нужно пропускать.
+	//skipping unneeded events
 	while(SDL_PollEvent(&event)) {
 		//printf("%d\n", event.type);
 		switch(event.type) {
@@ -58,13 +58,14 @@ unsigned int getEventType() {
 						screenScale.offsetX = 0;
 					}
 				}
-					rescaleTime = globalTime + resizeDelay;
-					screen->w = event.resize.w;
-					screen->h = event.resize.h;
+				rescaleTime = globalTime + resizeDelay;
+				screen->w = event.resize.w;
+				screen->h = event.resize.h;
 				//~ glClear(GL_COLOR_BUFFER_BIT);
 				//~ SDL_UpdateRect(screen, 0,0,0,0);
 				//~ SDL_GL_SwapBuffers();
 				return 6;
+			//TODO to do something here
 			case SDL_VIDEOEXPOSE: return 7;
 			case SDL_ACTIVEEVENT: return 8;
 			case SDL_JOYAXISMOTION:
