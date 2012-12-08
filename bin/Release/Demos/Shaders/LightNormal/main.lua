@@ -3,7 +3,7 @@ require 'lib.lquery.init'
 local C = cheetah
 local sin = math.sin
 local scr_w, scr_h = 1024, 768
-C.init('Lights', scr_w, scr_h, 32, 'v')
+C.init('Lights', scr_w, scr_h, 32, '')
 C.printFPS = true
 local landImg = C.newImage('tex1.jpg')
 local normalImg = C.newImage('tex1_n.jpg')
@@ -13,9 +13,9 @@ local lightFbo = C.newFramebuffer(scr_w, scr_h) --create new framebuffer - light
 local normFbo = C.newFramebuffer(scr_w, scr_h) -- normalmap layer
 --generate different light sources
 local lights = {}
-local lightsCount = 7
+local lightsCount = 5000
 for i = 1, lightsCount do
-	lights[i] = {math.random(0,1000),math.random(0,1000),math.random(0.6,2),math.random(0.6,2),math.random(100,300)}
+	lights[i] = {math.random(0,1000),math.random(0,1000),math.random(0.06,0.02),math.random(0.06,0.02),math.random(10,50)}
 end
 --normalmapping shader in separate file
 local shader = C.newShader('lightshader.glsl')
@@ -42,7 +42,7 @@ E:new(screen)
 	shader:set('lightColor', 0.6, 0.5, 0.4) --100% light is 0.5 due to detial blending mode
 	for i = 1, lightsCount do
 		local l = lights[i]
-		multi:drawxy((math.sin(time*l[3]+l[1])+1)*(scr_w-l[5])*0.5, (math.sin(time*l[4]+l[2])+1)*(scr_h-l[5])*0.5, l[5], l[5])
+		multi:drawxy((sin(time*l[3]+l[1])+1)*(scr_w-l[5])*0.5, (sin(time*l[4]+l[2])+1)*(scr_h-l[5])*0.5, l[5], l[5])
 	end
 	shader:set('lightColor', 0.4, 0.5, 0.6) --let mouse light be blue
 	multi:drawxy(lQuery.mX-mouseLight/2, lQuery.mY-mouseLight/2, mouseLight, mouseLight)
@@ -61,6 +61,6 @@ screen:wheel(function(s, x,y,b)
 	end
 end)
 
-C.gameSpeed(0.01) --slow down lights
+C.gameSpeed(1) --slow down lights
 
 C.mainLoop() --do not forget about main loop!

@@ -27,6 +27,9 @@ IN THE SOFTWARE.
 #ifndef __MACROS_H__
 #define __MACROS_H__
 
+#include "config.h"
+
+
 /**********************************MEMOTY OPS**********************************/
 #ifdef MEMORY_TEST
 	#define new(var, type, size) do {\
@@ -125,6 +128,11 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
 
 /**********************************VERTEX OPS**********************************/
 
+/* GLES compatibility */
+#ifndef GL_QUADS
+#define GL_QUADS GL_TRIANGLES
+#endif
+
 /* dynamic vertex array */
 #define VERTEX_QUERY(size) do {\
 	if((size) > verAlloc) {\
@@ -134,96 +142,101 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
 	}\
 } while(0)
 
-#define VERTEX_COORD(x,y,w,h) do {\
-	vertexCoord[0] = x;\
-	vertexCoord[1] = y;\
-	vertexCoord[2] = x;\
-	vertexCoord[3] = y + h;\
-	vertexCoord[4] = x + w;\
-	vertexCoord[5] = y + h;\
-	vertexCoord[6] = x + w;\
-	vertexCoord[7] = y;\
-} while(0)
 
-#define VERTEX_ROT_X(x,y) cosf(a)*(x-ox)-sinf(a)*(y-oy)
-#define VERTEX_ROT_Y(x,y) sinf(a)*(x-ox)+cosf(a)*(y-oy)
 
-#define VERTEX_COORD_TRANS(x,y,w,h,a,ox,oy) do {\
-	vertexCoord[0] = x + VERTEX_ROT_X(0,0);\
-	vertexCoord[1] = y + VERTEX_ROT_Y(0,0);\
-	vertexCoord[2] = x + VERTEX_ROT_X(0,h);\
-	vertexCoord[3] = y + VERTEX_ROT_Y(0,h);\
-	vertexCoord[4] = x + VERTEX_ROT_X(w,h);\
-	vertexCoord[5] = y + VERTEX_ROT_Y(w,h);\
-	vertexCoord[6] = x + VERTEX_ROT_X(w,0);\
-	vertexCoord[7] = y + VERTEX_ROT_Y(w,0);\
-} while(0)
-
-#define TEXTURE_COORD(qx,qy,qw,qh,w,h) do {\
-	texCoord[0] = qx/w;\
-	texCoord[1] = qy/h;\
-	texCoord[2] = texCoord[0];\
-	texCoord[3] = texCoord[1] + qh/h;\
-	texCoord[4] = texCoord[0] + qw/w;\
-	texCoord[5] = texCoord[3];\
-	texCoord[6] = texCoord[4];\
-	texCoord[7] = texCoord[1];\
-} while(0)
-
-#define DRAWQ do {\
-	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);\
-	glTexCoordPointer(2, GL_FLOAT, 0, texCoordQuad);\
-	glDrawArrays(GL_QUADS, 0, 4);\
-} while(0)
-
-#define DRAWQT do {\
-	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);\
-	glTexCoordPointer(2, GL_FLOAT, 0, texCoord);\
-	glDrawArrays(GL_QUADS, 0, 4);\
-} while(0)
+#define VERTEX_ROT_X(x,y,a,ox,oy) cosf(a)*(x-ox)-sinf(a)*(y-oy)
+#define VERTEX_ROT_Y(x,y,a,ox,oy) sinf(a)*(x-ox)+cosf(a)*(y-oy)
 
 /******************************VERTEX ACCUMULATOR******************************/
-int vertex_accum_shift;
-#define ACCUM_START(x) do {\
-	vertex_accum_shift = 0;\
-	VERTEX_QUERY(x);\
+
+#if 1
+
+#define VERTICLES_PER_SPRITE 4 * 2
+
+#define FLUSH_BUFFER() do {\
+	if(vertexCounter) {\
+		glDrawArrays(GL_QUADS, 0, vertexCounter / 2);\
+		vertexCounter = 0;\
+	}\
 } while(0)
 
-#define ACCUM_VERTEX(x,y,w,h) do {\
-	vertexCoord[vertex_accum_shift + 0] = x;\
-	vertexCoord[vertex_accum_shift + 1] = y;\
-	vertexCoord[vertex_accum_shift + 2] = x;\
-	vertexCoord[vertex_accum_shift + 3] = y + h;\
-	vertexCoord[vertex_accum_shift + 4] = x + w;\
-	vertexCoord[vertex_accum_shift + 5] = y + h;\
-	vertexCoord[vertex_accum_shift + 6] = x + w;\
-	vertexCoord[vertex_accum_shift + 7] = y;\
+static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,0};
+
+#define PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy) do {\
+	vertexCoord[vertexCounter + 0] = vx + VERTEX_ROT_X(0,  0,  a, ox, oy);\
+	vertexCoord[vertexCounter + 1] = vy + VERTEX_ROT_Y(0,  0,  a, ox, oy);\
+	vertexCoord[vertexCounter + 2] = vx + VERTEX_ROT_X(0,  vh, a, ox, oy);\
+	vertexCoord[vertexCounter + 3] = vy + VERTEX_ROT_Y(0,  vh, a, ox, oy);\
+	vertexCoord[vertexCounter + 4] = vx + VERTEX_ROT_X(vw, vh, a, ox, oy);\
+	vertexCoord[vertexCounter + 5] = vy + VERTEX_ROT_Y(vw, vh, a, ox, oy);\
+	vertexCoord[vertexCounter + 6] = vx + VERTEX_ROT_X(vw, 0,  a, ox, oy);\
+	vertexCoord[vertexCounter + 7] = vy + VERTEX_ROT_Y(vw, 0,  a, ox, oy);\
 } while(0)
 
-#define ACCUM_TEXTURE(qx,qy,qw,qh,w,h) do {\
-	texCoord[vertex_accum_shift + 0] = qx/w;\
-	texCoord[vertex_accum_shift + 1] = qy/h;\
-	texCoord[vertex_accum_shift + 2] = texCoord[vertex_accum_shift + 0];\
-	texCoord[vertex_accum_shift + 3] = texCoord[vertex_accum_shift + 1] + qh/h;\
-	texCoord[vertex_accum_shift + 4] = texCoord[vertex_accum_shift + 0] + qw/w;\
-	texCoord[vertex_accum_shift + 5] = texCoord[vertex_accum_shift + 3];\
-	texCoord[vertex_accum_shift + 6] = texCoord[vertex_accum_shift + 4];\
-	texCoord[vertex_accum_shift + 7] = texCoord[vertex_accum_shift + 1];\
+
+#define PUSH_QUADT(vx, vy, vw, vh, a, ox, oy, tx, ty, tw, th, w, h) do {\
+	if(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE) { FLUSH_BUFFER(); }\
+	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy); \
+	texCoord[vertexCounter + 2] = texCoord[vertexCounter + 0] = tx / w;\
+	texCoord[vertexCounter + 7] = texCoord[vertexCounter + 1] = ty / h;\
+	texCoord[vertexCounter + 5] = texCoord[vertexCounter + 3] = texCoord[vertexCounter + 1] + th / h;\
+	texCoord[vertexCounter + 6] = texCoord[vertexCounter + 4] = texCoord[vertexCounter + 0] + tw / w;\
+	vertexCounter += VERTICLES_PER_SPRITE;\
 } while(0)
 
-#define ACCUM_TEXTURE_ARRAY(x) do {\
-	memcpy(texCoord + vertex_accum_shift, x, 32);\
+#else
+
+#define VERTICLES_PER_SPRITE 6 * 2
+
+#define FLUSH_BUFFER() do {\
+	if(vertexCounter) {\
+		glDrawArrays(GL_TRIANGLES, 0, vertexCounter / 2);\
+		vertexCounter = 0;\
+	}\
 } while(0)
 
-#define ACCUM_ADD() do {\
-	vertex_accum_shift += 8;\
+static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
+
+#define PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy) do {\
+	vertexCoord[vertexCounter + 10] = vertexCoord[vertexCounter + 0] = vx + VERTEX_ROT_X(0,  0,  a, ox, oy);\
+	vertexCoord[vertexCounter + 11] = vertexCoord[vertexCounter + 1] = vy + VERTEX_ROT_Y(0,  0,  a, ox, oy);\
+	vertexCoord[vertexCounter + 2] = vx + VERTEX_ROT_X(0,  vh, a, ox, oy);\
+	vertexCoord[vertexCounter + 3] = vy + VERTEX_ROT_Y(0,  vh, a, ox, oy);\
+	vertexCoord[vertexCounter + 6] = vertexCoord[vertexCounter + 4] = vx + VERTEX_ROT_X(vw, vh, a, ox, oy);\
+	vertexCoord[vertexCounter + 7] = vertexCoord[vertexCounter + 5] = vy + VERTEX_ROT_Y(vw, vh, a, ox, oy);\
+	vertexCoord[vertexCounter + 8] = vx + VERTEX_ROT_X(vw, 0,  a, ox, oy);\
+	vertexCoord[vertexCounter + 9] = vy + VERTEX_ROT_Y(vw, 0,  a, ox, oy);\
 } while(0)
 
-#define ACCUM_DRAW() do {\
-	glVertexPointer(2, GL_FLOAT, 0, vertexCoord);\
-	glTexCoordPointer(2, GL_FLOAT, 0, texCoord);\
-	glDrawArrays(GL_QUADS, 0, vertex_accum_shift << 1);\
-	vertex_accum_shift = 0;\
+#define PUSH_QUADT(vx, vy, vw, vh, a, ox, oy, tx, ty, tw, th, w, h) do {\
+	if(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE) { FLUSH_BUFFER(); }\
+	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy); \
+	texCoord[vertexCounter + 10] = texCoord[vertexCounter + 2] = texCoord[vertexCounter + 0] = tx / w;\
+	texCoord[vertexCounter + 11] = texCoord[vertexCounter + 9] = texCoord[vertexCounter + 1] = ty / h;\
+	texCoord[vertexCounter + 7] = texCoord[vertexCounter + 5] = texCoord[vertexCounter + 3] = texCoord[vertexCounter + 1] + th / h;\
+	texCoord[vertexCounter + 8] = texCoord[vertexCounter + 6] = texCoord[vertexCounter + 4] = texCoord[vertexCounter + 0] + tw / w;\
+	vertexCounter += VERTICLES_PER_SPRITE;\
+} while(0)
+
+#endif
+
+#define PUSH_QUAD_TEXTURE(vx, vy, vw, vh, a, ox, oy, texture) do {\
+	if(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE) { FLUSH_BUFFER(); }\
+	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy); \
+	memcpy(texCoord + vertexCounter, texture, sizeof(float) * VERTICLES_PER_SPRITE); \
+	vertexCounter += VERTICLES_PER_SPRITE;\
+} while(0)
+
+#define PUSH_QUAD(vx, vy, vw, vh, a, ox, oy) do {\
+	PUSH_QUAD_TEXTURE(vx, vy, vw, vh, a, ox, oy, DEFAULT_QUAD_TEX);\
+} while(0)
+
+#define TEXTURE_BIND(tex) do {\
+	if(prevImageId != tex) {\
+		FLUSH_BUFFER();\
+		glBindTexture(GL_TEXTURE_2D, tex);\
+		prevImageId = tex;\
+	}\
 } while(0)
 
 /**********************************DEBUG STUFF*********************************/

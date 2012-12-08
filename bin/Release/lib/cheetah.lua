@@ -347,28 +347,28 @@ ffi.metatype('Atlas', {
 })
 
 local texturesArchive = {}
-C.newTilemap = function(file)
-	local f = assert(io.open(file))
-	local image, w, h, tw, th = f:read('*l'):match('([^ ]+) (%d+) (%d+) (%d+) (%d+)')
-	assert(h and w and image, 'Invalid tilemap file')
-	local ptr = ffi.new('Tilemap')
-	image = file:gsub('[^/]+$', image)
-	local img = C.newImage(image)
-	ptr.img = img
-	table.insert(texturesArchive, img)
-	ptr.w, ptr.h, ptr.tw, ptr.th = tonumber(w), tonumber(h), tonumber(tw), tonumber(th)
-	libcheetah.newTilmapInternal(ptr, file)
-	return ptr
-end
+--~ C.newTilemap = function(file)
+	--~ local f = assert(io.open(file))
+	--~ local image, w, h, tw, th = f:read('*l'):match('([^ ]+) (%d+) (%d+) (%d+) (%d+)')
+	--~ assert(h and w and image, 'Invalid tilemap file')
+	--~ local ptr = ffi.new('Tilemap')
+	--~ image = file:gsub('[^/]+$', image)
+	--~ local img = C.newImage(image)
+	--~ ptr.img = img
+	--~ table.insert(texturesArchive, img)
+	--~ ptr.w, ptr.h, ptr.tw, ptr.th = tonumber(w), tonumber(h), tonumber(tw), tonumber(th)
+	--~ libcheetah.newTilmapInternal(ptr, file)
+	--~ return ptr
+--~ end
 
-ffi.metatype('Tilemap', {
-	__index = {
-		draw = function(s, x, y, angle, zoom, ox, oy)
-			libcheetah.tilemapDraw(s, x or 0, y or 0, angle or 0, zoom or 1, ox or 0, oy or 0)
-		end
-	}, 
-	__gc = libcheetah.deleteTilemap
-})
+--~ ffi.metatype('Tilemap', {
+	--~ __index = {
+		--~ draw = function(s, x, y, angle, zoom, ox, oy)
+			--~ libcheetah.tilemapDraw(s, x or 0, y or 0, angle or 0, zoom or 1, ox or 0, oy or 0)
+		--~ end
+	--~ }, 
+	--~ __gc = libcheetah.deleteTilemap
+--~ })
 
 --~ local resLoadedImages
 C.fonts = {}

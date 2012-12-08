@@ -1,7 +1,7 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Gems game', 800, 600, 32, 'v')
+C.init('Animation queue', 800, 600, 32, 'v')
 local img = C.generate('light', 32, 32)
 C.blendMode(C.blendAdditive)
 Entity:new(screen)

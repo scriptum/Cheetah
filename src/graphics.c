@@ -26,6 +26,8 @@ IN THE SOFTWARE.
 #include "cheetah.h"
 #include "render.h"
 
+extern void resLoaderMainThread();
+
 bool clearScreenFlag = 1;
 
 void colorMask(bool r, bool g, bool b, bool a) {
@@ -41,6 +43,7 @@ GLuint prevImageId = 0;
 bool antiAliasing = 1;
 
 const float texCoordQuad[] = {0,0,0,1,1,1,1,0};
+int vertexCounter;
 float *texCoord = NULL;
 float *vertexCoord = NULL;
 
@@ -81,12 +84,31 @@ void disableStencilTest() {
 }
 
 /**
+ * @descr Enables scissor test. Equivalent to glEnable(GL_SCISSOR_TEST);
+ * @group graphics/drawing
+ * @see disableStencilTest
+ * */
+void enableScissorTest() {
+	glEnable(GL_SCISSOR_TEST);
+}
+
+/**
+ * @descr Disables scissor test. Equivalent to glDisable(GL_SCISSOR_TEST);
+ * @group graphics/drawing
+ * @see enableStencilTest
+ * */
+void disableScissorTest() {
+	glDisable(GL_SCISSOR_TEST);
+}
+
+/**
  * @descr Enables alpha test. Equivalent to glEnable(GL_ALPHA_TEST);
  * @group graphics/drawing
  * @see disableAlphaTest
  * */
 void enableAlphaTest() {
 	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_EQUAL,1.f);
 }
 
 /**
@@ -110,6 +132,7 @@ void disableAlphaTest() {
  * @see scale rotate translateObject
  * */
 void move(double translateX, double translateY) {
+	FLUSH_BUFFER();
 	glTranslated(translateX, translateY, 0);
 }
 
@@ -121,6 +144,7 @@ void move(double translateX, double translateY) {
  * @see move rotate translateObject
  * */
 void scale(double scaleX, double scaleY) {
+	FLUSH_BUFFER();
 	glScaled(scaleX, scaleY, 1);
 }
 
@@ -131,6 +155,7 @@ void scale(double scaleX, double scaleY) {
  * @see move scale translateObject
  * */
 void rotate(double angle) {
+	FLUSH_BUFFER();
 	glRotated(angle, 0, 0, 1);
 }
 
@@ -147,6 +172,7 @@ void rotate(double angle) {
  * @see move scale rotate
  * */
 void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y) {
+	FLUSH_BUFFER();
 	if(x || y) glTranslated(x, y, 0);
 	if(angle) glRotated(angle, 0, 0, 1);
 	if(width != 1.0 || height != 1.0) glScalef(width, height, 1);
@@ -163,8 +189,6 @@ void autoScale(bool autoScale) {
 }
 
 void prepare() {
-	Resource * r;
-	unsigned int millis;
 	unsigned int delta = globalTime;
 	globalTime = SDL_GetTicks();
 	delta = globalTime - delta;
@@ -177,16 +201,7 @@ void prepare() {
 		glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
 		glScalef(screenScale.scaleX, screenScale.scaleY, 1);
 	}
-	if(resShared) {
-		r = resShared;
-		//~ printf("Get image %s %d\n", r->image->name, r->image->id);
-		millis = globalTime;
-		r->image->id = loadImageTex(r->image->options, r->data, r->image->w, r->image->h, r->image->channels);
-		printf("Delayed resource loader: loaded %s with %d ms\n", r->image->name, SDL_GetTicks() - millis);
-		delete(r->image->name);
-		delete(r->image->options);
-		resShared = 0;
-	}
+	resLoaderMainThread();
 	if(rescaleTime && globalTime > rescaleTime)
 	{
 		SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
@@ -230,6 +245,7 @@ void end() {
  * @see enableBlend disableBlend
  * */
 void blend(bool blend) {
+	FLUSH_BUFFER();
 	if(blend) glEnable(GL_BLEND);
 	else glDisable(GL_BLEND);
 }
@@ -240,6 +256,7 @@ void blend(bool blend) {
  * @see blend
  * */
 void enableBlend() {
+	FLUSH_BUFFER();
 	glEnable(GL_BLEND);
 }
 
@@ -249,6 +266,7 @@ void enableBlend() {
  * @see blend
  * */
 void disableBlend() {
+	FLUSH_BUFFER();
 	glDisable(GL_BLEND);
 }
 
@@ -258,6 +276,7 @@ void disableBlend() {
  * @see pop reset
  * */
 void push() {
+	FLUSH_BUFFER();
 	glPushMatrix();
 	if (glGetError() == GL_STACK_OVERFLOW)
 		myError("No more free slots to save the view.");
@@ -269,6 +288,7 @@ void push() {
  * @see push reset
  * */
 void pop() {
+	FLUSH_BUFFER();
 	glPopMatrix();
 	if (glGetError() == GL_STACK_UNDERFLOW)
 		myError("No saved view was found.");
@@ -280,6 +300,7 @@ void pop() {
  * @see pop push
  * */
 void reset() {
+	FLUSH_BUFFER();
 	glLoadIdentity();
 }
 
@@ -329,6 +350,7 @@ void rectangle() {
 void rectanglexy(float x, float y, float w, float h) {
 	const float t[20] = {0,0, RECTOFF1,RECTOFF1, 1,0, RECTOFF2,RECTOFF1, 1,1, RECTOFF2,RECTOFF2, 0,1, RECTOFF1,RECTOFF2, 0,0, RECTOFF1,RECTOFF1};
 	if(antiAliasing) {
+		FLUSH_BUFFER();
 		vertexCoord[0] = x - RECTBORDER;
 		vertexCoord[1] = y - RECTBORDER;
 		vertexCoord[2] = x;
@@ -349,17 +371,16 @@ void rectanglexy(float x, float y, float w, float h) {
 		vertexCoord[17] = y - RECTBORDER;
 		vertexCoord[18] = x;
 		vertexCoord[19] = y;
+		memcpy(texCoord, t, sizeof(float) * 20);
 		glBindTexture(GL_TEXTURE_2D, rect_texture);
-		glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
-		glTexCoordPointer(2, GL_FLOAT, 0, t);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 	}
+	FLUSH_BUFFER();
 	if(prevImageId) {
 		glBindTexture(GL_TEXTURE_2D, 0);
 		prevImageId = 0;
 	}
-	VERTEX_COORD(x,y,w,h);
-	DRAWQ;
+	PUSH_QUAD(x,y,w,h,0,0,0);
 }
 
 /**
@@ -494,6 +515,7 @@ void smooth(bool smooth) {
  * @see colorf
  * */
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+	FLUSH_BUFFER();
 	glColor4ub(r,g,b,a);
 }
 
@@ -507,6 +529,7 @@ void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
  * @see color
  * */
 void colorf(float r, float g, float b, float a) {
+	FLUSH_BUFFER();
 	glColor4f(r,g,b,a);
 }
 
@@ -546,6 +569,7 @@ void clearScreen(bool enabled) {
  *  * cheetah.blendDetail - interesting effect, allows to use gray detail textures
  * */
 void blendMode(int mode) {
+	FLUSH_BUFFER();
 	switch(mode) {
 		case blend_alpha:
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -582,6 +606,7 @@ void blendMode(int mode) {
  *  * cheetah.GL_MAX
  * */
 void blendEquation(int mode) {
+	FLUSH_BUFFER();
 	glBlendEquation_(mode);
 }
 
@@ -609,6 +634,7 @@ void blendEquation(int mode) {
  *  * cheetah.GL_ONE_MINUS_DST_ALPHA
  * */
 void blendFunc(int sourcefactor, int destinationfactor) {
+	FLUSH_BUFFER();
 	glBlendFunc(sourcefactor, destinationfactor);
 }
 
@@ -666,8 +692,8 @@ void stencilOp(int fail, int zfail, int zpass) {
 }
 
 void drawToStencil() {
-	glStencilFunc (GL_NEVER, 0x0, 0x1);
-	glStencilOp(GL_REPLACE,GL_KEEP,GL_REPLACE);
+	glStencilFunc (GL_ALWAYS, 0x0, 0x1);
+	glStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
 }
 
 void drawUsingStencil() {

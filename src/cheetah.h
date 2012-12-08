@@ -25,7 +25,8 @@ IN THE SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <search.h>
+
+
 
 
 #ifdef __ANDROID_API__
@@ -35,6 +36,7 @@ IN THE SOFTWARE.
 #else
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <search.h>
 #endif
 
 #include "macros.h"
@@ -45,7 +47,9 @@ IN THE SOFTWARE.
 typedef unsigned char bool;
 unsigned char * loadfile(const char * filename, unsigned int * length);
 
+#ifdef _SDL_H
 extern SDL_Surface *screen;
+#endif
 
 void myError(const char *fmt, ...);
 
@@ -234,7 +238,10 @@ typedef struct Resource {
 } Resource;
 
 /*queue*/
+#ifdef _SDL_H
 SDL_mutex *resQueueMutex;
+#endif
+
 #define QDATA Resource
 	typedef struct node_t node_t, *node, *queue;
 	struct node_t {QDATA val; node prev, next;};
@@ -255,9 +262,12 @@ inline unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 inline void imageBind(Image * image);
 void initRenderer();
 
+#ifdef _SDL_H
 SDL_Event event;
-extern Uint32 rescaleTime;
-extern Uint32 globalTime;
+#endif
+
+extern unsigned rescaleTime;
+extern unsigned globalTime;
 extern double globalTimed;
 extern double globalTimeOffsetd;
 extern double globalGameSpeed;

@@ -21,19 +21,7 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-#include <math.h>
-#include "cheetah.h"
-#include "SOIL/SOIL.h"
-#include "render.h"
+/* Some Cheetah's tuning values */
 
-void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox, float oy) {
-	float scalex = w/p->w;
-	float scaley = h/p->h;
-	imageBind(p->image);
-	PUSH_QUAD_TEXTURE(x + p->x * scalex, y + p->y * scaley, p->aw * scalex, p->ah * scaley, a, ox, oy, p->tex);
-}
-
-void atlasDrawxy(Atlas *p, float x, float y, float w, float h) {
-	atlasDrawt(p, x, y, w, h,0,0,0);
-}
-
+/* Limit to virtual vertex buffer, after this limit engine flushes verticles */
+#define VERTEX_BUFFER_LIMIT 4096 /* 4096 verticles (=256 Kb) */

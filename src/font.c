@@ -86,19 +86,18 @@ float Font_Width(Font *f, register const char *str)
 	}\
 	while(0)
 #else 
-#define DRAW_CHAR \
-	do {\
-		VERTEX_QUERY(memstep + 8);\
-		texCoord[memstep] = texCoord[memstep+2] = ch->t[0];\
-		texCoord[memstep+1] = texCoord[memstep+7] = ch->t[1];\
-		texCoord[memstep+3] = texCoord[memstep+5] = ch->t[3];\
-		texCoord[memstep+4] = texCoord[memstep+6] = ch->t[2];\
+#define DRAW_CHAR do {\
+		if(vertexCounter >= VERTEX_BUFFER_LIMIT * 8) { FLUSH_BUFFER(); }\
+		texCoord[vertexCounter] = texCoord[vertexCounter+2] = ch->t[0];\
+		texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];\
+		texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];\
+		texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];\
 		w = ceil(x);\
-		vertexCoord[memstep] = vertexCoord[memstep+2] = ch->v[0] + w;\
-		vertexCoord[memstep+1] = vertexCoord[memstep+7] = ch->v[1] + h;\
-		vertexCoord[memstep+3] = vertexCoord[memstep+5] = ch->v[3] + h;\
-		vertexCoord[memstep+4] = vertexCoord[memstep+6] = ch->v[2] + w;\
-		memstep += 8;\
+		vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0] + w;\
+		vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;\
+		vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;\
+		vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6] = ch->v[2] + w;\
+		vertexCounter += 8;\
 		x += ch->w;\
 	}\
 	while(0)
@@ -150,6 +149,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 		maxw = maxw / currentFont->_scale * screenScale.scaleX;
 		if(maxw == .0) maxw = 0.0001;
 	}
+	FLUSH_BUFFER();
 	glPushMatrix();
 	if(!currentFont->scalable)
 	{
@@ -387,7 +387,7 @@ float fontGetInterval(Font *font) {
 void fontSetGlyph(Font *ptr, const char *line) {
 	static float cx2=0, cy2=0, x1=0, y1=0, x2=0, y2=0, cx1=0, cy1=0, w=0, h=0;
 	static unsigned int ch=0, ch2;
-	static unsigned char c[5];
+	static unsigned char char_string_buffer[9];
 	int i = 0, high=0, low=0, increment = 0;
 	FontChar * fch;
 	if(sscanf(line, "%d %f %f %f %f %f %f %f %f", &ch, &x1, &y1, &x2, &y2, &cx1, &cy1, &w, &h) == -1)
@@ -396,13 +396,13 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	while(ch) {
 		if(ch & 0xff000000)
 		{
-			c[i] = (ch & 0xff000000) >> 24;
+			char_string_buffer[i] = (ch & 0xff000000) >> 24;
 			i++;
 		}
 		ch <<= 8;
 	}
-	c[i] = 0;
-	UNICODE_TO_INT(c,0,increment)
+	char_string_buffer[i] = 0;
+	UNICODE_TO_INT(char_string_buffer, 0, increment)
 	else {
 		myError("character %d is out of range (high: %x, low: %x)", ch2, high, low);
 		return;
