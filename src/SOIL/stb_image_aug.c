@@ -519,11 +519,11 @@ const char *stbi_failure_reason(void)
    return failure_reason;
 }
 
-static int e(const char *str)
-{
-   failure_reason = str;
-   return 0;
-}
+// static int e(const char *str)
+// {
+//    failure_reason = str;
+//    return 0;
+// }
 
 // e - error
 // epf - error returning pointer to float
@@ -2982,7 +2982,7 @@ static int shiftsigned(int v, int shift, int bits)
 static stbi_uc *bmp_load(stbi *s, int *x, int *y, int *comp, int req_comp)
 {
    uint8 *out;
-   unsigned int mr=0,mg=0,mb=0,ma=0, fake_a=0;
+   unsigned int mr=0,mg=0,mb=0,ma=0/*, fake_a=0*/;
    stbi_uc pal[256][4];
    int psize=0,i,j,compress=0,width;
    int bpp, flip_vertically, pad, target, offset, hsz;
@@ -3031,7 +3031,7 @@ static stbi_uc *bmp_load(stbi *s, int *x, int *y, int *comp, int req_comp)
 				  mg = 0xffu <<  8;
 				  mb = 0xffu <<  0;
 				  ma = 0xffu << 24;
-				  fake_a = 1; // @TODO: check for cases like alpha value is all 0 and switch it to 255
+				  //fake_a = 1; // @TODO: check for cases like alpha value is all 0 and switch it to 255
 			   } else {
 				  mr = 31u << 10;
 				  mg = 31u <<  5;
@@ -3578,12 +3578,12 @@ stbi_uc *dds_load(stbi *s, int *x, int *y, int *comp, int req_comp)
 	stbi_uc *dds_data = s->img_buffer_original;
 //	stbi_uc block[16*4];
 //	stbi_uc compressed[8];
-	int flags, DXT_family;
+	int flags/*, DXT_family*/;
 //	int has_alpha, has_mipmap;
 //	int is_compressed, cubemap_faces;
 //	int block_pitch, num_blocks;
 	DDS_header header;
-	int i/*, sz, cf*/;
+//	int i, sz, cf;
 	//	load the header
 	if( sizeof( DDS_header ) != 128 )
 	{
@@ -3593,18 +3593,18 @@ stbi_uc *dds_load(stbi *s, int *x, int *y, int *comp, int req_comp)
 //	printf("s->img_buffer_original %x\n", header.dwMagic);
 //	printf("s->img_buffer_original %x\n", header.dwSize);
 	//	and do some checking
-	if( header.dwMagic != (('D' << 0) | ('D' << 8) | ('S' << 16) | (' ' << 24)) ) return 1;
-	if( header.dwSize != 124 ) return 2;
+	if( header.dwMagic != (('D' << 0) | ('D' << 8) | ('S' << 16) | (' ' << 24)) ) return NULL;
+	if( header.dwSize != 124 ) return NULL;
 	flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-	if( (header.dwFlags & flags) != flags ) return 3;
+	if( (header.dwFlags & flags) != flags ) return NULL;
 	/*	According to the MSDN spec, the dwFlags should contain
 		DDSD_LINEARSIZE if it's compressed, or DDSD_PITCH if
 		uncompressed.  Some DDS writers do not conform to the
 		spec, so I need to make my reader more tolerant	*/
-	if( header.sPixelFormat.dwSize != 32 ) return 4;
+	if( header.sPixelFormat.dwSize != 32 ) return NULL;
 	flags = DDPF_FOURCC | DDPF_RGB;
-	if( (header.sPixelFormat.dwFlags & flags) == 0 ) return 5;
-	if( (header.sCaps.dwCaps1 & DDSCAPS_TEXTURE) == 0 ) return 6;
+	if( (header.sPixelFormat.dwFlags & flags) == 0 ) return NULL;
+	if( (header.sCaps.dwCaps1 & DDSCAPS_TEXTURE) == 0 ) return NULL;
 	//	get the image data
 	s->img_x = header.dwWidth;
 	s->img_y = header.dwHeight;
