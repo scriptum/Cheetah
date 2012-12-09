@@ -158,7 +158,7 @@ void generateImage(Image *ptr, int w, int h, const char *imageType, const char *
 	generatorOptions.linear = 1;
 	generatorOptions.alpha = 0;
 	generatorOptions.smooth = 0;
-	NEDED_INIT;
+	NEDED_INIT_VOID;
 	if(ptr) {
 		imageData.data = NULL;
 		while(*options)

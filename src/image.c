@@ -26,31 +26,13 @@ IN THE SOFTWARE.
 #include "SOIL/SOIL.h"
 #include "render.h"
 
-inline unsigned char * loadImageData(const char *name, int *width, int *height, int *channels)
-{
-	unsigned int file_size;
-	unsigned char *img;
-	unsigned char *myBuf;
-	NEDED_INIT;
-	myBuf = loadfile(name, &file_size);
-	if(!myBuf)
-	{
-		MYERROR("cannot load image: empty file %s", name);
-		return NULL;
-	}
-	img = SOIL_load_image_from_memory(
-				myBuf, sizeof(unsigned char) * file_size,
-				width, height, channels,
-				0 );
-	delete(myBuf);
-	return img;
-}
-
 inline unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels)
 {
 	unsigned int tex_id;
 	NEDED_INIT;
-	tex_id = SOIL_internal_create_OGL_texture(
+	tex_id = SOIL_direct_load_DDS_from_memory(img,0,0,0);
+	if(!tex_id)
+		tex_id = SOIL_internal_create_OGL_texture(
 			img, width, height, channels,
 			0, SOIL_FLAG_TEXTURE_REPEATS,
 			GL_TEXTURE_2D, GL_TEXTURE_2D,
@@ -67,6 +49,28 @@ inline unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 /**
  * Threaded image loader
  * */
+
+/* Load image in separate thread (if specified) */
+inline unsigned char * loadImageData(const char *name, int *width, int *height, int *channels)
+{
+	unsigned int file_size;
+	unsigned char *img;
+	unsigned char *myBuf;
+	NEDED_INIT;
+	myBuf = loadfile(name, &file_size);
+	if(!myBuf)
+	{
+		MYERROR("cannot load image: empty file %s", name);
+		return NULL;
+	}
+	img = SOIL_load_image_from_memory(
+				myBuf, sizeof(unsigned char) * file_size,
+				width, height, channels,
+				0 );
+	if(img != myBuf)
+		delete(myBuf);
+	return img;
+}
 
 inline queue newQueue()
 {
@@ -229,7 +233,7 @@ void newImageOpt(Image* ptr, const char *name, const char *options) {
 	unsigned int tex_id;
 	unsigned char *img;
 	unsigned char *img_mask;
-	NEDED_INIT;
+	NEDED_INIT_VOID;
 	if(!name)
 	{
 		MYERROR("empty filename");
