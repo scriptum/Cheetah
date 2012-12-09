@@ -12,4 +12,10 @@ x86_64)
   MACHINE_NAME=
   ;;
 esac
+if [ "debug" != "$1" ]
+then
+	export LDFLAGS=-s
+else
+	export CFLAGS=-g
+fi
 make && mv libcheetah.so $DIR/bin/linux$MACHINE_NAME/libcheetah.so

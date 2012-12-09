@@ -1,6 +1,5 @@
 #!/bin/sh
 DIR=./bin/Release
-FAIL=0
 whereis i586-mingw32msvc-gcc | grep / > /dev/null
 if [ $? = "1" ]
 then
@@ -17,4 +16,10 @@ else
 fi
 
 export CC=$MINGWGCC
+if [ "debug" != "$1" ]
+then
+	export LDFLAGS=-s
+else
+	export CFLAGS=-g
+fi
 make && mv libcheetah.so $DIR/bin/win32/cheetah.dll
