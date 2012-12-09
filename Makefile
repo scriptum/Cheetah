@@ -14,6 +14,7 @@ $(TARGET) : $(OBJECTS)
 
 
 %.o : %.c $(INCLUDES)
+	@echo "Building $<";\
 	$(CC) $(CFLAGS) $(RESFLAGS) -o "$@" -c "$<"
 
 .PHONY : clean
