@@ -130,7 +130,7 @@ enum{
 static int has_NPOT_capability = SOIL_CAPABILITY_UNKNOWN;
 int query_NPOT_capability( void );
 /*	for texture rectangles	*/
-static int has_tex_rectangle_capability = SOIL_CAPABILITY_UNKNOWN;
+//static int has_tex_rectangle_capability = SOIL_CAPABILITY_UNKNOWN;
 //~ int query_tex_rectangle_capability( void );
 #define SOIL_TEXTURE_RECTANGLE_ARB				0x84F5
 #define SOIL_MAX_RECTANGLE_TEXTURE_SIZE_ARB		0x84F8
@@ -148,12 +148,12 @@ unsigned int SOIL_direct_load_DDS(
 		unsigned int reuse_texture_ID,
 		int flags,
 		int loading_as_cubemap );
-unsigned int SOIL_direct_load_DDS_from_memory(
-		const unsigned char *const buffer,
-		int buffer_length,
-		unsigned int reuse_texture_ID,
-		int flags,
-		int loading_as_cubemap );
+//unsigned int SOIL_direct_load_DDS_from_memory(
+//		const unsigned char *const buffer,
+//		int buffer_length,
+//		unsigned int reuse_texture_ID,
+//		int flags,
+//		int loading_as_cubemap );
 /*	other functions	*/
 
 
@@ -262,738 +262,63 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 	//~ return tex_id;
 //~ }
 
-unsigned int
-	SOIL_load_OGL_texture_from_memory
-	(
-		const unsigned char *const buffer,
-		int buffer_length,
-		int force_channels,
-		unsigned int reuse_texture_ID,
-		unsigned int flags
-	)
-{
-	/*	variables	*/
-	unsigned char* img;
-	int width, height, channels;
-	unsigned int tex_id;
-	/*	does the user want direct uploading of the image as a DDS file?	*/
-	if( flags & SOIL_FLAG_DDS_LOAD_DIRECT )
-	{
-		/*	1st try direct loading of the image as a DDS file
-			note: direct uploading will only load what is in the
-			DDS file, no MIPmaps will be generated, the image will
-			not be flipped, etc.	*/
-		tex_id = SOIL_direct_load_DDS_from_memory(
-				buffer, buffer_length,
-				reuse_texture_ID, flags, 0 );
-		if( tex_id )
-		{
-			/*	hey, it worked!!	*/
-			return tex_id;
-		}
-	}
-	/*	try to load the image	*/
-	img = SOIL_load_image_from_memory(
-					buffer, buffer_length,
-					&width, &height, &channels,
-					force_channels );
-	/*	channels holds the original number of channels, which may have been forced	*/
-	if( (force_channels >= 1) && (force_channels <= 4) )
-	{
-		channels = force_channels;
-	}
-	if( NULL == img )
-	{
-		/*	image loading failed	*/
-		result_string_pointer = stbi_failure_reason();
-		return 0;
-	}
-	/*	OK, make it a texture!	*/
-	tex_id = SOIL_internal_create_OGL_texture(
-			img, width, height, channels,
-			reuse_texture_ID, flags,
-			GL_TEXTURE_2D, GL_TEXTURE_2D,
-			GL_MAX_TEXTURE_SIZE );
-	/*	and nuke the image data	*/
-	SOIL_free_image_data( img );
-	/*	and return the handle, such as it is	*/
-	return tex_id;
-}
-
-//~ unsigned int
-	//~ SOIL_load_OGL_cubemap
-	//~ (
-		//~ const char *x_pos_file,
-		//~ const char *x_neg_file,
-		//~ const char *y_pos_file,
-		//~ const char *y_neg_file,
-		//~ const char *z_pos_file,
-		//~ const char *z_neg_file,
-		//~ int force_channels,
-		//~ unsigned int reuse_texture_ID,
-		//~ unsigned int flags
-	//~ )
-//~ {
-	//~ /*	variables	*/
-	//~ unsigned char* img;
-	//~ int width, height, channels;
-	//~ unsigned int tex_id;
-	//~ /*	error checking	*/
-	//~ if( (x_pos_file == NULL) ||
-		//~ (x_neg_file == NULL) ||
-		//~ (y_pos_file == NULL) ||
-		//~ (y_neg_file == NULL) ||
-		//~ (z_pos_file == NULL) ||
-		//~ (z_neg_file == NULL) )
-	//~ {
-		//~ result_string_pointer = "Invalid cube map files list";
-		//~ return 0;
-	//~ }
-	//~ /*	capability checking	*/
-	//~ if( query_cubemap_capability() != SOIL_CAPABILITY_PRESENT )
-	//~ {
-		//~ result_string_pointer = "No cube map capability present";
-		//~ return 0;
-	//~ }
-	//~ /*	1st face: try to load the image	*/
-	//~ img = SOIL_load_image( x_pos_file, &width, &height, &channels, force_channels );
-	//~ /*	channels holds the original number of channels, which may have been forced	*/
-	//~ if( (force_channels >= 1) && (force_channels <= 4) )
-	//~ {
-		//~ channels = force_channels;
-	//~ }
-	//~ if( NULL == img )
-	//~ {
-		//~ /*	image loading failed	*/
-		//~ result_string_pointer = stbi_failure_reason();
-		//~ return 0;
-	//~ }
-	//~ /*	upload the texture, and create a texture ID if necessary	*/
-	//~ tex_id = SOIL_internal_create_OGL_texture(
-			//~ img, width, height, channels,
-			//~ reuse_texture_ID, flags,
-			//~ SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_POSITIVE_X,
-			//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-	//~ /*	and nuke the image data	*/
-	//~ SOIL_free_image_data( img );
-	//~ /*	continue?	*/
-	//~ if( tex_id != 0 )
-	//~ {
-		//~ /*	1st face: try to load the image	*/
-		//~ img = SOIL_load_image( x_neg_file, &width, &height, &channels, force_channels );
-		//~ /*	channels holds the original number of channels, which may have been forced	*/
-		//~ if( (force_channels >= 1) && (force_channels <= 4) )
-		//~ {
-			//~ channels = force_channels;
-		//~ }
-		//~ if( NULL == img )
-		//~ {
-			//~ /*	image loading failed	*/
-			//~ result_string_pointer = stbi_failure_reason();
-			//~ return 0;
-		//~ }
-		//~ /*	upload the texture, but reuse the assigned texture ID	*/
-		//~ tex_id = SOIL_internal_create_OGL_texture(
-				//~ img, width, height, channels,
-				//~ tex_id, flags,
-				//~ SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-				//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-		//~ /*	and nuke the image data	*/
-		//~ SOIL_free_image_data( img );
-	//~ }
-	//~ /*	continue?	*/
-	//~ if( tex_id != 0 )
-	//~ {
-		//~ /*	1st face: try to load the image	*/
-		//~ img = SOIL_load_image( y_pos_file, &width, &height, &channels, force_channels );
-		//~ /*	channels holds the original number of channels, which may have been forced	*/
-		//~ if( (force_channels >= 1) && (force_channels <= 4) )
-		//~ {
-			//~ channels = force_channels;
-		//~ }
-		//~ if( NULL == img )
-		//~ {
-			//~ /*	image loading failed	*/
-			//~ result_string_pointer = stbi_failure_reason();
-			//~ return 0;
-		//~ }
-		//~ /*	upload the texture, but reuse the assigned texture ID	*/
-		//~ tex_id = SOIL_internal_create_OGL_texture(
-				//~ img, width, height, channels,
-				//~ tex_id, flags,
-				//~ SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-				//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-		//~ /*	and nuke the image data	*/
-		//~ SOIL_free_image_data( img );
-	//~ }
-	//~ /*	continue?	*/
-	//~ if( tex_id != 0 )
-	//~ {
-		//~ /*	1st face: try to load the image	*/
-		//~ img = SOIL_load_image( y_neg_file, &width, &height, &channels, force_channels );
-		//~ /*	channels holds the original number of channels, which may have been forced	*/
-		//~ if( (force_channels >= 1) && (force_channels <= 4) )
-		//~ {
-			//~ channels = force_channels;
-		//~ }
-		//~ if( NULL == img )
-		//~ {
-			//~ /*	image loading failed	*/
-			//~ result_string_pointer = stbi_failure_reason();
-			//~ return 0;
-		//~ }
-		//~ /*	upload the texture, but reuse the assigned texture ID	*/
-		//~ tex_id = SOIL_internal_create_OGL_texture(
-				//~ img, width, height, channels,
-				//~ tex_id, flags,
-				//~ SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-				//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-		//~ /*	and nuke the image data	*/
-		//~ SOIL_free_image_data( img );
-	//~ }
-	//~ /*	continue?	*/
-	//~ if( tex_id != 0 )
-	//~ {
-		//~ /*	1st face: try to load the image	*/
-		//~ img = SOIL_load_image( z_pos_file, &width, &height, &channels, force_channels );
-		//~ /*	channels holds the original number of channels, which may have been forced	*/
-		//~ if( (force_channels >= 1) && (force_channels <= 4) )
-		//~ {
-			//~ channels = force_channels;
-		//~ }
-		//~ if( NULL == img )
-		//~ {
-			//~ /*	image loading failed	*/
-			//~ result_string_pointer = stbi_failure_reason();
-			//~ return 0;
-		//~ }
-		//~ /*	upload the texture, but reuse the assigned texture ID	*/
-		//~ tex_id = SOIL_internal_create_OGL_texture(
-				//~ img, width, height, channels,
-				//~ tex_id, flags,
-				//~ SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-				//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-		//~ /*	and nuke the image data	*/
-		//~ SOIL_free_image_data( img );
-	//~ }
-	//~ /*	continue?	*/
-	//~ if( tex_id != 0 )
-	//~ {
-		//~ /*	1st face: try to load the image	*/
-		//~ img = SOIL_load_image( z_neg_file, &width, &height, &channels, force_channels );
-		//~ /*	channels holds the original number of channels, which may have been forced	*/
-		//~ if( (force_channels >= 1) && (force_channels <= 4) )
-		//~ {
-			//~ channels = force_channels;
-		//~ }
-		//~ if( NULL == img )
-		//~ {
-			//~ /*	image loading failed	*/
-			//~ result_string_pointer = stbi_failure_reason();
-			//~ return 0;
-		//~ }
-		//~ /*	upload the texture, but reuse the assigned texture ID	*/
-		//~ tex_id = SOIL_internal_create_OGL_texture(
-				//~ img, width, height, channels,
-				//~ tex_id, flags,
-				//~ SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-				//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-		//~ /*	and nuke the image data	*/
-		//~ SOIL_free_image_data( img );
-	//~ }
-	//~ /*	and return the handle, such as it is	*/
-	//~ return tex_id;
-//~ }
-//~ 
-//~ unsigned int
-	//~ SOIL_load_OGL_cubemap_from_memory
-	//~ (
-		//~ const unsigned char *const x_pos_buffer,
-		//~ int x_pos_buffer_length,
-		//~ const unsigned char *const x_neg_buffer,
-		//~ int x_neg_buffer_length,
-		//~ const unsigned char *const y_pos_buffer,
-		//~ int y_pos_buffer_length,
-		//~ const unsigned char *const y_neg_buffer,
-		//~ int y_neg_buffer_length,
-		//~ const unsigned char *const z_pos_buffer,
-		//~ int z_pos_buffer_length,
-		//~ const unsigned char *const z_neg_buffer,
-		//~ int z_neg_buffer_length,
-		//~ int force_channels,
-		//~ unsigned int reuse_texture_ID,
-		//~ unsigned int flags
-	//~ )
-//~ {
-	//~ /*	variables	*/
-	//~ unsigned char* img;
-	//~ int width, height, channels;
-	//~ unsigned int tex_id;
-	//~ /*	error checking	*/
-	//~ if( (x_pos_buffer == NULL) ||
-		//~ (x_neg_buffer == NULL) ||
-		//~ (y_pos_buffer == NULL) ||
-		//~ (y_neg_buffer == NULL) ||
-		//~ (z_pos_buffer == NULL) ||
-		//~ (z_neg_buffer == NULL) )
-	//~ {
-		//~ result_string_pointer = "Invalid cube map buffers list";
-		//~ return 0;
-	//~ }
-	//~ /*	capability checking	*/
-	//~ if( query_cubemap_capability() != SOIL_CAPABILITY_PRESENT )
-	//~ {
-		//~ result_string_pointer = "No cube map capability present";
-		//~ return 0;
-	//~ }
-	//~ /*	1st face: try to load the image	*/
-	//~ img = SOIL_load_image_from_memory(
-			//~ x_pos_buffer, x_pos_buffer_length,
-			//~ &width, &height, &channels, force_channels );
-	//~ /*	channels holds the original number of channels, which may have been forced	*/
-	//~ if( (force_channels >= 1) && (force_channels <= 4) )
-	//~ {
-		//~ channels = force_channels;
-	//~ }
-	//~ if( NULL == img )
-	//~ {
-		//~ /*	image loading failed	*/
-		//~ result_string_pointer = stbi_failure_reason();
-		//~ return 0;
-	//~ }
-	//~ /*	upload the texture, and create a texture ID if necessary	*/
-	//~ tex_id = SOIL_internal_create_OGL_texture(
-			//~ img, width, height, channels,
-			//~ reuse_texture_ID, flags,
-			//~ SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_POSITIVE_X,
-			//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-	//~ /*	and nuke the image data	*/
-	//~ SOIL_free_image_data( img );
-	//~ /*	continue?	*/
-	//~ if( tex_id != 0 )
-	//~ {
-		//~ /*	1st face: try to load the image	*/
-		//~ img = SOIL_load_image_from_memory(
-				//~ x_neg_buffer, x_neg_buffer_length,
-				//~ &width, &height, &channels, force_channels );
-		//~ /*	channels holds the original number of channels, which may have been forced	*/
-		//~ if( (force_channels >= 1) && (force_channels <= 4) )
-		//~ {
-			//~ channels = force_channels;
-		//~ }
-		//~ if( NULL == img )
-		//~ {
-			//~ /*	image loading failed	*/
-			//~ result_string_pointer = stbi_failure_reason();
-			//~ return 0;
-		//~ }
-		//~ /*	upload the texture, but reuse the assigned texture ID	*/
-		//~ tex_id = SOIL_internal_create_OGL_texture(
-				//~ img, width, height, channels,
-				//~ tex_id, flags,
-				//~ SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-				//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-		//~ /*	and nuke the image data	*/
-		//~ SOIL_free_image_data( img );
-	//~ }
-	//~ /*	continue?	*/
-	//~ if( tex_id != 0 )
-	//~ {
-		//~ /*	1st face: try to load the image	*/
-		//~ img = SOIL_load_image_from_memory(
-				//~ y_pos_buffer, y_pos_buffer_length,
-				//~ &width, &height, &channels, force_channels );
-		//~ /*	channels holds the original number of channels, which may have been forced	*/
-		//~ if( (force_channels >= 1) && (force_channels <= 4) )
-		//~ {
-			//~ channels = force_channels;
-		//~ }
-		//~ if( NULL == img )
-		//~ {
-			//~ /*	image loading failed	*/
-			//~ result_string_pointer = stbi_failure_reason();
-			//~ return 0;
-		//~ }
-		//~ /*	upload the texture, but reuse the assigned texture ID	*/
-		//~ tex_id = SOIL_internal_create_OGL_texture(
-				//~ img, width, height, channels,
-				//~ tex_id, flags,
-				//~ SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-				//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-		//~ /*	and nuke the image data	*/
-		//~ SOIL_free_image_data( img );
-	//~ }
-	//~ /*	continue?	*/
-	//~ if( tex_id != 0 )
-	//~ {
-		//~ /*	1st face: try to load the image	*/
-		//~ img = SOIL_load_image_from_memory(
-				//~ y_neg_buffer, y_neg_buffer_length,
-				//~ &width, &height, &channels, force_channels );
-		//~ /*	channels holds the original number of channels, which may have been forced	*/
-		//~ if( (force_channels >= 1) && (force_channels <= 4) )
-		//~ {
-			//~ channels = force_channels;
-		//~ }
-		//~ if( NULL == img )
-		//~ {
-			//~ /*	image loading failed	*/
-			//~ result_string_pointer = stbi_failure_reason();
-			//~ return 0;
-		//~ }
-		//~ /*	upload the texture, but reuse the assigned texture ID	*/
-		//~ tex_id = SOIL_internal_create_OGL_texture(
-				//~ img, width, height, channels,
-				//~ tex_id, flags,
-				//~ SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-				//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-		//~ /*	and nuke the image data	*/
-		//~ SOIL_free_image_data( img );
-	//~ }
-	//~ /*	continue?	*/
-	//~ if( tex_id != 0 )
-	//~ {
-		//~ /*	1st face: try to load the image	*/
-		//~ img = SOIL_load_image_from_memory(
-				//~ z_pos_buffer, z_pos_buffer_length,
-				//~ &width, &height, &channels, force_channels );
-		//~ /*	channels holds the original number of channels, which may have been forced	*/
-		//~ if( (force_channels >= 1) && (force_channels <= 4) )
-		//~ {
-			//~ channels = force_channels;
-		//~ }
-		//~ if( NULL == img )
-		//~ {
-			//~ /*	image loading failed	*/
-			//~ result_string_pointer = stbi_failure_reason();
-			//~ return 0;
-		//~ }
-		//~ /*	upload the texture, but reuse the assigned texture ID	*/
-		//~ tex_id = SOIL_internal_create_OGL_texture(
-				//~ img, width, height, channels,
-				//~ tex_id, flags,
-				//~ SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-				//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-		//~ /*	and nuke the image data	*/
-		//~ SOIL_free_image_data( img );
-	//~ }
-	//~ /*	continue?	*/
-	//~ if( tex_id != 0 )
-	//~ {
-		//~ /*	1st face: try to load the image	*/
-		//~ img = SOIL_load_image_from_memory(
-				//~ z_neg_buffer, z_neg_buffer_length,
-				//~ &width, &height, &channels, force_channels );
-		//~ /*	channels holds the original number of channels, which may have been forced	*/
-		//~ if( (force_channels >= 1) && (force_channels <= 4) )
-		//~ {
-			//~ channels = force_channels;
-		//~ }
-		//~ if( NULL == img )
-		//~ {
-			//~ /*	image loading failed	*/
-			//~ result_string_pointer = stbi_failure_reason();
-			//~ return 0;
-		//~ }
-		//~ /*	upload the texture, but reuse the assigned texture ID	*/
-		//~ tex_id = SOIL_internal_create_OGL_texture(
-				//~ img, width, height, channels,
-				//~ tex_id, flags,
-				//~ SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-				//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-		//~ /*	and nuke the image data	*/
-		//~ SOIL_free_image_data( img );
-	//~ }
-	//~ /*	and return the handle, such as it is	*/
-	//~ return tex_id;
-//~ }
-//~ 
-//~ unsigned int
-	//~ SOIL_load_OGL_single_cubemap
-	//~ (
-		//~ const char *filename,
-		//~ const char face_order[6],
-		//~ int force_channels,
-		//~ unsigned int reuse_texture_ID,
-		//~ unsigned int flags
-	//~ )
-//~ {
-	//~ /*	variables	*/
-	//~ unsigned char* img;
-	//~ int width, height, channels, i;
-	//~ unsigned int tex_id = 0;
-	//~ /*	error checking	*/
-	//~ if( filename == NULL )
-	//~ {
-		//~ result_string_pointer = "Invalid single cube map file name";
-		//~ return 0;
-	//~ }
-	//~ /*	does the user want direct uploading of the image as a DDS file?	*/
-	//~ if( flags & SOIL_FLAG_DDS_LOAD_DIRECT )
-	//~ {
-		//~ /*	1st try direct loading of the image as a DDS file
-			//~ note: direct uploading will only load what is in the
-			//~ DDS file, no MIPmaps will be generated, the image will
-			//~ not be flipped, etc.	*/
-		//~ tex_id = SOIL_direct_load_DDS( filename, reuse_texture_ID, flags, 1 );
-		//~ if( tex_id )
-		//~ {
-			//~ /*	hey, it worked!!	*/
-			//~ return tex_id;
-		//~ }
-	//~ }
-	//~ /*	face order checking	*/
-	//~ for( i = 0; i < 6; ++i )
-	//~ {
-		//~ if( (face_order[i] != 'N') &&
-			//~ (face_order[i] != 'S') &&
-			//~ (face_order[i] != 'W') &&
-			//~ (face_order[i] != 'E') &&
-			//~ (face_order[i] != 'U') &&
-			//~ (face_order[i] != 'D') )
-		//~ {
-			//~ result_string_pointer = "Invalid single cube map face order";
-			//~ return 0;
-		//~ };
-	//~ }
-	//~ /*	capability checking	*/
-	//~ if( query_cubemap_capability() != SOIL_CAPABILITY_PRESENT )
-	//~ {
-		//~ result_string_pointer = "No cube map capability present";
-		//~ return 0;
-	//~ }
-	//~ /*	1st off, try to load the full image	*/
-	//~ img = SOIL_load_image( filename, &width, &height, &channels, force_channels );
-	//~ /*	channels holds the original number of channels, which may have been forced	*/
-	//~ if( (force_channels >= 1) && (force_channels <= 4) )
-	//~ {
-		//~ channels = force_channels;
-	//~ }
-	//~ if( NULL == img )
-	//~ {
-		//~ /*	image loading failed	*/
-		//~ result_string_pointer = stbi_failure_reason();
-		//~ return 0;
-	//~ }
-	//~ /*	now, does this image have the right dimensions?	*/
-	//~ if( (width != 6*height) &&
-		//~ (6*width != height) )
-	//~ {
-		//~ SOIL_free_image_data( img );
-		//~ result_string_pointer = "Single cubemap image must have a 6:1 ratio";
-		//~ return 0;
-	//~ }
-	//~ /*	try the image split and create	*/
-	//~ tex_id = SOIL_create_OGL_single_cubemap(
-			//~ img, width, height, channels,
-			//~ face_order, reuse_texture_ID, flags
-			//~ );
-	//~ /*	nuke the temporary image data and return the texture handle	*/
-	//~ SOIL_free_image_data( img );
-	//~ return tex_id;
-//~ }
-//~ 
-//~ unsigned int
-	//~ SOIL_load_OGL_single_cubemap_from_memory
-	//~ (
-		//~ const unsigned char *const buffer,
-		//~ int buffer_length,
-		//~ const char face_order[6],
-		//~ int force_channels,
-		//~ unsigned int reuse_texture_ID,
-		//~ unsigned int flags
-	//~ )
-//~ {
-	//~ /*	variables	*/
-	//~ unsigned char* img;
-	//~ int width, height, channels, i;
-	//~ unsigned int tex_id = 0;
-	//~ /*	error checking	*/
-	//~ if( buffer == NULL )
-	//~ {
-		//~ result_string_pointer = "Invalid single cube map buffer";
-		//~ return 0;
-	//~ }
-	//~ /*	does the user want direct uploading of the image as a DDS file?	*/
-	//~ if( flags & SOIL_FLAG_DDS_LOAD_DIRECT )
-	//~ {
-		//~ /*	1st try direct loading of the image as a DDS file
-			//~ note: direct uploading will only load what is in the
-			//~ DDS file, no MIPmaps will be generated, the image will
-			//~ not be flipped, etc.	*/
-		//~ tex_id = SOIL_direct_load_DDS_from_memory(
-				//~ buffer, buffer_length,
-				//~ reuse_texture_ID, flags, 1 );
-		//~ if( tex_id )
-		//~ {
-			//~ /*	hey, it worked!!	*/
-			//~ return tex_id;
-		//~ }
-	//~ }
-	//~ /*	face order checking	*/
-	//~ for( i = 0; i < 6; ++i )
-	//~ {
-		//~ if( (face_order[i] != 'N') &&
-			//~ (face_order[i] != 'S') &&
-			//~ (face_order[i] != 'W') &&
-			//~ (face_order[i] != 'E') &&
-			//~ (face_order[i] != 'U') &&
-			//~ (face_order[i] != 'D') )
-		//~ {
-			//~ result_string_pointer = "Invalid single cube map face order";
-			//~ return 0;
-		//~ };
-	//~ }
-	//~ /*	capability checking	*/
-	//~ if( query_cubemap_capability() != SOIL_CAPABILITY_PRESENT )
-	//~ {
-		//~ result_string_pointer = "No cube map capability present";
-		//~ return 0;
-	//~ }
-	//~ /*	1st off, try to load the full image	*/
-	//~ img = SOIL_load_image_from_memory(
-			//~ buffer, buffer_length,
-			//~ &width, &height, &channels,
-			//~ force_channels );
-	//~ /*	channels holds the original number of channels, which may have been forced	*/
-	//~ if( (force_channels >= 1) && (force_channels <= 4) )
-	//~ {
-		//~ channels = force_channels;
-	//~ }
-	//~ if( NULL == img )
-	//~ {
-		//~ /*	image loading failed	*/
-		//~ result_string_pointer = stbi_failure_reason();
-		//~ return 0;
-	//~ }
-	//~ /*	now, does this image have the right dimensions?	*/
-	//~ if( (width != 6*height) &&
-		//~ (6*width != height) )
-	//~ {
-		//~ SOIL_free_image_data( img );
-		//~ result_string_pointer = "Single cubemap image must have a 6:1 ratio";
-		//~ return 0;
-	//~ }
-	//~ /*	try the image split and create	*/
-	//~ tex_id = SOIL_create_OGL_single_cubemap(
-			//~ img, width, height, channels,
-			//~ face_order, reuse_texture_ID, flags
-			//~ );
-	//~ /*	nuke the temporary image data and return the texture handle	*/
-	//~ SOIL_free_image_data( img );
-	//~ return tex_id;
-//~ }
-//~ 
-//~ unsigned int
-	//~ SOIL_create_OGL_single_cubemap
-	//~ (
-		//~ const unsigned char *const data,
-		//~ int width, int height, int channels,
-		//~ const char face_order[6],
-		//~ unsigned int reuse_texture_ID,
-		//~ unsigned int flags
-	//~ )
-//~ {
-	//~ /*	variables	*/
-	//~ unsigned char* sub_img;
-	//~ int dw, dh, sz, i;
-	//~ unsigned int tex_id;
-	//~ /*	error checking	*/
-	//~ if( data == NULL )
-	//~ {
-		//~ result_string_pointer = "Invalid single cube map image data";
-		//~ return 0;
-	//~ }
-	//~ /*	face order checking	*/
-	//~ for( i = 0; i < 6; ++i )
-	//~ {
-		//~ if( (face_order[i] != 'N') &&
-			//~ (face_order[i] != 'S') &&
-			//~ (face_order[i] != 'W') &&
-			//~ (face_order[i] != 'E') &&
-			//~ (face_order[i] != 'U') &&
-			//~ (face_order[i] != 'D') )
-		//~ {
-			//~ result_string_pointer = "Invalid single cube map face order";
-			//~ return 0;
-		//~ };
-	//~ }
-	//~ /*	capability checking	*/
-	//~ if( query_cubemap_capability() != SOIL_CAPABILITY_PRESENT )
-	//~ {
-		//~ result_string_pointer = "No cube map capability present";
-		//~ return 0;
-	//~ }
-	//~ /*	now, does this image have the right dimensions?	*/
-	//~ if( (width != 6*height) &&
-		//~ (6*width != height) )
-	//~ {
-		//~ result_string_pointer = "Single cubemap image must have a 6:1 ratio";
-		//~ return 0;
-	//~ }
-	//~ /*	which way am I stepping?	*/
-	//~ if( width > height )
-	//~ {
-		//~ dw = height;
-		//~ dh = 0;
-	//~ } else
-	//~ {
-		//~ dw = 0;
-		//~ dh = width;
-	//~ }
-	//~ sz = dw+dh;
-	//~ sub_img = (unsigned char *)malloc( sz*sz*channels );
-	//~ /*	do the splitting and uploading	*/
-	//~ tex_id = reuse_texture_ID;
-	//~ for( i = 0; i < 6; ++i )
-	//~ {
-		//~ int x, y, idx = 0;
-		//~ unsigned int cubemap_target = 0;
-		//~ /*	copy in the sub-image	*/
-		//~ for( y = i*dh; y < i*dh+sz; ++y )
-		//~ {
-			//~ for( x = i*dw*channels; x < (i*dw+sz)*channels; ++x )
-			//~ {
-				//~ sub_img[idx++] = data[y*width*channels+x];
-			//~ }
-		//~ }
-		//~ /*	what is my texture target?
-			//~ remember, this coordinate system is
-			//~ LHS if viewed from inside the cube!	*/
-		//~ switch( face_order[i] )
-		//~ {
-		//~ case 'N':
-			//~ cubemap_target = SOIL_TEXTURE_CUBE_MAP_POSITIVE_Z;
-			//~ break;
-		//~ case 'S':
-			//~ cubemap_target = SOIL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
-			//~ break;
-		//~ case 'W':
-			//~ cubemap_target = SOIL_TEXTURE_CUBE_MAP_NEGATIVE_X;
-			//~ break;
-		//~ case 'E':
-			//~ cubemap_target = SOIL_TEXTURE_CUBE_MAP_POSITIVE_X;
-			//~ break;
-		//~ case 'U':
-			//~ cubemap_target = SOIL_TEXTURE_CUBE_MAP_POSITIVE_Y;
-			//~ break;
-		//~ case 'D':
-			//~ cubemap_target = SOIL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
-			//~ break;
-		//~ }
-		//~ /*	upload it as a texture	*/
-		//~ tex_id = SOIL_internal_create_OGL_texture(
-				//~ sub_img, sz, sz, channels,
-				//~ tex_id, flags,
-				//~ SOIL_TEXTURE_CUBE_MAP,
-				//~ cubemap_target,
-				//~ SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
-	//~ }
-	//~ /*	and nuke the image and sub-image data	*/
-	//~ SOIL_free_image_data( sub_img );
-	//~ /*	and return the handle, such as it is	*/
-	//~ return tex_id;
-//~ }
+//unsigned int
+//	SOIL_load_OGL_texture_from_memory
+//	(
+//		const unsigned char *const buffer,
+//		int buffer_length,
+//		int force_channels,
+//		unsigned int reuse_texture_ID,
+//		unsigned int flags
+//	)
+//{
+//	/*	variables	*/
+//	unsigned char* img;
+//	int width, height, channels;
+//	unsigned int tex_id;
+//	/*	does the user want direct uploading of the image as a DDS file?	*/
+//	//~ if( flags & SOIL_FLAG_DDS_LOAD_DIRECT )
+//	{
+//		/*	1st try direct loading of the image as a DDS file
+//			note: direct uploading will only load what is in the
+//			DDS file, no MIPmaps will be generated, the image will
+//			not be flipped, etc.	*/
+//		tex_id = SOIL_direct_load_DDS_from_memory(
+//				buffer, buffer_length,
+//				reuse_texture_ID, flags, 0 );
+//		if( tex_id )
+//		{
+//			/*	hey, it worked!!	*/
+//			return tex_id;
+//		}
+//	}
+//	/*	try to load the image	*/
+//	img = SOIL_load_image_from_memory(
+//					buffer, buffer_length,
+//					&width, &height, &channels,
+//					force_channels );
+//	/*	channels holds the original number of channels, which may have been forced	*/
+//	if( (force_channels >= 1) && (force_channels <= 4) )
+//	{
+//		channels = force_channels;
+//	}
+//	if( NULL == img )
+//	{
+//		/*	image loading failed	*/
+//		result_string_pointer = stbi_failure_reason();
+//		return 0;
+//	}
+//	/*	OK, make it a texture!	*/
+//	tex_id = SOIL_internal_create_OGL_texture(
+//			img, width, height, channels,
+//			reuse_texture_ID, flags,
+//			GL_TEXTURE_2D, GL_TEXTURE_2D,
+//			GL_MAX_TEXTURE_SIZE );
+//	/*	and nuke the image data	*/
+//	SOIL_free_image_data( img );
+//	/*	and return the handle, such as it is	*/
+//	return tex_id;
+//}
 
 unsigned int
 	SOIL_create_OGL_texture
@@ -1265,40 +590,40 @@ unsigned int
 		glBindTexture( opengl_texture_type, tex_id );
 		check_for_GL_errors( "glBindTexture" );
 		/*  upload the main image	*/
-		if( DXT_mode == SOIL_CAPABILITY_PRESENT )
-		{
-			/*	user wants me to do the DXT conversion!	*/
-			int DDS_size;
-			unsigned char *DDS_data = NULL;
-			if( (channels & 1) == 1 )
-			{
-				/*	RGB, use DXT1	*/
-				DDS_data = convert_image_to_DXT1( img, width, height, channels, &DDS_size );
-			} else
-			{
-				/*	RGBA, use DXT5	*/
-				DDS_data = convert_image_to_DXT5( img, width, height, channels, &DDS_size );
-			}
-			if( DDS_data )
-			{
-				soilGlCompressedTexImage2D(
-					opengl_texture_target, 0,
-					internal_texture_format, width, height, 0,
-					DDS_size, DDS_data );
-				check_for_GL_errors( "glCompressedTexImage2D" );
-				SOIL_free_image_data( DDS_data );
-				/*	printf( "Internal DXT compressor\n" );	*/
-			} else
-			{
-				/*	my compression failed, try the OpenGL driver's version	*/
-				glTexImage2D(
-					opengl_texture_target, 0,
-					internal_texture_format, width, height, 0,
-					original_texture_format, GL_UNSIGNED_BYTE, img );
-				check_for_GL_errors( "glTexImage2D" );
-				/*	printf( "OpenGL DXT compressor\n" );	*/
-			}
-		} else
+		//~ if( DXT_mode == SOIL_CAPABILITY_PRESENT )
+		//~ {
+			//~ /*	user wants me to do the DXT conversion!	*/
+			//~ int DDS_size;
+			//~ unsigned char *DDS_data = NULL;
+			//~ if( (channels & 1) == 1 )
+			//~ {
+				//~ /*	RGB, use DXT1	*/
+				//~ DDS_data = convert_image_to_DXT1( img, width, height, channels, &DDS_size );
+			//~ } else
+			//~ {
+				//~ /*	RGBA, use DXT5	*/
+				//~ DDS_data = convert_image_to_DXT5( img, width, height, channels, &DDS_size );
+			//~ }
+			//~ if( DDS_data )
+			//~ {
+				//~ soilGlCompressedTexImage2D(
+					//~ opengl_texture_target, 0,
+					//~ internal_texture_format, width, height, 0,
+					//~ DDS_size, DDS_data );
+				//~ check_for_GL_errors( "glCompressedTexImage2D" );
+				//~ SOIL_free_image_data( DDS_data );
+				//~ /*	printf( "Internal DXT compressor\n" );	*/
+			//~ } else
+			//~ {
+				//~ /*	my compression failed, try the OpenGL driver's version	*/
+				//~ glTexImage2D(
+					//~ opengl_texture_target, 0,
+					//~ internal_texture_format, width, height, 0,
+					//~ original_texture_format, GL_UNSIGNED_BYTE, img );
+				//~ check_for_GL_errors( "glTexImage2D" );
+				//~ /*	printf( "OpenGL DXT compressor\n" );	*/
+			//~ }
+		//~ } else
 		{
 			/*	user want OpenGL to do all the work!	*/
 			glTexImage2D(
@@ -1323,40 +648,40 @@ unsigned int
 						resampled,
 						(1 << MIPlevel), (1 << MIPlevel) );
 				/*  upload the MIPmaps	*/
-				if( DXT_mode == SOIL_CAPABILITY_PRESENT )
-				{
-					/*	user wants me to do the DXT conversion!	*/
-					int DDS_size;
-					unsigned char *DDS_data = NULL;
-					if( (channels & 1) == 1 )
-					{
-						/*	RGB, use DXT1	*/
-						DDS_data = convert_image_to_DXT1(
-								resampled, MIPwidth, MIPheight, channels, &DDS_size );
-					} else
-					{
-						/*	RGBA, use DXT5	*/
-						DDS_data = convert_image_to_DXT5(
-								resampled, MIPwidth, MIPheight, channels, &DDS_size );
-					}
-					if( DDS_data )
-					{
-						soilGlCompressedTexImage2D(
-							opengl_texture_target, MIPlevel,
-							internal_texture_format, MIPwidth, MIPheight, 0,
-							DDS_size, DDS_data );
-						check_for_GL_errors( "glCompressedTexImage2D" );
-						SOIL_free_image_data( DDS_data );
-					} else
-					{
-						/*	my compression failed, try the OpenGL driver's version	*/
-						glTexImage2D(
-							opengl_texture_target, MIPlevel,
-							internal_texture_format, MIPwidth, MIPheight, 0,
-							original_texture_format, GL_UNSIGNED_BYTE, resampled );
-						check_for_GL_errors( "glTexImage2D" );
-					}
-				} else
+				//~ if( DXT_mode == SOIL_CAPABILITY_PRESENT )
+				//~ {
+					//~ /*	user wants me to do the DXT conversion!	*/
+					//~ int DDS_size;
+					//~ unsigned char *DDS_data = NULL;
+					//~ if( (channels & 1) == 1 )
+					//~ {
+						//~ /*	RGB, use DXT1	*/
+						//~ DDS_data = convert_image_to_DXT1(
+								//~ resampled, MIPwidth, MIPheight, channels, &DDS_size );
+					//~ } else
+					//~ {
+						//~ /*	RGBA, use DXT5	*/
+						//~ DDS_data = convert_image_to_DXT5(
+								//~ resampled, MIPwidth, MIPheight, channels, &DDS_size );
+					//~ }
+					//~ if( DDS_data )
+					//~ {
+						//~ soilGlCompressedTexImage2D(
+							//~ opengl_texture_target, MIPlevel,
+							//~ internal_texture_format, MIPwidth, MIPheight, 0,
+							//~ DDS_size, DDS_data );
+						//~ check_for_GL_errors( "glCompressedTexImage2D" );
+						//~ SOIL_free_image_data( DDS_data );
+					//~ } else
+					//~ {
+						//~ /*	my compression failed, try the OpenGL driver's version	*/
+						//~ glTexImage2D(
+							//~ opengl_texture_target, MIPlevel,
+							//~ internal_texture_format, MIPwidth, MIPheight, 0,
+							//~ original_texture_format, GL_UNSIGNED_BYTE, resampled );
+						//~ check_for_GL_errors( "glTexImage2D" );
+					//~ }
+				//~ } else
 				{
 					/*	user want OpenGL to do all the work!	*/
 					glTexImage2D(
@@ -1584,7 +909,7 @@ const char*
 
 unsigned int SOIL_direct_load_DDS_from_memory(
 		const unsigned char *const buffer,
-		int buffer_length,
+//		int buffer_length,
 		unsigned int reuse_texture_ID,
 		int flags,
 		int loading_as_cubemap )
@@ -1599,7 +924,7 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 	unsigned int DDS_main_size;
 	unsigned int DDS_full_size;
 	unsigned int width, height;
-	int mipmaps, cubemap, uncompressed, block_size = 16;
+	int mipmaps, /*cubemap, */uncompressed, block_size = 16;
 	unsigned int flag;
 	unsigned int cf_target, ogl_target_start, ogl_target_end;
 	unsigned int opengl_texture_type;
@@ -1611,12 +936,12 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 		result_string_pointer = "NULL buffer";
 		return 0;
 	}
-	if( buffer_length < sizeof( DDS_header ) )
-	{
-		/*	we can't do it!	*/
-		result_string_pointer = "DDS file was too small to contain the DDS header";
-		return 0;
-	}
+//	if( buffer_length < sizeof( DDS_header ) )
+//	{
+//		/*	we can't do it!	*/
+//		result_string_pointer = "DDS file was too small to contain the DDS header";
+//		return 0;
+//	}
 	/*	try reading in the header	*/
 	memcpy ( (void*)(&header), (const void *)buffer, sizeof( DDS_header ) );
 	buffer_index = sizeof( DDS_header );
@@ -1769,7 +1094,7 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 	/*	do this for each face of the cubemap!	*/
 	for( cf_target = ogl_target_start; cf_target <= ogl_target_end; ++cf_target )
 	{
-		if( buffer_index + DDS_full_size <= buffer_length )
+//		if( buffer_index + DDS_full_size <= buffer_length )
 		{
 			unsigned int byte_offset = DDS_main_size;
 			memcpy( (void*)DDS_data, (const void*)(&buffer[buffer_index]), DDS_full_size );
@@ -1831,13 +1156,14 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 			}
 			/*	it worked!	*/
 			result_string_pointer = "DDS file loaded";
-		} else
-		{
-			glDeleteTextures( 1, & tex_ID );
-			tex_ID = 0;
-			cf_target = ogl_target_end + 1;
-			result_string_pointer = "DDS file was too small for expected image data";
 		}
+//		else
+//		{
+//			glDeleteTextures( 1, & tex_ID );
+//			tex_ID = 0;
+//			cf_target = ogl_target_end + 1;
+//			result_string_pointer = "DDS file was too small for expected image data";
+//		}
 	}/* end reading each face */
 	SOIL_free_image_data( DDS_data );
 	if( tex_ID )
@@ -1875,53 +1201,53 @@ quick_exit:
 	return tex_ID;
 }
 
-unsigned int SOIL_direct_load_DDS(
-		const char *filename,
-		unsigned int reuse_texture_ID,
-		int flags,
-		int loading_as_cubemap )
-{
-	FILE *f;
-	unsigned char *buffer;
-	size_t buffer_length, bytes_read;
-	unsigned int tex_ID = 0;
-	/*	error checks	*/
-	if( NULL == filename )
-	{
-		result_string_pointer = "NULL filename";
-		return 0;
-	}
-	f = fopen( filename, "rb" );
-	if( NULL == f )
-	{
-		/*	the file doesn't seem to exist (or be open-able)	*/
-		result_string_pointer = "Can not find DDS file";
-		return 0;
-	}
-	fseek( f, 0, SEEK_END );
-	buffer_length = ftell( f );
-	fseek( f, 0, SEEK_SET );
-	buffer = (unsigned char *) malloc( buffer_length );
-	if( NULL == buffer )
-	{
-		result_string_pointer = "malloc failed";
-		fclose( f );
-		return 0;
-	}
-	bytes_read = fread( (void*)buffer, 1, buffer_length, f );
-	fclose( f );
-	if( bytes_read < buffer_length )
-	{
-		/*	huh?	*/
-		buffer_length = bytes_read;
-	}
-	/*	now try to do the loading	*/
-	tex_ID = SOIL_direct_load_DDS_from_memory(
-		(const unsigned char *const)buffer, buffer_length,
-		reuse_texture_ID, flags, loading_as_cubemap );
-	SOIL_free_image_data( buffer );
-	return tex_ID;
-}
+//~ unsigned int SOIL_direct_load_DDS(
+		//~ const char *filename,
+		//~ unsigned int reuse_texture_ID,
+		//~ int flags,
+		//~ int loading_as_cubemap )
+//~ {
+	//~ FILE *f;
+	//~ unsigned char *buffer;
+	//~ size_t buffer_length, bytes_read;
+	//~ unsigned int tex_ID = 0;
+	//~ /*	error checks	*/
+	//~ if( NULL == filename )
+	//~ {
+		//~ result_string_pointer = "NULL filename";
+		//~ return 0;
+	//~ }
+	//~ f = fopen( filename, "rb" );
+	//~ if( NULL == f )
+	//~ {
+		//~ /*	the file doesn't seem to exist (or be open-able)	*/
+		//~ result_string_pointer = "Can not find DDS file";
+		//~ return 0;
+	//~ }
+	//~ fseek( f, 0, SEEK_END );
+	//~ buffer_length = ftell( f );
+	//~ fseek( f, 0, SEEK_SET );
+	//~ buffer = (unsigned char *) malloc( buffer_length );
+	//~ if( NULL == buffer )
+	//~ {
+		//~ result_string_pointer = "malloc failed";
+		//~ fclose( f );
+		//~ return 0;
+	//~ }
+	//~ bytes_read = fread( (void*)buffer, 1, buffer_length, f );
+	//~ fclose( f );
+	//~ if( bytes_read < buffer_length )
+	//~ {
+		//~ /*	huh?	*/
+		//~ buffer_length = bytes_read;
+	//~ }
+	//~ /*	now try to do the loading	*/
+	//~ tex_ID = SOIL_direct_load_DDS_from_memory(
+		//~ (const unsigned char *const)buffer, buffer_length,
+		//~ reuse_texture_ID, flags, loading_as_cubemap );
+	//~ SOIL_free_image_data( buffer );
+	//~ return tex_ID;
+//~ }
 
 int query_NPOT_capability( void )
 {
