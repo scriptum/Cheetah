@@ -23,7 +23,7 @@ IN THE SOFTWARE.
 
 #include "cheetah.h"
 #include "render.h"
-
+#include "image_write.h"
 
 static int checkFramebufferStatus()
 {
@@ -33,25 +33,25 @@ static int checkFramebufferStatus()
 		case GL_FRAMEBUFFER_COMPLETE_EXT:
 			return 1;
 		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-			myError("Framebuffer incomplete, incomplete attachment\n");
+			myError("FBO: incomplete attachment\n");
 			return 0;
 		case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-			myError("Unsupported framebuffer format\n");
+			myError("Unsupported FBO format\n");
 			return 0;
 		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-			myError("Framebuffer incomplete, missing attachment\n");
+			myError("FBO: missing attachment\n");
 			return 0;
 		case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-			myError("Framebuffer incomplete, attached images must have same dimensions\n");
+			myError("FBO: attached images must have same dimensions\n");
 			return 0;
 		case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-			myError("Framebuffer incomplete, attached images must have same format\n");
+			myError("FBO: attached images must have same format\n");
 			return 0;
 		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-			myError("Framebuffer incomplete, missing draw buffer\n");
+			myError("FBO: missing draw buffer\n");
 			return 0;
 		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-			myError("Framebuffer incomplete, missing read buffer\n");
+			myError("FBO: missing read buffer\n");
 			return 0;
 	}
 	return 0;
@@ -85,11 +85,7 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 	
 	fboptr->id = 0;
 	
-	if(!screen)
-	{
-		myError("framebuffer: call init function before!");
-		return;
-	}
+	NEDED_INIT_VOID;
 	
 	if(!supported.FBO) {
 		myError("Framebuffers are not supported on this machine. You'd better to check it in script (if cheetah.supported.FBO)");
@@ -220,6 +216,22 @@ void framebufferUnbind(Framebuffer * ptr) {
 	glOrtho(0, screen->w, screen->h, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+}
+
+/**
+ * @descr Save image from framebuffer to BMP format
+ * @group graphics/framebuffer
+ * */
+void framebufferSaveBMP(Framebuffer * ptr, const char* name) {
+	unsigned char* img = NULL;
+	int w = (int)ptr->image->w, h = (int)ptr->image->h;
+	new(img, unsigned char, 3 * w * h);
+	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, ptr->id);
+	TEXTURE_BIND(ptr->image->id);
+	glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
+	glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, img);
+	stbi_write_bmp(name, w, h, 3, img);
+	delete(img);
 }
 
 #if 0
