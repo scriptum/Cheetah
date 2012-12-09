@@ -436,7 +436,12 @@ unsigned int
 		unsigned int opengl_texture_target,
 		unsigned int texture_check_size_enum
 	);
-
+unsigned int SOIL_direct_load_DDS_from_memory(
+		const unsigned char *const buffer,
+//		int buffer_length,
+		unsigned int reuse_texture_ID,
+		int flags,
+		int loading_as_cubemap );
 #ifdef __cplusplus
 }
 #endif

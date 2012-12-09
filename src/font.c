@@ -133,8 +133,17 @@ else if((a[i] & 0xf8) == 0xf0) {\
 
 void fontPrintf(Font *currentFont, register const unsigned char * str, float x, float y, float maxw, int align) {
 	FontChar *ch;
-	int i = 0, last_space = 0, buf = 0, spaces = -1, high = 0, low = 0, increment, incrementBuf, c;
-	float w = 0, lastw = 0, h;
+	int i = 0;
+	int last_space = 0;
+	int buf = 0;
+	int spaces = -1;
+	int high = 0;
+	int low = 0;
+	int increment = 0;
+	int incrementBuf = 0;
+	int c;
+	float w = 0, h;
+	float lastw = 0;
 	float justifyWidth = 0;
 	#ifdef NO_VBO
 		float justifyFrac = 0, justifyAdd = 0, justifyAddw;
@@ -388,7 +397,10 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	static float cx2=0, cy2=0, x1=0, y1=0, x2=0, y2=0, cx1=0, cy1=0, w=0, h=0;
 	static unsigned int ch=0, ch2;
 	static unsigned char char_string_buffer[9];
-	int i = 0, high=0, low=0, increment = 0;
+	int i = 0;
+	int increment = 0;
+	int high=0;
+	int low=0;
 	FontChar * fch;
 	if(sscanf(line, "%d %f %f %f %f %f %f %f %f", &ch, &x1, &y1, &x2, &y2, &cx1, &cy1, &w, &h) == -1)
 		return;
