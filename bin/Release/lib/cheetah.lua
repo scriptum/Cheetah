@@ -192,10 +192,18 @@ end
 	--~ libcheetah.disableTexture2D()
 --~ end
 
+--[[
+@descr Get extension of file. Returns just last word after dot.
+@group file
+]]
 C.fileExt = function(name)
 	return name:gsub('^.*%.', '')
 end
 
+--[[
+@descr Get file name (without extension). Returns just all before last dot.
+@group file
+]]
 C.fileName = function(name)
 	return name:gsub('%..*', '')
 end
@@ -585,6 +593,9 @@ ffi.metatype('Framebuffer', {
 			s.image:drawqxy(x, y, w, h, qx, qy, qw, qh)
 		end,
 		bind = libcheetah.framebufferBind,
+		save = function(s, name)
+			libcheetah.framebufferSaveBMP(s, name)
+		end,
 		check = libcheetah.framebufferCheck,
 		unbind = libcheetah.framebufferUnbind
 	},
