@@ -129,10 +129,10 @@ int getMouseY() {
 	return y;
 }
 
-char *getKeyState() {
+unsigned char *getKeyState() {
 	return SDL_GetKeyState(NULL);
 }
 
-char gameSpeed(double speed) {
+void gameSpeed(double speed) {
 	globalGameSpeed = speed;
 }
