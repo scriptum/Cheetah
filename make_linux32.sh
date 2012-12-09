@@ -1,4 +1,10 @@
 #!/bin/sh
 DIR=./bin/Release
-make clean
-CFLAGS=-m32 make && mv libcheetah.so $DIR/bin/linux32/libcheetah.so
+if [ "debug" != "$1" ]
+then
+	export LDFLAGS=-s
+	export CFLAGS=-m32
+else
+	export CFLAGS="-g -m32"
+fi
+make && mv libcheetah.so $DIR/bin/linux32/libcheetah.so
