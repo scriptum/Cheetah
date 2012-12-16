@@ -192,6 +192,10 @@ end
 	--~ libcheetah.disableTexture2D()
 --~ end
 
+--============================================================================--
+--                                 FILESYSTEM                                 --
+--============================================================================--
+
 --[[
 @descr Get extension of file. Returns just last word after dot.
 @group file
@@ -233,6 +237,23 @@ C.fileEach = function(dirname, func)
 	return t
 end
 
+--[[
+@descr Get full path to directory where you may save any data.
+@group file
+]]
+C.getAppDataDir = function()
+	if ffi.os == "Windows" then
+		return os.getenv("APPDATA")
+	else
+		local home = os.getenv("HOME")
+		if ffi.os == "OSX" then
+			return home .. '/Library/Application Support'
+		else
+			return home .. '/.config'
+		end
+	end
+end
+
 setmetatable(C, { __index = libcheetah})
 
 local keyState = libcheetah.getKeyState()
@@ -243,6 +264,35 @@ C.isKeyPressed = function(key)
 	end
 	return false
 end
+
+--============================================================================--
+--                            GENERAL DRAW FUNCTION                           --
+--============================================================================--
+
+local draw_general = function(d1, d2)
+	return function(s, x, y, w, h, angle, ox, oy)
+		if angle then
+			d1(s, x or 0, y or 0, w or s.w, h or s.h, angle, ox or 0, oy or 0)
+		else
+			d2(s, x or 0, y or 0, w or s.w, h or s.h)
+		end
+	end
+end
+local drawq_general = function(d1, d2)
+	return function(s, x, y, w, h, qx, qy, qw, qh, a, ox, oy)
+		if angle then
+			d1(s, x or 0, y or 0, w or s.w, h or s.h, 
+				 qx or 0, qy or 0, qw or s.w, qh or s.h, 
+				 angle, ox or 0, oy or 0)
+		else
+			d2(s, x or 0, y or 0, w or s.w, h or s.h, 
+				 qx or 0, qy or 0, qw or s.w, qh or s.h)
+		end
+	end
+end
+--============================================================================--
+--                                    IMAGE                                   --
+--============================================================================--
 
 C.generate = function(imageType, w, h, opt)
 	local ptr = ffi.new('Image')
@@ -258,19 +308,8 @@ end
 
 ffi.metatype('Image', {
 	__index = {
-		draw = function(s, x, y, w, h, angle, ox, oy)
-			if angle then
-				libcheetah.imageDrawt(s, x or 0, y or 0, w or s.w, h or s.h, angle or 0, ox or 0, oy or 0)
-			elseif x then
-				libcheetah.imageDrawxy(s, x or 0, y or 0, w or s.w, h or s.h)
-			else
-				libcheetah.imageDraw(s)
-			end
-		end,
-		drawxy = libcheetah.imageDrawxy,
-		drawt = libcheetah.imageDrawt,
-		drawq = libcheetah.imageDrawq,
-		drawqxy = libcheetah.imageDrawqxy,
+		draw = draw_general(libcheetah.imageDrawt, libcheetah.imageDrawxy),
+		drawq = drawq_general(libcheetah.imageDrawqt, libcheetah.imageDrawqxy)
 	}, 
 	__gc = libcheetah.deleteImage
 })
@@ -289,6 +328,10 @@ C.newImageFromData = function(data, options)
 	libcheetah._newImageFromData(ptr, data, options or '')
 	return ptr
 end
+
+--============================================================================--
+--                               MULTITEXTURE                                 --
+--============================================================================--
 
 C.newMultitexture = function(...)
 	local arg = {...}
@@ -310,22 +353,15 @@ end
 
 ffi.metatype('Multitexture', {
 	__index = {
-		draw = function(s, x, y, w, h, angle, ox, oy)
-			if angle then
-				libcheetah.multitextureDrawt(s, x or 0, y or 0, w or s.w, h or s.h, angle or 0, ox or 0, oy or 0)
-			elseif x then
-				libcheetah.multitextureDrawxy(s, x or 0, y or 0, w or s.w, h or s.h)
-			else
-				libcheetah.multitextureDraw(s)
-			end
-		end,
-		drawxy = libcheetah.multitextureDrawxy,
-		drawt = libcheetah.multitextureDrawt,
-		drawq = libcheetah.multitextureDrawq,
-		drawqxy = libcheetah.multitextureDrawqxy,
+		draw = draw_general(libcheetah.multitextureDrawt, libcheetah.multitextureDrawxy),
+		drawq = drawq_general(libcheetah.multitextureDrawqt, libcheetah.multitextureDrawqxy)
 	}, 
 	__gc = libcheetah.deleteMultitexture
 })
+
+--============================================================================--
+--                                    ATLAS                                   --
+--============================================================================--
 
 C.newAtlas = function(image, x, y, w, h)
 	local p = ffi.new('Atlas')
@@ -344,15 +380,13 @@ end
 
 ffi.metatype('Atlas', {
 	__index = {
-		draw = function(s, x, y, w, h, angle, ox, oy)
-			if angle then
-				libcheetah.atlasDrawt(s, x or 0, y or 0, w or s.w, h or s.h, angle or 0, ox or 0, oy or 0)
-			else
-				libcheetah.atlasDrawxy(s, x or 0, y or 0, w or s.w, h or s.h)
-			end
-		end
+		draw = draw_general(libcheetah.atlasDrawt, libcheetah.atlasDrawxy)
 	}
 })
+
+--============================================================================--
+--                                    FONT                                    --
+--============================================================================--
 
 local texturesArchive = {}
 --~ C.newTilemap = function(file)
@@ -416,11 +450,36 @@ C.newFont = function(name, scalable, codepage)
 	print('Loaded font '..name..' ('..glyphs..' glyphs, '..bytes..' bytes) in '..(C.getTicks()-millis)..' ms')
 end
 
+C.getFont = function(name, size)
+	return C.fonts[name][size]
+end
+
+ffi.metatype('Font', {
+	__index = {
+		print = function(font, text, x, y, width, align)
+			libcheetah.fontPrintf(font, text or 'undefined', x or 0, y or 0, width or 0, align or 0)
+		end,
+		interval = libcheetah.fontInterval,
+		scale = libcheetah.fontScale,
+		getInterval = libcheetah.fontGetInterval,
+		getScale = libcheetah.fontGetScale
+	},
+	--~ __gc = libcheetah.deleteFont
+})
+
+--============================================================================--
+--                                  RESOURCES                                 --
+--============================================================================--
+
 local resLoadImageCallback = function (path, t, dir, name, ext)
 	local buf = dir..'/'..name
 	if not C.fileExists(buf..'.fnt') and not C.fileExists(buf..'.atlas') then
 		if t[name] then
 			libcheetah.myError('resLoader: resourse %s already exists (replaced with %s)', name, n)
+		end
+		buf = tonumber(name)
+		if tostring(buf) == name then
+			name = buf
 		end
 		t[name] = C.newImage(path)
 	end
@@ -550,27 +609,14 @@ C.resLoader = function(dirname, recursive)
 end
 
 C.init = function(title, w, h, c, o)
-	libcheetah.init(title, w, h, c, o)
+	libcheetah.init(title or 'Cheetah 2D Engine', w or 800, h or 600, c or 32, o or '')
 	C.newFont('lib/font/DICE.fnt')
 	C.fonts.default = C.fonts.DICE[6]
 end
 
-C.getFont = function(name, size)
-	return C.fonts[name][size]
-end
-
-ffi.metatype('Font', {
-	__index = {
-		print = function(font, text, x, y, width, align)
-			libcheetah.fontPrintf(font, text or 'undefined', x or 0, y or 0, width or 0, align or 0)
-		end,
-		interval = libcheetah.fontInterval,
-		scale = libcheetah.fontScale,
-		getInterval = libcheetah.fontGetInterval,
-		getScale = libcheetah.fontGetScale
-	},
-	--~ __gc = libcheetah.deleteFont
-})
+--============================================================================--
+--                                 FRAMEBUFFER                                --
+--============================================================================--
 
 C.newFramebuffer = function(w, h, options)
 	local ptr = ffi.new('Framebuffer')
@@ -580,17 +626,11 @@ end
 
 ffi.metatype('Framebuffer', {
 	__index = {
-		draw = function(s)
+		draw = function(s, x, y, w, h, a, ox, oy)
 			s.image:draw()
 		end,
-		drawxy = function(s, x, y, w, h)
-			s.image:drawxy(x, y, w, h)
-		end,
-		drawq = function(s, qx, qy, qw, qh)
+		drawq = function(s, x, y, w, h, qx, qy, qw, qh, a, ox, oy)
 			s.image:drawq(qx, qy, qw, qh)
-		end,
-		drawqxy = function(s, x, y, w, h, qx, qy, qw, qh)
-			s.image:drawqxy(x, y, w, h, qx, qy, qw, qh)
 		end,
 		bind = libcheetah.framebufferBind,
 		save = function(s, name)
@@ -601,6 +641,10 @@ ffi.metatype('Framebuffer', {
 	},
 	__gc = libcheetah.deleteFramebuffer
 })
+
+--============================================================================--
+--                                  SHADERS                                   --
+--============================================================================--
 
 local uniforms = {}
 C.newShader = function(fragment, vertex)

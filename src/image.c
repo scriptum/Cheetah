@@ -333,16 +333,6 @@ void disableTexture() {
 }
 
 /**
- * @descr Draw while image using 1x1 pixel quad. You may change quad size and position using transformations.
- * @group graphics/image
- * @var Image object
- * */
-void imageDraw(Image * image) {
-	imageBind(image);
-	PUSH_QUAD(0,0,1,1,0,0,0);
-}
-
-/**
  * @descr Draw image of given size at a given position.
  * @group graphics/image
  * @var Image object
@@ -360,6 +350,45 @@ void imageDrawxy(Image * image, float x, float y, float w, float h) {
 void imageDrawt(Image * image, float x, float y, float w, float h, float a, float ox, float oy) {
 	imageBind(image);
 	PUSH_QUAD(x,y,w,h,a,ox,oy);
+}
+
+/**
+ * @descr Draw part of image of given size at a given position.
+ * @group graphics/image
+ * @var Image object
+ * @var position of left top corner
+ * @var position of left top corner
+ * @var width of quad
+ * @var height of quad
+ * @var x offset of texture
+ * @var y offset of texture
+ * @var width of texture
+ * @var height of texture
+ * */
+void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
+	imageBind(image);
+	PUSH_QUADT(x,y,w,h,0,0,0,qx, qy, qw, qh, image->w, image->h);
+}
+
+/**
+ * @descr Draw part of image of given size at a given position with transformations.
+ * @group graphics/image
+ * @var Image object
+ * @var position of left top corner
+ * @var position of left top corner
+ * @var width of quad
+ * @var height of quad
+ * @var angle
+ * @var origin x
+ * @var origin y
+ * @var x offset of texture
+ * @var y offset of texture
+ * @var width of texture
+ * @var height of texture
+ * */
+void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
+	imageBind(image);
+	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, image->w, image->h);
 }
 
 void initMultitexture(Multitexture * multitexture) {
@@ -386,16 +415,6 @@ inline void multitextureBind(Multitexture * multitexture) {
 }
 
 /**
- * @descr Draw while multitexture using 1x1 pixel quad. You may change quad size and position using transformations.
- * @group graphics/image
- * @var Multitexture object
- * */
-void multitextureDraw(Multitexture * multitexture) {
-	multitextureBind(multitexture);
-	PUSH_QUAD(0,0,1,1,0,0,0);
-}
-
-/**
  * @descr Draw multitexture of given size at a given position.
  * @group graphics/image
  * @var Multitexture object
@@ -416,21 +435,7 @@ void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, f
 }
 
 /**
- * @descr Draw part of multitexture using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
- * @group graphics/multitexture
- * @var Image object
- * @var x offset of texture
- * @var y offset of texture
- * @var width of texture
- * @var height of texture
- * */
-void multitextureDrawq(Multitexture * multitexture, float qx, float qy, float qw, float qh) {
-	multitextureBind(multitexture);
-	PUSH_QUADT(0,0,1,1,0,0,0,qx, qy, qw, qh, multitexture->w, multitexture->h);
-}
-
-/**
- * @descr Draw part of multitexture of given size at a given position using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
+ * @descr Draw part of multitexture of given size at a given position.
  * @group graphics/multitexture
  * @var Image object
  * @var position of left top corner
@@ -445,59 +450,6 @@ void multitextureDrawq(Multitexture * multitexture, float qx, float qy, float qw
 void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
 	multitextureBind(multitexture);
 	PUSH_QUADT(x,y,w,h,0,0,0,qx, qy, qw, qh, multitexture->w, multitexture->h);
-}
-
-/**
- * @descr Draw part of image using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
- * @group graphics/image
- * @var Image object
- * @var x offset of texture
- * @var y offset of texture
- * @var width of texture
- * @var height of texture
- * */
-void imageDrawq(Image * image, float qx, float qy, float qw, float qh) {
-	imageBind(image);
-	PUSH_QUADT(0,0,1,1,0,0,0,qx, qy, qw, qh, image->w, image->h);
-}
-
-/**
- * @descr Draw part of image of given size at a given position using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
- * @group graphics/image
- * @var Image object
- * @var position of left top corner
- * @var position of left top corner
- * @var width of quad
- * @var height of quad
- * @var x offset of texture
- * @var y offset of texture
- * @var width of texture
- * @var height of texture
- * */
-void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
-	imageBind(image);
-	PUSH_QUADT(x,y,w,h,0,0,0,qx, qy, qw, qh, image->w, image->h);
-}
-
-/**
- * @descr Draw part of image of given size at a given position using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
- * @group graphics/image
- * @var Image object
- * @var position of left top corner
- * @var position of left top corner
- * @var width of quad
- * @var height of quad
- * @var angle
- * @var origin x
- * @var origin y
- * @var x offset of texture
- * @var y offset of texture
- * @var width of texture
- * @var height of texture
- * */
-void imageDrawqt(Image * image, float x, float y, float w, float h, float a, float ox, float oy, float qx, float qy, float qw, float qh) {
-	imageBind(image);
-	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, image->w, image->h);
 }
 
 /**
@@ -516,7 +468,7 @@ void imageDrawqt(Image * image, float x, float y, float w, float h, float a, flo
  * @var width of texture
  * @var height of texture
  * */
-void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy, float qx, float qy, float qw, float qh) {
+void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
 	multitextureBind(multitexture);
 	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, multitexture->w, multitexture->h);
 }
@@ -544,24 +496,24 @@ void imageFiltering(Image * img, bool enabled) {
 		TEX_LINEAR;
 }
 
-void _newImageFromData(Image * ptr, ImageData * imgdata, const char *options) {
-	unsigned int tex_id;
-	if(!imgdata || !imgdata->data) MYERROR("invalid data");
-	ptr->w = (float)imgdata->w;
-	ptr->h = (float)imgdata->h;
-	ptr->channels = imgdata->channels;
-	tex_id = SOIL_internal_create_OGL_texture(
-			(unsigned char*)imgdata->data, ptr->w, ptr->h, ptr->channels,
-			0, SOIL_FLAG_TEXTURE_REPEATS,
-			GL_TEXTURE_2D, GL_TEXTURE_2D,
-			GL_MAX_TEXTURE_SIZE);
-	ptr->id = tex_id;
-	while(*options)
-	{
-		if(*options == 'n') TEX_NEAREST;
-		options++;
-	}
-}
+//~ void _newImageFromData(Image * ptr, ImageData * imgdata, const char *options) {
+	//~ unsigned int tex_id;
+	//~ if(!imgdata || !imgdata->data) MYERROR("invalid data");
+	//~ ptr->w = (float)imgdata->w;
+	//~ ptr->h = (float)imgdata->h;
+	//~ ptr->channels = imgdata->channels;
+	//~ tex_id = SOIL_internal_create_OGL_texture(
+			//~ (unsigned char*)imgdata->data, ptr->w, ptr->h, ptr->channels,
+			//~ 0, SOIL_FLAG_TEXTURE_REPEATS,
+			//~ GL_TEXTURE_2D, GL_TEXTURE_2D,
+			//~ GL_MAX_TEXTURE_SIZE);
+	//~ ptr->id = tex_id;
+	//~ while(*options)
+	//~ {
+		//~ if(*options == 'n') TEX_NEAREST;
+		//~ options++;
+	//~ }
+//~ }
 
 void deleteImage(Image * ptr) {
 	//~ printf("%d\n", same_type_p(typeof(ptr)) == INTEGER_TYPE);
