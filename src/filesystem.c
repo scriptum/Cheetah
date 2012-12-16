@@ -109,7 +109,7 @@ bool mkDir(const char * path) {
 #ifdef _WIN32
 	if(mkdir(path) == 0) return 1;
 #else
-	if(mkdir(path, 0) == 0) return 1;
+	if(mkdir(path, 0755) == 0) return 1;
 #endif
 	return 0;
 }
