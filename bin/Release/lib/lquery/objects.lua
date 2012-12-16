@@ -75,7 +75,7 @@ local image_draw = function(s)
 	if(s.angle) then
 		s._image:drawt(s.x,s.y,s.w,s.h,s.angle,s.ox or 0,s.oy or 0)
 	else
-		s._image:drawxy(s.x,s.y,s.w,s.h)
+		s._image:draw(s.x,s.y,s.w,s.h)
 	end
 end
 local image_draw_quad = function(s)
