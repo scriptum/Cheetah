@@ -77,31 +77,22 @@ float Font_Width(Font *f, register const char *str)
 	return width * f->_scale;
 }
 
-#ifdef NO_VBO
-#define DRAW_CHAR \
-	do {\
-		glCallList(ch->vertex);\
-		glTranslatef(ch->w, 0, 0);\
-		w += ch->w;\
-	}\
-	while(0)
-#else 
+
 #define DRAW_CHAR do {\
-		if(vertexCounter >= VERTEX_BUFFER_LIMIT * 8) { FLUSH_BUFFER(); }\
-		texCoord[vertexCounter] = texCoord[vertexCounter+2] = ch->t[0];\
-		texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];\
-		texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];\
-		texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];\
-		w = ceil(x);\
-		vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0] + w;\
-		vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;\
-		vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;\
-		vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6] = ch->v[2] + w;\
-		vertexCounter += 8;\
-		x += ch->w;\
-	}\
-	while(0)
-#endif
+	if(vertexCounter >= VERTEX_BUFFER_LIMIT * 8) { FLUSH_BUFFER(); }\
+	texCoord[vertexCounter] = texCoord[vertexCounter+2] = ch->t[0];\
+	texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];\
+	texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];\
+	texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];\
+	w = ceil(x);\
+	vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0] + w;\
+	vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;\
+	vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;\
+	vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6] = ch->v[2] + w;\
+	vertexCounter += 8;\
+	x += ch->w;\
+}\
+while(0)
 
 #define UNICODE_TO_INT(a,i,increment) \
 high = low = 0;\
@@ -145,11 +136,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 	float w = 0, h;
 	float lastw = 0;
 	float justifyWidth = 0;
-	#ifdef NO_VBO
-		float justifyFrac = 0, justifyAdd = 0, justifyAddw;
-	#else
-		int memstep = 0;
-	#endif
+	int memstep = 0;
 	float spacew = currentFont->spacew;
 	float fontHeight = currentFont->height * currentFont->_interval;
 	bool end = 0;
@@ -176,13 +163,21 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 	imageBind(currentFont->image);
 	if(maxw > .0) {
 		while(1) {
-			UNICODE_TO_INT(str,i, increment)
+			UNICODE_TO_INT(str, i, increment)
 			c = low | (high << 8);
-			if(currentFont->allocated < high)
+			if(!currentFont->chars[high] || !currentFont->chars[high][low])
 			{
+				//~ myError("Symbol %d not found!", c);
 				i += increment;
 				continue;
 			}
+			//~ printf("%d %d\n", high, low);
+			//~ printf("%d %d\n", currentFont->chars[high], currentFont->chars[high][low]);
+			//~ if(currentFont->allocated < high)
+			//~ {
+				//~ i += increment;
+				//~ continue;
+			//~ }
 			switch(c)
 			{
 					case '\t':
@@ -208,76 +203,38 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 				}
 				switch(align) {
 					case alignCenter:
-						#ifdef NO_VBO
-							w = floor((maxw - lastw)*0.5);
-							glTranslatef(w, 0, 0);
-						#else
-							x = (maxw - lastw)*0.5;
-						#endif
+						x = (maxw - lastw)*0.5;
 						break;
 					case alignRight:
-						#ifdef NO_VBO
-							w = floor((maxw - lastw));
-							glTranslatef(w, 0, 0);
-						#else
-							x = maxw - lastw;
-						#endif
+						x = maxw - lastw;
 						break;
 					case alignJustify:
 						if(c == '\n'|| end)
 							justifyWidth = spacew;
 						else
-						#ifdef NO_VBO
-							justifyFrac = modff((maxw + spacew*(spaces) - lastw)/(float)(spaces), &justifyWidth);
-						w = 0;
-						#else
 							justifyWidth = (maxw + spacew*(spaces) - lastw)/(float)(spaces);
 						x = 0;
-						#endif
 						break;
-					#ifdef NO_VBO
-						default: w = 0;
-					#else 
 						default: x = 0;
-					#endif
 				}
 				if(buf == last_space) last_space++;
 				while(buf < last_space) {
 					UNICODE_TO_INT(str,buf,incrementBuf)
 					c = low | (high << 8);
 					buf += incrementBuf;
-					if(currentFont->allocated < high)
-						continue;
-					if(c == '\t')
+					if(!currentFont->chars[high] || !currentFont->chars[high][low])
 					{
-						#ifdef NO_VBO
-							glTranslatef(spacew * 8, 0, 0);
-							w += spacew * 8;
-						#else
-							x += spacew * 8;
-						#endif
+						//~ myError("Symbol %d not found!", c);
+						continue;
 					}
+					if(c == '\t')
+							x += spacew * 8;
 					else if(c == ' ')
 					{
 						if(justify)
-						{
-							#ifdef NO_VBO
-								justifyAdd = modff(justifyFrac + justifyAdd, &justifyAddw);
-								glTranslatef(justifyWidth + justifyAddw, 0, 0);
-								w += justifyWidth + justifyAddw;
-							#else 
-								x += justifyWidth;
-							#endif
-						}
+							x += justifyWidth;
 						else
-						{
-							#ifdef NO_VBO
-								glTranslatef(spacew, 0, 0);
-								w += spacew;
-							#else 
-								x += spacew;
-							#endif
-						}
+							x += spacew;
 					}
 					else
 					{
@@ -286,11 +243,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 					}
 				}
 				if(end) break;
-				#ifdef NO_VBO
-					glTranslatef(-w, h, 0);
-				#else 
 					x = 0;
-				#endif
 				y += fontHeight;
 				h = ceil(y);
 				increment = 0;
@@ -305,9 +258,6 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 				last_space = 0;
 				w = 0;
 				spaces = -1;
-				#ifdef NO_VBO
-					justifyAdd = 0;
-				#endif
 			}
 			i += increment;
 		}
@@ -318,22 +268,12 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 				c = low | (high << 8);
 				switch(c) {
 					case '\n':
-						#ifdef NO_VBO
-							glTranslatef(-w, h, 0);
-							w = 0;
-						#else 
-							x = 0;
-						#endif
+						x = 0;
 						y += fontHeight;
 						h = ceil(y);
 						goto end_loop;
 					case '\t':
-						#ifdef NO_VBO
-							glTranslatef(spacew * 8, 0, 0);
-							w += spacew * 8;
-						#else 
-							x += spacew * 8;
-						#endif
+						x += spacew * 8;
 						goto end_loop;
 				}
 				
@@ -344,11 +284,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 				end_loop:
 				i += increment;
 			}
-	#ifndef NO_VBO
-		glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
-		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
-		glDrawArrays(GL_QUADS, 0, (memstep>>1));
-	#endif
+	FLUSH_BUFFER();
 	glPopMatrix();
 }
 
