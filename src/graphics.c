@@ -120,6 +120,11 @@ void disableAlphaTest() {
 	glDisable(GL_ALPHA_TEST);
 }
 
+void setScissor(int x, int y, int w, int h) {
+	glScissor(x, screen->h - y - h, w, h);
+}
+
+
 //~ void translate(double translateX, double translateY) {
 	//~ glTranslated(translateX, translateY, 0);
 //~ }
