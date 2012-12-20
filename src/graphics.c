@@ -125,7 +125,8 @@ void disableAlphaTest() {
 //~ }
 
 /**
- * @descr Move object relatively to the current matrix position.
+ * @descr Move object relatively to the current matrix position (in pixels). This function must be called between cheetah.push and cheetah.pop functions.
+ * @note This function is slow. Avoid to use it for object positioning.
  * @group graphics/drawing
  * @var x coordinate
  * @var y coordinate
@@ -137,7 +138,8 @@ void move(double translateX, double translateY) {
 }
 
 /**
- * @descr Scale object relatively to the current matrix size (initially, matrix has size 1x1 pixel).
+ * @descr Scale object relatively to the current matrix size (initially, matrix has size 1:1 to fit pixel grid). This function must be called between cheetah.push and cheetah.pop functions.
+ * @note This function is slow. Avoid to use it for object positioning.
  * @group graphics/drawing
  * @var x scale
  * @var y scale
@@ -149,7 +151,8 @@ void scale(double scaleX, double scaleY) {
 }
 
 /**
- * @descr Rotate object relatively to the current matrix angle.
+ * @descr Rotate object relatively to the current matrix angle. This function must be called between cheetah.push and cheetah.pop functions.
+ * @note This function is slow. Avoid to use it for object positioning.
  * @group graphics/drawing
  * @var angle
  * @see move scale translateObject
@@ -160,7 +163,8 @@ void rotate(double angle) {
 }
 
 /**
- * @descr Move, rotate and scale object relatively to it's center (origin)
+ * @descr Move, rotate and scale object relatively to it's center (origin). This function must be called between cheetah.push and cheetah.pop functions.
+ * @note This function is VERY slow. Avoid to use it for object positioning.
  * @group graphics/drawing
  * @var x coordinate
  * @var y coordinate

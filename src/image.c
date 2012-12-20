@@ -358,12 +358,12 @@ void imageDrawt(Image * image, float x, float y, float w, float h, float a, floa
  * @var Image object
  * @var position of left top corner
  * @var position of left top corner
- * @var width of quad
- * @var height of quad
+ * @var width of quad (actual drawing size)
+ * @var height of quad  (actual drawing size)
  * @var x offset of texture
  * @var y offset of texture
- * @var width of texture
- * @var height of texture
+ * @var width of texture (stretchig relative to width of quad)
+ * @var height of texture (stretchig relative to height of quad)
  * */
 void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
 	imageBind(image);
@@ -376,15 +376,15 @@ void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, f
  * @var Image object
  * @var position of left top corner
  * @var position of left top corner
- * @var width of quad
- * @var height of quad
- * @var angle
- * @var origin x
- * @var origin y
+ * @var width of quad (actual drawing size)
+ * @var height of quad  (actual drawing size)
  * @var x offset of texture
  * @var y offset of texture
- * @var width of texture
- * @var height of texture
+ * @var width of texture (stretchig relative to width of quad)
+ * @var height of texture (stretchig relative to height of quad)
+ * @var angle (relative to origin)
+ * @var origin x
+ * @var origin y
  * */
 void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
 	imageBind(image);
@@ -437,15 +437,15 @@ void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, f
 /**
  * @descr Draw part of multitexture of given size at a given position.
  * @group graphics/multitexture
- * @var Image object
+ * @var Multitexture object
  * @var position of left top corner
  * @var position of left top corner
- * @var width of quad
- * @var height of quad
+ * @var width of quad (actual drawing size)
+ * @var height of quad  (actual drawing size)
  * @var x offset of texture
  * @var y offset of texture
- * @var width of texture
- * @var height of texture
+ * @var width of texture (stretchig relative to width of quad)
+ * @var height of texture (stretchig relative to height of quad)
  * */
 void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
 	multitextureBind(multitexture);
@@ -458,43 +458,43 @@ void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w,
  * @var Multitexture object
  * @var position of left top corner
  * @var position of left top corner
- * @var width of quad
- * @var height of quad
- * @var angle
- * @var origin x
- * @var origin y
+ * @var width of quad (actual drawing size)
+ * @var height of quad  (actual drawing size)
  * @var x offset of texture
  * @var y offset of texture
- * @var width of texture
- * @var height of texture
+ * @var width of texture (stretchig relative to width of quad)
+ * @var height of texture (stretchig relative to height of quad)
+ * @var angle (relative to origin)
+ * @var origin x
+ * @var origin y
  * */
 void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
 	multitextureBind(multitexture);
 	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, multitexture->w, multitexture->h);
 }
 
-/**
- * @descr Set the current active texture for multitexturenig. Equivalent to glActiveTexture(GL_TEXTURE0 + i).
- * @group graphics/image
- * @var number of texture slot (min 0, max 7)
- * */
-void activeTexture(int i) {
-	glActiveTexture_(GL_TEXTURE0 + i);
-}
+//~ /**
+ //~ * @descr Set the current active texture for multitexturenig. Equivalent to glActiveTexture(GL_TEXTURE0 + i).
+ //~ * @group graphics/image
+ //~ * @var number of texture slot (min 0, max 7)
+ //~ * */
+//~ void activeTexture(int i) {
+	//~ glActiveTexture_(GL_TEXTURE0 + i);
+//~ }
 
-/**
- * @descr Enable/disable smooth interpolation for image. Disabled filtering useful, if you want to fit image to pixel matrix. If this image will be scaled and/or rotated you must enable filtering (this is by defaults).
- * @group graphics/image
- * @var Image object
- * @var true means that filtering is enabled, false means that filtering is disabled
- * */
-void imageFiltering(Image * img, bool enabled) {
-	glBindTexture(GL_TEXTURE_2D, img->id);
-	if(!enabled)
-		TEX_NEAREST;
-	else
-		TEX_LINEAR;
-}
+//~ /**
+ //~ * @descr Enable/disable smooth interpolation for image. Disabled filtering useful, if you want to fit image to pixel matrix. If this image will be scaled and/or rotated you must enable filtering (default). Must be called before texture loading.
+ //~ * @group graphics/image
+ //~ * @var Image object
+ //~ * @var true means that filtering is enabled, false means that filtering is disabled
+ //~ * */
+//~ void imageFiltering(Image * img, bool enabled) {
+	//~ glBindTexture(GL_TEXTURE_2D, img->id);
+	//~ if(!enabled)
+		//~ TEX_NEAREST;
+	//~ else
+		//~ TEX_LINEAR;
+//~ }
 
 //~ void _newImageFromData(Image * ptr, ImageData * imgdata, const char *options) {
 	//~ unsigned int tex_id;
