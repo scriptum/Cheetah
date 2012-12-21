@@ -89,6 +89,7 @@ void disableStencilTest() {
  * @see disableStencilTest
  * */
 void enableScissorTest() {
+	FLUSH_BUFFER();
 	glEnable(GL_SCISSOR_TEST);
 }
 
@@ -98,6 +99,7 @@ void enableScissorTest() {
  * @see enableStencilTest
  * */
 void disableScissorTest() {
+	FLUSH_BUFFER();
 	glDisable(GL_SCISSOR_TEST);
 }
 
@@ -121,6 +123,7 @@ void disableAlphaTest() {
 }
 
 void setScissor(int x, int y, int w, int h) {
+	FLUSH_BUFFER();
 	glScissor(x, screen->h - y - h, w, h);
 }
 
