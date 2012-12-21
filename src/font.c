@@ -21,6 +21,8 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
+//TODO: rich text
+
 #include <math.h>
 #include <locale.h>
 #include <string.h>
@@ -139,6 +141,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 	int memstep = 0;
 	float spacew = currentFont->spacew;
 	float fontHeight = currentFont->height * currentFont->_interval;
+	float oldx = x, oldy = y;
 	bool end = 0;
 	bool justify = align == alignJustify;
 	if(maxw > .0) {
@@ -201,55 +204,66 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 					last_space = i;
 					lastw = w;
 				}
+				
 				switch(align) {
 					case alignCenter:
-						x = (maxw - lastw)*0.5;
+						x = (maxw - lastw) * 0.5;
 						break;
 					case alignRight:
 						x = maxw - lastw;
 						break;
 					case alignJustify:
-						if(c == '\n'|| end)
+						if(c == '\n' || end)
 							justifyWidth = spacew;
 						else
-							justifyWidth = (maxw + spacew*(spaces) - lastw)/(float)(spaces);
+							justifyWidth = (maxw + spacew * (spaces) - lastw) / (float)(spaces);
 						x = 0;
 						break;
 						default: x = 0;
 				}
 				if(buf == last_space) last_space++;
-				while(buf < last_space) {
-					UNICODE_TO_INT(str,buf,incrementBuf)
-					c = low | (high << 8);
-					buf += incrementBuf;
-					if(!currentFont->chars[high] || !currentFont->chars[high][low])
-					{
-						//~ myError("Symbol %d not found!", c);
-						continue;
-					}
-					if(c == '\t')
-							x += spacew * 8;
-					else if(c == ' ')
-					{
-						if(justify)
-							x += justifyWidth;
+				if((y + oldy + fontHeight) * currentFont->_scale > 0)
+				{
+					while(buf < last_space) {
+						UNICODE_TO_INT(str,buf,incrementBuf)
+						c = low | (high << 8);
+						buf += incrementBuf;
+						if(!currentFont->chars[high] || !currentFont->chars[high][low])
+						{
+							//~ myError("Symbol %d not found!", c);
+							continue;
+						}
+						if(c == '\t')
+								x += spacew * 8;
+						else if(c == ' ')
+						{
+							if(justify)
+								x += justifyWidth;
+							else
+								x += spacew;
+						}
 						else
-							x += spacew;
-					}
-					else
-					{
-						ch = currentFont->chars[high][low];
-						DRAW_CHAR;
+						{
+							ch = currentFont->chars[high][low];
+							DRAW_CHAR;
+						}
 					}
 				}
+				else
+				{
+					buf = last_space;
+				}
+				
 				if(end) break;
-					x = 0;
+				x = 0;
 				y += fontHeight;
+				//fast dropping invisible lines
+				if((y + oldy) * currentFont->_scale > screen->h) break;
 				h = ceil(y);
 				increment = 0;
 				if(str[buf] == ' ' || str[buf] == '\t' || str[buf] == '\n')
 				{
-					i = buf = last_space+1;
+					i = buf = last_space + 1;
 				}
 				else
 				{
@@ -263,27 +277,28 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 		}
 	}
 	else
-			while(str[i]) {
-				UNICODE_TO_INT(str,i, increment)
-				c = low | (high << 8);
-				switch(c) {
-					case '\n':
-						x = 0;
-						y += fontHeight;
-						h = ceil(y);
-						goto end_loop;
-					case '\t':
-						x += spacew * 8;
-						goto end_loop;
-				}
-				
-				if(currentFont->allocated < high)
+		while(str[i]) {
+			UNICODE_TO_INT(str,i, increment)
+			c = low | (high << 8);
+			switch(c) {
+				case '\n':
+					x = 0;
+					y += fontHeight;
+					if((y + oldy) * currentFont->_scale > screen->h) break;
+					h = ceil(y);
 					goto end_loop;
-				ch = currentFont->chars[high][low];
-				DRAW_CHAR;
-				end_loop:
-				i += increment;
+				case '\t':
+					x += spacew * 8;
+					goto end_loop;
 			}
+			
+			if(currentFont->allocated < high)
+				goto end_loop;
+			ch = currentFont->chars[high][low];
+			DRAW_CHAR;
+			end_loop:
+			i += increment;
+		}
 	FLUSH_BUFFER();
 	glPopMatrix();
 }
