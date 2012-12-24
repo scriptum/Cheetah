@@ -227,7 +227,7 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *name
  *  * _i_ - load instantly without delayed resource loader
  * @return Image object
  * */
-void newImageOpt(Image* ptr, const char *name, const char *options) {
+void newImageOpt(Image *ptr, const char *name, const char *options) {
 	int width, height, channels, i = 0;
 	bool mask = 0, instant = 0;
 	unsigned int tex_id;

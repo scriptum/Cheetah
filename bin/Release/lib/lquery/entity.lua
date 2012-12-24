@@ -791,13 +791,13 @@ local function events(v)
 		end 
 		if _lQuery.MouseButton == "wu" and _lQuery.MousePressed == true then 
 			if v._wheel then
-				_lQuery.MouseButton = nil
 				v._wheel(v, mX, mY, "u")
+				_lQuery.MouseButton = nil
 			end
 		elseif _lQuery.MouseButton == "wd" and _lQuery.MousePressed == true then 
 			if v._wheel then
-				_lQuery.MouseButton = nil
 				v._wheel(v, mX, mY, "d")
+				_lQuery.MouseButton = nil
 			end
 		elseif _lQuery.MousePressed == true and mPressOwn == true then 
 			_lQuery.MousePressedOwner = v
