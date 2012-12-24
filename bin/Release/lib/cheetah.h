@@ -3,42 +3,39 @@ typedef struct SDL_Rect {
 	unsigned short w, h;
 } SDL_Rect;
 struct {
-	unsigned int flags;				/**< Read-only */
-	void *format;		/**< Read-only */
-	int w, h;				/**< Read-only */
-	unsigned short pitch;				/**< Read-only */
-	void *pixels;				/**< Read-write */
-	int offset;				/**< Private */
-
-	/** Hardware-specific surface info */
+	unsigned int flags;
+	void *format;
+	int w, h;
+	unsigned short pitch;
+	void *pixels;
+	int offset;
 	struct private_hwdata *hwdata;
-
-	/** clipping information */
-	SDL_Rect clip_rect;			/**< Read-only */
-	unsigned int unused1;				/**< for binary compatibility */
-
-	/** Allow recursive locks */
-	unsigned int locked;				/**< Private */
-
-	/** info for fast blit mapping to other surfaces */
-	struct SDL_BlitMap *map;		/**< Private */
-
-	/** format version, bumped at every change to invalidate blit maps */
-	unsigned int format_version;		/**< Private */
-
-	/** Reference count -- used when freeing surface */
-	int refcount;				/**< Read-mostly */
+	SDL_Rect clip_rect;
+	unsigned int unused1;
+	unsigned int locked;
+	struct SDL_BlitMap *map;
+	unsigned int format_version;
+	int refcount;
 } screen;
 typedef struct __dirstream {
 } DIR;
 struct {
 	char GLSL, BE, FBO, VBO, MT, PS;
 } supported;
+typedef struct Color {
+	unsigned char r, g, b, a;
+} Color;
+typedef struct Point {
+	float x, y;
+} Point;
+typedef struct Point3 {
+	float x, y, z;
+} Point3;
 typedef struct Image {
 	char *name;
 	char *options;
 	/* OpenGL texture id */
-	unsigned int id;
+	unsigned id;
 	/* width and height */
 	float w, h;
 	int channels;
@@ -53,8 +50,28 @@ typedef struct Multitexture {
 	int size;
 	Image **images;
 } Multitexture;
+typedef struct ParticleForce {
+	unsigned maxParticles;
+} ParticleForce;
+typedef struct ParticleSystem {
+	ParticleForce *forces;
+	Point *position;
+	Point *speed;
+	Point emitterPosition;
+	unsigned maxParticles;
+	float direction;
+	float directionVariation;
+	float scale;
+	float scaleVariation;
+	float scaleVariation;
+	unsigned emissionRate;
+	float gravity;
+	unsigned lifeTime;
+	Color color;
+	Color colorVariation;
+} ParticleSystem;
 typedef struct Atlas {
-	Image * image;
+	Image *image;
 	/* original width and height */
 	float w, h;
 	/* atlas width and height */
@@ -65,13 +82,13 @@ typedef struct Atlas {
 	float tex[8];
 } Atlas;
 typedef struct Framebuffer {
-	unsigned int id;
+	unsigned id;
 	Image *image;
 } Framebuffer;
 typedef struct FontChar
 {
 	/* OpenGL list id */
-	unsigned int vertex;
+	unsigned vertex;
 	/* Width of char */
 	float w;
 	float v[4], t[4];
@@ -95,12 +112,6 @@ typedef struct _Tilemap {
 	int scalable;        // should tilemap be scaled to screen size or drawed per-pixel
 	Image *img;
 } Tilemap;
-typedef struct Point {
-	float x, y;
-} Point;
-typedef struct Point3 {
-	float x, y, z;
-} Point3;
 typedef struct Vbo {
 	unsigned int id, count, tex;
 	Point *data;
@@ -202,6 +213,7 @@ void enableScissorTest();
 void disableScissorTest();
 void enableAlphaTest();
 void disableAlphaTest();
+void setScissor(int x, int y, int w, int h);
 void move(double translateX, double translateY);
 void scale(double scaleX, double scaleY);
 void rotate(double angle);
@@ -243,7 +255,7 @@ void stencilFunc(int func, int ref, unsigned int mask);
 void stencilOp(int fail, int zfail, int zpass);
 void drawToStencil();
 void drawUsingStencil();
-void newImageOpt(Image* ptr, const char *name, const char *options);
+void newImageOpt(Image *ptr, const char *name, const char *options);
 inline void imageCheckResLoader(Image * image);
 inline void imageBind(Image * image);
 void enableTexture();
@@ -259,9 +271,8 @@ void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, 
 void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy);
 void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
 void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy);
-void activeTexture(int i);
-void imageFiltering(Image * img, bool enabled);
 void deleteImage(Image * ptr);
+void newParticleSystem(ParticleSystem *ptr, const char *name, const char *options);
 void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver);
 void newFragmentShader(Shader * ptr, const char * frag);
 bool shaderCheck(Shader * ptr);

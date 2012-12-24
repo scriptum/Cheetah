@@ -415,7 +415,7 @@ local texturesArchive = {}
 --~ local resLoadedImages
 C.fonts = {}
 C.newFont = function(name, scalable, codepage)
-	local a, b, c, font, img
+	local a, b, c, d, font, img
 	local millis = C.getTicks()
 	local glyphs = 0
 	local bytes = 0
@@ -425,10 +425,14 @@ C.newFont = function(name, scalable, codepage)
 		if a then
 			n = name:gsub('[^/]+$', a)
 			img = ffi.new('Image')
-			libcheetah.newImageOpt(img, n, 'in') --disable delayed loader
+			if scalable then
+				libcheetah.newImageOpt(img, n, 'i') --disable delayed loader
+			else
+				libcheetah.newImageOpt(img, n, 'in') --disable delayed loader
+			end
 			table.insert(texturesArchive, img)
 		else
-			a, b, c = line:match('^([%w ]+) (%d+)(p[tx])$')
+			a, b, c = line:match('^([%w ]+) (%d+)(p[tx]) *([a-z]*)$')
 			if a then
 				if c == 'px' then b = math.ceil(b * 72 / 96) end
 				if font then bytes = bytes + font.mem end

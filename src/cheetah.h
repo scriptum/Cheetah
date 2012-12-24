@@ -62,31 +62,19 @@ typedef struct SDL_Rect {
 
 
 struct {
-	unsigned int flags;				/**< Read-only */
-	void *format;		/**< Read-only */
-	int w, h;				/**< Read-only */
-	unsigned short pitch;				/**< Read-only */
-	void *pixels;				/**< Read-write */
-	int offset;				/**< Private */
-
-	/** Hardware-specific surface info */
+	unsigned int flags;
+	void *format;
+	int w, h;
+	unsigned short pitch;
+	void *pixels;
+	int offset;
 	struct private_hwdata *hwdata;
-
-	/** clipping information */
-	SDL_Rect clip_rect;			/**< Read-only */
-	unsigned int unused1;				/**< for binary compatibility */
-
-	/** Allow recursive locks */
-	unsigned int locked;				/**< Private */
-
-	/** info for fast blit mapping to other surfaces */
-	struct SDL_BlitMap *map;		/**< Private */
-
-	/** format version, bumped at every change to invalidate blit maps */
-	unsigned int format_version;		/**< Private */
-
-	/** Reference count -- used when freeing surface */
-	int refcount;				/**< Read-mostly */
+	SDL_Rect clip_rect;
+	unsigned int unused1;
+	unsigned int locked;
+	struct SDL_BlitMap *map;
+	unsigned int format_version;
+	int refcount;
 } screen;
 
 typedef struct __dirstream {
@@ -98,19 +86,32 @@ struct {
 	char GLSL, BE, FBO, VBO, MT, PS;
 } supported;
 
+typedef struct Color {
+	unsigned char r, g, b, a;
+} Color;
+
+/*=================================points=====================================*/
+typedef struct Point {
+	float x, y;
+} Point;
+
+typedef struct Point3 {
+	float x, y, z;
+} Point3;
+
 /*=================================images=====================================*/
 typedef struct Image {
 	char *name;
 	char *options;
 	/* OpenGL texture id */
-	unsigned int id;
+	unsigned id;
 	/* width and height */
 	float w, h;
 	int channels;
 	int queued;
 } Image;
 
-typedef Image* pImage;
+typedef Image *pImage;
 
 typedef struct ImageData {
 	int w, h, channels;
@@ -123,9 +124,32 @@ typedef struct Multitexture {
 	Image **images;
 } Multitexture;
 
+/*================================particles===================================*/
+typedef struct ParticleForce {
+	unsigned maxParticles;
+} ParticleForce;
+
+typedef struct ParticleSystem {
+	ParticleForce *forces;
+	Point *position;
+	Point *speed;
+	Point emitterPosition;
+	unsigned maxParticles;
+	float direction;
+	float directionVariation;
+	float scale;
+	float scaleVariation;
+	float scaleVariation;
+	unsigned emissionRate;
+	float gravity;
+	unsigned lifeTime;
+	Color color;
+	Color colorVariation;
+} ParticleSystem;
+
 /*=================================atlas======================================*/
 typedef struct Atlas {
-	Image * image;
+	Image *image;
 	/* original width and height */
 	float w, h;
 	/* atlas width and height */
@@ -138,7 +162,7 @@ typedef struct Atlas {
 
 /*==============================framebuffers==================================*/
 typedef struct Framebuffer {
-	unsigned int id;
+	unsigned id;
 	Image *image;
 } Framebuffer;
 
@@ -146,7 +170,7 @@ typedef struct Framebuffer {
 typedef struct FontChar
 {
 	/* OpenGL list id */
-	unsigned int vertex;
+	unsigned vertex;
 	/* Width of char */
 	float w;
 	float v[4], t[4];
@@ -178,13 +202,6 @@ typedef struct _Tilemap {
 } Tilemap;
 
 /*==================================VBO=======================================*/
-typedef struct Point {
-	float x, y;
-} Point;
-
-typedef struct Point3 {
-	float x, y, z;
-} Point3;
 
 typedef struct Vbo {
 	unsigned int id, count, tex;
