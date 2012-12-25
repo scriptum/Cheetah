@@ -613,7 +613,7 @@ C.resLoader = function(dirname, recursive)
 end
 
 C.init = function(title, w, h, c, o)
-	libcheetah.init(title or 'Cheetah 2D Engine', w or 800, h or 600, c or 32, o or '')
+	libcheetah.init(title or 'Cheetah 2D Engine', w or 800, h or 600, c or 32, o or 'v')
 	C.newFont('lib/font/DICE.fnt')
 	C.fonts.default = C.fonts.DICE[6]
 end
