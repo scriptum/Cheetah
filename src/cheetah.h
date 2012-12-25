@@ -139,7 +139,6 @@ typedef struct ParticleSystem {
 	float directionVariation;
 	float scale;
 	float scaleVariation;
-	float scaleVariation;
 	unsigned emissionRate;
 	float gravity;
 	unsigned lifeTime;
