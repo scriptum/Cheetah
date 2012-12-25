@@ -110,7 +110,7 @@ void disableScissorTest() {
  * */
 void enableAlphaTest() {
 	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_EQUAL,1.f);
+	glAlphaFunc(GL_GREATER, 0.5f);
 }
 
 /**
