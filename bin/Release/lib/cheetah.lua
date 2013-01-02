@@ -122,7 +122,7 @@ C.mainLoop = function()
 			lasttime = time
 			if C.printFPS then 
 				print(C.FPS..' '..gcinfo())
-				C.caption(C.FPS..' '..gcinfo())
+				C.setTitle(C.FPS..' '..gcinfo())
 			end
 			C.FPS = tostring(math.floor(FPS))
 		end
@@ -309,7 +309,8 @@ end
 ffi.metatype('Image', {
 	__index = {
 		draw = draw_general(libcheetah.imageDrawt, libcheetah.imageDrawxy),
-		drawq = drawq_general(libcheetah.imageDrawqt, libcheetah.imageDrawqxy)
+		drawq = drawq_general(libcheetah.imageDrawqt, libcheetah.imageDrawqxy),
+		drawBorder = C.imageDrawBorder
 	}, 
 	__gc = libcheetah.deleteImage
 })
@@ -612,8 +613,8 @@ C.resLoader = function(dirname, recursive)
 	return res_tree
 end
 
-C.init = function(title, w, h, c, o)
-	libcheetah.init(title or 'Cheetah 2D Engine', w or 800, h or 600, c or 32, o or 'v')
+C.init = function(title, options)
+	libcheetah.init(title or 'Cheetah 2D Engine', options or 'vsync')
 	C.newFont('lib/font/DICE.fnt')
 	C.fonts.default = C.fonts.DICE[6]
 end
@@ -631,10 +632,10 @@ end
 ffi.metatype('Framebuffer', {
 	__index = {
 		draw = function(s, x, y, w, h, a, ox, oy)
-			s.image:draw()
+			s.image:draw(x, y, w, h, a, ox, oy)
 		end,
 		drawq = function(s, x, y, w, h, qx, qy, qw, qh, a, ox, oy)
-			s.image:drawq(qx, qy, qw, qh)
+			s.image:drawq(x, y, w, h, qx, qy, qw, qh, a, ox, oy)
 		end,
 		bind = libcheetah.framebufferBind,
 		save = function(s, name)

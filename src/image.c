@@ -391,6 +391,48 @@ void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, fl
 	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, image->w, image->h);
 }
 
+bool borderImageDrawCentralPart = TRUE;
+
+void imageDrawBorderCenter(bool drawCenter) {
+	borderImageDrawCentralPart = drawCenter;
+}
+
+/**
+ * @descr Draw image sliced on 9 parts by 4 lines: top, bottom, left and right
+ * @group graphics/image
+ * @var Image object
+ * @var position of left top corner
+ * @var position of left top corner
+ * @var summary width of object
+ * @var summary height of object
+ * @var slice top
+ * @var slice right
+ * @var slice bottom
+ * @var slice left
+ * */
+void imageDrawBorder(Image * image, float x, float y, float w, float h, float t, float r, float b, float l) {
+	imageBind(image);
+	float ow = image->w;
+	float oh = image->h;
+	if(t > 0.0)
+	{
+		PUSH_QUADT(x,          y,          l,          t,          0, 0, 0,  0,       0,       l,            t,          ow, oh);
+		PUSH_QUADT(x + l,      y,          w - l - r,  t,          0, 0, 0,  l,       0,       ow - l - r,    t,          ow, oh);
+		PUSH_QUADT(x + w - r,  y,          r,          t,          0, 0, 0,  ow - r,  0,       r,            t,          ow, oh);
+	}
+
+	PUSH_QUADT(x,            y + t,      l,          h - t - b,  0, 0, 0,  0,       t,        l,           oh - t - b, ow, oh);
+	if(borderImageDrawCentralPart)
+		PUSH_QUADT(x + l,      y + t,      w - l - r,  h - t - b,  0, 0, 0,  l,       t,        ow - l - r,  oh - t - b, ow, oh);
+	PUSH_QUADT(x + w - r,    y + t,      r,          h - t - b,  0, 0, 0,  ow - r,  t,        r,           oh - t - b, ow, oh);
+	if(b > 0.0)
+	{
+		PUSH_QUADT(x,          y + h - b,  l,          b,          0, 0, 0,  0,       oh - b,   l,           b,          ow, oh);
+		PUSH_QUADT(x + l,      y + h - b,  w - l - r,  b,          0, 0, 0,  l,       oh - b,   ow - l - r,  b,          ow, oh);
+		PUSH_QUADT(x + w - r,  y + h - b,  r,          b,          0, 0, 0,  ow - r,  oh - b,   r,           b,          ow, oh);
+	}
+}
+
 void initMultitexture(Multitexture * multitexture) {
 	new(multitexture->images, Image*, multitexture->size);
 }

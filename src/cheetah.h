@@ -288,4 +288,11 @@ extern double globalTimed;
 extern double globalTimeOffsetd;
 extern double globalGameSpeed;
 extern int resizeDelay;
+
+#ifndef TRUE
+#define TRUE (bool) 1
+#endif
+#ifndef FALSE
+#define FALSE (bool) 0
+#endif
 #endif //__CHEETAH_H__
