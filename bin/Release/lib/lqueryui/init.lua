@@ -1,10 +1,20 @@
 local ui = {}
 
+local C = cheetah
+
 ui.default = {
 	color = {255,255,255},
 	borderColor = {255,255,255},
 	--~ font = Fonts["Arial"][9]
 }
+
+ui.setColor = function(color)
+	if #color == 3 then
+		C.color(unpack(color), 255)
+	elseif #color == 4 then
+		C.color(unpack(color))
+	end
+end
 
 ui.defaultStyles = {}
 ui.setDefaultStyle = function(widgetType, style)
@@ -35,14 +45,14 @@ local parseMargin = function(m)
 		mT, mR, mB, mL = m, m, m, m
 	end
 end
-if not love then local G = S end --for scrupp engine
 local style = {}, hover, click
 local x,y,w,h
 local possibleCSS = {'margin', 'background', 'border', 'borderColor', 'color', 'font', 'backgroundImage', 'borderImage', 'align', 'valign'}
 ui.draw = function(s)
+	local x, y, w, h
 	if s.uiStyle then
-		if  love then G.setLineStyle( "rough" ) else G.setSmooth(false) end
-		x,y,w,h = s.x,s.y,s.w,s.h
+		--~ if love then G.setLineStyle( "rough" ) else G.setSmooth(false) end
+		local x, y, w, h = s.x, s.y, s.w, s.h
 		local st = s.uiStyle
 		for _, v in ipairs(possibleCSS) do
 			style[v] = st[v]
@@ -55,12 +65,11 @@ ui.draw = function(s)
 		end
 		if style.margin then
 			parseMargin(style.margin)
-			x,y,w,h = x+mL,y+mT,w-mR-mL,h-mT-mB
+			x, y, w, h = x + mL, y + mT, w - mR - mL, h - mT - mB
 		end
 		if style.background then
 			if type(style.background) == 'table' then
-				G.setColor(style.background)
-				if love then G.rectangle("fill",x,y,w,h) else G.rectangle(x,y,w,h,true) end
+				ui.setColor(style.background)
 			end
 		end
 		if style.backgroundImage then
@@ -88,17 +97,17 @@ ui.draw = function(s)
 		end
 		if style.border then
 			if style.borderColor then
-				G.setColor(style.borderColor)
+				ui.setColor(style.borderColor)
 			else
-				G.setColor(ui.default.borderColor)
+				ui.setColor(ui.default.borderColor)
 			end
 			G.setLineWidth(style.border+0.4999)
 			if love then G.rectangle("line",x,y,w,h) else G.rectangle(x,y,w,h) end
 		end
 		if style.color then 
-			G.setColor(style.color)
+			ui.setColor(style.color)
 		else
-			G.setColor(ui.default.color)
+			ui.setColor(ui.default.color)
 		end
 		if style.font then
 			if love then G.setFont(style.font) else style.font:select() end
@@ -114,9 +123,7 @@ ui.draw = function(s)
 					if love then pos = y + h - style.font:getLineHeight() else pos = y + h - G.stringHeight()end
 				end
 			end
-			if love then
-				G.printf(s._text, math.floor(x), math.floor(pos or y + (h - style.font:getLineHeight())/2*0.6), w, style.align or 'center')
-			else G.printf(s._text, math.floor(x), math.floor(pos or y + (h - G.stringHeight())/2), w, style.align or 'center') end
+			style.font:print(s._text, x, pos or y + (h - style.font:getLineHeight())/2*0.6), w, style.align or 'center')
 		end
 	end
 end
