@@ -126,31 +126,32 @@ else if((a[i] & 0xf8) == 0xf0) {\
 
 void fontPrintf(Font *currentFont, register const unsigned char * str, float x, float y, float maxw, int align) {
 	FontChar *ch;
-	int i = 0;
-	int last_space = 0;
-	int buf = 0;
-	int spaces = -1;
-	int high = 0;
-	int low = 0;
-	int increment = 0;
-	int incrementBuf = 0;
-	int c;
-	float w = 0, h;
-	float lastw = 0;
-	float justifyWidth = 0;
-	int memstep = 0;
-	float spacew = currentFont->spacew;
-	float fontHeight = currentFont->height * currentFont->_interval;
-	float oldx = x, oldy = y;
-	bool end = 0;
-	bool justify = align == alignJustify;
-	if(maxw > .0) {
+	int       i            = 0;
+	int       last_space   = 0;
+	int       buf          = 0;
+	int       spaces       = -1;
+	int       high         = 0;
+	int       low          = 0;
+	int       increment    = 0;
+	int       incrementBuf = 0;
+	int       c;
+	float     w            = 0.0;
+	float     h            = 0.0;
+	float     lastw        = 0.0;
+	float     justifyWidth = 0.0;
+	float     spacew       = currentFont->spacew;
+	float     fontHeight   = currentFont->height * currentFont->_interval;
+	float     oldy         = y;
+	bool      end          = FALSE;
+	bool      justify      = (align == alignJustify);
+	if(maxw > 0.0)
+	{
 		maxw = maxw / currentFont->_scale * screenScale.scaleX;
-		if(maxw == .0) maxw = 0.0001;
+		if(maxw == 0.0) maxw = 0.0001;
 	}
 	FLUSH_BUFFER();
 	glPushMatrix();
-	if(!currentFont->scalable)
+	if(FALSE == currentFont->scalable)
 	{
 		glScalef(currentFont->_scale / screenScale.scaleX, currentFont->_scale / screenScale.scaleY, 1);
 		glTranslatef(floor(x * screenScale.scaleX), floor(y * screenScale.scaleY), 0);
@@ -161,14 +162,16 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 		glTranslatef(x, y, 0);
 	}
 	
-	h = y = 0;
+	h = y = 0.0;
 
 	imageBind(currentFont->image);
-	if(maxw > .0) {
-		while(1) {
+	if(maxw > 0.0)
+	{
+		while(TRUE)
+		{
 			UNICODE_TO_INT(str, i, increment)
 			c = low | (high << 8);
-			if(!currentFont->chars[high] || !currentFont->chars[high][low])
+			if(NULL == currentFont->chars[high] || NULL == currentFont->chars[high][low])
 			{
 				//~ myError("Symbol %d not found!", c);
 				i += increment;
@@ -183,24 +186,24 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 			//~ }
 			switch(c)
 			{
-					case '\t':
-							w += spacew * 8;
-							last_space = i;
-							lastw = w;
-							break;
-					case '\0':
-							end = 1;
-							break;
-					case ' ':
-							last_space = i;
-							lastw = w;
-							spaces++;
-					default:
-							w += currentFont->chars[high][low]->w;
+				case '\t':
+						w += spacew * 8;
+						last_space = i;
+						lastw = w;
+						break;
+				case '\0':
+						end = TRUE;
+						break;
+				case ' ':
+						last_space = i;
+						lastw = w;
+						spaces++;
+				default:
+						w += currentFont->chars[high][low]->w;
 			}
-			if(w > maxw || c == '\n' || end)
+			if(w > maxw || c == '\n' || TRUE == end)
 			{
-				if(!last_space || c == '\n'|| end) {
+				if(!last_space || c == '\n'|| TRUE == end) {
 					last_space = i;
 					lastw = w;
 				}
@@ -213,7 +216,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 						x = maxw - lastw;
 						break;
 					case alignJustify:
-						if(c == '\n' || end)
+						if(c == '\n' || TRUE == end)
 							justifyWidth = spacew;
 						else
 							justifyWidth = (maxw + spacew * (spaces) - lastw) / (float)(spaces);
@@ -254,7 +257,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 					buf = last_space;
 				}
 				
-				if(end) break;
+				if(TRUE == end) break;
 				x = 0;
 				y += fontHeight;
 				//fast dropping invisible lines
