@@ -31,78 +31,65 @@ SDL_Surface *screen = NULL;
  * @descr Create window and initialize all OpenGL's stuff. You MUST call this before any graphics function, e.g. cheetah.newImage. You may call this function again to re-size window, change application title, toggle fullscreen. Other options are ignored.
  * @group graphics/window
  * @var application's title shown in titlebar
- * @var width of the window
- * @var height of the window
- * @var bits per pixel (8, 16, 32, usually 32)
  * @var string of options. Supported options:
- *  * _f_ - fullscreen
- *  * _r_ - allow to re-size window
- *  * _l_ - use delayed resource loader
- *  * _v_ - enable vertical sync (recommend)
- *  * _d_ - enable depth buffer (usually 2D apps do not need this)
- *  * _s_ - enable stencil buffer (usually 2D apps do not need this)
+ * * _1024x768_ - set window size to 1024x768, default window size - 800x600
+ * * _1024_ - set window size to 1024x1024
  * @return true if success
  * */
-bool init(const char * appName, unsigned int width, unsigned int height, int bpp, const char * attr) {
-	bool fullscreen = 0;
-	bool resizable = 0;
-	int vsync = 0;
-	bool firstrun = 0;
-	bool depth = 0;
-	bool stencil = 0;
-	bool loader = 0;
-	char ch;
-	Uint32 flags = SDL_OPENGL | SDL_DOUBLEBUF;
-	
-	
-	while(*attr)
-	{
-		ch = *attr;
-		if(ch == 'f') fullscreen = 1;
-		if(ch == 'r') resizable = 1;
-		if(ch == 'v') vsync = 1;
-		if(ch == 'd') depth = 1;
-		if(ch == 's') stencil = 1;
-		if(ch == 'l') loader = 1;
-		attr++;
-	}
-	if (fullscreen) {
+bool init(const char * appName, const char * options) {
+	unsigned flags = SDL_OPENGL | SDL_DOUBLEBUF;
+	bool firstrun = FALSE;
+	int width = 800, height = 600;
+	int count = sscanf(options, "%dx%d", &width, &height);
+	if(1 == count) height = width;
+	if(width <= 0)
+		width = 800;
+	if(height <= 0)
+		height = 600;
+	CHECK_OPTION(options, fullscreen);  /* run in fullscreen mode */
+	CHECK_OPTION(options, resizable);   /* make window resizable */
+	CHECK_OPTION(options, vsync);       /* enable vsync */
+	CHECK_OPTION(options, resloader);   /* enable delayed resource loader */
+	CHECK_OPTION(options, depth);       /* enable depth buffer */
+	CHECK_OPTION(options, stencil);     /* enable stencil buffer */
+	CHECK_OPTION(options, noframe);     /* try to make window without frame */
+	const int bpp = 32;
+	if(TRUE == fullscreen)
 		flags |= SDL_FULLSCREEN;
-	} else if (resizable) {
+	else if(TRUE == resizable)
 		flags |= SDL_RESIZABLE;
-	}
-	
-	if(width < 1) width = 1;
-	if(height < 1) height = 1;
-	
-	if (screen == NULL) {
-		if ( SDL_Init ( SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER ) != 0 )
-			return 0;
+	if(TRUE == noframe)
+		flags |= SDL_NOFRAME;
+	if(NULL == screen) {
+		if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) != 0)
+			return FALSE;
 		atexit(SDL_Quit);
 		SDL_EnableUNICODE(1);
 		//~ SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
-		if(depth) SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-		if(stencil) SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-		firstrun = 1;
+		if(TRUE == depth) SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+		if(TRUE == stencil) SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+		firstrun = TRUE;
 		/*Set screen auto-scale properties*/
 		screenScale.origWidth = width;
 		screenScale.origHeight = height;
-		screenScale.autoScale = 1;
-		screenScale.autoScaleFont = 1;
+		screenScale.autoScale = TRUE;
+		screenScale.autoScaleFont = TRUE;
 		screenScale.scaleX = 1.0f;
 		screenScale.scaleY = 1.0f;
 		screenScale.offsetX = 0.0f;
 		screenScale.offsetY = 0.0f;
 		screenScale.aspect = (float)width/height;
 	}
-	if(appName) SDL_WM_SetCaption (appName, appName);
+	if(NULL != appName)
+		SDL_WM_SetCaption(appName, appName);
 	screen = SDL_SetVideoMode(width, height, bpp, flags);
-	if (screen == NULL)
+	if (NULL == screen)
 		myError("couldn't set %dx%dx%d video mode: %s",
 								width, height, bpp, SDL_GetError());
 
-	if (firstrun) {
+	if(TRUE == firstrun)
+	{
 		initRenderer();
 		/* set background color */
 		glClearColor( 0, 0, 0, 1);
@@ -118,7 +105,7 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		glEnable(GL_TEXTURE_2D);
 		//~ glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
 		resLoaderQueue = NULL;
-		if(loader)
+		if(TRUE == resloader)
 		{
 			resLoaderQueue = newQueue();
 			resQueueMutex = SDL_CreateMutex();
@@ -141,7 +128,8 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	//~ glDepthRange(-10000,10000);
-	if(firstrun) {
+	if(TRUE == firstrun)
+	{
 		quadlist = glGenLists(1);
 		glNewList(quadlist, GL_COMPILE);
 		glBegin(GL_QUADS);
@@ -189,7 +177,7 @@ bool init(const char * appName, unsigned int width, unsigned int height, int bpp
 		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
 		//~ glBindTexture(GL_TEXTURE_2D, 0);
 	}
-	return 1;
+	return TRUE;
 }
 
 /**
@@ -236,7 +224,7 @@ void swapBuffers() {
  * @var text to replace the caption
  * @see init
  * */
-void caption(const char * text) {
+void setTitle(const char * text) {
 	SDL_WM_SetCaption(text, text);
 }
 
@@ -245,7 +233,8 @@ void caption(const char * text) {
  * @group graphics/window
  * @return array of pointers to SDL_Rect structure.
  * */
-SDL_Rect ** getModes() {
+SDL_Rect ** getModes()
+{
 	SDL_Rect ** modes = SDL_ListModes(0, SDL_OPENGL | SDL_FULLSCREEN);
 	if(modes == (SDL_Rect **)0 || modes == (SDL_Rect **)-1)
 		return 0;
