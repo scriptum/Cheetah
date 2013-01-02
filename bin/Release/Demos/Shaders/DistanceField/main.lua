@@ -1,7 +1,7 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Test', 1920, 1080, 32, 'v')
+C.init('Test')
 
 C.printFPS = true
 
@@ -27,9 +27,9 @@ E:new(screen):draw(function(s)
 	df:set('sharpness', sharp)
 	df:set('gamma', 0.3)
 	df:set('pixel', 1/s.w)
-	img:drawt(s.x, s.y, s.w, s.h, 0, s.ox, s.oy)
+	img:draw(s.x, s.y, s.w, s.h, 0, s.ox, s.oy)
 	df:unbind()
-	img:drawxy(0, 0, img.w, img.h)
+	img:draw(0, 0, img.w, img.h)
 end)
 :wheel(function(s, x, y, b)
 	if b == 'u' then
