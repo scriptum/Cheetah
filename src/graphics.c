@@ -127,6 +127,11 @@ void setScissor(int x, int y, int w, int h) {
 	glScissor(x, screen->h - y - h, w, h);
 }
 
+void flush() {
+	FLUSH_BUFFER();
+	glFinish();
+}
+
 
 //~ void translate(double translateX, double translateY) {
 	//~ glTranslated(translateX, translateY, 0);
