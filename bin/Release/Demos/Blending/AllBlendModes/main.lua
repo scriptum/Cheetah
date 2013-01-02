@@ -1,7 +1,7 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Test', '1024x'..(512)..' vsync')
+C.init('Test', '1024x512 vsync')
 
 local gray = C.generate('light', 64, 64)
 local img = C.newImage('sprite.png')
