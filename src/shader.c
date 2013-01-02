@@ -24,10 +24,11 @@ IN THE SOFTWARE.
 #include "cheetah.h"
 #include "render.h"
 
-const char * std_vertex_shader = "void main()\
+const char * std_vertex_shader = "varying vec2 TexCoord;\
+void main()\
 {\
-	gl_Position    = gl_ModelViewProjectionMatrix * gl_Vertex;\
-	gl_TexCoord[0] = gl_MultiTexCoord0;\
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\
+	TexCoord = gl_MultiTexCoord0.xy;\
 }";
 
 //~ char * loadfile(const char * name, unsigned int * length)
