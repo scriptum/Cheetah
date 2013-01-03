@@ -2,7 +2,7 @@ require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
 local scr_w, scr_h = 1024, 1024
-C.init('Sunlight', scr_w, scr_h, 32, '')
+C.init('Sunlight', scr_w..'x'..scr_h)
 C.printFPS = true
 local landImg = C.newImage('1.png')
 local normalImg = C.newImage('1n.png')

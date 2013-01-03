@@ -1,7 +1,7 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Test', 800, 600, 32, '')
+C.init('Road of ribbon raytrace example', '800x600 resizable')
 C.printFPS = true
 
 local shader = C.newShader("shader.glsl")

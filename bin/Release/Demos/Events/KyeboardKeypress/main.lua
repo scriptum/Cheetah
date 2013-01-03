@@ -4,13 +4,13 @@ require 'lib.lquery.init'
 --alias for all cheetah's functions
 local C = cheetah
 
---800x600x32 with vertical synch
-C.init('Test', 800, 600, 32, 'v')
+--800x600 with vertical synch by default
+C.init('Keyboard events')
 
 --show FPS in console and window title
 C.printFPS = true
 
---generate image
+--generate simple image
 player_img = C.generate("circle", 32, 32)
 
 local player = E:new(screen):image(player_img)
