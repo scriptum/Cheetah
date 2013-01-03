@@ -1,6 +1,6 @@
 TARGET := libcheetah.so
-CFLAGS += -fPIC -O3 -fomit-frame-pointer -ffast-math -Wall
-LDFLAGS += -shared -L"lib" -lSDL -lGL
+CFLAGS += -fPIC -Ofast -fomit-frame-pointer -funroll-loops -flto -Wall -pipe
+LDFLAGS += -shared -L"lib" -lSDL -lGL -flto -pipe
 RESFLAGS := -I"inc"
 SOURCEDIR := src src/SOIL
 
