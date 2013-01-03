@@ -4,13 +4,13 @@ local C = cheetah
 --set window width and height
 local scr_w, scr_h = 800, 600
 --map size
-local map_size = 64
+local map_size = 1024
 local tile_size = 16
-C.init('Lights', scr_w, scr_h, 32, '')
+C.init('Lights', scr_w..'x'..scr_h)
 --print fps
 C.printFPS = true
 --tileset
-local tileSet = C.newImage('tiles.png', '')
+local tileSet = C.newImage('tiles.png')
 --generate random tilemap, nearest interpolation needed!
 local tileMap = C.generate('noise', map_size, map_size, 'n')
 
@@ -21,10 +21,11 @@ uniform sampler2D tileSet;
 uniform sampler2D tileMap;
 uniform float tilesInRow;
 uniform float scale;
+varying vec2 TexCoord;
 void main() {
 	//we have only 16 tiles in a row, discrete them
-	vec2 offset = floor(texture2D(tileMap, gl_TexCoord[0].st).rg*tilesInRow)/tilesInRow;
-	gl_FragColor = texture2D(tileSet, fract(gl_TexCoord[0].st*scale*tilesInRow)/tilesInRow + offset);
+	vec2 offset = floor(texture2D(tileMap, TexCoord).rg*tilesInRow)/tilesInRow;
+	gl_FragColor = texture2D(tileSet, fract(TexCoord*scale*tilesInRow)/tilesInRow + offset);
 }
 ]])
 
@@ -35,7 +36,7 @@ E:new(screen):draw(function(s)
 	shader:set('tilesInRow', tile_size)
 	shader:set('scale', map_size*tile_size/tileSet.w)
 	local total_size = map_size*tile_size
-	multi:draw(-total_size/scr_w*lQuery.mX/20+scr_w/2, -total_size/scr_h*lQuery.mY/20+scr_h/2, total_size, total_size, time/1000)
+	multi:draw(-total_size/scr_w*lQuery.mX+scr_w/2, -total_size/scr_h*lQuery.mY+scr_h/2, total_size, total_size)
 end)
 
 --do not forget about main loop!

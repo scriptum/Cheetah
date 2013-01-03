@@ -1,7 +1,7 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Laplas edge detaction')
+C.init('Laplas edge detection')
 local img = C.newImage('Cheetah.jpg')
 
 local shader = C.newShader('laplas.glsl')

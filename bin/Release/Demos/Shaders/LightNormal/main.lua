@@ -3,7 +3,7 @@ require 'lib.lquery.init'
 local C = cheetah
 local sin = math.sin
 local scr_w, scr_h = 1024, 768
-C.init('Lights', scr_w, scr_h, 32, '')
+C.init('Lights', scr_w..'x'..scr_h)
 C.printFPS = true
 local landImg = C.newImage('tex1.jpg')
 local normalImg = C.newImage('tex1_n.jpg')
@@ -24,10 +24,10 @@ local multi = C.newMultitexture(normFbo.image, lightImg)
 --new entity just for rendering
 E:new(screen)
 :draw(function()
-	landImg:drawqxy(0,0,scr_w,scr_h,0,0,scr_w,scr_h) --draw background
+	landImg:drawq(0,0,scr_w,scr_h,0,0,scr_w,scr_h) --draw background
 	--normalmap to framebuffer
 	normFbo:bind()
-	normalImg:drawqxy(0,0,scr_w,scr_h,0,0,scr_w,scr_h)
+	normalImg:drawq(0,0,scr_w,scr_h,0,0,scr_w,scr_h)
 	normFbo:unbind()
 	--draw to lighting layer now
 	lightFbo:bind()
@@ -42,14 +42,14 @@ E:new(screen)
 	shader:set('lightColor', 0.6, 0.5, 0.4) --100% light is 0.5 due to detial blending mode
 	for i = 1, lightsCount do
 		local l = lights[i]
-		multi:drawxy((sin(time*l[3]+l[1])+1)*(scr_w-l[5])*0.5, (sin(time*l[4]+l[2])+1)*(scr_h-l[5])*0.5, l[5], l[5])
+		multi:draw((sin(time*l[3]+l[1])+1)*(scr_w-l[5])*0.5, (sin(time*l[4]+l[2])+1)*(scr_h-l[5])*0.5, l[5], l[5])
 	end
 	shader:set('lightColor', 0.4, 0.5, 0.6) --let mouse light be blue
-	multi:drawxy(lQuery.mX-mouseLight/2, lQuery.mY-mouseLight/2, mouseLight, mouseLight)
+	multi:draw(lQuery.mX-mouseLight/2, lQuery.mY-mouseLight/2, mouseLight, mouseLight)
 	shader:unbind() --disable shader
 	lightFbo:unbind() --stop rendering to framebuffer
 	C.blendMode(C.blendDetail) --detail blenging is perfect for light effects
-	lightFbo:drawxy(0, 0, scr_w, scr_h) --merge light layer (framebuffer)
+	lightFbo:draw(0, 0, scr_w, scr_h) --merge light layer (framebuffer)
 	C.blendMode(0) --return blending mode to default
 end)
 

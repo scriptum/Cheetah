@@ -1,7 +1,7 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Masked Image', 800, 600, 32, 'v')
+C.init('Masked Image')
 local img = C.newImage('checkers.jpg', 'm')
 
 Entity:new(screen):image(img):draggable()

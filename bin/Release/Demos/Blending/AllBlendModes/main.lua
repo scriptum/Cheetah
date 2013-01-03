@@ -30,7 +30,7 @@ local blend2 = {
 }
 E:new(screen):draw(function()
 	C.color(255,255,255,255)
-	--~ C.setBlendEquation(cheetah.GL_MAX)
+	--~ C.blendEquation(cheetah.GL_MAX)
 	
 	for i, u in ipairs(blend1) do
 		for j, v in ipairs(blend2) do
@@ -44,7 +44,7 @@ E:new(screen):draw(function()
 			gray:draw((i+8)*64, (j-1)*64)
 		end
 	end
-	C.blendEquation(cheetah.GL_FUNC_ADD)
+	--~ C.blendEquation(cheetah.GL_FUNC_ADD)
 	C.blendMode(0)
 end)
 

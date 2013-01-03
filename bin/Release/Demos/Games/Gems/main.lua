@@ -1,7 +1,7 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Gems game', 800, 600, 32, 'v')
+C.init('Gems game')
 
 local img = {gems = {}}
 for i = 0, 7 do 
@@ -258,8 +258,8 @@ lQuery.addhook(function()
 end)
 
 local gem_draw = function(s)
-	img.gems[s.k]:drawxy(s.x, s.y, gemSize,  gemSize)
-	if s.sel == true then img.sel:drawxy(s.x, s.y, gemSize,  gemSize) end
+	img.gems[s.k]:draw(s.x, s.y, gemSize,  gemSize)
+	if s.sel == true then img.sel:draw(s.x, s.y, gemSize,  gemSize) end
 end
 
 math.randomseed(os.time())
