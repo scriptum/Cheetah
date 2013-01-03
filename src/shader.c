@@ -31,22 +31,6 @@ void main()\
 	TexCoord = gl_MultiTexCoord0.xy;\
 }";
 
-//~ char * loadfile(const char * name, unsigned int * length)
-//~ {
-	//~ char * data;
-	//~ unsigned int len;
-	//~ PHYSFS_file* myfile = PHYSFS_openRead(name);
-	//~ if (!myfile)
-		//~ return 0;
-	//~ len = PHYSFS_fileLength(myfile);
-	//~ *length = len;
-	//~ data = (char *)malloc(sizeof(char) * len + 1);
-	//~ PHYSFS_read (myfile, data, sizeof(char), len);
-	//~ PHYSFS_close(myfile);
-	//~ data[len] = 0;
-	//~ return data;
-//~ }
-
 static int compile(GLuint shader, const char* name)
 {
 	GLint compiled;
@@ -80,7 +64,6 @@ void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
 		myError("Call init function before!");
 		return;
 	}
-	//~ new(ptr, Shader, 1);
 	ptr->id = 0;
 	if(!supported.GLSL)
 	{
