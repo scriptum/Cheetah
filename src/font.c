@@ -100,20 +100,20 @@ while(0)
 high = low = 0;\
 if((a[i] & 0x80) == 0) {\
 	low = a[i];\
-	increment = 1;\
+	increment=1;\
 }\
 else if((a[i] & 0xe0) == 0xc0) {\
 	low = a[i+1] & 0x3f;\
 	low |= (a[i] & 0x03) << 6;\
 	high = (a[i] & 0x1f) >> 2;\
-	increment = 2;\
+	increment=2;\
 }\
 else if((a[i] & 0xf0) == 0xe0) {\
 	low = a[i+2] & 0x3f;\
 	low |= (a[i+1] & 0x03) << 6;\
 	high = (a[i+1] & 0x3f) >> 2;\
 	high |= (a[i] & 0x0f) << 4;\
-	increment = 3;\
+	increment=3;\
 }\
 else if((a[i] & 0xf8) == 0xf0) {\
 	low = a[i+3] & 0x3f;\
@@ -121,7 +121,7 @@ else if((a[i] & 0xf8) == 0xf0) {\
 	high = (a[i+2] & 0x3f) >> 2;\
 	high |= (a[i+1] & 0x3f) << 4;\
 	high |= (a[i] & 0x07) << 10;\
-	increment = 4;\
+	increment=4;\
 }
 
 void fontPrintf(Font *currentFont, register const unsigned char * str, float x, float y, float maxw, int align) {
@@ -348,11 +348,19 @@ float fontGetInterval(Font *font) {
 }
 
 void fontSetGlyph(Font *ptr, const char *line) {
-	static float cx2=0, cy2=0, x1=0, y1=0, x2=0, y2=0, cx1=0, cy1=0, w=0, h=0;
-	static unsigned int ch=0, ch2;
-	static unsigned char char_string_buffer[9];
+	float cx2 = 0.0;
+	float cy2 = 0.0;
+	float x1  = 0.0;
+	float y1  = 0.0;
+	float x2  = 0.0;
+	float y2  = 0.0;
+	float cx1 = 0.0;
+	float cy1 = 0.0;
+	float w   = 0.0;
+	float h   = 0.0;
+	unsigned ch = 0, ch2;
+	unsigned char char_string_buffer[9];
 	int i = 0;
-	int increment = 0;
 	int high=0;
 	int low=0;
 	FontChar * fch;
@@ -368,7 +376,7 @@ void fontSetGlyph(Font *ptr, const char *line) {
 		ch <<= 8;
 	}
 	char_string_buffer[i] = 0;
-	UNICODE_TO_INT(char_string_buffer, 0, increment)
+	UNICODE_TO_INT(char_string_buffer, 0, i)
 	else {
 		myError("character %d is out of range (high: %x, low: %x)", ch2, high, low);
 		return;
