@@ -4,7 +4,7 @@ local C = cheetah
 local scr_w, scr_h = 800, 600
 C.init('Bicubic Filter', scr_w..'x'..scr_h)
 C.printFPS = true
-local img1 = C.newImage('1.dds')
+local img1 = C.newImage('1.png')
 local img2 = C.newImage('2.png')
 local shader = C.newShader('bicubic.glsl')
 local bic = false

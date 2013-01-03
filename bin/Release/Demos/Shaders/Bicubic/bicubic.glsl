@@ -2,7 +2,7 @@
 
 uniform sampler2D texture;
 uniform vec2 size;
-
+varying vec2 TexCoord;
 float BSpline( float x )
 {
 	float f = abs(x);
@@ -47,5 +47,5 @@ vec4 filter(sampler2D tex, vec2 texcoord)
 
 
 void main() {
-   gl_FragColor = filter(texture, gl_TexCoord[0].st * size);
+   gl_FragColor = filter(texture, TexCoord * size);
 }
