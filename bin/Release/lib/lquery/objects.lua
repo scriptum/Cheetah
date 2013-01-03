@@ -23,105 +23,48 @@ IN THE SOFTWARE.
 
 local C = cheetah
 
---point
-local point_draw = function(s)
-  C.point()
-end
-function Entity:point(R)
-  self.R = R or 1
-  self:draw(point_draw)
-  self._bound = Entity.bounds.circle
-  return self
-end
---rect
-local rect_draw = function(s)
-  C.rectangle()
-end
-function Entity:rectangle()
-  self:draw(rect_draw)
-  return self
-end
---circle
---~ local circle_draw = function(s)
-  --~ G.circle("fill", s.x, s.y, s.R, 2*s.R)
---~ end
---~ function Entity:circle(radius)
-  --~ self.R = radius or 10
-  --~ self._draw=circle_draw
-  --~ self._bound = Entity.bounds.circle
-  --~ return self
---~ end
 local C = cheetah
---text
-local text_draw = function(s)
-  --~ G.fontSize = s.fontSize or 12
-  --~ if s.w then
-    --~ Gprintf(s.text, s.x, s.y, s.w, s.align)
-  --~ else
-    --~ Gprint(s.text, s.x, s.y)
-  --~ end
-  S.print(s.text, s.x, s.y, s.w, s.align)
-end
-function Entity:text(text, font, align)
-  self.font = font
-  self.text = text or ''
-  self.align = align
-  self._draw = text_draw
-  return self
-end
 
 --image
 local image_draw = function(s)
-	if(s.angle) then
-		s._image:drawt(s.x,s.y,s.w,s.h,s.angle,s.ox or 0,s.oy or 0)
-	else
-		s._image:draw(s.x,s.y,s.w,s.h)
-	end
+	s._image:draw(s.x, s.y, s.w, s.h, s.angle, s.ox, s.oy)
 end
 local image_draw_quad = function(s)
-  s._image:drawq(s.qx, s.qy, s.w, s.h)
+	s._image:drawq(s.qx, s.qy, s.w, s.h)
 end
 function Entity:image(image, options)
  if image and not self._image then
-    if type(image) == 'string' then 
-      image = C.newImage(image)
-    end
-    self._image = image
-    self.w = image.w
-    self.h = image.h
-    if options and options.quad and options.quad == true then 
-      self:draw(image_draw_quad)
-      self.qx = 0
-      self.qy = 0
-      self.qw = self.w
-      self.qh = self.h
-    else
-      self:draw(image_draw)
-    end
-  end
-  return self
+		if type(image) == 'string' then 
+			image = C.newImage(image)
+		end
+		self._image = image
+		self.w = image:getWidth()
+		self.h = image:getHeight()
+		if options and options.quad and options.quad == true then 
+			self:draw(image_draw_quad)
+			self.qx = 0
+			self.qy = 0
+			self.qw = self.w
+			self.qh = self.h
+		else
+			self:draw(image_draw)
+		end
+	end
+	return self
 end
 
 --border-image
-local border_image_draw = function(s)
-  C.imageDrawBorder(s._image, s.x, s.y, s.w, s.h, s.top, s.right, s.bottom, s.left)
-end
-lQuery.border_image_draw = border_image_draw
 function Entity:borderImage(image, top, right, bottom, left)
  if image and not self._image then
-    if type(image) == 'string' then 
-      image = C.newImage(image)
-    end
-    self._image = image
-    self._draw = border_image_draw
-    self.w = image.w
-    self.h = image.h
-    self.top = top
-    self.right = right
-    self.bottom = bottom
-    self.left= left
-  end
-  return self
+		if type(image) == 'string' then 
+			image = C.newBorderImage(image, top, right, bottom, left)
+		end
+		self._image = image
+		self._draw = image_draw
+		self.w = image:getWidth()
+		self.h = image:getHeight()
+	end
+	return self
 end
 
 local end_camera = function()
@@ -141,8 +84,7 @@ function Entity:camera()
 	return self
 end
 
-
-
+--fps
 local draw_fps = function(s)
 	local defFont = C.fonts.default
 	defFont._scale = s.scale
@@ -155,6 +97,7 @@ function Entity:fps(scale)
 	return self:draw(draw_fps)
 end
 
+--text
 local draw_text = function(s)
 	s.font:print(s.text, s.x, s.y)
 end

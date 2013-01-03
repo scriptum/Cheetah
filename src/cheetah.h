@@ -118,6 +118,14 @@ typedef struct ImageData {
 	char *data;
 } ImageData;
 
+typedef struct BorderImage {
+	Image * image;
+	/* image borders */
+	float top, right, bottom, left;
+	/* draw border only, without center */
+	bool borderOnly;
+} BorderImage;
+
 typedef struct Multitexture {
 	float w, h;
 	int size;

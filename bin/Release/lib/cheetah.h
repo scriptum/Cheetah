@@ -45,6 +45,13 @@ typedef struct ImageData {
 	int w, h, channels;
 	char *data;
 } ImageData;
+typedef struct BorderImage {
+	Image * image;
+	/* image borders */
+	float top, right, bottom, left;
+	/* draw border only, without center */
+	bool borderOnly;
+} BorderImage;
 typedef struct Multitexture {
 	float w, h;
 	int size;
@@ -264,8 +271,8 @@ void imageDrawxy(Image * image, float x, float y, float w, float h);
 void imageDrawt(Image * image, float x, float y, float w, float h, float a, float ox, float oy);
 void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
 void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy);
-void imageDrawBorderCenter(bool drawCenter);
-void imageDrawBorder(Image * image, float x, float y, float w, float h, float t, float r, float b, float l);
+void borderImageDrawxy(BorderImage * borderImage, float x, float y, float w, float h);
+void borderImageDrawt(BorderImage * borderImage, float x, float y, float w, float h, float a, float ox, float oy);
 void initMultitexture(Multitexture * multitexture);
 void deleteMultitexture(Multitexture * multitexture);
 inline void multitextureBind(Multitexture * multitexture);

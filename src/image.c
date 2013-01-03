@@ -391,10 +391,40 @@ void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, fl
 	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, image->w, image->h);
 }
 
-bool borderImageDrawCentralPart = TRUE;
+/**
+ * @descr Draw image sliced on 9 parts by 4 lines: top, bottom, left and right
+ * @group graphics/image
+ * @var Image object
+ * @var position of left top corner
+ * @var position of left top corner
+ * @var summary width of object
+ * @var summary height of object
+ * */
+void borderImageDrawxy(BorderImage * borderImage, float x, float y, float w, float h) {
+	imageBind(borderImage->image);
+	float ow = borderImage->image->w;
+	float oh = borderImage->image->h;
+	float t  = borderImage->top;
+	float r  = borderImage->right;
+	float b  = borderImage->bottom;
+	float l  = borderImage->left;
+	if(t > 0.0)
+	{
+		PUSH_QUADT(x,          y,          l,          t,          0, 0, 0,  0,       0,       l,            t,          ow, oh);
+		PUSH_QUADT(x + l,      y,          w - l - r,  t,          0, 0, 0,  l,       0,       ow - l - r,   t,          ow, oh);
+		PUSH_QUADT(x + w - r,  y,          r,          t,          0, 0, 0,  ow - r,  0,       r,            t,          ow, oh);
+	}
 
-void imageDrawBorderCenter(bool drawCenter) {
-	borderImageDrawCentralPart = drawCenter;
+	PUSH_QUADT(x,            y + t,      l,          h - t - b,  0, 0, 0,  0,       t,        l,           oh - t - b, ow, oh);
+	if(FALSE == borderImage->borderOnly)
+		PUSH_QUADT(x + l,      y + t,      w - l - r,  h - t - b,  0, 0, 0,  l,       t,        ow - l - r,  oh - t - b, ow, oh);
+	PUSH_QUADT(x + w - r,    y + t,      r,          h - t - b,  0, 0, 0,  ow - r,  t,        r,           oh - t - b, ow, oh);
+	if(b > 0.0)
+	{
+		PUSH_QUADT(x,          y + h - b,  l,          b,          0, 0, 0,  0,       oh - b,   l,           b,          ow, oh);
+		PUSH_QUADT(x + l,      y + h - b,  w - l - r,  b,          0, 0, 0,  l,       oh - b,   ow - l - r,  b,          ow, oh);
+		PUSH_QUADT(x + w - r,  y + h - b,  r,          b,          0, 0, 0,  ow - r,  oh - b,   r,           b,          ow, oh);
+	}
 }
 
 /**
@@ -409,27 +439,34 @@ void imageDrawBorderCenter(bool drawCenter) {
  * @var slice right
  * @var slice bottom
  * @var slice left
+ * @var angle (radians)
+ * @var origin x
+ * @var origin y
  * */
-void imageDrawBorder(Image * image, float x, float y, float w, float h, float t, float r, float b, float l) {
-	imageBind(image);
-	float ow = image->w;
-	float oh = image->h;
+void borderImageDrawt(BorderImage * borderImage, float x, float y, float w, float h, float a, float ox, float oy) {
+	imageBind(borderImage->image);
+	float ow = borderImage->image->w;
+	float oh = borderImage->image->h;
+	float t  = borderImage->top;
+	float r  = borderImage->right;
+	float b  = borderImage->bottom;
+	float l  = borderImage->left;
 	if(t > 0.0)
 	{
-		PUSH_QUADT(x,          y,          l,          t,          0, 0, 0,  0,       0,       l,            t,          ow, oh);
-		PUSH_QUADT(x + l,      y,          w - l - r,  t,          0, 0, 0,  l,       0,       ow - l - r,    t,          ow, oh);
-		PUSH_QUADT(x + w - r,  y,          r,          t,          0, 0, 0,  ow - r,  0,       r,            t,          ow, oh);
+		PUSH_QUADT(x,          y,          l,          t,          a, ox, oy,  0,       0,       l,            t,          ow, oh);
+		PUSH_QUADT(x,      y,          w - l - r,  t,          a, ox - l, oy,  l,       0,       ow - l - r,   t,          ow, oh);
+		PUSH_QUADT(x,  y,          r,          t,          a, ox - w + r, oy,  ow - r,  0,       r,            t,          ow, oh);
 	}
 
-	PUSH_QUADT(x,            y + t,      l,          h - t - b,  0, 0, 0,  0,       t,        l,           oh - t - b, ow, oh);
-	if(borderImageDrawCentralPart)
-		PUSH_QUADT(x + l,      y + t,      w - l - r,  h - t - b,  0, 0, 0,  l,       t,        ow - l - r,  oh - t - b, ow, oh);
-	PUSH_QUADT(x + w - r,    y + t,      r,          h - t - b,  0, 0, 0,  ow - r,  t,        r,           oh - t - b, ow, oh);
+	PUSH_QUADT(x,            y,      l,          h - t - b,  a, ox, oy - t,  0,       t,        l,           oh - t - b, ow, oh);
+	if(FALSE == borderImage->borderOnly)
+		PUSH_QUADT(x,      y,      w - l - r,  h - t - b,  a, ox - l, oy - t,  l,       t,        ow - l - r,  oh - t - b, ow, oh);
+	PUSH_QUADT(x,    y,      r,          h - t - b,  a, ox - w + r, oy - t,  ow - r,  t,        r,           oh - t - b, ow, oh);
 	if(b > 0.0)
 	{
-		PUSH_QUADT(x,          y + h - b,  l,          b,          0, 0, 0,  0,       oh - b,   l,           b,          ow, oh);
-		PUSH_QUADT(x + l,      y + h - b,  w - l - r,  b,          0, 0, 0,  l,       oh - b,   ow - l - r,  b,          ow, oh);
-		PUSH_QUADT(x + w - r,  y + h - b,  r,          b,          0, 0, 0,  ow - r,  oh - b,   r,           b,          ow, oh);
+		PUSH_QUADT(x,          y,  l,          b,          a, ox, oy - h + b,  0,       oh - b,   l,           b,          ow, oh);
+		PUSH_QUADT(x,      y,  w - l - r,  b,          a, ox - l, oy - h + b,  l,       oh - b,   ow - l - r,  b,          ow, oh);
+		PUSH_QUADT(x,  y,  r,          b,          a, ox - w + r, oy - h + b,  ow - r,  oh - b,   r,           b,          ow, oh);
 	}
 }
 

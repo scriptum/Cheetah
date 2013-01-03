@@ -290,6 +290,7 @@ local drawq_general = function(d1, d2)
 		end
 	end
 end
+
 --============================================================================--
 --                                    IMAGE                                   --
 --============================================================================--
@@ -310,7 +311,8 @@ ffi.metatype('Image', {
 	__index = {
 		draw = draw_general(libcheetah.imageDrawt, libcheetah.imageDrawxy),
 		drawq = drawq_general(libcheetah.imageDrawqt, libcheetah.imageDrawqxy),
-		drawBorder = C.imageDrawBorder
+		getWidth = function(s) return s.w end,
+		getHeight = function(s) return s.h end
 	}, 
 	__gc = libcheetah.deleteImage
 })
@@ -329,6 +331,29 @@ C.newImageFromData = function(data, options)
 	libcheetah._newImageFromData(ptr, data, options or '')
 	return ptr
 end
+
+--============================================================================--
+--                                BORDER IMAGE                                --
+--============================================================================--
+
+C.newBorderImage = function(name, top, right, bottom, left, options)
+	local ptr = ffi.new('BorderImage')
+	ptr.image = C.newImage(name, options)
+	ptr.top = top or 0
+	ptr.right = right or 0
+	ptr.bottom = bottom or 0
+	ptr.left = left or 0
+	return ptr
+end
+
+ffi.metatype('BorderImage', {
+	__index = {
+		draw = draw_general(libcheetah.borderImageDrawt, libcheetah.borderImageDrawxy),
+		drawBorderOnly = function(s, borderOnly) s.borderOnly = borderOnly or false end,
+		getWidth = function(s) return s.image.w end,
+		getHeight = function(s) return s.image.h end
+	}
+})
 
 --============================================================================--
 --                               MULTITEXTURE                                 --
@@ -355,7 +380,9 @@ end
 ffi.metatype('Multitexture', {
 	__index = {
 		draw = draw_general(libcheetah.multitextureDrawt, libcheetah.multitextureDrawxy),
-		drawq = drawq_general(libcheetah.multitextureDrawqt, libcheetah.multitextureDrawqxy)
+		drawq = drawq_general(libcheetah.multitextureDrawqt, libcheetah.multitextureDrawqxy),
+		getWidth = function(s) return s.w end,
+		getHeight = function(s) return s.h end
 	}, 
 	__gc = libcheetah.deleteMultitexture
 })
