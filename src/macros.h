@@ -128,29 +128,13 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);\
 
 /**********************************VERTEX OPS**********************************/
 
-/* GLES compatibility */
-#ifndef GL_QUADS
-#define GL_QUADS GL_TRIANGLES
-#endif
-
-/* dynamic vertex array */
-#define VERTEX_QUERY(size) do {\
-	if((size) > verAlloc) {\
-		renew(vertexCoord, float, verAlloc * 2);\
-		renew(texCoord, float, verAlloc * 2);\
-		verAlloc *= 2;\
-	}\
-} while(0)
-
-
-
 #define VERTEX_ROT_X(x,y,a,ox,oy) cosf(a)*((x)-(ox))-sinf(a)*((y)-(oy))
 #define VERTEX_ROT_Y(x,y,a,ox,oy) sinf(a)*((x)-(ox))+cosf(a)*((y)-(oy))
 
 /******************************VERTEX ACCUMULATOR******************************/
 
-#if 1
-
+#ifdef GL_QUADS
+//Draw using quads
 #define VERTICLES_PER_SPRITE 4 * 2
 
 #define FLUSH_BUFFER() do {\
@@ -185,7 +169,7 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,0};
 } while(0)
 
 #else
-
+//Draw using triangles
 #define VERTICLES_PER_SPRITE 6 * 2
 
 #define FLUSH_BUFFER() do {\
@@ -198,12 +182,16 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,0};
 static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
 
 #define PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy) do {\
-	vertexCoord[vertexCounter + 10] = vertexCoord[vertexCounter + 0] = (vx) + VERTEX_ROT_X(0,  0, (a), (ox), (oy));\
-	vertexCoord[vertexCounter + 11] = vertexCoord[vertexCounter + 1] = (vy) + VERTEX_ROT_Y(0,  0, (a), (ox), (oy));\
+	vertexCoord[vertexCounter + 10] = \
+	vertexCoord[vertexCounter + 0] = (vx) + VERTEX_ROT_X(0,  0, (a), (ox), (oy));\
+	vertexCoord[vertexCounter + 11] = \
+	vertexCoord[vertexCounter + 1] = (vy) + VERTEX_ROT_Y(0,  0, (a), (ox), (oy));\
 	vertexCoord[vertexCounter + 2] = (vx) + VERTEX_ROT_X(0, (vh), (a), (ox), (oy));\
 	vertexCoord[vertexCounter + 3] = (vy) + VERTEX_ROT_Y(0, (vh), (a), (ox), (oy));\
-	vertexCoord[vertexCounter + 6] = vertexCoord[vertexCounter + 4] = (vx) + VERTEX_ROT_X((vw), (vh), (a), (ox), (oy));\
-	vertexCoord[vertexCounter + 7] = vertexCoord[vertexCounter + 5] = (vy) + VERTEX_ROT_Y((vw), (vh), (a), (ox), (oy));\
+	vertexCoord[vertexCounter + 6] = \
+	vertexCoord[vertexCounter + 4] = (vx) + VERTEX_ROT_X((vw), (vh), (a), (ox), (oy));\
+	vertexCoord[vertexCounter + 7] = \
+	vertexCoord[vertexCounter + 5] = (vy) + VERTEX_ROT_Y((vw), (vh), (a), (ox), (oy));\
 	vertexCoord[vertexCounter + 8] = (vx) + VERTEX_ROT_X((vw), 0, (a), (ox), (oy));\
 	vertexCoord[vertexCounter + 9] = (vy) + VERTEX_ROT_Y((vw), 0, (a), (ox), (oy));\
 } while(0)
@@ -211,10 +199,20 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
 #define PUSH_QUADT(vx, vy, vw, vh, a, ox, oy, tx, ty, tw, th, w, h) do {\
 	if(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE) { FLUSH_BUFFER(); }\
 	PUSH_QUAD_VERTEX_OPS((vx), (vy), (vw), (vh), (a), (ox), (oy)); \
-	texCoord[vertexCounter + 10] = texCoord[vertexCounter + 2] = texCoord[vertexCounter + 0] = (tx) / (w);\
-	texCoord[vertexCounter + 11] = texCoord[vertexCounter + 9] = texCoord[vertexCounter + 1] = (ty) / (h);\
-	texCoord[vertexCounter + 7] = texCoord[vertexCounter + 5] = texCoord[vertexCounter + 3] = texCoord[vertexCounter + 1] + (th) / (h);\
-	texCoord[vertexCounter + 8] = texCoord[vertexCounter + 6] = texCoord[vertexCounter + 4] = texCoord[vertexCounter + 0] + (tw) / (w);\
+	texCoord[vertexCounter + 10] = \
+	texCoord[vertexCounter + 2] = \
+	texCoord[vertexCounter + 0] = (tx) / (w);\
+	texCoord[vertexCounter + 11] = \
+	texCoord[vertexCounter + 9] = \
+	texCoord[vertexCounter + 1] = (ty) / (h);\
+	texCoord[vertexCounter + 7] = \
+	texCoord[vertexCounter + 5] = \
+	texCoord[vertexCounter + 3] = \
+	texCoord[vertexCounter + 1] + (th) / (h);\
+	texCoord[vertexCounter + 8] = \
+	texCoord[vertexCounter + 6] = \
+	texCoord[vertexCounter + 4] = \
+	texCoord[vertexCounter + 0] + (tw) / (w);\
 	vertexCounter += VERTICLES_PER_SPRITE;\
 } while(0)
 
@@ -242,10 +240,10 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
 /********************************OPTIONS CHECKER*******************************/
 
 #define CHECK_OPTION(options, o) char o = 0; do {\
-	typeof(options) __o = strstr(options, #o); \
+	typeof(options) _o = strstr(options, #o); \
 	int l = strlen(#o); \
 	/* check bounds */ \
-	if(NULL != __o && (' ' == *(__o+l) || 0 == *(__o+l)) && (' ' == *(__o-1) || 0 == *(__o-1))) { \
+	if(NULL != _o && (' '==*(_o+l)||0==*(_o+l)) && (' '==*(_o-1)||0==*(_o-1))) { \
 		o = 1; \
 	} \
 } while(0)
