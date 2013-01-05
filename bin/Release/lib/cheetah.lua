@@ -442,7 +442,7 @@ local texturesArchive = {}
 
 --~ local resLoadedImages
 C.fonts = {}
-C.newFont = function(name, scalable, codepage)
+C.newFont = function(name, scalable)
 	local a, b, c, d, font, img
 	local millis = C.getTicks()
 	local glyphs = 0
@@ -494,7 +494,8 @@ ffi.metatype('Font', {
 		interval = libcheetah.fontInterval,
 		scale = libcheetah.fontScale,
 		getInterval = libcheetah.fontGetInterval,
-		getScale = libcheetah.fontGetScale
+		getScale = libcheetah.fontGetScale,
+		getHeight = libcheetah.fontHeight
 	},
 	--~ __gc = libcheetah.deleteFont
 })

@@ -176,8 +176,6 @@ typedef struct Framebuffer {
 /*=================================fonts======================================*/
 typedef struct FontChar
 {
-	/* OpenGL list id */
-	unsigned vertex;
 	/* Width of char */
 	float w;
 	float v[4], t[4];

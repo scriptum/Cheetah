@@ -37,9 +37,7 @@ static int compile(GLuint shader, const char* name)
 	GLint blen = 0;
 	GLsizei slen = 0;
 	GLchar *compiler_log = NULL;
-	
 	glCompileShader_(shader);
-
 	glGetShaderiv_(shader, GL_COMPILE_STATUS, &compiled);
 	if (!compiled)
 	{
@@ -59,6 +57,7 @@ static int compile(GLuint shader, const char* name)
 void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
 	GLuint v, f, p;
 	GLint linked;
+	const GLsizei count = 1;
 	if(!screen)
 	{
 		myError("Call init function before!");
@@ -72,8 +71,8 @@ void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
 	}
 	v = glCreateShaderObject_(GL_VERTEX_SHADER);
 	f = glCreateShaderObject_(GL_FRAGMENT_SHADER);
-	glShaderSource_(v, 1, &ver, NULL);
-	glShaderSource_(f, 1, &pix, NULL);
+	glShaderSource_(v, count, &ver, NULL);
+	glShaderSource_(f, count, &pix, NULL);
 	if(!compile(v, "string_shader"))
 		return;
 	if(!compile(f, "string_shader"))
@@ -87,15 +86,13 @@ void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
 	glLinkProgram_(p);
   
 	glGetProgramiv_(p, GL_LINK_STATUS, &linked);
+	glDeleteObject_(v);
+	glDeleteObject_(f);
 	if (!linked)
 	{
 		myError("Error while linking shader\n");
-		glDeleteObject_(v);
-		glDeleteObject_(f);
 		return;
 	}
-	glDeleteObject_(v);
-	glDeleteObject_(f);
 	ptr->id = p;
 }
 
@@ -104,7 +101,7 @@ void newFragmentShader(Shader * ptr, const char * frag) {
 }
 
 bool shaderCheck(Shader * ptr) {
-	return ptr->id;
+	return (bool)ptr->id;
 }
 
 void deleteShader(Shader * ptr) {
@@ -133,10 +130,6 @@ void shaderUnbind(Shader * ptr) {
 
 unsigned int GetUniformLocation(unsigned int program, const char * name) {
 	return glGetUniformLocation_(program, name);
-}
-void UseProgramObject(unsigned int program) {
-	FLUSH_BUFFER();
-	glUseProgramObject_(program);
 }
 void Uniform1i(unsigned int location, int var) {
 	glUniform1i_(location, var);

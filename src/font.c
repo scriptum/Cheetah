@@ -29,8 +29,6 @@ IN THE SOFTWARE.
 #include "cheetah.h"
 #include "render.h"
 
-//~ #define NO_VBO
-
 /**
  * @descr Calculate width of string.
  * @group font
@@ -67,7 +65,7 @@ float Font_Width(Font *f, register const char *str)
 	float width = 0;
 	if(*str)
 	do {
-		if(*str == '\t')\
+		if(*str == '\t')
 		{
 			//~ width += f->chars[32]->w * 8;
 			continue;
@@ -80,51 +78,51 @@ float Font_Width(Font *f, register const char *str)
 }
 
 
-#define DRAW_CHAR do {\
-	if(vertexCounter >= VERTEX_BUFFER_LIMIT * 8) { FLUSH_BUFFER(); }\
-	texCoord[vertexCounter] = texCoord[vertexCounter+2] = ch->t[0];\
-	texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];\
-	texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];\
-	texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];\
-	w = ceil(x);\
-	vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0] + w;\
-	vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;\
-	vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;\
-	vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6] = ch->v[2] + w;\
-	vertexCounter += 8;\
-	x += ch->w;\
-}\
+#define DRAW_CHAR do {                                                         \
+	if(vertexCounter >= VERTEX_BUFFER_LIMIT * 8) { FLUSH_BUFFER(); }             \
+	texCoord[vertexCounter] = texCoord[vertexCounter+2] = ch->t[0];              \
+	texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];            \
+	texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];            \
+	texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];            \
+	w = ceil(x);                                                                 \
+	vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0] + w;    \
+	vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;  \
+	vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;  \
+	vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6] = ch->v[2] + w;  \
+	vertexCounter += 8;                                                          \
+	x += ch->w;                                                                  \
+}                                                                              \
 while(0)
 
-#define UNICODE_TO_INT(a,i,increment) \
-high = low = 0;\
-if((a[i] & 0x80) == 0) {\
-	low = a[i];\
-	increment=1;\
-}\
-else if((a[i] & 0xe0) == 0xc0) {\
-	low = a[i+1] & 0x3f;\
-	low |= (a[i] & 0x03) << 6;\
-	high = (a[i] & 0x1f) >> 2;\
-	increment=2;\
-}\
-else if((a[i] & 0xf0) == 0xe0) {\
-	low = a[i+2] & 0x3f;\
-	low |= (a[i+1] & 0x03) << 6;\
-	high = (a[i+1] & 0x3f) >> 2;\
-	high |= (a[i] & 0x0f) << 4;\
-	increment=3;\
-}\
-else if((a[i] & 0xf8) == 0xf0) {\
-	low = a[i+3] & 0x3f;\
-	low |= (a[i+2] & 0x03) << 6;\
-	high = (a[i+2] & 0x3f) >> 2;\
-	high |= (a[i+1] & 0x3f) << 4;\
-	high |= (a[i] & 0x07) << 10;\
-	increment=4;\
+#define UNICODE_TO_INT(a, i, increment)                                        \
+high = low = 0;                                                                \
+if((a[i] & 0x80) == 0) {                                                       \
+	low = a[i];                                                                  \
+	increment=1;                                                                 \
+}                                                                              \
+else if((a[i] & 0xe0) == 0xc0) {                                               \
+	low = a[i+1] & 0x3f;                                                         \
+	low |= (a[i] & 0x03) << 6;                                                   \
+	high = (a[i] & 0x1f) >> 2;                                                   \
+	increment=2;                                                                 \
+}                                                                              \
+else if((a[i] & 0xf0) == 0xe0) {                                               \
+	low = a[i+2] & 0x3f;                                                         \
+	low |= (a[i+1] & 0x03) << 6;                                                 \
+	high = (a[i+1] & 0x3f) >> 2;                                                 \
+	high |= (a[i] & 0x0f) << 4;                                                  \
+	increment=3;                                                                 \
+}                                                                              \
+else if((a[i] & 0xf8) == 0xf0) {                                               \
+	low = a[i+3] & 0x3f;                                                         \
+	low |= (a[i+2] & 0x03) << 6;                                                 \
+	high = (a[i+2] & 0x3f) >> 2;                                                 \
+	high |= (a[i+1] & 0x3f) << 4;                                                \
+	high |= (a[i] & 0x07) << 10;                                                 \
+	increment=4;                                                                 \
 }
 
-void fontPrintf(Font *currentFont, register const unsigned char * str, float x, float y, float maxw, int align) {
+void fontPrintf(Font *currentFont, const unsigned char * str, float x, float y, float maxw, int align) {
 	FontChar *ch;
 	int       i            = 0;
 	int       last_space   = 0;
@@ -162,30 +160,29 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 		glTranslatef(x, y, 0);
 	}
 	
-	h = y = 0.0;
+	x = h = y = 0.0;
 
 	imageBind(currentFont->image);
+	#define CHAR_NOT_EXISTS (NULL == currentFont->chars[high] || NULL == currentFont->chars[high][low])
 	if(maxw > 0.0)
 	{
 		while(TRUE)
 		{
 			UNICODE_TO_INT(str, i, increment)
 			c = low | (high << 8);
-			if(NULL == currentFont->chars[high] || NULL == currentFont->chars[high][low])
+			if(CHAR_NOT_EXISTS)
 			{
-				//~ myError("Symbol %d not found!", c);
 				i += increment;
 				continue;
 			}
-			//~ printf("%d %d\n", high, low);
-			//~ printf("%d %d\n", currentFont->chars[high], currentFont->chars[high][low]);
-			//~ if(currentFont->allocated < high)
-			//~ {
-				//~ i += increment;
-				//~ continue;
-			//~ }
 			switch(c)
 			{
+				case ' ':
+						last_space = i;
+						lastw = w;
+						spaces++;
+						w += currentFont->chars[0][' ']->w;
+						break;
 				case '\t':
 						w += spacew * 8;
 						last_space = i;
@@ -194,21 +191,18 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 				case '\0':
 						end = TRUE;
 						break;
-				case ' ':
-						last_space = i;
-						lastw = w;
-						spaces++;
 				default:
 						w += currentFont->chars[high][low]->w;
 			}
-			if(w > maxw || c == '\n' || TRUE == end)
+			if(w > maxw || '\n' == c || TRUE == end)
 			{
-				if(!last_space || c == '\n'|| TRUE == end) {
+				if(0 == last_space || '\n' == c || TRUE == end)
+				{
 					last_space = i;
 					lastw = w;
 				}
-				
-				switch(align) {
+				switch(align)
+				{
 					case alignCenter:
 						x = (maxw - lastw) * 0.5;
 						break;
@@ -216,7 +210,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 						x = maxw - lastw;
 						break;
 					case alignJustify:
-						if(c == '\n' || TRUE == end)
+						if('\n' == c || TRUE == end)
 							justifyWidth = spacew;
 						else
 							justifyWidth = (maxw + spacew * (spaces) - lastw) / (float)(spaces);
@@ -227,20 +221,18 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 				if(buf == last_space) last_space++;
 				if((y + oldy + fontHeight) * currentFont->_scale > 0)
 				{
-					while(buf < last_space) {
+					while(buf < last_space)
+					{
 						UNICODE_TO_INT(str,buf,incrementBuf)
 						c = low | (high << 8);
 						buf += incrementBuf;
-						if(!currentFont->chars[high] || !currentFont->chars[high][low])
-						{
-							//~ myError("Symbol %d not found!", c);
+						if(CHAR_NOT_EXISTS)
 							continue;
-						}
-						if(c == '\t')
+						if('\t' == c)
 								x += spacew * 8;
-						else if(c == ' ')
+						else if(' ' == c)
 						{
-							if(justify)
+							if(TRUE == justify)
 								x += justifyWidth;
 							else
 								x += spacew;
@@ -253,25 +245,19 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 					}
 				}
 				else
-				{
 					buf = last_space;
-				}
-				
-				if(TRUE == end) break;
+				if(TRUE == end)
+					break;
 				x = 0;
 				y += fontHeight;
-				//fast dropping invisible lines
+				/* fast dropping invisible lines */
 				if((y + oldy) * currentFont->_scale > screen->h) break;
 				h = ceil(y);
 				increment = 0;
-				if(str[buf] == ' ' || str[buf] == '\t' || str[buf] == '\n')
-				{
+				if(' ' == str[buf] || '\t' == str[buf] || '\n' == str[buf])
 					i = buf = last_space + 1;
-				}
 				else
-				{
 					i = buf = last_space;
-				}
 				last_space = 0;
 				w = 0;
 				spaces = -1;
@@ -281,7 +267,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 	}
 	else
 		while(str[i]) {
-			UNICODE_TO_INT(str,i, increment)
+			UNICODE_TO_INT(str, i, increment)
 			c = low | (high << 8);
 			switch(c) {
 				case '\n':
@@ -294,8 +280,7 @@ void fontPrintf(Font *currentFont, register const unsigned char * str, float x, 
 					x += spacew * 8;
 					goto end_loop;
 			}
-			
-			if(currentFont->allocated < high)
+			if(CHAR_NOT_EXISTS)
 				goto end_loop;
 			ch = currentFont->chars[high][low];
 			DRAW_CHAR;
@@ -412,24 +397,10 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	cy2 = cy1 + y2;
 	x2 = x1 + x2 / (float)ptr->image->w;
 	y2 = y1 + y2 / (float)ptr->image->h;
-	#ifdef NO_VBO
-	fch->vertex = glGenLists(1);
-	glNewList(fch->vertex, GL_COMPILE);
-	glBegin(GL_QUADS);
-	glTexCoord2f(x1, y1);         glVertex2i(cx1, cy1);
-	glTexCoord2f(x1, y2);         glVertex2i(cx1, cy2);
-	glTexCoord2f(x2, y2);         glVertex2i(cx2, cy2);
-	glTexCoord2f(x2, y1);         glVertex2i(cx2, cy1);
-	glEnd();
-	glEndList();
-	#else
-	//~ float vert[] = {cx1,cy1,cx1,cy2,cx2,cy2,cx2,cy1};
-	//~ float tex[] = {x1,y1,x1,y2,x2,y2,x2,y1};
 	float vert[] = {cx1,cy1,cx2,cy2};
 	float tex[] = {x1,y1,x2,y2};
 	memcpy(fch->v, vert, sizeof(vert));
 	memcpy(fch->t, tex, sizeof(tex));
-	#endif
 	fch->w = w;
 	if(low == 32 && high==0) {
 		ptr->spacew = w;
@@ -446,8 +417,6 @@ void fontSetGlyph(Font *ptr, const char *line) {
 void deleteFont(Font * ptr) {
 	int i, j;
 	if(ptr) {
-		//~ glDeleteTextures(1, &ptr->image->id);
-		//~ delete(ptr->image);
 		if(ptr->chars)
 		{
 			for(i = 0; i < ptr->allocated; i++)

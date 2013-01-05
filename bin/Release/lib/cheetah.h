@@ -93,8 +93,6 @@ typedef struct Framebuffer {
 } Framebuffer;
 typedef struct FontChar
 {
-	/* OpenGL list id */
-	unsigned vertex;
 	/* Width of char */
 	float w;
 	float v[4], t[4];
@@ -262,6 +260,7 @@ void stencilFunc(int func, int ref, unsigned int mask);
 void stencilOp(int fail, int zfail, int zpass);
 void drawToStencil();
 void drawUsingStencil();
+void texEnv(unsigned target, unsigned pname, int param);
 void newImageOpt(Image *ptr, const char *name, const char *options);
 inline void imageCheckResLoader(Image * image);
 inline void imageBind(Image * image);

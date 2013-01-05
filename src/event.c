@@ -29,12 +29,11 @@ Uint32 globalTime = 0;
 double globalTimed = 0;
 double globalTimeOffsetd = 0;
 double globalGameSpeed = 1;
-int resizeDelay = 100;
+int resizeDelay = 100; /* 100 ms to avoid resize blinking */
 
 unsigned int getEventType() {
-	//skipping unneeded events
+	/* skip unneeded events */
 	while(SDL_PollEvent(&event)) {
-		//printf("%d\n", event.type);
 		switch(event.type) {
 			case SDL_QUIT: return 1;
 			case SDL_KEYDOWN: return 2;
@@ -61,11 +60,8 @@ unsigned int getEventType() {
 				rescaleTime = globalTime + resizeDelay;
 				screen->w = event.resize.w;
 				screen->h = event.resize.h;
-				//~ glClear(GL_COLOR_BUFFER_BIT);
-				//~ SDL_UpdateRect(screen, 0,0,0,0);
-				//~ SDL_GL_SwapBuffers();
 				return 6;
-			//TODO to do something here
+			/* TODO to do something here */
 			case SDL_VIDEOEXPOSE: return 7;
 			case SDL_ACTIVEEVENT: return 8;
 			case SDL_JOYAXISMOTION:
