@@ -24,6 +24,7 @@ IN THE SOFTWARE.
 #include "cheetah.h"
 #include "render.h"
 
+/*
 Vbo * newVbo(Point * data, Point * tex, unsigned int count) {
 	Vbo *ptr = NULL;
 	new(ptr, Vbo, 1);
@@ -150,3 +151,4 @@ void deleteVbo(Vbo * ptr) {
 	}
 	else myError("Trying to free a null-VBO. Maybe, you did it manually?");
 }
+*/

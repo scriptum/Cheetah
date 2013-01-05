@@ -92,10 +92,7 @@ bool init(const char * appName, const char * options) {
 	{
 		initRenderer();
 		/* set background color */
-		glClearColor( 0, 0, 0, 1);
-		/* set line antialiasing */
-		//~ glEnable(GL_POINT_SMOOTH);
-		//~ glEnable(GL_LINE_SMOOTH);
+		glClearColor(0.0, 0.0, 0.0, 1.0);
 		/* enable blending */
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
@@ -130,37 +127,12 @@ bool init(const char * appName, const char * options) {
 	//~ glDepthRange(-10000,10000);
 	if(TRUE == firstrun)
 	{
-		quadlist = glGenLists(1);
-		glNewList(quadlist, GL_COMPILE);
-		glBegin(GL_QUADS);
-		glTexCoord2f(0, 0); glVertex2f(0, 0);
-		glTexCoord2f(0, 1); glVertex2f(0, 1);
-		glTexCoord2f(1, 1); glVertex2f(1, 1);
-		glTexCoord2f(1, 0); glVertex2f(1, 0);
-		glEnd();
-		glEndList();
-		pointlist = glGenLists(1);
-		glNewList(pointlist, GL_COMPILE);
-		glBegin(GL_POINTS);
-		glVertex2f(0, 0);
-		glEnd();
-		glEndList();
-		
 		/*two vertex buffers*/
 		vertexCounter = 0;
 		new(texCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
 		new(vertexCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
 		verAlloc = VERTEX_BUFFER_LIMIT;
-		
-		//~ static float tex[] = {0,0,0,1,1,1,1,0};
-		//~ static float ver[] = {0,0,0,1,1,1,1,0};
-		//~ glGenBuffers_(1, &vboVer);
-		//~ glBindBuffer_(GL_ARRAY_BUFFER_ARB, vboVer);
-		//~ glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*4, (void*)ver, GL_STATIC_DRAW_ARB);
-		//~ glGenBuffers_(1, &vboTex);
-		//~ glBindBuffer_(GL_ARRAY_BUFFER_ARB, vboTex);
-		//~ glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point)*4, (void*)tex, GL_STATIC_DRAW_ARB);
-		//~ glBindBuffer_(GL_ARRAY_BUFFER_ARB, 0);
+
 		glGenTextures(1, &rect_texture);
 		glBindTexture(GL_TEXTURE_2D, rect_texture);
 		TEX_CLAMP;

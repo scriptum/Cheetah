@@ -30,6 +30,8 @@ extern void resLoaderMainThread();
 
 bool clearScreenFlag = 1;
 
+unsigned prevColor = 0xffffffff;
+
 void colorMask(bool r, bool g, bool b, bool a) {
 	glColorMask(r,g,b,a);
 }
@@ -132,11 +134,6 @@ void flush() {
 	glFinish();
 }
 
-
-//~ void translate(double translateX, double translateY) {
-	//~ glTranslated(translateX, translateY, 0);
-//~ }
-
 /**
  * @descr Move object relatively to the current matrix position (in pixels). This function must be called between cheetah.push and cheetah.pop functions.
  * @note This function is slow. Avoid to use it for object positioning.
@@ -210,7 +207,6 @@ void prepare() {
 	globalTime = SDL_GetTicks();
 	delta = globalTime - delta;
 	globalTimeOffsetd += (1.0 - globalGameSpeed) * delta / 1000.0;
-	//~ varf(globalTimeOffsetd);
 	globalTimed = globalTime / 1000.0 - globalTimeOffsetd;
 	if(screenScale.autoScale)
 	{
@@ -234,7 +230,6 @@ void prepare() {
 			glScalef(screenScale.scaleX, screenScale.scaleY, 1);
 		}
 		rescaleTime = 0;
-		//~ glClear(GL_COLOR_BUFFER_BIT);
 	}
 	if(clearScreenFlag) glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -532,8 +527,13 @@ void smooth(bool smooth) {
  * @see colorf
  * */
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
-	FLUSH_BUFFER();
-	glColor4ub(r,g,b,a);
+	int color = r << 24 | g << 16 | b << 8 | a;
+	if(color != prevColor)
+	{
+		FLUSH_BUFFER();
+		glColor4ub(r, g, b, a);
+		prevColor = color;
+	}
 }
 
 /**
@@ -546,8 +546,13 @@ void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
  * @see color
  * */
 void colorf(float r, float g, float b, float a) {
-	FLUSH_BUFFER();
-	glColor4f(r,g,b,a);
+	int color = ((unsigned char)r) << 24 | ((unsigned char)g) << 16 | ((unsigned char)b) << 8 | ((unsigned char)a);
+	if(color != prevColor)
+	{
+		FLUSH_BUFFER();
+		glColor4f(r,g,b,a);
+		prevColor = color;
+	}
 }
 
 /**
@@ -716,4 +721,8 @@ void drawToStencil() {
 void drawUsingStencil() {
 	glStencilFunc (GL_EQUAL, 0x1, 0x1);
 	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
+}
+
+void texEnv(unsigned target, unsigned pname, int param) {
+	glTexEnvi(target, pname, param);
 }

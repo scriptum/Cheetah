@@ -23,19 +23,6 @@ IN THE SOFTWARE.
 
 local ffi  = require( "ffi" )
 
---~ local libs = ffi_OpenGL_libs or {
-   --~ OSX     = { x86 = "OpenGL.framework/OpenGL", x64 = "OpenGL.framework/OpenGL" },
-   --~ Windows = { x86 = "OPENGL32.DLL",            x64 = "OPENGL32.DLL" },
-   --~ Linux   = { x86 = "libGL.so",                x64 = "libGL.so", arm = "libGL.so" },
-   --~ BSD     = { x86 = "libGL.so",                x64 = "libGL.so" },
-   --~ POSIX   = { x86 = "libGL.so",                x64 = "libGL.so" },
-   --~ Other   = { x86 = "libGL.so",                x64 = "libGL.so" },
---~ }
---~ 
---~ local lib  = ffi_OpenGL_lib or libs[ ffi.os ][ ffi.arch ]
---~ 
---~ GL = ffi.load( lib )
-
 ffi.cdef[[
 enum {
  GL_ACCUM                          = 0x0100,
@@ -728,7 +715,7 @@ enum {
  GL_PRIMARY_COLOR                  = 0x8577,
  GL_PREVIOUS                       = 0x8578,
  GL_SUBTRACT                       = 0x84E7,
- GL_SR0_RGB                       = 0x8580,
+ GL_SRC0_RGB                       = 0x8580,
  GL_SRC1_RGB                       = 0x8581,
  GL_SRC2_RGB                       = 0x8582,
  GL_SRC3_RGB                       = 0x8583,
