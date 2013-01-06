@@ -27,6 +27,18 @@ IN THE SOFTWARE.
 
 SDL_Surface *screen = NULL;
 
+int resLoaderThread(void *unused);
+
+void resetView(int w, int h)
+{
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, w, h, 0, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+}
+
 /**
  * @descr Create window and initialize all OpenGL's stuff. You MUST call this before any graphics function, e.g. cheetah.newImage. You may call this function again to re-size window, change application title, toggle fullscreen. Other options are ignored.
  * @group graphics/window
@@ -118,12 +130,7 @@ bool init(const char * appName, const char * options) {
 		//~ glAlphaFunc(GL_GREATER,0.1f);
 	}
 
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, width, height, 0, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	resetView(width, height);
 	//~ glDepthRange(-10000,10000);
 	if(TRUE == firstrun)
 	{

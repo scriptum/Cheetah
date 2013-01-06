@@ -34,52 +34,36 @@ struct {
 	bool alpha, linear, smooth;
 } generatorOptions;
 
-#define TEXPARAM(a) do {\
-	glGenTextures(1, &bufid);\
-	glBindTexture(GL_TEXTURE_2D, bufid);\
-	if(generatorOptions.linear)\
-		TEX_LINEAR;\
-	else \
-		TEX_NEAREST;\
-	glTexImage2D( GL_TEXTURE_2D, \
-								0, \
-								(a) ? GL_RGBA : GL_RGB, \
-								w, \
-								h, \
-								0, \
-								(a) ? GL_RGBA : GL_RGB, \
-								GL_UNSIGNED_BYTE, \
-								imageData.data);\
-	glBindTexture(GL_TEXTURE_2D, 0);\
-} while(0)
+void newImageRaw(Image *, int, int, const char *, const char *);
 
-#define REPEAT \
-for(j = h / 2; j < h; j++) \
-	for(i = 0; i <= w / 2; i++) \
-		*((int*)(buf + (j * h + i) * channels)) = *((int*)(buf + ((h - j - 1) * h + i) * channels)); \
-for(j = 0; j < h; j++) \
-	for(i = w / 2; i < w; i++) \
-		if(channels == 3) \
-		{ \
-			*((int*)(buf + (j * h +          i)  * channels)) =  \
-			*((int*)(buf + (j * h + (w - i - 1)) * channels)) & 0xffffff; \
-		} \
-		else \
-		{ \
-			*((int*)(buf + (j * h +          i)  * channels)) =  \
-			*((int*)(buf + (j * h + (w - i - 1)) * channels)); \
+#define REPEAT                                                                 \
+for(j = h / 2; j < h; j++)                                                     \
+	for(i = 0; i <= w / 2; i++)                                                  \
+		*((int*)(buf + (j * h + i) * channels)) =                                  \
+														*((int*)(buf + ((h - j - 1) * h + i) * channels)); \
+for(j = 0; j < h; j++)                                                         \
+	for(i = w / 2; i < w; i++)                                                   \
+		if(channels == 3)                                                          \
+		{                                                                          \
+			*((int*)(buf + (j * h +          i)  * channels)) =                      \
+			*((int*)(buf + (j * h + (w - i - 1)) * channels)) & 0xffffff;            \
+		}                                                                          \
+		else                                                                       \
+		{                                                                          \
+			*((int*)(buf + (j * h +          i)  * channels)) =                      \
+			*((int*)(buf + (j * h + (w - i - 1)) * channels));                       \
 		}
 
-#define LOOP_CIRCLE(code) \
-for(j = 0; j <= h / 2; j++) { \
-	for(i = 0; i <= w / 2; i++) { code }} \
+#define LOOP_CIRCLE(code)                                                      \
+for(j = 0; j <= h / 2; j++) {                                                  \
+	for(i = 0; i <= w / 2; i++) { code }}                                        \
 REPEAT
 
-#define DISTANCE \
-((i - w / 2 + 0.5) * (i - w / 2 + 0.5) / (float)(w * w) + \
+#define DISTANCE                                                               \
+((i - w / 2 + 0.5) * (i - w / 2 + 0.5) / (float)(w * w) +                      \
  (j - h / 2 + 0.5) * (j - h / 2 + 0.5) / (float)(h * h))
 
-void generateImageData(ImageData *ptr, int w, int h, const char *imageType) {
+static void generateImageData(ImageData *ptr, int w, int h, const char *imageType) {
 	int i, j, c, channels;
 	char *buf = NULL;
 	static rt88_state *taus88 = NULL;
@@ -94,13 +78,13 @@ void generateImageData(ImageData *ptr, int w, int h, const char *imageType) {
 		myError("generateImageData: empty pointer");
 		return;
 	}
-	#define NEW do {\
-		if(generatorOptions.alpha) {\
-			channels = 4; new(buf, char, w * h * channels);\
-		}\
-		else {\
-			channels = 3; new(buf, char, w * h * channels + 1);\
-		}\
+	#define NEW do {                                                             \
+		if(generatorOptions.alpha) {                                               \
+			channels = 4; new(buf, char, w * h * channels);                          \
+		}                                                                          \
+		else {                                                                     \
+			channels = 3; new(buf, char, w * h * channels + 1);                      \
+		}                                                                          \
 	} while(0)
 	if(strcmp(imageType, "dummy") == 0) {
 		NEW;
@@ -111,15 +95,15 @@ void generateImageData(ImageData *ptr, int w, int h, const char *imageType) {
 		for(i = 0; i < w * h; i++)
 			*((int*)(buf + i * channels)) = rt88_trand(taus88);
 	}
-	#define COLOR_LIGHT \
-		if(channels==3) { \
-			c = c | c << 8 | c << 16;\
-			*((int*)(buf + (j * h + i) * channels)) = c; \
-		} else { \
-			c = 0xffffff | c<<24; \
-			*((int*)(buf + (j * h + i) * channels)) = c; \
+	#define COLOR_LIGHT                                                          \
+		if(channels==3) {                                                          \
+			c = c | c << 8 | c << 16;                                                \
+			*((int*)(buf + (j * h + i) * channels)) = c;                             \
+		} else {                                                                   \
+			c = 0xffffff | c<<24;                                                    \
+			*((int*)(buf + (j * h + i) * channels)) = c;                             \
 		}
-	#define LIGHT c = 255 - 2 * 255 * sqrtf(DISTANCE);\
+	#define LIGHT c = 255 - 2 * 255 * sqrtf(DISTANCE);                           \
 		if (c < 0) c = 0;
 	else if(strcmp(imageType, "light") == 0) {
 		NEW;
@@ -131,10 +115,10 @@ void generateImageData(ImageData *ptr, int w, int h, const char *imageType) {
 		LOOP_CIRCLE(LIGHTEXP
 			COLOR_LIGHT)
 	}
-	#define CIRCLE_COLOR \
-		c = (i - w / 2) * (i - w / 2) + \
-		(j - h / 2) * (j - h / 2);\
-		if(c > (w / 4 * w)) c = 0; else c = 0xffffffff;\
+	#define CIRCLE_COLOR                                                         \
+		c = (i - w / 2) * (i - w / 2) +                                            \
+		(j - h / 2) * (j - h / 2);                                                 \
+		if(c > (w / 4 * w)) c = 0; else c = 0xffffffff;                            \
 		*((int*)(buf + (j * h + i) * channels)) = c;
 	else if(strcmp(imageType, "circle") == 0) {
 		NEW;
@@ -153,7 +137,6 @@ void generateImageData(ImageData *ptr, int w, int h, const char *imageType) {
 
 void generateImage(Image *ptr, int w, int h, const char *imageType, const char *options) {
 	static ImageData imageData;
-	GLuint bufid = 0;
 	ptr->id = 0;
 	generatorOptions.linear = 1;
 	generatorOptions.alpha = 0;
@@ -163,19 +146,17 @@ void generateImage(Image *ptr, int w, int h, const char *imageType, const char *
 		imageData.data = NULL;
 		while(*options)
 		{
-			if(*options == 'n') generatorOptions.linear = 0;
-			else if(*options == 'a') generatorOptions.alpha = 1;
-			else if(*options == 's') generatorOptions.smooth = 1;
+			if(*options == 'n')
+				generatorOptions.linear = 0;
+			else if(*options == 'a')
+				generatorOptions.alpha = 1;
+			else if(*options == 's')
+				generatorOptions.smooth = 1;
 			options++;
 		}
 		generateImageData(&imageData, w, h, imageType);
 		if(imageData.data)
-		{
-			TEXPARAM(generatorOptions.alpha);
-			ptr->w = (float)w;
-			ptr->h = (float)h;
-			ptr->id = bufid;
-		}
+			newImageRaw(ptr, w, h, imageData.data, options);
 	}
 	if(imageData.data) delete(imageData.data);
 }

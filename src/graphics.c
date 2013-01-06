@@ -202,52 +202,32 @@ void autoScale(bool autoScale) {
 	screenScale.autoScale = autoScale;
 }
 
-void prepare() {
-	unsigned int delta = globalTime;
-	globalTime = SDL_GetTicks();
-	delta = globalTime - delta;
-	globalTimeOffsetd += (1.0 - globalGameSpeed) * delta / 1000.0;
-	globalTimed = globalTime / 1000.0 - globalTimeOffsetd;
+static void doAutoScale()
+{
 	if(screenScale.autoScale)
 	{
 		glLoadIdentity();
 		glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
 		glScalef(screenScale.scaleX, screenScale.scaleY, 1);
 	}
+}
+
+void prepare() {
+	unsigned int delta = globalTime;
+	globalTime = SDL_GetTicks();
+	delta = globalTime - delta;
+	globalTimeOffsetd += (1.0 - globalGameSpeed) * delta / 1000.0;
+	globalTimed = globalTime / 1000.0 - globalTimeOffsetd;
+	doAutoScale();
 	resLoaderMainThread();
 	if(rescaleTime && globalTime > rescaleTime)
 	{
 		SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
-		glViewport( 0, 0, screen->w, screen->h );
-		glMatrixMode( GL_PROJECTION );
-		glLoadIdentity();
-		glOrtho( 0, screen->w, screen->h, 0, -1, 1 );
-		glMatrixMode( GL_MODELVIEW );
-		glLoadIdentity();
-		if(screenScale.autoScale)
-		{
-			glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
-			glScalef(screenScale.scaleX, screenScale.scaleY, 1);
-		}
+		resetView(screen->w, screen->h);
+		doAutoScale();
 		rescaleTime = 0;
 	}
 	if(clearScreenFlag) glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void end() {
-	if(rescaleTime && globalTime > rescaleTime)
-	{
-		SDL_GL_SwapBuffers();
-		SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
-		glViewport( 0, 0, screen->w, screen->h );
-		glMatrixMode( GL_PROJECTION );
-		glLoadIdentity();
-		glOrtho( 0, screen->w, screen->h, 0, -1, 1 );
-		glMatrixMode( GL_MODELVIEW );
-		glLoadIdentity();
-		rescaleTime = 0;
-		SDL_GL_SwapBuffers();
-	}
 }
 
 /**
@@ -721,8 +701,4 @@ void drawToStencil() {
 void drawUsingStencil() {
 	glStencilFunc (GL_EQUAL, 0x1, 0x1);
 	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
-}
-
-void texEnv(unsigned target, unsigned pname, int param) {
-	glTexEnvi(target, pname, param);
 }

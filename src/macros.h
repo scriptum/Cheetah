@@ -28,7 +28,7 @@ IN THE SOFTWARE.
 #define __MACROS_H__
 
 #include "config.h"
-
+#include "math.h"
 
 /**********************************MEMOTY OPS**********************************/
 #ifdef MEMORY_TEST
