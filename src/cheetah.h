@@ -270,19 +270,15 @@ SDL_mutex *resQueueMutex;
 #define QHEAD(q) q->prev
 #define QTAIL(q) q->next
 #define QEMPTY(q) !QHEAD(q)
-inline queue newQueue();
-inline void enqueue(queue q, QDATA n);
-inline int dequeue(queue q, QDATA *val);
+queue newQueue();
 queue resLoaderQueue;
 
 Resource *resShared;
 
-int resLoaderThread(void *unused);
-inline unsigned char * loadImageData(const char *name, int *width, int *height, int *channels);
-inline unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels);
-
-inline void imageBind(Image * image);
+void imageBind(Image * image);
 void initRenderer();
+
+void resetView(int w, int h);
 
 #ifdef _SDL_H
 SDL_Event event;

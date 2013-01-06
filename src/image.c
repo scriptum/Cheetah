@@ -26,7 +26,7 @@ IN THE SOFTWARE.
 #include "SOIL/SOIL.h"
 #include "render.h"
 
-inline unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels)
+static unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels)
 {
 	unsigned int tex_id;
 	NEDED_INIT;
@@ -51,7 +51,7 @@ inline unsigned int loadImageTex(const char *options, unsigned char *img, int wi
  * */
 
 /* Load image in separate thread (if specified) */
-inline unsigned char * loadImageData(const char *name, int *width, int *height, int *channels)
+static unsigned char * loadImageData(const char *name, int *width, int *height, int *channels)
 {
 	unsigned int file_size;
 	unsigned char *img;
@@ -72,14 +72,14 @@ inline unsigned char * loadImageData(const char *name, int *width, int *height, 
 	return img;
 }
 
-inline queue newQueue()
+queue newQueue()
 {
 	node q = malloc(sizeof(node_t));
 	q->next = q->prev = 0;
 	return q;
 }
 
-inline void enqueue(queue q, QDATA n)
+static void enqueue(queue q, QDATA n)
 {
 	//~ printf("%s\n", n.image->name);
 	//~ SDL_mutexP(resQueueMutex);
@@ -94,7 +94,7 @@ inline void enqueue(queue q, QDATA n)
 	//~ SDL_mutexV(resQueueMutex);
 }
  
-inline int dequeue(queue q, QDATA *val)
+static int dequeue(queue q, QDATA *val)
 {
 	//~ SDL_mutexP(resQueueMutex);
 	node tmp = QHEAD(q);
@@ -126,8 +126,7 @@ int resLoaderThread(void *unused)
 		//~ empty = QEMPTY(resLoaderQueue)
 		//~ SDL_mutexV(resQueueMutex);
 		SDL_Delay(10);
-		//~ if(QEMPTY(resLoaderQueue)) printf(": %d\n", QEMPTY(resLoaderQueue));
-		if(!resShared&&!QEMPTY(resLoaderQueue))
+		if(!resShared && !QEMPTY(resLoaderQueue))
 		{
 			//~ printf("Queue: %d\n", QEMPTY(resLoaderQueue));
 			//~ SDL_mutexP(resQueueMutex);
@@ -154,12 +153,10 @@ int resLoaderThread(void *unused)
 void resLoaderMainThread()
 {
 	Resource * r;
-	//~ unsigned int millis;
-	if(resShared) {
+	if(resShared)
+	{
 		r = resShared;
-		//~ millis = globalTime;
 		r->image->id = loadImageTex(r->image->options, r->data, r->image->w, r->image->h, r->image->channels);
-		//~ printf("Delayed resource loader: loaded %s with %d ms\n", r->image->name, SDL_GetTicks() - millis);
 		delete(r->image->name);
 		delete(r->image->options);
 		resShared = NULL;
@@ -197,10 +194,12 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *name
 			new_img[j++] = img[img_step++];
 			new_img[j++] = img[img_step++];
 			new_img[j++] = img[img_step++];
-			if(channels == 4) img_step++;
+			if(channels == 4)
+				img_step++;
 			new_img[j++] = 0xff - mask_img[(y * mask_h + x) * mask_channels];
 			x++;
-			if(x >= mask_h) x = 0;
+			if(x >= mask_h)
+				x = 0;
 			mask_step++;
 			if(mask_step >= width)
 			{
@@ -264,7 +263,6 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 			}
 		}
 		tex_id = loadImageTex(options, img, width, height, channels);
-		//~ new(ptr, Image, 1);
 		ptr->id = tex_id;
 		ptr->w = (float)width;
 		ptr->h = (float)height;
@@ -283,22 +281,48 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 	}
 }
 
-//~ /**
- //~ * @descr Load image from disc.
- //~ * @group graphics/image
- //~ * @var file name
- //~ * @return Image object
- //~ * */
-//~ Image *newImage(const char *name) {
-	//~ return newImageOpt(name, "");
-//~ }
+/**
+ * @descr Load image from raw memory. By default image must be 3 bytes per pixel RGB
+ * @group graphics/image
+ * @var width of image
+ * @var height of image
+ * @var string of options. This is depends on image loading module you use. Supported options:
+ *  * _n_ - use nearest interpolation
+ *  * _a_ - image with alpha (4 bytes per pixel)
+ * @return Image object
+ * */
+void newImageRaw(Image *ptr, int width, int height, const char *data, const char *options) {
+	int i = 0;
+	bool nearest = FALSE;
+	unsigned int tex_id;
+	GLenum format = GL_RGB;
+	const int level = 0;
+	const int border = 0;
+	NEDED_INIT_VOID;
+	if(options) while(options[i])
+	{
+		if(options[i] == 'n') nearest = TRUE;
+		if(options[i] == 'a') format = GL_RGBA;
+		i++;
+	}
+	glGenTextures(1, &tex_id);
+	TEXTURE_BIND(tex_id);
+	if(TRUE == nearest)
+		TEX_NEAREST;
+	else
+		TEX_LINEAR;
+	glTexImage2D(GL_TEXTURE_2D, level, format, width, height, border,
+							format, GL_UNSIGNED_BYTE, (void *)data);
+	ptr->w = (float)width;
+	ptr->h = (float)height;
+	ptr->id = tex_id;
+}
 
-//~ #endif
-
-inline void imageCheckResLoader(Image * image) {
+static void imageCheckResLoader(Image * image) {
 	if(resLoaderQueue && image->id == null_texture && !image->queued)
 	{
 		Resource r;
+		memset(&r, 0, sizeof(Resource));
 		image->queued = 1;
 		r.image = image;
 		enqueue(resLoaderQueue, r);
@@ -310,7 +334,7 @@ inline void imageCheckResLoader(Image * image) {
  * @group graphics/image
  * @var Image object
  * */
-inline void imageBind(Image * image) {
+void imageBind(Image * image) {
 	if(!image) return;
 	imageCheckResLoader(image);
 	TEXTURE_BIND(image->id);
@@ -478,7 +502,7 @@ void deleteMultitexture(Multitexture * multitexture) {
 	delete(multitexture->images);
 }
 
-inline void multitextureBind(Multitexture * multitexture) {
+static void multitextureBind(Multitexture * multitexture) {
 	//~ if(prevImageId == image->id) return;
 	FLUSH_BUFFER();
 	Image * image;

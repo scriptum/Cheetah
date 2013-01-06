@@ -345,9 +345,9 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	float h   = 0.0;
 	unsigned ch = 0, ch2;
 	unsigned char char_string_buffer[9];
-	int i = 0;
-	int high=0;
-	int low=0;
+	int i    = 0;
+	int high = 0;
+	int low  = 0;
 	FontChar * fch;
 	if(sscanf(line, "%d %f %f %f %f %f %f %f %f", &ch, &x1, &y1, &x2, &y2, &cx1, &cy1, &w, &h) == -1)
 		return;
@@ -362,29 +362,34 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	}
 	char_string_buffer[i] = 0;
 	UNICODE_TO_INT(char_string_buffer, 0, i)
-	else {
+	else
+	{
 		myError("character %d is out of range (high: %x, low: %x)", ch2, high, low);
 		return;
 	}
-	if(!ptr->chars) {
+	if(!ptr->chars)
+	{
 		ptr->allocated = 1;
 		new(ptr->chars, FontChar**, ptr->allocated);
 		fill(ptr->chars, 0, FontChar**, ptr->allocated);
 		ptr->mem += ptr->allocated * sizeof(FontChar**);
 	}
 	const int incr = 1;
-	if(high + 1> ptr->allocated) {
+	if(high + 1> ptr->allocated)
+	{
 		renew(ptr->chars, FontChar**, high + incr);
 		fill(ptr->chars + ptr->allocated, 0, FontChar**, high + incr - ptr->allocated);
 		ptr->mem += (high + incr - ptr->allocated) * sizeof(FontChar**);
 		ptr->allocated = incr + high;
 	}
-	if(!ptr->chars[high]) {
+	if(!ptr->chars[high])
+	{
 		new(ptr->chars[high], FontChar*, 256);
 		fill(ptr->chars[high], 0, FontChar*, 256);
 		ptr->mem += 256 * sizeof(FontChar*);
 	}
-	if(!ptr->chars[high][low]) {
+	if(!ptr->chars[high][low])
+	{
 		new(ptr->chars[high][low], FontChar, 1);
 		ptr->mem += sizeof(FontChar);
 	}
@@ -402,9 +407,10 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	memcpy(fch->v, vert, sizeof(vert));
 	memcpy(fch->t, tex, sizeof(tex));
 	fch->w = w;
-	if(low == 32 && high==0) {
+	if(' ' == low && '\0' == high)
+	{
 		ptr->spacew = w;
-		if(!ptr->chars[0][0]) new(ptr->chars[0][0], FontChar, 1);
+		if(!ptr->chars[0]['\0']) new(ptr->chars[0]['\0'], FontChar, 1);
 		if(!ptr->chars[0]['\n']) new(ptr->chars[0]['\n'], FontChar, 1);
 		if(!ptr->chars[0]['\r']) new(ptr->chars[0]['\r'], FontChar, 1);
 		if(!ptr->chars[0]['\t']) new(ptr->chars[0]['\t'], FontChar, 1);
@@ -416,7 +422,8 @@ void fontSetGlyph(Font *ptr, const char *line) {
 
 void deleteFont(Font * ptr) {
 	int i, j;
-	if(ptr) {
+	if(ptr)
+	{
 		if(ptr->chars)
 		{
 			for(i = 0; i < ptr->allocated; i++)
@@ -425,7 +432,8 @@ void deleteFont(Font * ptr) {
 				{
 					for(j = 0; j < 255; j++)
 					{
-						if(ptr->chars[i][j]) delete(ptr->chars[i][j]);
+						if(ptr->chars[i][j])
+							delete(ptr->chars[i][j]);
 					}
 					delete(ptr->chars[i]);
 				}
@@ -433,5 +441,6 @@ void deleteFont(Font * ptr) {
 			delete(ptr->chars);
 		}
 	}
-	else myError("Trying to free a null-font. Maybe, you did it manually?");
+	else
+		myError("Trying to free a null-font. Maybe, you did it manually?");
 }
