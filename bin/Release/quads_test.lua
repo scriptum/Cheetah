@@ -4,7 +4,7 @@ require 'lib.lquery.init'
 local C = cheetah
 
 local scr = 512
-C.init('Test', scr, scr, 32, '')
+C.init('Test', scr..'x'..scr)
 C.printFPS = true
 
 local size = 2
