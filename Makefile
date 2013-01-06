@@ -1,6 +1,6 @@
 TARGET := libcheetah.so
-CFLAGS += -fPIC -Ofast -fomit-frame-pointer -funroll-loops -flto -Wall -pipe
-LDFLAGS += -shared -L"lib" -lSDL -lGL -flto -pipe
+CFLAGS += -Wall -Winline -pipe
+LDFLAGS += -shared -L"lib" -lSDL -lGL
 RESFLAGS := -I"inc"
 SOURCEDIR := src src/SOIL
 
@@ -20,4 +20,4 @@ $(TARGET) : $(OBJECTS)
 .PHONY : clean
  
 clean :
-	rm $(OBJECTS)
+	rm -f $(OBJECTS)
