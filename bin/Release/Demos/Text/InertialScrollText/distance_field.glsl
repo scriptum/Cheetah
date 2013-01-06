@@ -2,8 +2,8 @@
 uniform sampler2D texture;
 uniform float sharpness;
 uniform float gamma;
-
+varying vec2 TexCoord;
 void main() {
-	vec4 color = texture2D(texture, gl_TexCoord[0].xy);
+	vec4 color = texture2D(texture, TexCoord);
 	gl_FragColor = vec4(color.rgb, smoothstep(gamma - sharpness, gamma + sharpness, color.a));
 }
