@@ -3,6 +3,7 @@
 *.exe
 *.dll
 *.so
+*.gcda
 obj*
 luajit
 *devel_art*
