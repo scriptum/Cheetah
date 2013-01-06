@@ -3,22 +3,19 @@
 Dependencies:
 1. SDL
 2. SOIL (for image loading)
-3. OpenGL:)
+3. OpenGL :)
 
 
 Installing:
 
 LINUX, BSD, etc:
 1. Download LuaJIT (http://luajit.org/download.html) and build it (you may use 
-   thirdparty sources).
+   thirdparty sources to build luajit).
 2. Put file luajit into bin/Release/bin/<Your-system>/ directory. Be careful with 
    the architecture.
-3. Download SOIL (http://www.lonesock.net/soil.html) and build it (you may use 
-   thirdparty sources).
-4. Move libSOIL.so into bin/Release/bin/<Your-system>/ directory.
-5. Go to the cheetah's root directory and type 'make'.
-6. Move bin/Release/libcheetah.so into bin/Release/bin/<Your-system>/ directory.
-7. Go to bin/Release and run run_linux.sh
+3. Go to the cheetah's root directory and type 'make'.
+4. Move bin/Release/libcheetah.so into bin/Release/bin/<Your-system>/ directory.
+5. Go to bin/Release and run run_linux.sh
 
 Optionally:
 1. Build SDL_mixer if you want sound support.
@@ -29,4 +26,4 @@ Put all *.so to bin/Release/bin/<Your-system>.
 
 
 Windows:
-Building on windows is not supported yet.
+Building on windows is not supported. Windows version is cross-compiled using gcc, but you may try mingw...
