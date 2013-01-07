@@ -30,7 +30,7 @@ static unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 {
 	unsigned int tex_id;
 	NEDED_INIT;
-	tex_id = SOIL_direct_load_DDS_from_memory(img,0,0,0);
+	tex_id = SOIL_direct_load_DDS_from_memory(img, 0, SOIL_FLAG_TEXTURE_REPEATS, 0);
 	if(!tex_id)
 		tex_id = SOIL_internal_create_OGL_texture(
 			img, width, height, channels,
