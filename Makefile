@@ -1,5 +1,5 @@
 TARGET := libcheetah.so
-CFLAGS += -Wall -Winline -pipe
+CFLAGS += -Wall -Winline -pipe -fPIC
 LDFLAGS += -shared -L"lib" -lSDL -lGL
 RESFLAGS := -I"inc"
 SOURCEDIR := src src/SOIL
