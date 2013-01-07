@@ -30,34 +30,41 @@ local image_draw = function(s)
 	s._image:draw(s.x, s.y, s.w, s.h, s.angle, s.ox, s.oy)
 end
 local image_draw_quad = function(s)
-	s._image:drawq(s.qx, s.qy, s.w, s.h)
+	s._image:drawq(s.x, s.y, s.w, s.h, s.qx, s.qy, s.w, s.h, s.angle, s.ox, s.oy)
 end
 function Entity:image(image, options)
  if image and not self._image then
 		if type(image) == 'string' then 
-			image = C.newImage(image)
+			image = C.newImage(image, options)
 		end
 		self._image = image
 		self.w = image:getWidth()
 		self.h = image:getHeight()
-		if options and options.quad and options.quad == true then 
-			self:draw(image_draw_quad)
-			self.qx = 0
-			self.qy = 0
-			self.qw = self.w
-			self.qh = self.h
-		else
-			self:draw(image_draw)
-		end
+		self:draw(image_draw)
 	end
 	return self
 end
-
---border-image
-function Entity:borderImage(image, top, right, bottom, left)
+function Entity:imageq(image, options)
  if image and not self._image then
 		if type(image) == 'string' then 
-			image = C.newBorderImage(image, top, right, bottom, left)
+			image = C.newImage(image, options)
+		end
+		self._image = image
+		self.w = image:getWidth()
+		self.h = image:getHeight()
+		self:draw(image_draw_quad)
+		self.qx = 0
+		self.qy = 0
+		self.qw = self.w
+		self.qh = self.h
+	end
+	return self
+end
+--border-image
+function Entity:borderImage(image, top, right, bottom, left, options)
+ if image and not self._image then
+		if type(image) == 'string' then 
+			image = C.newBorderImage(image, top, right, bottom, left, options)
 		end
 		self._image = image
 		self._draw = image_draw

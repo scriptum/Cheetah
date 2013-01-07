@@ -29,19 +29,25 @@ IN THE SOFTWARE.
 static unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels)
 {
 	unsigned int tex_id;
+	bool nearest = FALSE;
+	int flags = SOIL_FLAG_TEXTURE_REPEATS;
 	NEDED_INIT;
-	tex_id = SOIL_direct_load_DDS_from_memory(img, 0, SOIL_FLAG_TEXTURE_REPEATS, 0);
+	while(*options)
+	{
+		if(*options == 'n') /* nearest */
+			nearest = TRUE;
+		else if(*options == 'c') /* clamp */
+			flags = 0;
+		options++;
+	}
+	tex_id = SOIL_direct_load_DDS_from_memory(img, 0, flags, 0);
 	if(!tex_id)
 		tex_id = SOIL_internal_create_OGL_texture(
 			img, width, height, channels,
-			0, SOIL_FLAG_TEXTURE_REPEATS,
+			0, flags,
 			GL_TEXTURE_2D, GL_TEXTURE_2D,
 			GL_MAX_TEXTURE_SIZE);
-	while(*options)
-	{
-		if(*options == 'n') TEX_NEAREST;
-		options++;
-	}
+	if(TRUE == nearest) TEX_NEAREST;
 	SOIL_free_image_data(img);
 	return tex_id;
 }
