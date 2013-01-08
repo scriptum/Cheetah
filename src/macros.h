@@ -133,15 +133,25 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);                  \
 
 /**********************************VERTEX OPS**********************************/
 
+/**
+ * Rotation of verticles. We are hoping that compiler will optimize sin(0) and
+ * cos(0) and applies sincosf instead of four sin/cos calls. I checked assembly
+ * for that.
+ * */
 #define VERTEX_ROT_X(x,y,a,ox,oy) cosf(a)*((x)-(ox))-sinf(a)*((y)-(oy))
 #define VERTEX_ROT_Y(x,y,a,ox,oy) sinf(a)*((x)-(ox))+cosf(a)*((y)-(oy))
 
 /******************************VERTEX ACCUMULATOR******************************/
 
 #ifdef GL_QUADS
-//Draw using quads
+/******************************DRAW USING QUADS********************************/
 #define VERTICLES_PER_SPRITE 4 * 2
 
+/**
+ * Flushing buffer accumulator. It doesn't send glFlush() or glFinish, it just
+ * calls glDrawArrays to draw quads from buffer. Some functions as color, move,
+ * bindShader need to flush buffer to avoid visual appearance corruption.
+ * */
 #define FLUSH_BUFFER() do {                                                    \
 	if(vertexCounter) {                                                          \
 		glDrawArrays(GL_QUADS, 0, vertexCounter / 2);                              \
@@ -149,8 +159,22 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);                  \
 	}                                                                            \
 } while(0)
 
+/**
+ * Just checking if buffer grows over his size and flushing it.
+ * */
+#define FLUSH_BUFFER_IF_OVERFLOW() do {                                        \
+	if(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE)              \
+		FLUSH_BUFFER();                                                            \
+} while(0)
+
+/**
+ * Default texture coordinates.
+ * */
 static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,0};
 
+/**
+ * Genegal vertex operations: push vertex coordinates to buffer.
+ * */
 #define PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy) do {                   \
 	vertexCoord[vertexCounter + 0] = (vx) + VERTEX_ROT_X(0,  0,  a, ox, oy);     \
 	vertexCoord[vertexCounter + 1] = (vy) + VERTEX_ROT_Y(0,  0,  a, ox, oy);     \
@@ -162,9 +186,12 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,0};
 	vertexCoord[vertexCounter + 7] = (vy) + VERTEX_ROT_Y(vw, 0,  a, ox, oy);     \
 } while(0)
 
-
+/**
+ * Pushing full quad with all transformaions: size, rotation (a - angle), 
+ * texture offsets and origin position (ox, oy).
+ * */
 #define PUSH_QUADT(vx, vy, vw, vh, a, ox, oy, tx, ty, tw, th, w, h) do {       \
-	if(vertexCounter >= VERTEX_BUFFER_LIMIT*VERTICLES_PER_SPRITE) FLUSH_BUFFER();\
+	FLUSH_BUFFER_IF_OVERFLOW();                                                  \
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);                             \
 	texCoord[vertexCounter + 2] =                                                \
 	texCoord[vertexCounter + 0] = (tx) / (w);                                    \
@@ -180,7 +207,7 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,0};
 } while(0)
 
 #else
-//Draw using triangles
+/****************************DRAW USING TRIANGLES******************************/
 #define VERTICLES_PER_SPRITE 6 * 2
 
 #define FLUSH_BUFFER() do {                                                    \
@@ -208,7 +235,7 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
 } while(0)
 
 #define PUSH_QUADT(vx, vy, vw, vh, a, ox, oy, tx, ty, tw, th, w, h) do {       \
-	if(vertexCounter >= VERTEX_BUFFER_LIMIT*VERTICLES_PER_SPRITE) FLUSH_BUFFER();\
+	FLUSH_BUFFER_IF_OVERFLOW();                                                  \
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);                             \
 	texCoord[vertexCounter + 10] =                                               \
 	texCoord[vertexCounter + 2] =                                                \
@@ -230,7 +257,7 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
 #endif
 
 #define PUSH_QUAD_TEXTURE(vx, vy, vw, vh, a, ox, oy, texture) do {             \
-	if(vertexCounter >= VERTEX_BUFFER_LIMIT*VERTICLES_PER_SPRITE) FLUSH_BUFFER();\
+	FLUSH_BUFFER_IF_OVERFLOW();                                                  \
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);                             \
 	memcpy(texCoord+vertexCounter, texture, sizeof(float)*VERTICLES_PER_SPRITE); \
 	vertexCounter += VERTICLES_PER_SPRITE;                                       \
