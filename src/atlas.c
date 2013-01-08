@@ -31,9 +31,9 @@ void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox,
 	float scaley = h/p->h;
 	imageBind(p->image);
 	if(0.0 == a)
-		PUSH_QUAD_TEXTURE(x, y, p->aw * scalex, p->ah * scaley, a, ox - p->x * scalex, oy - p->y * scaley, p->tex);
-	else
 		PUSH_QUAD_TEXTURE(x, y, p->aw * scalex, p->ah * scaley, 0.0, ox - p->x * scalex, oy - p->y * scaley, p->tex);
+	else
+		PUSH_QUAD_TEXTURE(x, y, p->aw * scalex, p->ah * scaley, a, ox - p->x * scalex, oy - p->y * scaley, p->tex);
 }
 
 void atlasDrawxy(Atlas *p, float x, float y, float w, float h) {
