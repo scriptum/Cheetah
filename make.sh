@@ -3,7 +3,8 @@ TMP=/tmp/cheetah-build-last
 LAST=native
 MAKE="/usr/bin/make -j4"
 CLEAN="/usr/bin/make clean"
-FLAGS_OPTIMIZE="-Ofast -fomit-frame-pointer -funroll-loops -mmmx -msse -ftree-vectorize -flto"
+FLAGS_OPTIMIZE_GENERAL="-fomit-frame-pointer -funroll-loops -mmmx -msse -ftree-vectorize -flto"
+FLAGS_OPTIMIZE="-Ofast $FLAGS_OPTIMIZE_GENERAL"
 DIR=./bin/Release
 MACHINE_NAME=`uname -m`
 case ${MACHINE_NAME} in
@@ -37,7 +38,7 @@ then
 	else
 		MINGWGCC=i586-mingw32msvc-gcc
 	fi
-	FLAGS_OPTIMIZE="-O3 -ffast-math -fomit-frame-pointer -funroll-loops -mmmx -msse -ftree-vectorize"
+	FLAGS_OPTIMIZE="-O3 -ffast-math $FLAGS_OPTIMIZE_GENERAL"
 	export CC=$MINGWGCC
 	OS=win
 	MACHINE_NAME=32
