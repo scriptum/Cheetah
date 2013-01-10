@@ -25,36 +25,40 @@ IN THE SOFTWARE.
 #include "render.h"
 #include "image_write.h"
 
-static int checkFramebufferStatus()
+static bool checkFramebufferStatus()
 {
 	GLenum status;
+	const char *error;
 	status = (GLenum) glCheckFramebufferStatus_(GL_FRAMEBUFFER_EXT);
 	switch(status) {
 		case GL_FRAMEBUFFER_COMPLETE_EXT:
-			return 1;
+			return TRUE;
 		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-			myError("FBO: incomplete attachment\n");
-			return 0;
+			error = "FBO: incomplete attachment\n";
+			break;
 		case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-			myError("Unsupported FBO format\n");
-			return 0;
+			error = "Unsupported FBO format\n";
+			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-			myError("FBO: missing attachment\n");
-			return 0;
+			error = "FBO: missing attachment\n";
+			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-			myError("FBO: attached images must have same dimensions\n");
-			return 0;
+			error = "FBO: attached images must have same dimensions\n";
+			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-			myError("FBO: attached images must have same format\n");
-			return 0;
+			error = "FBO: attached images must have same format\n";
+			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-			myError("FBO: missing draw buffer\n");
-			return 0;
+			error = "FBO: missing draw buffer\n";
+			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-			myError("FBO: missing read buffer\n");
-			return 0;
+			error = "FBO: missing read buffer\n";
+			break;
+		default:
+			error = "FBO: unknown error\n";
 	}
-	return 0;
+	myError(error);
+	return FALSE;
 }
 
 /**
@@ -63,114 +67,90 @@ static int checkFramebufferStatus()
  * @var width
  * @var height
  * @var string of options. Supported options:
- *  * _a_ - enable alpha channel
- *  * _n_ - enable smooth interpolation
- *  * _r_ - repeat as texture (not all faramebuffers need this)
- *  * _1_ - create 8 bits (1 byte) per channel framebuffer (default)
- *  * _2_ - create 16 bits (2 byte) per channel framebuffer (slow), not all systems support this
- *  * _4_ - create 32 bits (4 byte) per channel framebuffer (very SLOW), use only if you know, that you doing, not all systems support this
  * @return Framebuffer object
  * */
 void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int height, const char * options) {
-	//unsigned int percision, bool alpha, bool interpolation, bool repeat) {
-	unsigned int percision = 8;
-	bool alpha = 0;
-	bool interpolation = 1;
-	bool repeat = 0;
 	Image *ptr = NULL;
 	GLint current_fbo;
 	GLenum internal, format;
 	bool status;
-	char ch;
 	
 	fboptr->id = 0;
 	
 	NEDED_INIT_VOID;
 	
 	if(!supported.FBO) {
-		myError("Framebuffers are not supported on this machine. You'd better to check it in script (if cheetah.supported.FBO)");
+		myError("Framebuffers are not supported on this machine. You'd better to check it in script (try \"if cheetah.supported.FBO\")");
 		return;
 	}
-	
-	while(*options)
+
+	CHECK_OPTION(options, alpha);       /* Use alpha channel */
+	CHECK_OPTION(options, nearest);     /* Use nearest interpolation */
+	CHECK_OPTION(options, clamp);       /* Use clamp policy */
+	CHECK_OPTION(options, percision16); /* Set percision to half float */
+	CHECK_OPTION(options, percision32); /* Set percision  */
+
+	if(TRUE == percision32)
 	{
-		ch = *options;
-		options++;
-		if(ch == 'a') {alpha = 1; continue;}
-		if(ch == 'n') {interpolation = 0; continue;}
-		if(ch == 'r') {repeat = 1; continue;}
-		if(ch == '4') {percision = 32; continue;}
-		if(ch == '2') {percision = 16; continue;}
-		if(ch == '1') {percision = 8; continue;}
-	}
-	
-	if(percision == 32) {
 		internal = alpha ? GL_RGBA32F_ARB : GL_RGB32F_ARB;
 		format = GL_FLOAT;
 	}
-	else if(percision == 16) {
+	else if(TRUE == percision16)
+	{
 		internal = alpha ? GL_RGBA16F_ARB : GL_RGB16F_ARB;
 		format = GL_HALF_FLOAT_ARB;
 	}
-	else {
-		//~ if(percision != 8) myError("Invalid parameter in framebuffer's percision (8 expected, got %d). Using 8bit framebuffer.", percision);
+	else 
+	{
 		internal = alpha ? GL_RGBA : GL_RGB;
 		format = GL_UNSIGNED_BYTE;
 	}
 	
-	//save current fbo
+	/* save current fbo */
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING_EXT, &current_fbo);
 	
 	new(ptr, Image, 1);
-	//~ new(fboptr, Framebuffer, 1);
 	ptr->w = width;
 	ptr->h = height;
-	//~ GLuint depthbuffer;
-	//~ glGenRenderbuffers_(1, &depthbuffer);
-			//~ glBindRenderbuffer_(GL_RENDERBUFFER_EXT, depthbuffer);
-			//~ glRenderbufferStorage_(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT16, width, height);
-			//~ glBindRenderbuffer_(GL_RENDERBUFFER_EXT, 0);
-			
-	// generate texture save target
+	
+	/* generate texture save target */
 	glGenTextures(1, &ptr->id);
 	glBindTexture(GL_TEXTURE_2D, ptr->id);
 	
-	if(interpolation)
-		TEX_LINEAR;
-	else 
+	if(TRUE == nearest)
 		TEX_NEAREST;
-	
-	if(repeat)
-		TEX_REPEAT;
 	else 
+		TEX_LINEAR;
+	
+	if(TRUE == clamp)
 		TEX_CLAMP;
+	else 
+		TEX_REPEAT;
 	
 	glTexImage2D(GL_TEXTURE_2D, 0, internal, width, height, 0, GL_RGBA, format, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
-	// create framebuffer
+	/* create framebuffer */
 	glGenFramebuffers_(1, &fboptr->id);
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, fboptr->id);
 	glFramebufferTexture2D_(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, ptr->id, 0);
-	//~ glFramebufferRenderbuffer_(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
-					//~ GL_RENDERBUFFER_EXT, depthbuffer);
 	status = checkFramebufferStatus();
 
-	// unbind framebuffer
+	/* unbind framebuffer */
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, (GLuint)current_fbo);
 		
-	if (status) {
+	if(TRUE == status)
+	{
 		fboptr->image = ptr;
 		return;
 	}
-	else {
+	else 
+	{
 		glDeleteTextures(1, &ptr->id);
 		glDeleteFramebuffers_(1, &fboptr->id);
 		delete(ptr);
 		fboptr->id = 0;
-		//~ myError("Framebuffer is not initialized.");
-		//~ delete(fboptr);
 		return;
 	}
 }
@@ -190,7 +170,8 @@ bool framebufferCheck(Framebuffer * ptr) {
  * @var Framebuffer object
  * */
 void framebufferBind(Framebuffer * ptr) {
-	if(ptr->id) {
+	if(ptr->id)
+	{
 		FLUSH_BUFFER();
 		glBindFramebuffer_(GL_FRAMEBUFFER_EXT, ptr->id);
 		glViewport(0, 0, (GLsizei)ptr->image->w, (GLsizei)ptr->image->h);
@@ -200,7 +181,6 @@ void framebufferBind(Framebuffer * ptr) {
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 	}
-	//~ else myError("Framebuffer is not initialized.");
 }
 
 /**
@@ -233,32 +213,6 @@ void framebufferSaveBMP(Framebuffer * ptr, const char* name) {
 	stbi_write_bmp(name, w, h, 3, img);
 	delete(img);
 }
-
-#if 0
-/**
- * @descr Draw framebuffer. Same as Image:draw.
- * @group graphics/framebuffer
- * @var Framebuffer object
- * @see imageDraw
- * */
-void framebufferDraw(Framebuffer * ptr) {
-	imageDraw(ptr->image);
-}
-
-/**
- * @descr Draw part of framebuffer with texture coordinates. Same as Image:drawq.
- * @group graphics/framebuffer
- * @var Framebuffer object
- * @var x offset of framebuffer's texture
- * @var y offset of framebuffer's texture
- * @var width of framebuffer's texture
- * @var height of framebuffer's texture
- * @see imageDrawq
- * */
-void framebufferDrawq(Framebuffer * ptr, float qx, float qy, float qw, float qh) {
-	imageDrawq(ptr->image, qx, qy, qw, qh);
-}
-#endif
 
 /**
  * @descr Delete framebuffer and free memory.

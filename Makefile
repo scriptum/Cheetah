@@ -6,6 +6,7 @@ SOURCEDIR := src src/SOIL
 
 SOURCES := $(wildcard $(addsuffix /*.c*, $(SOURCEDIR)))
 OBJECTS := $(SOURCES:.c=.o)
+PROFILING := $(SOURCES:.c=.gcda)
 INCLUDES := $(wildcard $(addsuffix /*.h*, $(SOURCEDIR)))
 all : $(TARGET)
  
@@ -20,4 +21,4 @@ $(TARGET) : $(OBJECTS)
 .PHONY : clean
  
 clean :
-	rm -f $(OBJECTS)
+	rm -f $(OBJECTS) $PROFILING
