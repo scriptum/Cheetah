@@ -29,17 +29,12 @@ IN THE SOFTWARE.
 static unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels)
 {
 	unsigned int tex_id;
-	bool nearest = FALSE;
 	int flags = SOIL_FLAG_TEXTURE_REPEATS;
 	NEDED_INIT;
-	while(*options)
-	{
-		if(*options == 'n') /* nearest */
-			nearest = TRUE;
-		else if(*options == 'c') /* clamp */
-			flags = 0;
-		options++;
-	}
+	CHECK_OPTION(options, nearest);
+	CHECK_OPTION(options, clamp);
+	if(TRUE == clamp)
+		flags = 0;
 	tex_id = SOIL_direct_load_DDS_from_memory(img, 0, flags, 0);
 	if(!tex_id)
 		tex_id = SOIL_internal_create_OGL_texture(
@@ -233,8 +228,7 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *name
  * @return Image object
  * */
 void newImageOpt(Image *ptr, const char *name, const char *options) {
-	int width, height, channels, i = 0;
-	bool mask = 0, instant = 0;
+	int width, height, channels;
 	unsigned int tex_id;
 	unsigned char *img;
 	unsigned char *img_mask;
@@ -244,13 +238,9 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 		MYERROR("empty filename");
 		return;
 	}
-	if(options) while(options[i])
-	{
-		if(options[i] == 'i') instant = 1;
-		if(options[i] == 'm') mask = 1;
-		i++;
-	}
-	if(!resLoaderQueue||instant)
+	CHECK_OPTION(options, instant);
+	CHECK_OPTION(options, mask);
+	if(FALSE == resLoaderQueue || TRUE == instant)
 	{
 		img = loadImageData(name, &width, &height, &channels);
 		if(img == NULL)
@@ -258,7 +248,7 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 			MYERROR("can't load image %s", name);
 			return;
 		}
-		if(mask)
+		if(TRUE == mask)
 		{
 			img_mask = loadImageMask(img, name, width, height, channels);
 			if(img_mask)
@@ -275,7 +265,6 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 	}
 	else
 	{
-		//~ new(ptr, Image, 1);
 		new(ptr->name, char, strlen(name)+1);
 		new(ptr->options, char, strlen(options)+1);
 		memcpy(ptr->name, name, strlen(name)+1);
@@ -298,19 +287,15 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
  * @return Image object
  * */
 void newImageRaw(Image *ptr, int width, int height, const char *data, const char *options) {
-	int i = 0;
-	bool nearest = FALSE;
 	unsigned int tex_id;
 	GLenum format = GL_RGB;
 	const int level = 0;
 	const int border = 0;
 	NEDED_INIT_VOID;
-	if(options) while(options[i])
-	{
-		if(options[i] == 'n') nearest = TRUE;
-		if(options[i] == 'a') format = GL_RGBA;
-		i++;
-	}
+	CHECK_OPTION(options, nearest);
+	CHECK_OPTION(options, alpha);
+	if(TRUE == alpha)
+		format = GL_RGBA;
 	glGenTextures(1, &tex_id);
 	TEXTURE_BIND(tex_id);
 	if(TRUE == nearest)
@@ -421,41 +406,31 @@ void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, fl
 	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, image->w, image->h);
 }
 
-/**
- * @descr Draw image sliced on 9 parts by 4 lines: top, bottom, left and right
- * @group graphics/image
- * @var Image object
- * @var position of left top corner
- * @var position of left top corner
- * @var summary width of object
- * @var summary height of object
- * */
-void borderImageDrawxy(BorderImage * borderImage, float x, float y, float w, float h) {
-	imageBind(borderImage->image);
-	float ow = borderImage->image->w;
-	float oh = borderImage->image->h;
-	float t  = borderImage->top;
-	float r  = borderImage->right;
-	float b  = borderImage->bottom;
-	float l  = borderImage->left;
-	if(t > 0.0)
-	{
-		PUSH_QUADT(x,          y,          l,          t,          0, 0, 0,  0,       0,       l,            t,          ow, oh);
-		PUSH_QUADT(x + l,      y,          w - l - r,  t,          0, 0, 0,  l,       0,       ow - l - r,   t,          ow, oh);
-		PUSH_QUADT(x + w - r,  y,          r,          t,          0, 0, 0,  ow - r,  0,       r,            t,          ow, oh);
-	}
-
-	PUSH_QUADT(x,            y + t,      l,          h - t - b,  0, 0, 0,  0,       t,        l,           oh - t - b, ow, oh);
-	if(FALSE == borderImage->borderOnly)
-		PUSH_QUADT(x + l,      y + t,      w - l - r,  h - t - b,  0, 0, 0,  l,       t,        ow - l - r,  oh - t - b, ow, oh);
-	PUSH_QUADT(x + w - r,    y + t,      r,          h - t - b,  0, 0, 0,  ow - r,  t,        r,           oh - t - b, ow, oh);
-	if(b > 0.0)
-	{
-		PUSH_QUADT(x,          y + h - b,  l,          b,          0, 0, 0,  0,       oh - b,   l,           b,          ow, oh);
-		PUSH_QUADT(x + l,      y + h - b,  w - l - r,  b,          0, 0, 0,  l,       oh - b,   ow - l - r,  b,          ow, oh);
-		PUSH_QUADT(x + w - r,  y + h - b,  r,          b,          0, 0, 0,  ow - r,  oh - b,   r,           b,          ow, oh);
-	}
-}
+#define borderImageDrawInternal(borderImage, x, y, w, h, a, ox, oy) do {\
+	imageBind(borderImage->image);\
+	float ow = borderImage->image->w;\
+	float oh = borderImage->image->h;\
+	float t  = borderImage->top;\
+	float r  = borderImage->right;\
+	float b  = borderImage->bottom;\
+	float l  = borderImage->left;\
+	if(t > 0.0)\
+	{\
+		PUSH_QUADT(x,  y,  l,          t,          a, ox,         oy,          0,       0,       l,            t,          ow, oh);\
+		PUSH_QUADT(x,  y,  w - l - r,  t,          a, ox - l,     oy,          l,       0,       ow - l - r,   t,          ow, oh);\
+		PUSH_QUADT(x,  y,  r,          t,          a, ox - w + r, oy,          ow - r,  0,       r,            t,          ow, oh);\
+	}\
+	PUSH_QUADT(x,    y,      l,      h - t - b,  a, ox,         oy - t,      0,       t,        l,           oh - t - b, ow, oh);\
+	if(FALSE == borderImage->borderOnly)\
+		PUSH_QUADT(x,  y,  w - l - r,  h - t - b,  a, ox - l,     oy - t,      l,       t,        ow - l - r,  oh - t - b, ow, oh);\
+	PUSH_QUADT(x,    y,  r,          h - t - b,  a, ox - w + r, oy - t,      ow - r,  t,        r,           oh - t - b, ow, oh);\
+	if(b > 0.0)\
+	{\
+		PUSH_QUADT(x,  y,  l,          b,          a, ox,         oy - h + b,  0,       oh - b,   l,           b,          ow, oh);\
+		PUSH_QUADT(x,  y,  w - l - r,  b,          a, ox - l,     oy - h + b,  l,       oh - b,   ow - l - r,  b,          ow, oh);\
+		PUSH_QUADT(x,  y,  r,          b,          a, ox - w + r, oy - h + b,  ow - r,  oh - b,   r,           b,          ow, oh);\
+	}\
+} while(0)
 
 /**
  * @descr Draw image sliced on 9 parts by 4 lines: top, bottom, left and right
@@ -474,30 +449,20 @@ void borderImageDrawxy(BorderImage * borderImage, float x, float y, float w, flo
  * @var origin y
  * */
 void borderImageDrawt(BorderImage * borderImage, float x, float y, float w, float h, float a, float ox, float oy) {
-	imageBind(borderImage->image);
-	float ow = borderImage->image->w;
-	float oh = borderImage->image->h;
-	float t  = borderImage->top;
-	float r  = borderImage->right;
-	float b  = borderImage->bottom;
-	float l  = borderImage->left;
-	if(t > 0.0)
-	{
-		PUSH_QUADT(x,          y,          l,          t,          a, ox, oy,  0,       0,       l,            t,          ow, oh);
-		PUSH_QUADT(x,      y,          w - l - r,  t,          a, ox - l, oy,  l,       0,       ow - l - r,   t,          ow, oh);
-		PUSH_QUADT(x,  y,          r,          t,          a, ox - w + r, oy,  ow - r,  0,       r,            t,          ow, oh);
-	}
+	borderImageDrawInternal(borderImage, x, y, w, h, a, ox, oy);
+}
 
-	PUSH_QUADT(x,            y,      l,          h - t - b,  a, ox, oy - t,  0,       t,        l,           oh - t - b, ow, oh);
-	if(FALSE == borderImage->borderOnly)
-		PUSH_QUADT(x,      y,      w - l - r,  h - t - b,  a, ox - l, oy - t,  l,       t,        ow - l - r,  oh - t - b, ow, oh);
-	PUSH_QUADT(x,    y,      r,          h - t - b,  a, ox - w + r, oy - t,  ow - r,  t,        r,           oh - t - b, ow, oh);
-	if(b > 0.0)
-	{
-		PUSH_QUADT(x,          y,  l,          b,          a, ox, oy - h + b,  0,       oh - b,   l,           b,          ow, oh);
-		PUSH_QUADT(x,      y,  w - l - r,  b,          a, ox - l, oy - h + b,  l,       oh - b,   ow - l - r,  b,          ow, oh);
-		PUSH_QUADT(x,  y,  r,          b,          a, ox - w + r, oy - h + b,  ow - r,  oh - b,   r,           b,          ow, oh);
-	}
+/**
+ * @descr Draw image sliced on 9 parts by 4 lines: top, bottom, left and right
+ * @group graphics/image
+ * @var Image object
+ * @var position of left top corner
+ * @var position of left top corner
+ * @var summary width of object
+ * @var summary height of object
+ * */
+void borderImageDrawxy(BorderImage * borderImage, float x, float y, float w, float h) {
+	borderImageDrawInternal(borderImage, x, y, w, h, 0, 0, 0);
 }
 
 void initMultitexture(Multitexture * multitexture) {

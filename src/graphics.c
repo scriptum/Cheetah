@@ -49,39 +49,48 @@ int vertexCounter;
 float *texCoord = NULL;
 float *vertexCoord = NULL;
 
+static void flushBuffer()
+{
+	FLUSH_BUFFER();
+}
+
 /**
- * @descr Enables depth test. Useless if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_DEPTH_TEST);
+ * @descr Enables depth test. Useless if you didn't pass 'depth' option to cheetah.init. Equivalent to glEnable(GL_DEPTH_TEST);
  * @group graphics/drawing
  * @see disableDepthTest
  * */
 void enableDepthTest() {
+	flushBuffer();
 	glEnable(GL_DEPTH_TEST);
 }
 
 /**
- * @descr Disables depth test. Useless if you didn't pass 'd' option to cheetah.init. Equivalent to glDisable(GL_DEPTH_TEST);
+ * @descr Disables depth test. Useless if you didn't pass 'depth' option to cheetah.init. Equivalent to glDisable(GL_DEPTH_TEST);
  * @group graphics/drawing
  * @see enableDepthTest
  * */
 void disableDepthTest() {
+	flushBuffer();
 	glDisable(GL_DEPTH_TEST);
 }
 
 /**
- * @descr Enables stencil test. Useless if you didn't pass 'd' option to cheetah.init. Equivalent to glEnable(GL_STENCIL_TEST);
+ * @descr Enables stencil test. Useless if you didn't pass 'stencil' option to cheetah.init. Equivalent to glEnable(GL_STENCIL_TEST);
  * @group graphics/drawing
  * @see disableStencilTest
  * */
 void enableStencilTest() {
+	flushBuffer();
 	glEnable(GL_STENCIL_TEST);
 }
 
 /**
- * @descr Disables stencil test. Useless if you didn't pass 'd' option to cheetah.init. Equivalent to glDisable(GL_STENCIL_TEST);
+ * @descr Disables stencil test. Useless if you didn't pass 'stencil' option to cheetah.init. Equivalent to glDisable(GL_STENCIL_TEST);
  * @group graphics/drawing
  * @see enableStencilTest
  * */
 void disableStencilTest() {
+	flushBuffer();
 	glDisable(GL_STENCIL_TEST);
 }
 
@@ -91,7 +100,7 @@ void disableStencilTest() {
  * @see disableStencilTest
  * */
 void enableScissorTest() {
-	FLUSH_BUFFER();
+	flushBuffer();
 	glEnable(GL_SCISSOR_TEST);
 }
 
@@ -101,7 +110,7 @@ void enableScissorTest() {
  * @see enableStencilTest
  * */
 void disableScissorTest() {
-	FLUSH_BUFFER();
+	flushBuffer();
 	glDisable(GL_SCISSOR_TEST);
 }
 
@@ -125,12 +134,12 @@ void disableAlphaTest() {
 }
 
 void setScissor(int x, int y, int w, int h) {
-	FLUSH_BUFFER();
+	flushBuffer();
 	glScissor(x, screen->h - y - h, w, h);
 }
 
 void flush() {
-	FLUSH_BUFFER();
+	flushBuffer();
 	glFinish();
 }
 
@@ -186,7 +195,7 @@ void rotate(double angle) {
  * @see move scale rotate
  * */
 void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y) {
-	FLUSH_BUFFER();
+	flushBuffer();
 	if(x || y) glTranslated(x, y, 0);
 	if(angle) glRotated(angle, 0, 0, 1);
 	if(width != 1.0 || height != 1.0) glScalef(width, height, 1);
@@ -296,36 +305,6 @@ void reset() {
 	glLoadIdentity();
 }
 
-/**
- * @descr Draw line.
- * @group graphics/drawing
- * @var x start
- * @var y start
- * @var x end
- * @var y end
- * @see color lineWidth smooth
- * */
-void line(double x1, double y1, double x2, double y2) {
-	glBegin(GL_LINES);
-	glVertex2d(x1, y1);
-	glVertex2d(x2, y2);
-	glEnd();
-}
-
-/**
- * @descr Draw rectangle. Note, if you bind texture or shader, filled rectangle may be shaded or textured.
- * @group graphics/drawing
- * @var is rectangle filled
- * @see color rectanglexy imageDraw framebufferDraw
- * */
-void rectangle() {
-	if(prevImageId) {
-		glBindTexture(GL_TEXTURE_2D, 0);
-		prevImageId = 0;
-	}
-	glCallList(quadlist);
-}
-
 #define RECTBORDER 4
 #define RECTOFF1 0.5
 #define RECTOFF2 0.5
@@ -376,28 +355,6 @@ void rectanglexy(float x, float y, float w, float h) {
 }
 
 /**
- * @descr Draw circle.
- * @group graphics/drawing
- * @var radius
- * @var segments (more is slower and better)
- * @var is circle filled
- * @see color circlexy
- * */
-void circle(double rad, double segments, bool filled) {
-	int i;
-	const double DBLPI = 3.1415926 * 2;
-	GLdouble angle;
-	glBegin(filled ? GL_TRIANGLE_FAN : GL_LINE_LOOP);
-	int max = segments;
-	for (i = 0; i <= max; i++)
-	{
-		angle = DBLPI / segments * (double)i;
-		glVertex2d(sin(angle) * rad, cos(angle) * rad);
-	}
-	glEnd();
-}
-
-/**
  * @descr Draw circle at a given position.
  * @group graphics/drawing
  * @var position of circle center
@@ -419,82 +376,6 @@ void circlexy(float x, float y, double rad, double segments, bool filled) {
 		glVertex2d(sin(angle) * rad + x, cos(angle) * rad + y);
 	}
 	glEnd();
-}
-
-/**
- * @descr Draw point.
- * @group graphics/drawing
- * @see color pointxy pointSize smooth getPointSize
- * */
-void point() {
-	glCallList(pointlist);
-}
-
-/**
- * @descr Draw point at a given position.
- * @group graphics/drawing
- * @var position
- * @var position
- * @see color point pointSize smooth getPointSize
- * */
-void pointxy(float x, float y) {
-	glBegin(GL_POINTS);
-	glVertex2f(x, y);
-	glEnd();
-}
-
-/**
- * @descr Sets the current point size. Not all platforms support point size correctly.
- * @group graphics/drawing
- * @var point size
- * @see point getPointSize
- * */
-void pointSize(float size) {
-	glPointSize(size);
-}
-
-/**
- * @descr Gets the current point size.
- * @group graphics/drawing
- * @return point size
- * @see point pointSize
- * */
-double getPointSize() {
-	double s;
-	glGetDoublev(GL_POINT_SIZE, &s);
-	return s;
-}
-
-/**
- * @descr Sets the line width. Not all platforms support line width correctly.
- * @group graphics/drawing
- * @var line size
- * @see line getLineWidth
- * */
-void lineWidth(float width) {
-	glLineWidth(width);
-}
-
-/**
- * @descr Gets the line width.
- * @group graphics/drawing
- * @return line size
- * @see line lineWidth
- * */
-double getLineWidth() {
-	double s;
-	glGetDoublev(GL_LINE_WIDTH, &s);
-	return s;
-}
-
-/**
- * @descr Enables or disables lines and points smoothing. Not all platforms support this.
- * @group graphics/drawing
- * @var enable or disable smoothing
- * @see line point
- * */
-void smooth(bool smooth) {
-	antiAliasing = smooth;
 }
 
 /**
