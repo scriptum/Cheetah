@@ -18,9 +18,9 @@ LINUX, BSD, etc:
    cross-compile rules for thirdparty libraries, you must do it yourself.
 2. Put file luajit into bin/Release/bin/<Your-system>/ directory. Be careful with 
    the architecture.
-3. Go to the cheetah's root directory and run __./make.sh native release__.
-4. Move bin/Release/libcheetah.so into bin/Release/bin/<Your-system>/ directory.
-5. Go to bin/Release and run run_linux.sh
+3. Go to the cheetah's root directory and run ./make.sh native release. If you
+   want to cross-compile engine, you may try ./make.sh linux32 release or
+   ./make.sh windows release (see also cross-compilation section).
 
 Optionally:
 1. Build SDL_mixer if you want sound support.
