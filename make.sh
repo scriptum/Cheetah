@@ -1,10 +1,11 @@
 #!/bin/sh
 TMP=/tmp/cheetah-build-last
 LAST=native
-MAKE="/usr/bin/make -j4"
+CORES=`nproc`
+THREADS=`expr $CORES \* 2`
+MAKE="/usr/bin/make -j$THREADS"
 CLEAN="/usr/bin/make clean"
-FLAGS_OPTIMIZE_GENERAL="-fomit-frame-pointer -funroll-loops -mmmx -msse -ftree-vectorize -flto"
-FLAGS_OPTIMIZE="-Ofast $FLAGS_OPTIMIZE_GENERAL"
+
 DIR=./bin/Release
 MACHINE_NAME=`uname -m`
 case ${MACHINE_NAME} in
@@ -22,6 +23,7 @@ esac
 OS=linux
 LIB=libcheetah.so
 EXE=luajit
+COMPILER=gcc
 if [ "$1" == "win" -o "$1" == "windows" ]
 then
 	whereis i586-mingw32msvc-gcc | grep / > /dev/null
@@ -38,13 +40,26 @@ then
 	else
 		MINGWGCC=i586-mingw32msvc-gcc
 	fi
-	FLAGS_OPTIMIZE="-O3 -ffast-math $FLAGS_OPTIMIZE_GENERAL"
 	export CC=$MINGWGCC
+	COMPILER=$MINGWGCC
 	OS=win
 	MACHINE_NAME=32
 	LIB=cheetah.dll
 	EXE=luajit.exe
 	LAST=win
+fi
+
+GCC_VERSION=$($COMPILER -v |& tail -1 | awk '{print $3}' | sed s/\\.//g)
+FLAGS_OPTIMIZE_GENERAL="-fomit-frame-pointer -funroll-loops -mmmx -msse -ftree-vectorize"
+if [ $GCC_VERSION -ge 450 ]
+then
+	FLAGS_OPTIMIZE_GENERAL="$FLAGS_OPTIMIZE_GENERAL -flto"
+fi
+if [ $GCC_VERSION -ge 460 ]
+then
+	FLAGS_OPTIMIZE="-Ofast $FLAGS_OPTIMIZE_GENERAL"
+else
+	FLAGS_OPTIMIZE="-O3 -ffast-math $FLAGS_OPTIMIZE_GENERAL"
 fi
 
 if [ "$2" == "release" -o "$2" == "final" ]

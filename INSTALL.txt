@@ -2,28 +2,66 @@
 
 Dependencies:
 1. SDL
-2. SOIL (for image loading)
-3. OpenGL :)
+2. OpenGL :)
+
+Also if you want to cross-compile engine you will need:
+1. OpenGL for Linux x86
+2. SDL for x86
+3. Linux x86_64 system with multilib support
 
 
-Installing:
+Building:
 
 LINUX, BSD, etc:
 1. Download LuaJIT (http://luajit.org/download.html) and build it (you may use 
-   thirdparty sources to build luajit).
+   sources from thirdparty directory to build luajit). Unfortunately there is no
+   cross-compile rules for thirdparty libraries, you must do it yourself.
 2. Put file luajit into bin/Release/bin/<Your-system>/ directory. Be careful with 
    the architecture.
-3. Go to the cheetah's root directory and type 'make'.
-4. Move bin/Release/libcheetah.so into bin/Release/bin/<Your-system>/ directory.
-5. Go to bin/Release and run run_linux.sh
+3. Go to the cheetah's root directory and run ./make.sh native release. If you
+   want to cross-compile engine, you may try ./make.sh linux32 release or
+   ./make.sh windows release (see also cross-compilation section).
 
 Optionally:
 1. Build SDL_mixer if you want sound support.
 2. If you want physics - build chipmunk from thirdparty directory - this is the 
-   version with ffi. Chipmuk from offitial site DOES NOT WORK! Use Chipmunk from
+   version with ffi. Chipmunk from offitial site DOES NOT WORK! Use Chipmunk from
    thirdparty directory.
-Put all *.so to bin/Release/bin/<Your-system>.
+Put all *.so libraries to bin/Release/bin/<Your-system>.
 
+Where <Your-system> is:
+1. On Linux x86_64 platform - linux64
+2. On Linux x86 platform - linux32
+3. On Windows - win32
 
 Windows:
 Building on windows is not supported. Windows version is cross-compiled using gcc, but you may try mingw...
+
+Android:
+Building for Android will be in nearest future.
+
+============================== Cross-compilation ===============================
+
+Cheetah 2D engine may work on most known platforms. Oficially supported: Linux, Windows.
+
+Building for all ofitial platforms is possible with Linux x86_64 operating system.
+You need:
+1. gcc compiler
+2. SDL and OpenGL for x86 and x86_64 platforms
+3. mingw-gcc package (depends on your distribution)
+
+To build Cheetah itself you must use make.sh script. This script takes two parameters:
+./make.sh <Target Platform> <Optimization level>
+
+<Target Platform> - one of __native__, __windows__ or __linux32__. Note that to buid engine for
+Linux x86_64 you must do it on Linux x86_64 platform and run ./make.sh native. Running 
+./make.sh native on Linux x86 platform is equivalent of ./make.sh linux32
+
+<Optimization level> - one of __release__, __final__, __debug__. Also you 
+may leave it empty - smallest build time (without any optimizations). 
+Release - enables -Ofast (or -O3 if not possible) and some other 
+optimizations. Final - builds engine as release with profiling information,
+runs tests and then builds engine using profiling information. Final 
+produces fastest code but it works only when you have Cheetah engine 
+compiled with all tests. You must run all tests using ./run_linux.sh 
+before building to generate paths.
