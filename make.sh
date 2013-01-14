@@ -5,7 +5,6 @@ CORES=`nproc`
 THREADS=`expr $CORES \* 2`
 MAKE="/usr/bin/make -j$THREADS"
 CLEAN="/usr/bin/make clean"
-
 DIR=./bin/Release
 MACHINE_NAME=`uname -m`
 case ${MACHINE_NAME} in
@@ -61,7 +60,7 @@ then
 else
 	FLAGS_OPTIMIZE="-O3 -ffast-math $FLAGS_OPTIMIZE_GENERAL"
 fi
-
+echo "Building on $CORES cores with flags: $FLAGS_OPTIMIZE"
 if [ "$2" == "release" -o "$2" == "final" ]
 then
 	FLAGS="$FLAGS_OPTIMIZE"
