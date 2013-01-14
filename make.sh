@@ -3,7 +3,12 @@ TMP=/tmp/cheetah-build-last
 LAST=native
 MAKE="/usr/bin/make -j4"
 CLEAN="/usr/bin/make clean"
-FLAGS_OPTIMIZE_GENERAL="-fomit-frame-pointer -funroll-loops -mmmx -msse -ftree-vectorize -flto"
+GCC_VERSION=`gcc --version | head -1 | awk '{print $3}' | sed s/\\.//g`
+FLAGS_OPTIMIZE_GENERAL="-fomit-frame-pointer -funroll-loops -mmmx -msse -ftree-vectorize"
+if [ $GCC_VERSION -ge 450 ]
+then
+	FLAGS_OPTIMIZE_GENERAL="$FLAGS_OPTIMIZE_GENERAL -flto"
+fi
 FLAGS_OPTIMIZE="-O3 -ffast-math $FLAGS_OPTIMIZE_GENERAL"
 DIR=./bin/Release
 MACHINE_NAME=`uname -m`
@@ -38,6 +43,7 @@ then
 	else
 		MINGWGCC=i586-mingw32msvc-gcc
 	fi
+	FLAGS_OPTIMIZE="-O3 -ffast-math $FLAGS_OPTIMIZE_GENERAL"
 	export CC=$MINGWGCC
 	OS=win
 	MACHINE_NAME=32
