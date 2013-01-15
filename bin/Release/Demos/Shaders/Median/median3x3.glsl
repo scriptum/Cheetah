@@ -31,6 +31,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #version 120
+
+#define INTENSITY_MODE
+
 // Input texture
 uniform sampler2D T;
 
@@ -38,8 +41,6 @@ varying vec2 TexCoord;
 
 // vec2(1/width, 1/height) of the texture
     uniform vec2 texel;
-
-// Change these 2 defines to change precision,
 
 #define s2(a, b)				temp = a; a = min(a, b); b = max(temp, b);
 #define mn3(a, b, c)			s2(a, b); s2(a, c);
@@ -50,21 +51,40 @@ varying vec2 TexCoord;
 #define mnmx5(a, b, c, d, e)	s2(a, b); s2(c, d); mn3(a, c, e); mx3(b, d, e);           // 6 exchanges
 #define mnmx6(a, b, c, d, e, f) s2(a, d); s2(b, e); s2(c, f); mn3(a, b, c); mx3(d, e, f); // 7 exchanges
 
+#ifdef INTENSITY_MODE
+#define vec float
+const vec3 luma = vec3(0.299, 0.587, 0.114);
+#define getvec(v) dot(luma, v.rgb)
+#else
+#define vec vec4
+#define getvec(v) v
+#endif
+
+#define get(x, y) getvec(texture2D(T, TexCoord + vec2(x, y) * texel))
+
 void main() {
-	vec4 v[6];
-	v[0] = texture2D(T, TexCoord + vec2(-1, -1) * texel);
-	v[1] = texture2D(T, TexCoord + vec2( 0, -1) * texel);
-	v[2] = texture2D(T, TexCoord + vec2( 1, -1) * texel);
-	v[3] = texture2D(T, TexCoord + vec2(-1,  0) * texel);
-	v[4] = texture2D(T, TexCoord);
-	v[5] = texture2D(T, TexCoord + vec2( 1,  0) * texel);
-	vec4 temp;
+	vec v[6];
+	vec4 central = texture2D(T, TexCoord);
+	v[0] = get(-1, -1);
+	v[1] = get( 0, -1);
+	v[2] = get( 1, -1);
+	v[3] = get(-1,  0);
+	v[4] = getvec(central);
+	v[5] = get( 1,  0);
+	vec temp;
 	mnmx6(v[0], v[1], v[2], v[3], v[4], v[5]);
-	v[5] = texture2D(T, TexCoord + vec2(-1, 1) * texel);
+	v[5] = get(-1, 1);
 	mnmx5(v[1], v[2], v[3], v[4], v[5]);
-	v[5] = texture2D(T, TexCoord + vec2(0, 1) * texel);
+	v[5] = get(0, 1);
 	mnmx4(v[2], v[3], v[4], v[5]);
-	v[5] = texture2D(T, TexCoord + vec2(1, 1) * texel);
+	v[5] = get(1, 1);
 	mnmx3(v[3], v[4], v[5]);
+	#ifdef INTENSITY_MODE
+	float Y = dot(luma, central.rgb);
+	//~ gl_FragColor = vec4(v[4] + central.r - Y, v[4] - (central.b - Y)*0.194 - (central.r - Y)*0.509, v[4] + central.b - Y, central.a);
+	gl_FragColor = vec4(v[4] + central.r - Y, v[4] + central.g - Y, v[4] + central.b - Y, central.a);
+	//~ gl_FragColor = vec4(vec3(v[4]), central.a);
+	#else
 	gl_FragColor = v[4];
+	#endif
 }
