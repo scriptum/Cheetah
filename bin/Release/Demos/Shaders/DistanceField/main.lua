@@ -10,9 +10,9 @@ local df = C.newShader([[#version 120
 uniform sampler2D texture;
 uniform float sharpness;
 uniform float gamma;
-
+varying vec2 TexCoord;
 void main() {
-	vec4 color = texture2D(texture, gl_TexCoord[0].xy);
+	vec4 color = texture2D(texture, TexCoord);
 	gl_FragColor = vec4(color.rgb, smoothstep(gamma - sharpness, gamma + sharpness, color.a));
 }
 ]])
@@ -37,7 +37,6 @@ end)
 	else
 		s:set({tw = s.tw/1.2, th = s.th/1.2})
 	end
-	s:stop():animate({ox = s.tw/2, oy = s.th/2, w = s.tw, h = s.th}, {easing = "linear"})
 end)
 :set({tw = img.w, th = img.h})
 :origin(img.w/2, img.h/2)
