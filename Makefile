@@ -11,6 +11,7 @@ INCLUDES := $(wildcard $(addsuffix /*.h*, $(SOURCEDIR)))
 all : $(TARGET)
  
 $(TARGET) : $(OBJECTS)
+	@echo "Linking $(TARGET)";\
 	$(CC) -o $@ $(OBJECTS) $(CFLAGS) $(LDFLAGS)
 
 
