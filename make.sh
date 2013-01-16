@@ -23,6 +23,7 @@ OS=linux
 LIB=libcheetah.so
 EXE=luajit
 COMPILER=gcc
+FLAGS_THIRDPARTY=""
 if [ "$1" == "win" -o "$1" == "windows" ]
 then
 	whereis i586-mingw32msvc-gcc | grep / > /dev/null
@@ -77,11 +78,34 @@ if [ "$1" == "linux32" ]
 then
 	FLAGS="$FLAGS -m32"
 	MACHINE_NAME=32
+	FLAGS_THIRDPARTY="-m32"
 	LAST=linux32
 fi
 
 LIBPATH="$DIR/bin/$OS$MACHINE_NAME/$LIB"
 EXEPATH="./bin/$OS$MACHINE_NAME/$EXE"
+
+if [ ! -f "$DIR/bin/$OS$MACHINE_NAME/$EXE" ]
+then
+	echo "Building luajit..."
+	pushd .
+	cd thirdparty/LuaJIT
+	make clean
+	if [ "$1" == "win" -o "$1" == "windows" ]
+	then
+		make HOST_CC="gcc -m32" CROSS=`echo $MINGWGCC | sed s/-gcc/-/` TARGET_SYS=Windows
+		cp src/luajit.dll "../../$DIR/bin/$OS$MACHINE_NAME/"
+	else
+		if [ "$1" == "linux32" ]
+		then
+			CFLAGS=-m32 make
+		else
+			make
+		fi
+	fi
+	cp src/$EXE "../../$DIR/bin/$OS$MACHINE_NAME/"
+	popd
+fi
 
 if [ "`cat $TMP`" != "$LAST $2" ]
 then
