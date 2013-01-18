@@ -4,7 +4,7 @@
 
 /**
  * @descr Gets the number of milliseconds past from the execution time. Equivalent to SDL_GetTicks();
- * @group graphics/timer
+ * @group timer
  * */
 unsigned int getTicks() {
 	return SDL_GetTicks();
@@ -12,7 +12,7 @@ unsigned int getTicks() {
 
 /**
  * @descr Gets the time in seconds past from the execution time. This function returns the time in view of game speed!
- * @group graphics/timer
+ * @group timer
  * */
 double getTime() {
 	return globalTimed;
@@ -20,7 +20,7 @@ double getTime() {
 
 /**
  * @descr Gets the time in seconds past from the execution time. Returns "pure" time (no game speed).
- * @group graphics/timer
+ * @group timer
  * */
 double getRealTime() {
 	return SDL_GetTicks() / 1000.0;
@@ -28,7 +28,7 @@ double getRealTime() {
 
 /**
  * @descr Do nothing some time.
- * @group graphics/timer
+ * @group timer
  * @var delay in milliseconds (1/1000 s)
  * @see sleep
  * */
@@ -38,7 +38,7 @@ void delay(unsigned int ms) {
 
 /**
  * @descr Do nothing some time.
- * @group graphics/timer
+ * @group timer
  * @var delay in seconds
  * @see delay
  * */

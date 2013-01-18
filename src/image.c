@@ -26,6 +26,10 @@ IN THE SOFTWARE.
 #include "SOIL/SOIL.h"
 #include "render.h"
 
+/*******************************************************************************
+PRIVATE FUNCTIOS
+*******************************************************************************/
+
 static unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels)
 {
 	unsigned int tex_id;
@@ -217,15 +221,49 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *name
 	return NULL;
 }
 
+static void imageCheckResLoader(Image * image)
+{
+	if(resLoaderQueue && image->id == null_texture && !image->queued)
+	{
+		Resource r;
+		memset(&r, 0, sizeof(Resource));
+		image->queued = 1;
+		r.image = image;
+		enqueue(resLoaderQueue, r);
+	}
+}
+
+static void multitextureBind(Multitexture * multitexture)
+{
+	//~ if(prevImageId == image->id) return;
+	FLUSH_BUFFER();
+	Image * image;
+	int i;
+	for(i = 0; i < multitexture->size; i++)
+	{
+		image = multitexture->images[i];
+		glActiveTexture_(GL_TEXTURE0 + i);
+		imageCheckResLoader(image);
+		if (image->id) glBindTexture(GL_TEXTURE_2D, image->id);
+	}
+	glActiveTexture_(GL_TEXTURE0);
+}
+
+/*******************************************************************************
+PUBLIC FUNCTIOS
+*******************************************************************************/
+
 /**
  * @descr Load image from disc with specific options.
- * @group graphics/image
+ * @group image
  * @var file name
  * @var string of options. This is depends on image loading module you use. Supported options:
- *  * _n_ - use nearest interpolation
- *  * _m_ - generate mip-maps (automatically sets mip-map interpolation)
- *  * _i_ - load instantly without delayed resource loader
+ *  * _nearest_ - use nearest interpolation
+ *  * _mipmap_ - generate mip-maps (automatically sets mip-map interpolation)
+ *  * _instant_ - load instantly without delayed resource loader
+ *  * _clamp_ - force texture clamp (default is repeat)
  * @return Image object
+ * @advanced
  * */
 void newImageOpt(Image *ptr, const char *name, const char *options) {
 	int width, height, channels;
@@ -278,13 +316,14 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 
 /**
  * @descr Load image from raw memory. By default image must be 3 bytes per pixel RGB
- * @group graphics/image
+ * @group image
  * @var width of image
  * @var height of image
  * @var string of options. This is depends on image loading module you use. Supported options:
  *  * _n_ - use nearest interpolation
  *  * _a_ - image with alpha (4 bytes per pixel)
  * @return Image object
+ * @advanced
  * */
 void newImageRaw(Image *ptr, int width, int height, const char *data, const char *options) {
 	unsigned int tex_id;
@@ -309,21 +348,11 @@ void newImageRaw(Image *ptr, int width, int height, const char *data, const char
 	ptr->id = tex_id;
 }
 
-static void imageCheckResLoader(Image * image) {
-	if(resLoaderQueue && image->id == null_texture && !image->queued)
-	{
-		Resource r;
-		memset(&r, 0, sizeof(Resource));
-		image->queued = 1;
-		r.image = image;
-		enqueue(resLoaderQueue, r);
-	}
-}
-
 /**
  * @descr Bind Image object. Equivalent to glBindTexture.
- * @group graphics/image
+ * @group image
  * @var Image object
+ * @advanced
  * */
 void imageBind(Image * image) {
 	if(!image) return;
@@ -333,7 +362,8 @@ void imageBind(Image * image) {
 
 /**
  * @descr Enable texturing. Equivalent to glEnable(GL_TEXTURE_2D).
- * @group graphics/image
+ * @group image
+ * @advanced
  * */
 void enableTexture() {
 	glEnable(GL_TEXTURE_2D);
@@ -341,7 +371,8 @@ void enableTexture() {
 
 /**
  * @descr Disable texturing. Equivalent to glDisable(GL_TEXTURE_2D).
- * @group graphics/image
+ * @group image
+ * @advanced
  * */
 void disableTexture() {
 	glDisable(GL_TEXTURE_2D);
@@ -349,8 +380,9 @@ void disableTexture() {
 
 /**
  * @descr Draw image of given size at a given position.
- * @group graphics/image
+ * @group image
  * @var Image object
+ * @advanced
  * */
 void imageDrawxy(Image * image, float x, float y, float w, float h) {
 	imageBind(image);
@@ -359,8 +391,9 @@ void imageDrawxy(Image * image, float x, float y, float w, float h) {
 
 /**
  * @descr Draw image with full translation.
- * @group graphics/image
+ * @group image
  * @var Image object
+ * @advanced
  * */
 void imageDrawt(Image * image, float x, float y, float w, float h, float a, float ox, float oy) {
 	imageBind(image);
@@ -369,7 +402,7 @@ void imageDrawt(Image * image, float x, float y, float w, float h, float a, floa
 
 /**
  * @descr Draw part of image of given size at a given position.
- * @group graphics/image
+ * @group image
  * @var Image object
  * @var position of left top corner
  * @var position of left top corner
@@ -379,6 +412,7 @@ void imageDrawt(Image * image, float x, float y, float w, float h, float a, floa
  * @var y offset of texture
  * @var width of texture (stretchig relative to width of quad)
  * @var height of texture (stretchig relative to height of quad)
+ * @advanced
  * */
 void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
 	imageBind(image);
@@ -387,7 +421,7 @@ void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, f
 
 /**
  * @descr Draw part of image of given size at a given position with transformations.
- * @group graphics/image
+ * @group image
  * @var Image object
  * @var position of left top corner
  * @var position of left top corner
@@ -400,6 +434,7 @@ void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, f
  * @var angle (relative to origin)
  * @var origin x
  * @var origin y
+ * @advanced
  * */
 void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
 	imageBind(image);
@@ -434,7 +469,7 @@ void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, fl
 
 /**
  * @descr Draw image sliced on 9 parts by 4 lines: top, bottom, left and right
- * @group graphics/image
+ * @group image
  * @var Image object
  * @var position of left top corner
  * @var position of left top corner
@@ -447,6 +482,7 @@ void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, fl
  * @var angle (radians)
  * @var origin x
  * @var origin y
+ * @advanced
  * */
 void borderImageDrawt(BorderImage * borderImage, float x, float y, float w, float h, float a, float ox, float oy) {
 	borderImageDrawInternal(borderImage, x, y, w, h, a, ox, oy);
@@ -454,44 +490,23 @@ void borderImageDrawt(BorderImage * borderImage, float x, float y, float w, floa
 
 /**
  * @descr Draw image sliced on 9 parts by 4 lines: top, bottom, left and right
- * @group graphics/image
+ * @group image
  * @var Image object
  * @var position of left top corner
  * @var position of left top corner
  * @var summary width of object
  * @var summary height of object
+ * @advanced
  * */
 void borderImageDrawxy(BorderImage * borderImage, float x, float y, float w, float h) {
 	borderImageDrawInternal(borderImage, x, y, w, h, 0, 0, 0);
 }
 
-void initMultitexture(Multitexture * multitexture) {
-	new(multitexture->images, Image*, multitexture->size);
-}
-
-void deleteMultitexture(Multitexture * multitexture) {
-	delete(multitexture->images);
-}
-
-static void multitextureBind(Multitexture * multitexture) {
-	//~ if(prevImageId == image->id) return;
-	FLUSH_BUFFER();
-	Image * image;
-	int i;
-	for(i = 0; i < multitexture->size; i++)
-	{
-		image = multitexture->images[i];
-		glActiveTexture_(GL_TEXTURE0 + i);
-		imageCheckResLoader(image);
-		if (image->id) glBindTexture(GL_TEXTURE_2D, image->id);
-	}
-	glActiveTexture_(GL_TEXTURE0);
-}
-
 /**
  * @descr Draw multitexture of given size at a given position.
- * @group graphics/image
+ * @group image
  * @var Multitexture object
+ * @advanced
  * */
 void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, float h) {
 	multitextureBind(multitexture);
@@ -500,8 +515,9 @@ void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, 
 
 /**
  * @descr Draw multitexture with full translation.
- * @group graphics/image
+ * @group image
  * @var Multitexture object
+ * @advanced
  * */
 void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy) {
 	multitextureBind(multitexture);
@@ -510,7 +526,7 @@ void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, f
 
 /**
  * @descr Draw part of multitexture of given size at a given position.
- * @group graphics/multitexture
+ * @group multitexture
  * @var Multitexture object
  * @var position of left top corner
  * @var position of left top corner
@@ -520,6 +536,7 @@ void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, f
  * @var y offset of texture
  * @var width of texture (stretchig relative to width of quad)
  * @var height of texture (stretchig relative to height of quad)
+ * @advanced
  * */
 void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
 	multitextureBind(multitexture);
@@ -528,7 +545,7 @@ void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w,
 
 /**
  * @descr Draw part of multitexture of given size at a given position using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
- * @group graphics/multitexture
+ * @group multitexture
  * @var Multitexture object
  * @var position of left top corner
  * @var position of left top corner
@@ -541,6 +558,7 @@ void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w,
  * @var angle (relative to origin)
  * @var origin x
  * @var origin y
+ * @advanced
  * */
 void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
 	multitextureBind(multitexture);
@@ -549,7 +567,7 @@ void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, 
 
 //~ /**
  //~ * @descr Set the current active texture for multitexturenig. Equivalent to glActiveTexture(GL_TEXTURE0 + i).
- //~ * @group graphics/image
+ //~ * @group image
  //~ * @var number of texture slot (min 0, max 7)
  //~ * */
 //~ void activeTexture(int i) {
@@ -558,7 +576,7 @@ void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, 
 
 //~ /**
  //~ * @descr Enable/disable smooth interpolation for image. Disabled filtering useful, if you want to fit image to pixel matrix. If this image will be scaled and/or rotated you must enable filtering (default). Must be called before texture loading.
- //~ * @group graphics/image
+ //~ * @group image
  //~ * @var Image object
  //~ * @var true means that filtering is enabled, false means that filtering is disabled
  //~ * */
@@ -589,6 +607,13 @@ void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, 
 	//~ }
 //~ }
 
+
+
+/**
+ * @descr Free GPU memory occupied by Image.
+ * @var Image object
+ * @advanced
+ * */
 void deleteImage(Image * ptr) {
 	//~ printf("%d\n", same_type_p(typeof(ptr)) == INTEGER_TYPE);
 	#ifdef MEMORY_TEST

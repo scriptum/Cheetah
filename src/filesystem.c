@@ -39,6 +39,7 @@ bool isPointer(void * ptr) {
 	return ptr != NULL;
 }
 
+
 unsigned char * loadfile(const char * filename, unsigned int * length) {
 	unsigned char * result = NULL;
 	size_t size = 0;

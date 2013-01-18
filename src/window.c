@@ -46,6 +46,13 @@ void resetView(int w, int h)
  * @var string of options. Supported options:
  * * _1024x768_ - set window size to 1024x768, default window size - 800x600
  * * _1024_ - set window size to 1024x1024
+ * * _fullscreen_ - run in fullscreen mode
+ * * _resizable_ - make window resizable
+ * * _vsync_ - enable vertical synchronization
+ * * _resloader_ - enable delayed resource loader (all images are loaded in separate thread), possible only with internal image loader, external modules (as DevIL) are not supported
+ * * _depth_ - enable depth buffer
+ * * _stencil_ - enable stencil buffer
+ * * _noframe_ - ry to make window without frame (depending on window manager, fullscreen mode, OS may not work)
  * @return true if success
  * */
 bool init(const char * appName, const char * options) {
@@ -58,13 +65,13 @@ bool init(const char * appName, const char * options) {
 		width = 800;
 	if(height <= 0)
 		height = 600;
-	CHECK_OPTION(options, fullscreen);  /* run in fullscreen mode */
-	CHECK_OPTION(options, resizable);   /* make window resizable */
-	CHECK_OPTION(options, vsync);       /* enable vsync */
-	CHECK_OPTION(options, resloader);   /* enable delayed resource loader */
-	CHECK_OPTION(options, depth);       /* enable depth buffer */
-	CHECK_OPTION(options, stencil);     /* enable stencil buffer */
-	CHECK_OPTION(options, noframe);     /* try to make window without frame */
+	CHECK_OPTION(options, fullscreen);
+	CHECK_OPTION(options, resizable);
+	CHECK_OPTION(options, vsync);
+	CHECK_OPTION(options, resloader);
+	CHECK_OPTION(options, depth);
+	CHECK_OPTION(options, stencil);
+	CHECK_OPTION(options, noframe);
 	const int bpp = 32;
 	if(TRUE == fullscreen)
 		flags |= SDL_FULLSCREEN;
@@ -126,8 +133,6 @@ bool init(const char * appName, const char * options) {
 			//~ TEX_LINEAR;
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, "\0\0\0\0");
 		}
-		//~ glEnable(GL_ALPHA_TEST);
-		//~ glAlphaFunc(GL_GREATER,0.1f);
 	}
 
 	resetView(width, height);
@@ -144,6 +149,13 @@ bool init(const char * appName, const char * options) {
 		glBindTexture(GL_TEXTURE_2D, rect_texture);
 		TEX_CLAMP;
 		TEX_LINEAR;
+		/*
+		 * Texture for drawing device independent anti-aliased rectangle:
+		 * 0000
+		 * 0110
+		 * 0110
+		 * 0000
+		 * */
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4, 4, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 		"\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0\377"
 		"\377\377\377\377\377\377\377\377\377\377\0\377\377\377\0\377\377\377\377"
@@ -151,16 +163,15 @@ bool init(const char * appName, const char * options) {
 		"\377\377\377\0");
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		// fix vertex pointers to one memory area
+		/* fix vertex pointers to fixed memory area */
 		glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
 		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
-		//~ glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	return TRUE;
 }
 
 /**
- * @descr Check, if screen exists. Useful if you have windowless version of y our application, e.g. server.
+ * @descr Check, if screen exists. Useful if you have windowless version of your application, e.g. server.
  * @group graphics/window
  * @return true if screen was initialized
  * */
@@ -169,7 +180,7 @@ bool isInit() {
 }
 
 /**
- * @descr Get window's width
+ * @descr Get window's width.
  * @group graphics/window
  * @return width of the window
  * @see getWindowHeight
@@ -179,7 +190,7 @@ int getWindowWidth() {
 }
 
 /**
- * @descr Get window's height
+ * @descr Get window's height.
  * @group graphics/window
  * @return height of the window
  * @see getWindowWidth
@@ -189,8 +200,9 @@ int getWindowHeight() {
 }
 
 /**
- * @descr Swap buffers and present graphics
+ * @descr Swap buffers and present graphics. This function calls automatically every frame by default.
  * @group graphics/window
+ * @advanced
  * */
 void swapBuffers() {
 	FLUSH_BUFFER();
@@ -198,7 +210,7 @@ void swapBuffers() {
 }
 
 /**
- * @descr Set window's title
+ * @descr Set window's title.
  * @group graphics/window
  * @var text to replace the caption
  * @see init
@@ -208,9 +220,10 @@ void setTitle(const char * text) {
 }
 
 /**
- * @descr Get list of possible screen modes. You need this if you want to run application in fullscreen mode.
+ * @descr Get list of possible screen modes. You need this if you want to run application in fullscreen mode. This function gives you direct access to SDL's structure.
  * @group graphics/window
  * @return array of pointers to SDL_Rect structure.
+ * @advanced
  * */
 SDL_Rect ** getModes()
 {
