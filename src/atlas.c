@@ -26,6 +26,19 @@ IN THE SOFTWARE.
 #include "SOIL/SOIL.h"
 #include "render.h"
 
+/**
+ * @descr Draw part atlas of given size at a given position of given size with transformations.
+ * @group graphics/multitexture
+ * @var Atlas object
+ * @var x position of left top corner
+ * @var y position of left top corner
+ * @var width
+ * @var height
+ * @var angle (relative to origin)
+ * @var origin x
+ * @var origin y
+ * @advanced
+ * */
 void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox, float oy) {
 	float scalex = w/p->w;
 	float scaley = h/p->h;
@@ -36,6 +49,16 @@ void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox,
 		PUSH_QUAD_TEXTURE(x, y, p->aw * scalex, p->ah * scaley, a, ox - p->x * scalex, oy - p->y * scaley, p->tex);
 }
 
+/**
+ * @descr Draw part atlas of given size at a given position of given size.
+ * @group graphics/multitexture
+ * @var Atlas object
+ * @var x position of left top corner
+ * @var y position of left top corner
+ * @var width
+ * @var height
+ * @advanced
+ * */
 void atlasDrawxy(Atlas *p, float x, float y, float w, float h) {
 	float scalex = w/p->w;
 	float scaley = h/p->h;
