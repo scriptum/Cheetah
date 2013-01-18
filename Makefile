@@ -1,25 +1,24 @@
 TARGET := libcheetah.so
 CFLAGS += -Wall -Winline -pipe -fPIC
 LDFLAGS += -shared -L"lib" -lSDL -lGL
-RESFLAGS := -I"inc"
-SOURCEDIR := src src/SOIL
+INCLUDES := -I"inc"
+SOURCEDIR := $(shell find src -type d)
 
 SOURCES := $(wildcard $(addsuffix /*.c*, $(SOURCEDIR)))
 OBJECTS := $(SOURCES:.c=.o)
 PROFILING := $(SOURCES:.c=.gcda)
-INCLUDES := $(wildcard $(addsuffix /*.h*, $(SOURCEDIR)))
+HEADERS := $(wildcard $(addsuffix /*.h*, $(SOURCEDIR)))
+
 all : $(TARGET)
  
 $(TARGET) : $(OBJECTS)
 	@echo "Linking $(TARGET)";\
 	$(CC) -o $@ $(OBJECTS) $(CFLAGS) $(LDFLAGS)
 
-
-%.o : %.c $(INCLUDES)
+%.o : %.c $(HEADERS)
 	@echo "Building $<";\
-	$(CC) $(CFLAGS) $(RESFLAGS) -o "$@" -c "$<"
-
-.PHONY : clean
+	$(CC) $(CFLAGS) $(INCLUDES) -o "$@" -c "$<"
  
 clean :
-	rm -f $(OBJECTS) $PROFILING
+	@echo "Cleaning...";\
+	rm -f $(OBJECTS) $(PROFILING)
