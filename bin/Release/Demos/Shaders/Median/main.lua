@@ -2,7 +2,7 @@ require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
 C.init('Median filter' ,'800x600 resizable')
-local img = C.newImage('Cheetah.jpg')
+local img = C.newImage('Cheetah.jpg', 'clamp')
 C.printFPS = true
 local shader = C.newShader('median3x3.glsl')
 shader:bind()

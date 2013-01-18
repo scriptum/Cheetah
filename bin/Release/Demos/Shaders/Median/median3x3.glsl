@@ -29,6 +29,9 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Copyright (c) 2013 adapted by Pavel Roschin aka RPG (rpg89@post.ru)
+
 */
 #version 120
 
@@ -41,7 +44,6 @@ varying vec2 TexCoord;
 
 // vec2(1/width, 1/height) of the texture
     uniform vec2 texel;
-
 #define s2(a, b)				temp = a; a = min(a, b); b = max(temp, b);
 #define mn3(a, b, c)			s2(a, b); s2(a, c);
 #define mx3(a, b, c)			s2(b, c); s2(a, c);
@@ -60,7 +62,7 @@ const vec3 luma = vec3(0.299, 0.587, 0.114);
 #define getvec(v) v
 #endif
 
-#define get(x, y) getvec(texture2D(T, TexCoord + vec2(x, y) * texel))
+#define get(x, y) getvec(texture2D(T, TexCoord + vec2(x, y) * texel)) 
 
 void main() {
 	vec v[6];
