@@ -1,19 +1,20 @@
 #version 120
-#define NUM_INTENSITIES 16
+#define NUM_INTENSITIES 256
 uniform sampler2D tex;
 uniform vec2 texel;
 uniform int radius;
-uniform int radius_sq;
 uniform float exponent;
+uniform float intensities;
+varying vec2 TexCoord;
 void main() {
-	vec4 hist[NUM_INTENSITIES];
-	vec4 hist_max = vec4(1.0);
+	ivec4 hist[NUM_INTENSITIES];
+	ivec4 hist_max = ivec4(1);
 	int i, j, intensity;
-	vec2 tc = gl_TexCoord[0].st;
+	float radius_sq = radius * radius;
 	vec4 temp_pixel;
-	for (i = 0; i < NUM_INTENSITIES; i++)
+	for (i = 0; i < intensities; i++)
 	{
-		hist[i] = vec4(0.0);
+		hist[i] = ivec4(0);
 	}
 	
 	for (i = -radius; i <= radius; i++)
@@ -22,16 +23,16 @@ void main() {
 			{
 				if (i*i + j*j <= radius_sq)
 					{
-						temp_pixel = texture2D(tex, tc + vec2(i, j) * texel);
-						hist[int(temp_pixel.x * (NUM_INTENSITIES - 1))].x+=1;
-						hist[int(temp_pixel.y * (NUM_INTENSITIES - 1))].y+=1;
-						hist[int(temp_pixel.z * (NUM_INTENSITIES - 1))].z+=1;
-						hist[int(temp_pixel.w * (NUM_INTENSITIES - 1))].w+=1;
+						temp_pixel = texture2D(tex, TexCoord + vec2(i, j) * texel);
+						hist[int(temp_pixel.x * (intensities - 1))].x+=1;
+						hist[int(temp_pixel.y * (intensities - 1))].y+=1;
+						hist[int(temp_pixel.z * (intensities - 1))].z+=1;
+						hist[int(temp_pixel.w * (intensities - 1))].w+=1;
 					}
 			}
 	}
 
-	for (i = 0; i < NUM_INTENSITIES; i++) {
+	for (i = 0; i < intensities; i++) {
 		if(hist_max.x < hist[i].x)
 			hist_max.x = hist[i].x;
 		if(hist_max.y < hist[i].y)
@@ -46,12 +47,12 @@ void main() {
 	vec4 ratio, weight;
 
 	vec4 color = vec4(0.0);
-  for (i = 0; i < NUM_INTENSITIES; i++)
+  for (i = 0; i < intensities; i++)
 	{
-		ratio = hist[i] / hist_max;
+		ratio = vec4(hist[i]) / vec4(hist_max);
 		weight = pow(ratio, vec4(exponent));
 		sum += weight * vec4(i);
 		div += weight;
 	}
-  gl_FragColor = sum / div / float(NUM_INTENSITIES - 1);
+  gl_FragColor = sum / div / (intensities - 1);
 }
