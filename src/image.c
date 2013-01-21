@@ -34,7 +34,7 @@ static unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 {
 	unsigned int tex_id;
 	int flags = SOIL_FLAG_TEXTURE_REPEATS;
-	NEDED_INIT;
+	NEEDED_INIT;
 	CHECK_OPTION(options, nearest);
 	CHECK_OPTION(options, clamp);
 	if(TRUE == clamp)
@@ -61,7 +61,7 @@ static unsigned char * loadImageData(const char *name, int *width, int *height, 
 	unsigned int file_size;
 	unsigned char *img;
 	unsigned char *myBuf;
-	NEDED_INIT;
+	NEEDED_INIT;
 	myBuf = loadfile(name, &file_size);
 	if(!myBuf)
 	{
@@ -253,24 +253,13 @@ static void multitextureBind(Multitexture * multitexture)
 PUBLIC FUNCTIOS
 *******************************************************************************/
 
-/**
- * @descr Load image from disc with specific options.
- * @group image
- * @var file name
- * @var string of options. This is depends on image loading module you use. Supported options:
- *  * _nearest_ - use nearest interpolation
- *  * _mipmap_ - generate mip-maps (automatically sets mip-map interpolation)
- *  * _instant_ - load instantly without delayed resource loader
- *  * _clamp_ - force texture clamp (default is repeat)
- * @return Image object
- * @advanced
- * */
+/* Load image from disk */
 void newImageOpt(Image *ptr, const char *name, const char *options) {
 	int width, height, channels;
 	unsigned int tex_id;
 	unsigned char *img;
 	unsigned char *img_mask;
-	NEDED_INIT_VOID;
+	NEEDED_INIT_VOID;
 	if(!name)
 	{
 		MYERROR("empty filename");
@@ -330,9 +319,10 @@ void newImageRaw(Image *ptr, int width, int height, const char *data, const char
 	GLenum format = GL_RGB;
 	const int level = 0;
 	const int border = 0;
-	NEDED_INIT_VOID;
+	NEEDED_INIT_VOID;
 	CHECK_OPTION(options, nearest);
 	CHECK_OPTION(options, alpha);
+	CHECK_OPTION(options, clamp);
 	if(TRUE == alpha)
 		format = GL_RGBA;
 	glGenTextures(1, &tex_id);
@@ -341,6 +331,10 @@ void newImageRaw(Image *ptr, int width, int height, const char *data, const char
 		TEX_NEAREST;
 	else
 		TEX_LINEAR;
+	if(TRUE == clamp)
+		TEX_CLAMP;
+	else
+		TEX_REPEAT;
 	glTexImage2D(GL_TEXTURE_2D, level, format, width, height, border,
 							format, GL_UNSIGNED_BYTE, (void *)data);
 	ptr->w = (float)width;
@@ -378,64 +372,21 @@ void disableTexture() {
 	glDisable(GL_TEXTURE_2D);
 }
 
-/**
- * @descr Draw image of given size at a given position.
- * @group image
- * @var Image object
- * @advanced
- * */
 void imageDrawxy(Image * image, float x, float y, float w, float h) {
 	imageBind(image);
 	PUSH_QUAD(x,y,w,h,0,0,0);
 }
 
-/**
- * @descr Draw image with full translation.
- * @group image
- * @var Image object
- * @advanced
- * */
 void imageDrawt(Image * image, float x, float y, float w, float h, float a, float ox, float oy) {
 	imageBind(image);
 	PUSH_QUAD(x,y,w,h,a,ox,oy);
 }
 
-/**
- * @descr Draw part of image of given size at a given position.
- * @group image
- * @var Image object
- * @var position of left top corner
- * @var position of left top corner
- * @var width of quad (actual drawing size)
- * @var height of quad  (actual drawing size)
- * @var x offset of texture
- * @var y offset of texture
- * @var width of texture (stretchig relative to width of quad)
- * @var height of texture (stretchig relative to height of quad)
- * @advanced
- * */
 void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
 	imageBind(image);
 	PUSH_QUADT(x,y,w,h,0,0,0,qx, qy, qw, qh, image->w, image->h);
 }
 
-/**
- * @descr Draw part of image of given size at a given position with transformations.
- * @group image
- * @var Image object
- * @var position of left top corner
- * @var position of left top corner
- * @var width of quad (actual drawing size)
- * @var height of quad  (actual drawing size)
- * @var x offset of texture
- * @var y offset of texture
- * @var width of texture (stretchig relative to width of quad)
- * @var height of texture (stretchig relative to height of quad)
- * @var angle (relative to origin)
- * @var origin x
- * @var origin y
- * @advanced
- * */
 void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
 	imageBind(image);
 	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, image->w, image->h);
@@ -467,99 +418,29 @@ void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, fl
 	}\
 } while(0)
 
-/**
- * @descr Draw image sliced on 9 parts by 4 lines: top, bottom, left and right
- * @group image
- * @var Image object
- * @var position of left top corner
- * @var position of left top corner
- * @var summary width of object
- * @var summary height of object
- * @var slice top
- * @var slice right
- * @var slice bottom
- * @var slice left
- * @var angle (radians)
- * @var origin x
- * @var origin y
- * @advanced
- * */
 void borderImageDrawt(BorderImage * borderImage, float x, float y, float w, float h, float a, float ox, float oy) {
 	borderImageDrawInternal(borderImage, x, y, w, h, a, ox, oy);
 }
 
-/**
- * @descr Draw image sliced on 9 parts by 4 lines: top, bottom, left and right
- * @group image
- * @var Image object
- * @var position of left top corner
- * @var position of left top corner
- * @var summary width of object
- * @var summary height of object
- * @advanced
- * */
 void borderImageDrawxy(BorderImage * borderImage, float x, float y, float w, float h) {
 	borderImageDrawInternal(borderImage, x, y, w, h, 0, 0, 0);
 }
 
-/**
- * @descr Draw multitexture of given size at a given position.
- * @group image
- * @var Multitexture object
- * @advanced
- * */
 void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, float h) {
 	multitextureBind(multitexture);
 	PUSH_QUAD(x,y,w,h,0,0,0);
 }
 
-/**
- * @descr Draw multitexture with full translation.
- * @group image
- * @var Multitexture object
- * @advanced
- * */
 void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy) {
 	multitextureBind(multitexture);
 	PUSH_QUAD(x,y,w,h,a,ox,oy);
 }
 
-/**
- * @descr Draw part of multitexture of given size at a given position.
- * @group multitexture
- * @var Multitexture object
- * @var position of left top corner
- * @var position of left top corner
- * @var width of quad (actual drawing size)
- * @var height of quad  (actual drawing size)
- * @var x offset of texture
- * @var y offset of texture
- * @var width of texture (stretchig relative to width of quad)
- * @var height of texture (stretchig relative to height of quad)
- * @advanced
- * */
 void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
 	multitextureBind(multitexture);
 	PUSH_QUADT(x,y,w,h,0,0,0,qx, qy, qw, qh, multitexture->w, multitexture->h);
 }
 
-/**
- * @descr Draw part of multitexture of given size at a given position using 1x1 pixel quad with texture coordinates. You may change quad size and position using transformations.
- * @group multitexture
- * @var Multitexture object
- * @var position of left top corner
- * @var position of left top corner
- * @var width of quad (actual drawing size)
- * @var height of quad  (actual drawing size)
- * @var x offset of texture
- * @var y offset of texture
- * @var width of texture (stretchig relative to width of quad)
- * @var height of texture (stretchig relative to height of quad)
- * @var angle (relative to origin)
- * @var origin x
- * @var origin y
- * @advanced
- * */
 void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
 	multitextureBind(multitexture);
 	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, multitexture->w, multitexture->h);

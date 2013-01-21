@@ -39,22 +39,7 @@ void resetView(int w, int h)
 	glLoadIdentity();
 }
 
-/**
- * @descr Create window and initialize all OpenGL's stuff. You MUST call this before any graphics function, e.g. cheetah.newImage. You may call this function again to re-size window, change application title, toggle fullscreen. Other options are ignored.
- * @group graphics/window
- * @var application's title shown in titlebar
- * @var string of options. Supported options:
- * * _1024x768_ - set window size to 1024x768, default window size - 800x600
- * * _1024_ - set window size to 1024x1024
- * * _fullscreen_ - run in fullscreen mode
- * * _resizable_ - make window resizable
- * * _vsync_ - enable vertical synchronization
- * * _resloader_ - enable delayed resource loader (all images are loaded in separate thread), possible only with internal image loader, external modules (as DevIL) are not supported
- * * _depth_ - enable depth buffer
- * * _stencil_ - enable stencil buffer
- * * _noframe_ - ry to make window without frame (depending on window manager, fullscreen mode, OS may not work)
- * @return true if success
- * */
+/* Create window and initialize all OpenGL's stuff. */
 bool init(const char * appName, const char * options) {
 	unsigned flags = SDL_OPENGL | SDL_DOUBLEBUF;
 	bool firstrun = FALSE;
@@ -225,11 +210,11 @@ void setTitle(const char * text) {
  * @return array of pointers to SDL_Rect structure.
  * @advanced
  * */
-SDL_Rect ** getModes()
-{
-	SDL_Rect ** modes = SDL_ListModes(0, SDL_OPENGL | SDL_FULLSCREEN);
+SDL_Rect **getModesSDL() {
+	NEEDED_INIT;
+	SDL_Rect **modes = SDL_ListModes(0, SDL_OPENGL | SDL_FULLSCREEN);
 	if(modes == (SDL_Rect **)0 || modes == (SDL_Rect **)-1)
-		return 0;
+		return NULL;
 	return modes;
 }
 

@@ -61,14 +61,7 @@ static bool checkFramebufferStatus()
 	return FALSE;
 }
 
-/**
- * @descr Create framebuffer object. Note, that not all video drivers support this. It's recommend to check returning value using cheetah.inPointer and check framebuffer support using cheetah.supported.FBO.
- * @group graphics/framebuffer
- * @var width
- * @var height
- * @var string of options. Supported options:
- * @return Framebuffer object
- * */
+/* Create framebuffer object. Note, that not all video drivers support this. It's recommend to check returning value using cheetah.inPointer and check framebuffer support using cheetah.supported.FBO. */
 void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int height, const char * options) {
 	Image *ptr = NULL;
 	GLint current_fbo;
@@ -77,7 +70,7 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 	
 	fboptr->id = 0;
 	
-	NEDED_INIT_VOID;
+	NEEDED_INIT_VOID;
 	
 	if(!supported.FBO) {
 		myError("Framebuffers are not supported on this machine. You'd better to check it in script (try \"if cheetah.supported.FBO\")");
@@ -155,20 +148,12 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 	}
 }
 
-/**
- * @descr Check, if framebuffer created without errors.
- * @group graphics/framebuffer
- * @var Framebuffer object
- * */
+/* Check, if framebuffer created without errors. */
 bool framebufferCheck(Framebuffer * ptr) {
 	return ptr->id;
 }
 
-/**
- * @descr Bind framebuffer object. Means, that now all graphics will be rendered to this framebuffer.
- * @group graphics/framebuffer
- * @var Framebuffer object
- * */
+/* Bind framebuffer object. Means, that now all graphics will be rendered to this framebuffer. */
 void framebufferBind(Framebuffer * ptr) {
 	if(ptr->id)
 	{
@@ -183,10 +168,7 @@ void framebufferBind(Framebuffer * ptr) {
 	}
 }
 
-/**
- * @descr Unbind framebuffer object. Means, that now all graphics will be rendered to default screen. This function unbinds the current framebuffer object.
- * @group graphics/framebuffer
- * */
+/* Unbind framebuffer object. Means, that now all graphics will be rendered to default screen. This function unbinds the current framebuffer object. */
 void framebufferUnbind(Framebuffer * ptr) {
 	FLUSH_BUFFER();
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, 0);
@@ -198,10 +180,7 @@ void framebufferUnbind(Framebuffer * ptr) {
 	glLoadIdentity();
 }
 
-/**
- * @descr Save image from framebuffer to BMP format
- * @group graphics/framebuffer
- * */
+/* Save image from framebuffer to BMP format */
 void framebufferSaveBMP(Framebuffer * ptr, const char* name) {
 	unsigned char* img = NULL;
 	int w = (int)ptr->image->w, h = (int)ptr->image->h;
@@ -214,11 +193,7 @@ void framebufferSaveBMP(Framebuffer * ptr, const char* name) {
 	delete(img);
 }
 
-/**
- * @descr Delete framebuffer and free memory.
- * @group graphics/framebuffer
- * @var Framebuffer object
- * */
+/* Delete framebuffer and free memory. */
 void deleteFramebuffer(Framebuffer * ptr) {
 	if(ptr) {
 		glDeleteTextures(1, &ptr->image->id);

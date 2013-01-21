@@ -36,6 +36,6 @@ IN THE SOFTWARE.
  * @return Image object
  * */
 void newParticleSystem(ParticleSystem *ptr, const char *name, const char *options) {
-	NEDED_INIT_VOID;
+	NEEDED_INIT_VOID;
 	
 }
