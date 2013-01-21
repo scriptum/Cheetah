@@ -1,0 +1,537 @@
+--------------------------------------------------------------------------------
+--                                   CLASSES                                  --
+--------------------------------------------------------------------------------
+
+@descr Create new %class from file. Reads file from disk by path specified in _filename_. If  You may pass some _options_ to this function. Image loader supports these image formats:
+ * PNG (24-bit or 32-bit only, indexed colors are not supported) - slow and pretty
+ * Jpeg (only non-progressive!) - good for photos but may produce artifacts
+ * BMP - slow and disk space hungry
+ * DDS (DXT1 or DXT3) - fastest loading and rendering on most desktop GPUs
+@class Image
+@constructor
+@var path to file
+@var string of options. This is depends on image loading module you use. Supported options:
+ * _nearest_ - use nearest interpolation instead of default linear interpolation
+ * _mipmap_ - generate mip-maps (automatically sets mip-map interpolation)
+ * _instant_ - load instantly without delayed resource loader
+ * _clamp_ - force texture clamp (default is repeat)
+@return %class object
+%class function newImage(string filename, string options = '')
+
+@descr Procedural generation of %class. Engine generates specified in _type_ procedural texture loads it as %class object. Fast and simple way to create some simple demosntrations and effects.
+@class Image
+@constructor
+@var type of procedural contet. Following types are supported:
+ * _dummy_ - just white rectangle
+ * _noise_ - random pixels - often used as noise pattern for shaders
+ * _light_ - create light
+ * _lightexp_ - create smooth gaussian light
+ * _circle_ - generates ugly aliased circle
+@var width of %class
+@var height of generated %class
+@var string of generated options. Supported options:
+ * _alpha_ - generate image with alpha channel instead of making 24-bit RPG image
+ * _nearest_ - use nearest interpolation instead of default linear interpolation
+ * _clamp_ - force texture clamp (default is repeat)
+@return %class object
+%class function generate(string type, number width, number height, string options = '')
+
+@descr Create new %class from file. This class is based on %class(Image) and used for displaying sliced images. Image will be splitted into 9 different parts. Useful used for GUI elements.
+@class BorderImage
+@constructor
+@var path to file
+@var top slice position
+@var right slice position
+@var bottom slice position
+@var left slice position
+@var string of options. Same as %class(Image).
+@return %class object
+%class function newBorderImage(string filename, number top, number right, number bottom, number left, string options)
+
+@descr Create new %class from several %class(Image) classes. Multitexturing - a technique often used with shaders to combine up to 8 images in one shader (see %class(Shader)).
+@class Multitexture
+@constructor
+@var set of %class(Image). You must pass at least 2 arguments.
+@return %class object
+%class function newMultitexture(Image ...)
+
+@descr Create new %class. %class is used as off-screen render target: when you call %class:bind all drawing will be in this %class. Then you may draw this %class as %class(Image). Default framebuffer has 8 bits per channel percision and you can change it, but be carefull: high percision framebuffers are very slow.
+@class Framebuffer
+@constructor
+@var width
+@var height
+@var string of options. Supported options:
+ * _nearest_ - use nearest interpolation instead of default linear interpolation
+ * _clamp_ - force texture clamp (default is repeat)
+ * _alpha_ - use alpha channel, RGBA (defaul is RGB)
+ * _percision16_ - set percision to half float (16 bits per channel)
+ * _percision32_ - set percision to float (32 bits per channel)
+@return %class object
+%class function newFramebuffer(number width, number height, string options = '')
+
+@descr Create new %class. %class is used to produce beatiful pixel effects: lighting, bump-mapping, texture generation and so on. Cheetah 2D Engine supports GLSL shaders. Usually shaders are consist from two shader programs: vertex shader and fragment (pixel) shader. Vertex shader usually sets to default, but fragment shader must be specified any way. Default vertex shader in Cheetah  2D Engine:
+
+```glsl
+varying vec2 TexCoord;
+void main()
+{
+	gl_Position = gl_ModelViewProjectionMatrixgl_Vertex;
+	TexCoord = gl_MultiTexCoord0.xy;
+}
+```
+@class Shader
+@constructor
+@var fragment shader: source code or file with source
+@var vertex shader: source code or file with source
+@return %class object
+%class function newShader(string fragment, string vertex = '')
+
+@descr Draw %class on screen with transformations.
+@class Image BorderImage Multitexture Atlas Framebuffer
+@var x position
+@var y position
+@var width of object
+@var height of object
+@var angle (radians)
+@var origin x
+@var origin y
+function draw(number x = 0, number y = 0, number width = %class:getWidth(), number height = %class:getHeight(), number angle = 0, number origin_x = 0, number origin_y = 0)
+
+@descr Draw part of %class on screen with transformations. Quads are useful for drawing or only part of image or drawing repeating patterns. %class will be clamped according to quad metrics and then it works as %class:draw() method.
+@class Image Multitexture Framebuffer
+@var x position
+@var y position
+@var quad x position
+@var quad y position
+@var quad width
+@var quad height
+@var angle (radians)
+@var origin x
+@var origin y
+function drawq(number x = 0, number y = 0, number width = %class:getWidth(), number height = %class:getHeight(), quad_x = 0, quad_y = 0, quad_wigth = %class:getWidth(), quad_height = %class:getHeight(), number angle = 0, number origin_x = 0, number origin_y = 0)
+
+@descr Get width of %class.
+@class Image BorderImage Multitexture Atlas Framebuffer
+@return width of %class
+number function getWidth()
+
+@descr Get height of %class.
+@class Image BorderImage Multitexture Framebuffer
+@return height of %class
+number function getHeight()
+
+@descr Bind %class to store all drawings into it.
+@class Framebuffer
+function bind()
+
+@descr Unbind %class (sets screen as default render target).
+@class Framebuffer
+function unbind()
+
+@descr Save %class as image (only BMP format supported).
+@class Framebuffer
+@var file name where image must be saved
+function save(string filename)
+
+@descr Check if %class was created without errors.
+@class Framebuffer Shader
+@return true if %class was created normally
+bool function check()
+
+@descr Bind %class. After binding all drawings will use this %class.
+@class Shader
+@see unbind
+function bind()
+
+@descr Unbind %class.
+@class Shader
+@see bind
+function unbind()
+
+@descr Set %class uniform variable. Any %class may conains variables passed from script. You _must_ set all shader usiforms _after_ calling %class:bind(). Supported uniforms:
+ * _float_
+ * _vec2_
+ * _vec3_
+ * _vec4_
+ * _sampler2D_
+@class Shader
+@var uniform name
+@var values
+@example ```lua
+shader = cheetah.newShader('shader.frag')
+shader:bind()
+shader:set('textureId', 0)
+shader:set('scale', 1)
+shader:set('size', 4, 4)
+```
+function set(string uniform, ...)
+
+--~ @descr Create new %class - a set of images based on one texture.
+--~ @class Atlas
+--~ @constructor
+--~ @var set of %class(Image). You must pass at least 2 arguments.
+--~ @return %class object
+--~ %class function newAtlas(Image ...)
+
+
+@descr Create new %class, this function reads font file generated by UBFG (Ultimate Bitmap Font Generator). Font files of UBFG have .fnt extension. One .fnt file may contains several fonts (different sizes, garnitures), all fonts objects placed into cheetah.fonts[NAME][SIZE].
+@class Font
+@constructor
+@var font file name
+@var is font scalable (if true, uses linear interpolation, nearest otherwise)
+function newFont(string filename, bool scalable = true)
+
+@descr Get height of %class in pixels, takes into account screen scale.
+@class Font
+@return height of %class
+%class function getHeight()
+
+@descr Get scale of %class.
+@class Font
+@return scale of %class
+number function getScale()
+
+@descr Get interval of %class in pixels (interval between lines).
+@class Font
+@return interval of %class
+number function getInerval()
+
+@descr Set scale of %class in pixels.
+@class Font
+@var height
+function setScale(number scale)
+
+@descr Get interval of %class in pixels (interval between lines).
+@class Font
+@var interval
+function setInerval(number interval)
+
+@descr Print text using %class with alignment. This function akes into account scaling factor, if font scalable x and y coordinates are floating-point, otherwise x and y are decimal to fit screen pixel grid.
+@class Font
+@var text string, if string is bigger than _width_ - word-wrapping will be enabled
+@var x coordinate
+@var y coordinate
+@var width of text, 0 means infinite width
+@var alignment of text, possible values are:
+cheeath.alignLeft
+cheeath.alignRight
+cheeath.alignCenter
+cheeath.alignJustify
+function setInerval(string text = 'undefined', number x = 0, number y = 0, number width = 0, Align align = cheetah.alignLeft)
+
+--------------------------------------------------------------------------------
+--                                  FUNCTIONS                                 --
+--------------------------------------------------------------------------------
+
+
+@descr Gets the number of milliseconds past from the execution time. Equivalent to SDL_GetTicks().
+@group timer
+@return numer of milliseconds past from the execution time
+number function getTicks()
+
+@descr Gets the time in seconds past from the execution time. This function returns the time in view of game speed!
+@group timer
+@return seconds past from the execution time
+number function getTime()
+
+@descr Gets the time in seconds past from the execution time. Returns "pure" time (no game speed).
+@group timer
+@return seconds past from the execution time
+number function getRealTime()
+
+@descr Do nothing some time.
+@group timer
+@var delay in milliseconds (1/1000 s)
+@see sleep
+function delay(number ms)
+
+
+@descr Do nothing some time.
+@group timer
+@var delay in seconds
+@see delay
+void function sleep(number sec)
+
+@descr Read entire file into string.
+@group filesystem
+@var path to file
+@return string with file content or nil in cause of error
+@see putFile fileExists appendFile
+string function getFile(string filename)
+
+@descr Put sting into file.
+@group filesystem
+@var path to file
+@var content to write
+@var write mode (as in c), use one of:
+w - replace file if exists
+wa - append string to file if exists
+@return true if success
+@see appendFile getFile
+bool function putFile(string filename, string content, string writemode)
+
+@descr Check if file exists.
+@group filesystem
+@var path to file
+@return true if file exists
+bool function fileExists(string filename)
+
+@descr Append string to end of file.
+@group filesystem
+@var path to file
+@var content to write
+@return true if success
+@see putFile getFile
+bool function appendFile(string filename, string content)
+
+@descr Get file extension. This functions just returns text from last dot.
+@group file
+@var file name or path (may be unexistent file)
+@return extension of file
+string function fileExt(string filename)
+
+@descr Get file name (without extension). Returns just all text before last dot.
+@group file
+@var file name or path (may be unexistent file)
+@return file name
+string function fileName(string filename)
+
+@descr Runs function passed as second argument for each file in directory. Callback function has one orgument: file path.
+@group file
+@var path to directory you want to scan
+@var callback function
+function fileEach(string dirname, function callback)
+
+@descr Get full path to directory where you may save any data.
+@group file
+@return path to data dir
+string function getAppDataDir()
+
+@descr Get file access time.
+@group file
+@var path to file
+@return file creation time in UNIX time format
+number function fileatime(string filename)
+
+@descr Get file modification time.
+@group file
+@var path to file
+@return file modification time in UNIX time format
+number function filemtime(string filename)
+
+@descr Get file creation time.
+@group file
+@var path to file
+@return file creation time in UNIX time format
+number function filectime(string filename)
+
+@descr Create new directory.
+@group file
+@var path to directory
+@return true if success
+bool function mkDir(string dirname)
+
+@descr Create window and initialize all OpenGL's stuff. You MUST call this before any graphics function, e.g. cheetah.newImage. You may call this function again to re-size window, change application title, toggle fullscreen. Other options are ignored.
+@group window
+@var application's title shown in titlebar
+@var string of options. Supported options:
+ * _1024x768_ - set window size to 1024x768, default window size - 800x600
+ * _1024_ - set window size to 1024x1024
+ * _fullscreen_ - run in fullscreen mode
+ * _resizable_ - make window resizable
+ * _vsync_ - enable vertical synchronization
+ * _resloader_ - enable delayed resource loader (all images are loaded in separate thread), possible only with internal image loader, external modules (as DevIL) are not supported
+ * _depth_ - enable depth buffer
+ * _stencil_ - enable stencil buffer
+ * _noframe_ - try to make window without frame (depending on window manager, fullscreen mode, OS may not work)
+@return true if success
+bool function init(string appName, string options)
+
+@descr Check, if screen exists. Useful if you have windowless version of your application, e.g. server.
+@group window
+@return true if screen was initialized
+@advanced
+bool function isInit()
+
+
+
+@descr Starts main loop. You must always place this function at the end of all scripts to start application.
+@group window
+function mainLoop()
+
+@descr Close application.
+@group window
+function quit()
+
+@descr Get window width.
+@group window
+@return width of window
+@advanced
+number function getWindowWidth()
+
+@descr Get window height.
+@group window
+@return height of window
+@advanced
+number function getWindowHeight()
+
+@descr Get window dimensions.
+@group window
+@return two variables: width and height
+number, number function getWindowSize()
+
+@descr Swap buffers and present graphics. This function calls automatically every frame by default.
+@group window
+@advanced
+function swapBuffers()
+
+@descr Set window's title.
+@group window
+@var text to replace the caption
+@see init
+@advanced
+function setTitle(string text)
+
+@descr Get all avaiable screen modes (screen resolution list). This is useful if you want to use fullscreen mode.
+@group window
+@var text to replace the caption
+@see init
+function getModes(string text)
+
+@descr Get mouse position.
+@group events
+@return two variables: x and y position of mouse
+number, number function getMousePos()
+
+@descr Get mouse x position.
+@group events
+@return x position of mouse
+@advanced
+number function getMouseX()
+
+@descr Get mouse y position.
+@group events
+@return y position of mouse
+@advanced
+number function getMouseY()
+
+@descr Checks if key is pressed. Useful for objects movement.
+@group events
+@var key (e.g. "a", "space", "enter")
+@return true if key is pressed
+bool function isKeyPressed(string key)
+
+@descr Set game speed (main timer will be slower or faster).
+@group events
+@var speed (e.g. 1 - normal speed, 2 - 2x faster, 0.5 - 2x slower)
+function gameSpeed(number speed)
+
+@descr Get FPS (frames per second).
+@group graphics
+@return number of frames per second
+number function getFps()
+
+@descr Enables depth test. Useless if you didn't pass 'depth' option to cheetah.init. Equivalent to glEnable(GL_DEPTH_TEST);
+@group graphics
+@see disableDepthTest
+@advanced
+function enableDepthTest()
+
+@descr Disables depth test. Useless if you didn't pass 'depth' option to cheetah.init. Equivalent to glDisable(GL_DEPTH_TEST);
+@group graphics
+@see enableDepthTest
+@advanced
+function disableDepthTest()
+
+@descr Enables stencil test. Useless if you didn't pass 'stencil' option to cheetah.init. Equivalent to glEnable(GL_STENCIL_TEST);
+@group graphics
+@see disableStencilTest
+@advanced
+function enableStencilTest()
+
+@descr Disables stencil test. Useless if you didn't pass 'stencil' option to cheetah.init. Equivalent to glDisable(GL_STENCIL_TEST);
+@group graphics
+@see enableStencilTest
+@advanced
+function disableStencilTest()
+
+@descr Enables scissor test. Equivalent to glEnable(GL_SCISSOR_TEST);
+@group graphics
+@see disableStencilTest
+@advanced
+function enableScissorTest()
+
+@descr Disables scissor test. Equivalent to glDisable(GL_SCISSOR_TEST);
+@group graphics
+@see enableStencilTest
+@advanced
+function disableScissorTest()
+
+@descr Enables alpha test. Equivalent to glEnable(GL_ALPHA_TEST);
+@group graphics
+@see disableAlphaTest
+@advanced
+function enableAlphaTest()
+
+@descr Disables alpha test. Equivalent to glDisable(GL_ALPHA_TEST);
+@group graphics
+@see enableAlphaTest
+@advanced
+function disableAlphaTest()
+
+@descr Set scissor area.
+@group graphics
+@see enableScissorTest
+@advanced
+function setScissor(number x, number y, number w, number h)
+
+@descr Flush graphics. Forces OpenGL to complete all draw calls.
+@group graphics
+@advanced
+function flush()
+
+@descr Move object relatively to the current matrix position (in pixels). This function must be called between cheetah.push and cheetah.pop functions.
+@note This function is slow. Avoid to use it for object positioning.
+@group graphics
+@var x coordinate
+@var y coordinate
+@see scale rotate translateObject
+@advanced
+function move(number translateX, number translateY)
+
+@descr Scale object relatively to the current matrix size (initially, matrix has size 1:1 to fit pixel grid). This function must be called between cheetah.push and cheetah.pop functions.
+@note This function is slow. Avoid to use it for object positioning.
+@group graphics
+@var x scale
+@var y scale
+@see move rotate translateObject
+@advanced
+function scale(number scaleX, number scaleY)
+
+@descr Rotate object relatively to the current matrix angle. This function must be called between cheetah.push and cheetah.pop functions.
+@note This function is slow. Avoid to use it for object positioning.
+@group graphics
+@var angle
+@see move scale translateObject
+@advanced
+function rotate(number angle)
+
+@descr Move, rotate and scale object relatively to it's center (origin). This function must be called between cheetah.push and cheetah.pop functions.
+@note This function is VERY slow. Avoid to use it for object positioning.
+@group graphics
+@var x coordinate
+@var y coordinate
+@var angle
+@var x scale
+@var y scale
+@var x offset (center)
+@var y offset (center)
+@see move scale rotate
+@advanced
+function translateObject(number x, number y, number angle, number width, number height, number origin_x, number origin_y)
+
+
+@descr Enable or disable autoscale. Autoscale allows you to draw stuff in the fixed coordinates, and engine automatically translates all coordinates if window changes his size. Is you want to control screen size yourself, disable this.
+@group graphics
+@var enable or disable autoscale
+function autoScale(bool autoScale)
