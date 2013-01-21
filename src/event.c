@@ -109,6 +109,7 @@ unsigned int getEventResizeH() {
 void setResizeDelay(int delay) {
 	resizeDelay = delay;
 }
+
 int getMouseX() {
 	int x;
 	SDL_GetMouseState(&x, NULL);

@@ -30,10 +30,6 @@ IN THE SOFTWARE.
 
 #define MAGICK_CONSTANT 20
 
-struct {
-	bool alpha, linear, smooth;
-} generatorOptions;
-
 void newImageRaw(Image *, int, int, const char *, const char *);
 
 #define REPEAT                                                                 \
@@ -63,7 +59,7 @@ REPEAT
 ((i - w / 2 + 0.5) * (i - w / 2 + 0.5) / (float)(w * w) +                      \
  (j - h / 2 + 0.5) * (j - h / 2 + 0.5) / (float)(h * h))
 
-static void generateImageData(ImageData *ptr, int w, int h, const char *imageType) {
+static void generateImageData(ImageData *ptr, int w, int h, const char *imageType, bool alpha) {
 	int i, j, c, channels;
 	char *buf = NULL;
 	static rt88_state *taus88 = NULL;
@@ -79,7 +75,7 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 		return;
 	}
 	#define NEW do {                                                             \
-		if(generatorOptions.alpha) {                                               \
+		if(alpha) {                                                                \
 			channels = 4; new(buf, char, w * h * channels);                          \
 		}                                                                          \
 		else {                                                                     \
@@ -138,23 +134,11 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 void generateImage(Image *ptr, int w, int h, const char *imageType, const char *options) {
 	static ImageData imageData;
 	ptr->id = 0;
-	generatorOptions.linear = 1;
-	generatorOptions.alpha = 0;
-	generatorOptions.smooth = 0;
-	NEDED_INIT_VOID;
+	NEEDED_INIT_VOID;
 	if(ptr) {
 		imageData.data = NULL;
-		while(*options)
-		{
-			if(*options == 'n')
-				generatorOptions.linear = 0;
-			else if(*options == 'a')
-				generatorOptions.alpha = 1;
-			else if(*options == 's')
-				generatorOptions.smooth = 1;
-			options++;
-		}
-		generateImageData(&imageData, w, h, imageType);
+		CHECK_OPTION(options, alpha);
+		generateImageData(&imageData, w, h, imageType, alpha);
 		if(imageData.data)
 			newImageRaw(ptr, w, h, imageData.data, options);
 	}

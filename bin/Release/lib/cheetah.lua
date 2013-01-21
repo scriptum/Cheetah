@@ -38,9 +38,11 @@ C.getFile = function(filename)
 end
 
 C.putFile = function(filename, str, writemode)
-	local file = assert(io.open(filename, writemode or "w"))
+	local file = io.open(filename, writemode or "w")
+	if not file then return false end
 	file:write(str)
 	file:close()
+	return true
 end
 
 C.fileExists = function(name)
@@ -53,7 +55,7 @@ C.fileExists = function(name)
 end
 
 C.appendFile = function(filename, str)
-	C.putFile(filename, str, "wa")
+	return C.putFile(filename, str, "wa")
 end
 
 local archToInt = {x86 = 32, x64 = 64}
@@ -89,12 +91,8 @@ int (*grabCursor)(int mode);
 
 local libcheetah = C.loadDLL 'cheetah'
 assert(libcheetah, 'Cannot load cheetah library!')
---~ if not libcheetah.initSDL() then print 'Cannot init SDL!' end
---~ libcheetah.init('C engine', 640, 480, 32, '')
 
 require "lib.gl"
---~ 
---~ local gl = GL
 
 local lua_keys = require 'lib.keys'
 local keys_reverse = require 'lib.keys_reverse'
@@ -191,22 +189,14 @@ end
 	--~ libcheetah.disableTexture2D()
 --~ end
 
---============================================================================--
+--------------------------------------------------------------------------------
 --                                 FILESYSTEM                                 --
---============================================================================--
+--------------------------------------------------------------------------------
 
---[[
-@descr Get extension of file. Returns just last word after dot.
-@group file
-]]
 C.fileExt = function(name)
 	return name:gsub('^.*%.', '')
 end
 
---[[
-@descr Get file name (without extension). Returns just all before last dot.
-@group file
-]]
 C.fileName = function(name)
 	return name:gsub('%..*', '')
 end
@@ -236,10 +226,7 @@ C.fileEach = function(dirname, func)
 	return t
 end
 
---[[
-@descr Get full path to directory where you may save any data.
-@group file
-]]
+-- Get full path to directory where you may save any data.
 C.getAppDataDir = function()
 	if ffi.os == "Windows" then
 		return os.getenv("APPDATA")
@@ -264,9 +251,9 @@ C.isKeyPressed = function(key)
 	return false
 end
 
---============================================================================--
+--------------------------------------------------------------------------------
 --                            GENERAL DRAW FUNCTION                           --
---============================================================================--
+--------------------------------------------------------------------------------
 
 local draw_general = function(d1, d2)
 	return function(s, x, y, w, h, angle, ox, oy)
@@ -290,9 +277,9 @@ local drawq_general = function(d1, d2)
 	end
 end
 
---============================================================================--
+--------------------------------------------------------------------------------
 --                                    IMAGE                                   --
---============================================================================--
+--------------------------------------------------------------------------------
 
 C.generate = function(imageType, w, h, opt)
 	local ptr = ffi.new('Image')
@@ -300,9 +287,9 @@ C.generate = function(imageType, w, h, opt)
 	return ptr
 end
 
-C.newImage = function(name, options)
+C.newImage = function(filename, options)
 	local ptr = ffi.new('Image')
-	libcheetah.newImageOpt(ptr, name, options or '')
+	libcheetah.newImageOpt(ptr, filename, options or '')
 	return ptr
 end
 
@@ -331,9 +318,9 @@ C.newImageFromData = function(data, options)
 	return ptr
 end
 
---============================================================================--
+--------------------------------------------------------------------------------
 --                                BORDER IMAGE                                --
---============================================================================--
+--------------------------------------------------------------------------------
 
 C.newBorderImage = function(name, top, right, bottom, left, options)
 	local ptr = ffi.new('BorderImage')
@@ -354,9 +341,9 @@ ffi.metatype('BorderImage', {
 	}
 })
 
---============================================================================--
+--------------------------------------------------------------------------------
 --                               MULTITEXTURE                                 --
---============================================================================--
+--------------------------------------------------------------------------------
 
 C.newMultitexture = function(...)
 	local arg = {...}
@@ -382,13 +369,12 @@ ffi.metatype('Multitexture', {
 		drawq = drawq_general(libcheetah.multitextureDrawqt, libcheetah.multitextureDrawqxy),
 		getWidth = function(s) return s.w end,
 		getHeight = function(s) return s.h end
-	}, 
-	__gc = libcheetah.deleteMultitexture
+	}
 })
 
---============================================================================--
+--------------------------------------------------------------------------------
 --                                    ATLAS                                   --
---============================================================================--
+--------------------------------------------------------------------------------
 
 C.newAtlas = function(image, x, y, w, h)
 	local p = ffi.new('Atlas')
@@ -411,9 +397,9 @@ ffi.metatype('Atlas', {
 	}
 })
 
---============================================================================--
+--------------------------------------------------------------------------------
 --                                    FONT                                    --
---============================================================================--
+--------------------------------------------------------------------------------
 
 local texturesArchive = {}
 --~ C.newTilemap = function(file)
@@ -490,8 +476,8 @@ ffi.metatype('Font', {
 		print = function(font, text, x, y, width, align)
 			libcheetah.fontPrintf(font, text or 'undefined', x or 0, y or 0, width or 0, align or 0)
 		end,
-		interval = libcheetah.fontInterval,
-		scale = libcheetah.fontScale,
+		setInterval = libcheetah.fontInterval,
+		setScale = libcheetah.fontScale,
 		getInterval = libcheetah.fontGetInterval,
 		getScale = libcheetah.fontGetScale,
 		getHeight = libcheetah.fontHeight
@@ -499,9 +485,9 @@ ffi.metatype('Font', {
 	--~ __gc = libcheetah.deleteFont
 })
 
---============================================================================--
+--------------------------------------------------------------------------------
 --                                  RESOURCES                                 --
---============================================================================--
+--------------------------------------------------------------------------------
 
 local resLoadImageCallback = function (path, t, dir, name, ext)
 	local buf = dir..'/'..name
@@ -646,9 +632,9 @@ C.init = function(title, options)
 	C.fonts.default = C.fonts.DICE[6]
 end
 
---============================================================================--
+--------------------------------------------------------------------------------
 --                                 FRAMEBUFFER                                --
---============================================================================--
+--------------------------------------------------------------------------------
 
 C.newFramebuffer = function(w, h, options)
 	local ptr = ffi.new('Framebuffer')
@@ -674,9 +660,9 @@ ffi.metatype('Framebuffer', {
 	__gc = libcheetah.deleteFramebuffer
 })
 
---============================================================================--
+--------------------------------------------------------------------------------
 --                                  SHADERS                                   --
---============================================================================--
+--------------------------------------------------------------------------------
 
 local uniforms = {}
 C.newShader = function(fragment, vertex)
@@ -740,6 +726,18 @@ ffi.metatype('Shader', {
 	},
 	__gc = libcheetah.deleteShader
 })
+
+C.getModes = function()
+	local modes = libcheetah.getModesSDL()
+	if not libcheetah.isPointer(modes) then return nil end
+	local i = 0
+	local list = {}
+	while libcheetah.isPointer(modes[i]) do
+		list[i + 1] = {width = modes[i].w, height = modes[i].h}
+		i = i + 1
+	end
+	return list
+end
 
 C.newPoints = ffi.typeof("Point[?]")
 

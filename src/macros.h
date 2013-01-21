@@ -304,17 +304,17 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
 #define varf(v) printf(DEBUG_MSG_FORMAT " %s = %f\n", LOCATION, #v, v);
 
 /**********************************INIT ASSERT*********************************/
-#define _NEDED_INIT_STR MYERROR("call init function before!")
+#define _NEEDED_INIT_STR MYERROR("call init function before!")
 
-#define NEDED_INIT do {                                                        \
+#define NEEDED_INIT do {                                                        \
 	if(!screen) {                                                                \
-		_NEDED_INIT_STR; return 0;                                                 \
+		_NEEDED_INIT_STR; return 0;                                                 \
 	}                                                                            \
 } while(0)
 
-#define NEDED_INIT_VOID do {                                                   \
+#define NEEDED_INIT_VOID do {                                                   \
 	if(!screen) {                                                                \
-		_NEDED_INIT_STR; return;                                                   \
+		_NEEDED_INIT_STR; return;                                                   \
 	}                                                                            \
 } while(0)
 

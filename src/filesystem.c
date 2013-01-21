@@ -63,15 +63,15 @@ unsigned char * loadfile(const char * filename, unsigned int * length) {
 	return result;
 }
 
-#define filetime(var) int file ## var ## time(const char * filename) {\
-	static struct stat buf;\
-	int result = stat( filename, &buf );\
-	if( result != 0 ) {\
-		myError("can't get information about file %s", filename);\
-		return -1;\
-	}\
-	else \
-		return buf.st_ ## var ## time;\
+#define filetime(var) int file ## var ## time(const char * filename) {         \
+	static struct stat buf;                                                      \
+	int result = stat( filename, &buf );                                         \
+	if( result != 0 ) {                                                          \
+		myError("can't get information about file %s", filename);                  \
+		return -1;                                                                 \
+	}                                                                            \
+	else                                                                         \
+		return buf.st_ ## var ## time;                                             \
 }
 
 filetime(m)
@@ -101,21 +101,21 @@ bool isDir(const char *name) {
 	if(dir)
 	{
 		closedir(dir);
-		return 1;
+		return TRUE;
 	}
-	return 0;
+	return FALSE;
 }
 
 bool mkDir(const char * path) {
 #ifdef _WIN32
-	if(mkdir(path) == 0) return 1;
+	if(mkdir(path) == 0) return TRUE;
 #else
-	if(mkdir(path, 0755) == 0) return 1;
+	if(mkdir(path, 0755) == 0) return TRUE;
 #endif
-	return 0;
+	return FALSE;
 }
 
-char * getDirentName(struct dirent * de) {
+char *getDirentName(struct dirent * de) {
 	return de->d_name;
 }
 
