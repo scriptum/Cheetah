@@ -61,7 +61,7 @@ then
 else
 	FLAGS_OPTIMIZE="-O3 -ffast-math $FLAGS_OPTIMIZE_GENERAL"
 fi
-echo "Building on $CORES cores with flags: $FLAGS_OPTIMIZE"
+
 if [ "$2" == "release" -o "$2" == "final" ]
 then
 	FLAGS="$FLAGS_OPTIMIZE"
@@ -106,6 +106,8 @@ then
 	cp src/$EXE "../../$DIR/bin/$OS$MACHINE_NAME/"
 	popd
 fi
+
+echo "Building on $CORES cores with flags: $FLAGS"
 
 if [ "`cat $TMP`" != "$LAST $2" ]
 then
