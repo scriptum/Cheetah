@@ -108,7 +108,7 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 	
 	/* generate texture save target */
 	glGenTextures(1, &ptr->id);
-	glBindTexture(GL_TEXTURE_2D, ptr->id);
+	TEXTURE_BIND(ptr->id);
 	
 	if(TRUE == nearest)
 		TEX_NEAREST;
@@ -121,7 +121,7 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 		TEX_REPEAT;
 	
 	glTexImage2D(GL_TEXTURE_2D, 0, internal, width, height, 0, GL_RGBA, format, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	//~ glBindTexture(GL_TEXTURE_2D, 0);
 	
 	/* create framebuffer */
 	glGenFramebuffers_(1, &fboptr->id);
