@@ -21,83 +21,64 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-
-//~ #define MEMORY_TEST
-
 #ifndef __MACROS_H__
 #define __MACROS_H__
 
 #include "config.h"
 #include "math.h"
 
-/**********************************MEMOTY OPS**********************************/
-#ifdef MEMORY_TEST
-	#define new(var, type, size) do {                                            \
-		if(var){                                                                   \
-			myError("variable %s already contains data: %x."                         \
-							" Delete it before allocating", #var, var);                      \
-			exit(1);                                                                 \
-		}                                                                          \
-		var = (type*)malloc(sizeof(type)*(size));                                  \
-		/*initialize memory for small structures*/                                 \
-		if(size == 1) memset(var, 0, sizeof(type));                                \
-		if(!var) {                                                                 \
-			myError("cannot allocate %d bytes for %s", sizeof(type)*(size), #var);   \
-			exit(1);                                                                 \
-		}                                                                          \
-		printf("Added: %s %d %s (%x) %d bytes\n",                                  \
-					 __FILE__, __LINE__, #var, var, sizeof(type)*(size));                \
-	} while(0)
+/***********************************DEBUGGING**********************************/
 
-	#define renew(var, type, size) do {                                          \
-		var = (type*)realloc(var, sizeof(type)*(size));                            \
-		if(!var) {                                                                 \
-			myError("cannot re-allocate %d bytes for %s", sizeof(type)*(size), #var);\
-			exit(1);                                                                 \
-		}                                                                          \
-		printf("Reallocated: %s %d %s (%x) %d bytes\n",                            \
-					 __FILE__, __LINE__, #var, var, sizeof(type)*(size));                \
-	} while(0)
+/* Debug memory operations */
+#define DEBUG_MEMORY 0
 
-	#define delete(var) do {                                                     \
-		if(var) {                                                                  \
-			free(var);                                                               \
-			printf("Removed: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var);       \
-			var = NULL;                                                              \
-		}                                                                          \
-	} while(0)
+#if DEBUG_MEMORY
+	#define dprintf_mem(...) printf(__VA_ARGS__)
 #else
-	#define new(var, type, size) do {                                            \
-		if(var){                                                                   \
-			myError("variable %s already contains data: %x."                         \
-							" Delete it before allocating", #var, var);                      \
-			exit(1);                                                                 \
-		}                                                                          \
-		var = (type*)malloc(sizeof(type)*(size));                                  \
-		/*initialize memory for small structures*/                                 \
-		if(size == 1) memset(var, 0, sizeof(type));                                \
-		if(!var) {                                                                 \
-			myError("cannot allocate %d bytes for %s", sizeof(type)*(size), #var);   \
-			exit(1);                                                                 \
-		}                                                                          \
-	} while(0)
-
-	#define renew(var, type, size) do {                                          \
-		var = (type*)realloc(var, sizeof(type)*(size));                            \
-		if(!var) {                                                                 \
-			myError("cannot re-allocate %d bytes for %s (%x)",                       \
-							sizeof(type)*(size), #var, var);                                 \
-			exit(1);                                                                 \
-		}                                                                          \
-	} while(0)
-
-	#define delete(data) do {                                                    \
-		if(data) {                                                                 \
-			free(data);                                                              \
-			data = NULL;                                                             \
-		}                                                                          \
-	} while(0)
+	#define dprintf_mem(...)
 #endif
+
+/**********************************MEMOTY OPS**********************************/
+
+#define new(var, type, size) do {                                              \
+	if(var){                                                                     \
+		myError("variable %s already contains data: %x."                           \
+						" Delete it before allocating", #var, var);                        \
+		exit(1);                                                                   \
+	}                                                                            \
+	var = (type*)malloc(sizeof(type)*(size));                                    \
+	/*initialize memory for small structures*/                                   \
+	if(size == 1) memset(var, 0, sizeof(type));                                  \
+	if(!var) {                                                                   \
+		myError("cannot allocate %d bytes for %s", sizeof(type)*(size), #var);     \
+		exit(1);                                                                   \
+	}                                                                            \
+	dprintf_mem("Added: %s %d %s (%x) %d bytes\n",                               \
+				 __FILE__, __LINE__, #var, var, sizeof(type)*(size));                  \
+} while(0)
+
+#define new0(var, type, size) do {                                             \
+	new(var, type, size);                                                        \
+	memset(var, 0, sizeof(type) * (size));                                       \
+} while(0)
+
+#define renew(var, type, size) do {                                            \
+	var = (type*)realloc(var, sizeof(type)*(size));                              \
+	if(!var) {                                                                   \
+		myError("cannot re-allocate %d bytes for %s", sizeof(type)*(size), #var);  \
+		exit(1);                                                                   \
+	}                                                                            \
+	dprintf_mem("Reallocated: %s %d %s (%x) %d bytes\n",                         \
+				 __FILE__, __LINE__, #var, var, sizeof(type)*(size));                  \
+} while(0)
+
+#define delete(var) do {                                                       \
+	if(var) {                                                                    \
+		free(var);                                                                 \
+		dprintf_mem("Removed: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var);    \
+		var = NULL;                                                                \
+	}                                                                            \
+} while(0)
 
 #define renewif(condition, var, type, size) do {                               \
 	if(condition) {                                                              \
@@ -254,7 +235,7 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
 	vertexCounter += VERTICLES_PER_SPRITE;                                       \
 } while(0)
 
-#endif
+#endif /* #ifdef GL_QUADS */
 
 #define PUSH_QUAD_TEXTURE(vx, vy, vw, vh, a, ox, oy, texture) do {             \
 	FLUSH_BUFFER_IF_OVERFLOW();                                                  \
@@ -307,15 +288,15 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
 #define _NEEDED_INIT_STR MYERROR("call init function before!")
 
 #define NEEDED_INIT do {                                                        \
-	if(!screen) {                                                                \
+	if(!screen) {                                                                 \
 		_NEEDED_INIT_STR; return 0;                                                 \
-	}                                                                            \
+	}                                                                             \
 } while(0)
 
 #define NEEDED_INIT_VOID do {                                                   \
-	if(!screen) {                                                                \
+	if(!screen) {                                                                 \
 		_NEEDED_INIT_STR; return;                                                   \
-	}                                                                            \
+	}                                                                             \
 } while(0)
 
 #endif //__MACROS_H__
