@@ -46,8 +46,10 @@ static unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 			0, flags,
 			GL_TEXTURE_2D, GL_TEXTURE_2D,
 			GL_MAX_TEXTURE_SIZE);
-	if(TRUE == nearest) TEX_NEAREST;
+	if(TRUE == nearest)
+		TEX_NEAREST;
 	SOIL_free_image_data(img);
+	prevImageId = 0;
 	return tex_id;
 }
 
@@ -244,8 +246,10 @@ static void multitextureBind(Multitexture * multitexture)
 		image = multitexture->images[i];
 		glActiveTexture_(GL_TEXTURE0 + i);
 		imageCheckResLoader(image);
-		if (image->id) glBindTexture(GL_TEXTURE_2D, image->id);
+		if (image->id)
+			glBindTexture(GL_TEXTURE_2D, image->id);
 	}
+	prevImageId = 0;
 	glActiveTexture_(GL_TEXTURE0);
 }
 
