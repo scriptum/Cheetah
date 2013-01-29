@@ -21,15 +21,28 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
 #include "cheetah.h"
 #include "render.h"
 #include "config.h"
+#include "macros.h"
+#include "vertex.h"
+
+#include <SDL.h>
 
 SDL_Surface *screen = NULL;
+bool clearScreenFlag = 1;
 
 int resLoaderThread(void *unused);
+void initRenderer();
+void resLoaderInit(bool resloader);
+extern void resLoaderMainThread();
 
-void resetView(int w, int h)
+void resetView(unsigned w, unsigned h)
 {
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
@@ -37,6 +50,16 @@ void resetView(int w, int h)
 	glOrtho(0, w, h, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+}
+
+void resetViewDefault()
+{
+	resetView(screen->w, screen->h);
+}
+
+void setWindowSize(unsigned w, unsigned h) {
+	screen->w = w;
+	screen->h = h;
 }
 
 /* Create window and initialize all OpenGL's stuff. */
@@ -105,22 +128,24 @@ bool init(const char * appName, const char * options) {
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_TEXTURE_2D);
 		//~ glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-		resLoaderQueue = NULL;
+		resLoaderInit(resloader);
 		if(TRUE == resloader)
 		{
-			resLoaderQueue = newQueue();
-			resQueueMutex = SDL_CreateMutex();
-			resShared = 0;
 			SDL_CreateThread(resLoaderThread, (void *)NULL);
-			glGenTextures(1, &null_texture);
-			glBindTexture(GL_TEXTURE_2D, null_texture);
-			//~ TEX_CLAMP;
-			//~ TEX_LINEAR;
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, "\0\0\0\0");
 		}
+		glGenTextures(1, &null_texture);
+		glBindTexture(GL_TEXTURE_2D, null_texture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, "\0\0\0\0");
+	
+		globalTimers.gameSpeed = 1.0;
+		globalTimers.rescaleTime = 0;
+		globalTimers.resizeDelay = 100;
+		globalTimers.time = 0;
+		globalTimers.timed = 0.0;
+		globalTimers.timeOffsetd = 0.0;
 	}
 
-	resetView(width, height);
+	resetViewDefault();
 	//~ glDepthRange(-10000,10000);
 	if(TRUE == firstrun)
 	{
@@ -128,7 +153,6 @@ bool init(const char * appName, const char * options) {
 		vertexCounter = 0;
 		new(texCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
 		new(vertexCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
-		verAlloc = VERTEX_BUFFER_LIMIT;
 
 		glGenTextures(1, &rect_texture);
 		glBindTexture(GL_TEXTURE_2D, rect_texture);
@@ -216,6 +240,74 @@ SDL_Rect **getModesSDL() {
 	if(modes == (SDL_Rect **)0 || modes == (SDL_Rect **)-1)
 		return NULL;
 	return modes;
+}
+
+/**
+ * @descr Toggle auto-clear screen. Disable auto-clear if you want to do it manually or you have fullscreen background.
+ * @group graphics/drawing
+ * @var enable or disable
+ * @see clear
+ * */
+void clearScreen(bool enabled) {
+	clearScreenFlag = enabled;
+}
+
+/**
+ * @descr Enable or disable autoscale. Autoscale allows you to draw stuff in the fixed coordinates, and engine automatically translates all coordinates if window changes his size. Is you want to control screen size yourself, disable this.
+ * @group graphics/drawing
+ * @var enable or disable autoscale
+ * */
+void autoScale(bool autoScale) {
+	screenScale.autoScale = autoScale;
+}
+
+static void doAutoScale()
+{
+	if(screenScale.autoScale)
+	{
+		glLoadIdentity();
+		glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
+		glScalef(screenScale.scaleX, screenScale.scaleY, 1);
+	}
+}
+
+void prepare() {
+	unsigned int delta = globalTimers.time;
+	globalTimers.time = SDL_GetTicks();
+	delta = globalTimers.time - delta;
+	globalTimers.timeOffsetd += (1.0 - globalTimers.gameSpeed) * delta / 1000.0;
+	globalTimers.timed = globalTimers.time / 1000.0 - globalTimers.timeOffsetd;
+	doAutoScale();
+	resLoaderMainThread();
+	if(globalTimers.rescaleTime && globalTimers.time > globalTimers.rescaleTime)
+	{
+		SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
+		resetView(screen->w, screen->h);
+		doAutoScale();
+		globalTimers.rescaleTime = 0;
+	}
+	if(clearScreenFlag)
+		glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void recomputeScreenScale(double w, double h)
+{
+	if(screenScale.autoScale)
+	{
+		screenScale.aspect = w/h;
+		if(screenScale.aspect > (double)4/3)
+		{
+			screenScale.scaleX = screenScale.scaleY = h/screenScale.origHeight;
+			screenScale.offsetX = floor((w - screenScale.origWidth * screenScale.scaleX) * 0.5);
+			screenScale.offsetY = 0;
+		}
+		else
+		{
+			screenScale.scaleX = screenScale.scaleY = w/screenScale.origWidth;
+			screenScale.offsetY = floor((h - screenScale.origHeight * screenScale.scaleY) * 0.5);
+			screenScale.offsetX = 0;
+		}
+	}
 }
 
 int (*showCursor)(int mode) = &SDL_ShowCursor;

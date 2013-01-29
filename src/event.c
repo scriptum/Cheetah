@@ -21,15 +21,16 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-#include "cheetah.h"
-#include "math.h"
+#include <stddef.h>
+#include <math.h>
+#include <SDL.h>
 
-Uint32 rescaleTime = 0;
-Uint32 globalTime = 0;
-double globalTimed = 0;
-double globalTimeOffsetd = 0;
-double globalGameSpeed = 1;
-int resizeDelay = 100; /* 100 ms to avoid resize blinking */
+#include "cheetah.h"
+
+SDL_Event event;
+
+void recomputeScreenScale(double w, double h);
+void setWindowSize(unsigned w, unsigned h);
 
 unsigned int getEventType() {
 	/* skip unneeded events */
@@ -41,25 +42,9 @@ unsigned int getEventType() {
 			case SDL_MOUSEBUTTONDOWN: return 4;
 			case SDL_MOUSEBUTTONUP: return 5;
 			case SDL_VIDEORESIZE: 
-				if(screenScale.autoScale)
-				{
-					screenScale.aspect = (float)event.resize.w/(float)event.resize.h;
-					if(screenScale.aspect > (float)4/3)
-					{
-						screenScale.scaleX = screenScale.scaleY = event.resize.h/screenScale.origHeight;
-						screenScale.offsetX = floor((event.resize.w - screenScale.origWidth * screenScale.scaleX)*0.5);
-						screenScale.offsetY = 0;
-					}
-					else
-					{
-						screenScale.scaleX = screenScale.scaleY = event.resize.w/screenScale.origWidth;
-						screenScale.offsetY = floor((event.resize.h - screenScale.origHeight * screenScale.scaleY)*0.5);
-						screenScale.offsetX = 0;
-					}
-				}
-				rescaleTime = globalTime + resizeDelay;
-				screen->w = event.resize.w;
-				screen->h = event.resize.h;
+				recomputeScreenScale(event.resize.w, event.resize.h);
+				globalTimers.rescaleTime = globalTimers.time + globalTimers.resizeDelay;
+				setWindowSize(event.resize.w, event.resize.h);
 				return 6;
 			/* TODO to do something here */
 			case SDL_VIDEOEXPOSE: return 7;
@@ -107,7 +92,7 @@ unsigned int getEventResizeH() {
 }
 
 void setResizeDelay(int delay) {
-	resizeDelay = delay;
+	globalTimers.resizeDelay = delay;
 }
 
 int getMouseX() {
@@ -131,5 +116,5 @@ unsigned char *getKeyState() {
 }
 
 void gameSpeed(double speed) {
-	globalGameSpeed = speed;
+	globalTimers.gameSpeed = speed;
 }

@@ -21,8 +21,14 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "cheetah.h"
 #include "render.h"
+#include "macros.h"
+#include "vertex.h"
 
 const char * std_vertex_shader = "varying vec2 TexCoord;\
 void main()\
@@ -58,11 +64,7 @@ void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
 	GLuint v, f, p;
 	GLint linked;
 	const GLsizei count = 1;
-	if(!screen)
-	{
-		myError("Call init function before!");
-		return;
-	}
+	NEEDED_INIT_VOID;
 	ptr->id = 0;
 	if(!supported.GLSL)
 	{

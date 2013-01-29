@@ -21,9 +21,21 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
+//~ #include <SDL_opengl.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include "cheetah.h"
+#include "macros.h"
 #include "render.h"
+#include "vertex.h"
 #include "image_write.h"
+
+//~ extern SDL_Surface *screen;
+
+void resetView(unsigned w, unsigned h);
+void resetViewDefault();
 
 static bool checkFramebufferStatus()
 {
@@ -159,25 +171,14 @@ void framebufferBind(Framebuffer * ptr) {
 	{
 		FLUSH_BUFFER();
 		glBindFramebuffer_(GL_FRAMEBUFFER_EXT, ptr->id);
-		glViewport(0, 0, (GLsizei)ptr->image->w, (GLsizei)ptr->image->h);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(0, (int)ptr->image->w, 0, (int)ptr->image->h, -1, 1);
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+		resetView((unsigned)ptr->image->w, (unsigned)ptr->image->h);
 	}
 }
 
 /* Unbind framebuffer object. Means, that now all graphics will be rendered to default screen. This function unbinds the current framebuffer object. */
 void framebufferUnbind(Framebuffer * ptr) {
 	FLUSH_BUFFER();
-	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, 0);
-	glViewport(0, 0, screen->w, screen->h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, screen->w, screen->h, 0, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	resetViewDefault();
 }
 
 /* Save image from framebuffer to BMP format */

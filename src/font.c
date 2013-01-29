@@ -23,11 +23,19 @@ IN THE SOFTWARE.
 
 //TODO: rich text
 
-#include <math.h>
-#include <locale.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <math.h>
+#include <SDL.h>
+
 #include "cheetah.h"
+#include "macros.h"
 #include "render.h"
+#include "vertex.h"
+
+void imageBind(Image * image);
+extern SDL_Surface *screen;
 
 /**
  * @descr Calculate width of string.

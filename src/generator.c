@@ -21,10 +21,14 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <time.h>
-#include <string.h>
+
 #include "cheetah.h"
+#include "macros.h"
 #include "render.h"
 #include "random-taus88.h"
 

@@ -21,9 +21,11 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-#include <math.h>
-#include "cheetah.h"
-#include "render.h"
+//~ #include <math.h>
+//~ #include <SDL.h>
+//~ 
+//~ #include "cheetah.h"
+//~ #include "render.h"
 
 /**
  * @descr Load image from disc with specific options.
@@ -35,7 +37,7 @@ IN THE SOFTWARE.
  *  * _i_ - load instantly without delayed resource loader
  * @return Image object
  * */
-void newParticleSystem(ParticleSystem *ptr, const char *name, const char *options) {
-	NEEDED_INIT_VOID;
-	
-}
+//~ void newParticleSystem(ParticleSystem *ptr, const char *name, const char *options) {
+	//~ NEEDED_INIT_VOID;
+	//~ 
+//~ }

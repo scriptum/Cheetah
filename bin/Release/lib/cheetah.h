@@ -150,18 +150,19 @@ enum {
 };
 struct {
 	double scaleX, scaleY, offsetX, offsetY;
-	/*оригинальные ширина и высота, относительно которых считаются все координаты*/
+	/* original (first-time defined) width and height, if auto-scale enabled*/
 	double origWidth, origHeight;
 	double aspect;
 	bool autoScale, autoScaleFont;
 } screenScale;
-typedef struct Resource {
-	Image *image;
-	unsigned char *data;
-	char *name;
-	char *options;
-	int len;
-} Resource;
+struct {
+	unsigned rescaleTime;
+	unsigned time;
+	double timed;
+	double timeOffsetd;
+	double gameSpeed;
+	unsigned resizeDelay; /* 100 ms to avoid resize blinking */
+} globalTimers;
 void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox, float oy);
 void atlasDrawxy(Atlas *p, float x, float y, float w, float h);
 unsigned int getEventType();
@@ -221,8 +222,6 @@ void move(double translateX, double translateY);
 void scale(double scaleX, double scaleY);
 void rotate(double angle);
 void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y);
-void autoScale(bool autoScale);
-void prepare();
 void blend(bool blend);
 void enableBlend();
 void disableBlend();
@@ -234,7 +233,6 @@ void circlexy(float x, float y, double rad, double segments, bool filled);
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void colorf(float r, float g, float b, float a);
 void clearColor(float r, float g, float b, float a);
-void clearScreen(bool enabled);
 void blendMode(int mode);
 void blendEquation(int mode);
 void blendFunc(int sourcefactor, int destinationfactor);
@@ -263,7 +261,6 @@ void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, f
 void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
 void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy);
 void deleteImage(Image * ptr);
-void newParticleSystem(ParticleSystem *ptr, const char *name, const char *options);
 void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver);
 void newFragmentShader(Shader * ptr, const char * frag);
 bool shaderCheck(Shader * ptr);
@@ -291,6 +288,7 @@ void vboDrawSprites(Vbo * ptr, Image * img, float size);
 Vbo * newVboPoints3(Point3 * data, unsigned int count);
 void vboDrawSprites3(Vbo * ptr, Image * img, float size);
 void deleteVbo(Vbo * ptr);
+void setWindowSize(unsigned w, unsigned h);
 bool init(const char * appName, const char * options);
 bool isInit();
 int getWindowWidth();
@@ -298,5 +296,8 @@ int getWindowHeight();
 void swapBuffers();
 void setTitle(const char * text);
 SDL_Rect **getModesSDL();
+void clearScreen(bool enabled);
+void autoScale(bool autoScale);
+void prepare();
 int (*showCursor)(int mode);
 int (*grabCursor)(int mode);

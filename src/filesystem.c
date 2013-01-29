@@ -21,10 +21,16 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
+
 #include "cheetah.h"
+#include "macros.h"
 
 void myError(const char *fmt, ...) {
 	va_list args;

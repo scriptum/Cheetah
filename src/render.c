@@ -23,10 +23,12 @@ IN THE SOFTWARE.
 
 #include <string.h>
 #include <stdio.h>
+#include <SDL.h>
+
 #include "cheetah.h"
 #include "render.h"
 
-//шейдры
+//Shaders
 // GL_ARB_shading_language_100, GL_ARB_shader_objects, GL_ARB_fragment_shader, GL_ARB_vertex_shader
 PFNGLCREATEPROGRAMOBJECTARBPROC       glCreateProgramObject_      = NULL;
 PFNGLDELETEOBJECTARBPROC              glDeleteObject_             = NULL;
