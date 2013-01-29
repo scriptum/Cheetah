@@ -171,7 +171,12 @@ void framebufferBind(Framebuffer * ptr) {
 	{
 		FLUSH_BUFFER();
 		glBindFramebuffer_(GL_FRAMEBUFFER_EXT, ptr->id);
-		resetView((unsigned)ptr->image->w, (unsigned)ptr->image->h);
+		glViewport(0, 0, (GLsizei)ptr->image->w, (GLsizei)ptr->image->h);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(0, (int)ptr->image->w, 0, (int)ptr->image->h, -1, 1);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
 	}
 }
 
