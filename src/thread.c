@@ -41,7 +41,7 @@ unsigned int getTicks() {
  * @group timer
  * */
 double getTime() {
-	return globalTimed;
+	return globalTimers.timed;
 }
 
 /**

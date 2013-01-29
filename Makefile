@@ -6,7 +6,6 @@ SOURCEDIR := $(shell find src -type d)
 
 SOURCES := $(wildcard $(addsuffix /*.c*, $(SOURCEDIR)))
 OBJECTS := $(SOURCES:.c=.o)
-PROFILING := $(SOURCES:.c=.gcda)
 HEADERS := $(wildcard $(addsuffix /*.h*, $(SOURCEDIR)))
 
 all : $(TARGET)
@@ -21,4 +20,4 @@ $(TARGET) : $(OBJECTS)
  
 clean :
 	@echo "Cleaning...";\
-	rm -f $(OBJECTS) $(PROFILING)
+	rm -f $(OBJECTS)
