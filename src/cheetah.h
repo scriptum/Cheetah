@@ -21,25 +21,10 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-
-
-
-
-#ifdef __ANDROID_API__
-#define GL_GLEXT_PROTOTYPES
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
-#else
-#include <SDL.h>
-#include <SDL_opengl.h>
-#include <search.h>
-#endif
-
-#include "macros.h"
+//~ #include <stdio.h>
+//~ #include <stdlib.h>
+//~ #include <string.h>
+//~ #include <stdarg.h>
 
 #ifndef __CHEETAH_H__
 #define __CHEETAH_H__
@@ -47,9 +32,6 @@ IN THE SOFTWARE.
 typedef unsigned char bool;
 unsigned char * loadfile(const char * filename, unsigned int * length);
 
-#ifdef _SDL_H
-extern SDL_Surface *screen;
-#endif
 
 void myError(const char *fmt, ...);
 
@@ -245,51 +227,30 @@ enum {
 
 struct {
 	double scaleX, scaleY, offsetX, offsetY;
-	/*оригинальные ширина и высота, относительно которых считаются все координаты*/
+	/* original (first-time defined) width and height, if auto-scale enabled*/
 	double origWidth, origHeight;
 	double aspect;
 	bool autoScale, autoScaleFont;
 } screenScale;
 
-typedef struct Resource {
-	Image *image;
-	unsigned char *data;
-	char *name;
-	char *options;
-	int len;
-} Resource;
+struct {
+	unsigned rescaleTime;
+	unsigned time;
+	double timed;
+	double timeOffsetd;
+	double gameSpeed;
+	unsigned resizeDelay; /* 100 ms to avoid resize blinking */
+} globalTimers;
 
-/*queue*/
-#ifdef _SDL_H
-SDL_mutex *resQueueMutex;
-#endif
+//~ void imageBind(Image * image);
+//~ void initRenderer();
 
-#define QDATA Resource
-	typedef struct node_t node_t, *node, *queue;
-	struct node_t {QDATA val; node prev, next;};
-#define QHEAD(q) q->prev
-#define QTAIL(q) q->next
-#define QEMPTY(q) !QHEAD(q)
-queue newQueue();
-queue resLoaderQueue;
-
-Resource *resShared;
-
-void imageBind(Image * image);
-void initRenderer();
-
-void resetView(int w, int h);
-
-#ifdef _SDL_H
-SDL_Event event;
-#endif
-
-extern unsigned rescaleTime;
-extern unsigned globalTime;
-extern double globalTimed;
-extern double globalTimeOffsetd;
-extern double globalGameSpeed;
-extern int resizeDelay;
+//~ extern unsigned rescaleTime;
+//~ extern unsigned globalTime;
+//~ extern double globalTimed;
+//~ extern double globalTimeOffsetd;
+//~ extern double globalGameSpeed;
+//~ extern int resizeDelay;
 
 #ifndef TRUE
 #define TRUE (bool) 1

@@ -22,9 +22,36 @@ IN THE SOFTWARE.
 *******************************************************************************/
 
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "cheetah.h"
-#include "SOIL/SOIL.h"
+#include "macros.h"
 #include "render.h"
+#include "vertex.h"
+#include "SOIL/SOIL.h"
+
+void delay();
+
+typedef struct Resource {
+	Image *image;
+	unsigned char *data;
+	char *name;
+	char *options;
+	int len;
+} Resource;
+
+#define QDATA Resource
+	typedef struct node_t node_t, *node, *queue;
+	struct node_t {QDATA val; node prev, next;};
+#define QHEAD(q) q->prev
+#define QTAIL(q) q->next
+#define QEMPTY(q) !QHEAD(q)
+queue newQueue();
+queue resLoaderQueue;
+
+Resource *resShared;
 
 /*******************************************************************************
 PRIVATE FUNCTIOS
@@ -115,6 +142,17 @@ static int dequeue(queue q, QDATA *val)
 	return 1;
 }
 
+void resLoaderInit(bool resloader)
+{
+	resLoaderQueue = NULL;
+	if(TRUE == resloader)
+	{
+		resLoaderQueue = newQueue();
+		//~ resQueueMutex = SDL_CreateMutex();
+		resShared = 0;
+	}
+}
+
 //TODO
 /**
  * Separate thread to load images
@@ -132,7 +170,7 @@ int resLoaderThread(void *unused)
 		//~ SDL_mutexP(resQueueMutex);
 		//~ empty = QEMPTY(resLoaderQueue)
 		//~ SDL_mutexV(resQueueMutex);
-		SDL_Delay(10);
+		delay(10);
 		if(!resShared && !QEMPTY(resLoaderQueue))
 		{
 			//~ printf("Queue: %d\n", QEMPTY(resLoaderQueue));
@@ -508,3 +546,4 @@ void deleteImage(Image * ptr) {
 	
 	//~ else MYERROR("Trying to free a null-image. Maybe, you did it manually?");
 }
+

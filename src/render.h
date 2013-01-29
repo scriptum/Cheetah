@@ -25,28 +25,13 @@ IN THE SOFTWARE.
 #ifndef __RENDER_H_
 #define __RENDER_H_
 
-#ifdef __ANDROID_API__
-#define GL_GLEXT_PROTOTYPES
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
-#else
 #include <SDL_opengl.h>
-#endif
 
 /***********************************GLOBALS************************************/
 
-extern GLuint quadlist, pointlist, null_texture, rect_texture, vboVer, vboTex;
-
+extern GLuint null_texture, rect_texture;
 extern GLuint prevImageId;
-
 extern bool antiAliasing;
-
-extern int vertexCounter;
-extern const float texCoordQuad[];
-extern float *texCoord;
-extern float *vertexCoord;
-volatile int verAlloc;
-
 
 #ifndef __ANDROID_API__
 

@@ -22,9 +22,13 @@ IN THE SOFTWARE.
 *******************************************************************************/
 
 #include <math.h>
+#include <string.h>
+
 #include "cheetah.h"
-#include "SOIL/SOIL.h"
 #include "render.h"
+#include "vertex.h"
+
+void imageBind(Image * image);
 
 void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox, float oy) {
 	float scalex = w/p->w;

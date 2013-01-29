@@ -23,12 +23,13 @@ IN THE SOFTWARE.
 
 #include <math.h>
 #include <string.h>
+
 #include "cheetah.h"
 #include "render.h"
+#include "vertex.h"
 
 extern void resLoaderMainThread();
-
-bool clearScreenFlag = 1;
+int getWindowHeight();
 
 unsigned prevColor = 0xffffffff;
 
@@ -135,7 +136,7 @@ void disableAlphaTest() {
 
 void setScissor(int x, int y, int w, int h) {
 	flushBuffer();
-	glScissor(x, screen->h - y - h, w, h);
+	glScissor(x, getWindowHeight() - y - h, w, h);
 }
 
 void flush() {
@@ -200,43 +201,6 @@ void translateObject(double x, double y, double angle, double width, double heig
 	if(angle) glRotated(angle, 0, 0, 1);
 	if(width != 1.0 || height != 1.0) glScalef(width, height, 1);
 	if(origin_x || origin_y) glTranslated(-origin_x/width, -origin_y/height, 0);
-}
-
-/**
- * @descr Enable or disable autoscale. Autoscale allows you to draw stuff in the fixed coordinates, and engine automatically translates all coordinates if window changes his size. Is you want to control screen size yourself, disable this.
- * @group graphics/drawing
- * @var enable or disable autoscale
- * */
-void autoScale(bool autoScale) {
-	screenScale.autoScale = autoScale;
-}
-
-static void doAutoScale()
-{
-	if(screenScale.autoScale)
-	{
-		glLoadIdentity();
-		glTranslatef(screenScale.offsetX, screenScale.offsetY, 0);
-		glScalef(screenScale.scaleX, screenScale.scaleY, 1);
-	}
-}
-
-void prepare() {
-	unsigned int delta = globalTime;
-	globalTime = SDL_GetTicks();
-	delta = globalTime - delta;
-	globalTimeOffsetd += (1.0 - globalGameSpeed) * delta / 1000.0;
-	globalTimed = globalTime / 1000.0 - globalTimeOffsetd;
-	doAutoScale();
-	resLoaderMainThread();
-	if(rescaleTime && globalTime > rescaleTime)
-	{
-		SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
-		resetView(screen->w, screen->h);
-		doAutoScale();
-		rescaleTime = 0;
-	}
-	if(clearScreenFlag) glClear(GL_COLOR_BUFFER_BIT);
 }
 
 /**
@@ -427,16 +391,6 @@ void colorf(float r, float g, float b, float a) {
  * */
 void clearColor(float r, float g, float b, float a) {
 	glClearColor(r,g,b,a);
-}
-
-/**
- * @descr Toggle auto-clear screen. Disable auto-clear if you want to do it manually or you have fullscreen background.
- * @group graphics/drawing
- * @var enable or disable
- * @see clear
- * */
-void clearScreen(bool enabled) {
-	clearScreenFlag = enabled;
 }
 
 /**
