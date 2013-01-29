@@ -149,7 +149,7 @@ bool init(const char * appName, const char * options) {
 	//~ glDepthRange(-10000,10000);
 	if(TRUE == firstrun)
 	{
-		/*two vertex buffers*/
+		/* two main vertex buffers */
 		vertexCounter = 0;
 		new(texCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
 		new(vertexCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);

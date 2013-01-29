@@ -21,7 +21,6 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-//~ #include <SDL_opengl.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -31,8 +30,6 @@ IN THE SOFTWARE.
 #include "render.h"
 #include "vertex.h"
 #include "image_write.h"
-
-//~ extern SDL_Surface *screen;
 
 void resetView(unsigned w, unsigned h);
 void resetViewDefault();
