@@ -392,6 +392,7 @@ void fontSetGlyph(Font *ptr, const char *line) {
 		new0(fch, FontChar, 1);
 		FontHash_set((FontHash*)ptr->hash, '\n', fch);
 		fch = NULL;
+		ptr->mem += sizeof(FontHash) + sizeof(Font) + sizeof(FontChar) * 2 + FontHash_size((FontHash*)ptr->hash) * sizeof(FontHashNode);
 	}
 	new0(fch, FontChar, 1);
 	x1 = x1 / (float)ptr->image->w;
@@ -406,6 +407,7 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	memcpy(fch->t, tex, sizeof(tex));
 	fch->w = w;
 	FontHash_set((FontHash*)ptr->hash, c, fch);
+	ptr->mem += sizeof(FontChar);
 	if(' ' == c)
 	{
 		ptr->spacew = w;
@@ -413,6 +415,7 @@ void fontSetGlyph(Font *ptr, const char *line) {
 		new0(fch, FontChar, 1);
 		fch->w = w * 8;
 		FontHash_set((FontHash*)ptr->hash, '\t', fch);
+		ptr->mem += sizeof(FontChar);
 	}
 	ptr->height = h;
 }
