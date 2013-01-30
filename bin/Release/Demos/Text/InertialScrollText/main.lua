@@ -9,8 +9,9 @@ C.newFont('dejavuDF.fnt', true)
 local f = C.fonts["DejaVu Sans"][21]
 --load DF shader
 local dfshader = C.newShader('distance_field.glsl')
---just put it there
+--load text as string
 local str = C.getFile('bigtext.txt')
+-------------------------------SCROLL TEXT ENTITY-------------------------------
 local textarea = E:new(screen)
 :set({
 	fontScale = 0.5, --50% font scale (21/2=10pt)
@@ -34,7 +35,7 @@ local textarea = E:new(screen)
 	dfshader:bind()
 	dfshader:set('gamma', s.gamma)
 	dfshader:set('sharpness', s.sharpness / s.fontScale)
-	f:scale(s.fontScale)
+	f:setScale(s.fontScale)
 	f:print(str,s.x,s.y - s._offset / s.fontScale,s.w, C.alignJustify)
 	dfshader:unbind()
 end):size(C.getWindowWidth(),C.getWindowHeight())
@@ -59,12 +60,14 @@ end)
 		s._velocity = s._velocity + 10
 	end
 end)
+-----------------------------END SCROLL TEXT ENTITY-----------------------------
 --when window resizes, resize texarea too
 lQuery.onresize(function()
 	textarea:size(C.getWindowWidth(),C.getWindowHeight())
 end)
 
 local fontScaleStep = 1.1
+--some key bindings
 screen:keypress(function(s, key)
 	if key == "a" then
 		textarea:stop():animate({fontScale = textarea.fontScale * fontScaleStep})
