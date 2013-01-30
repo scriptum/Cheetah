@@ -146,7 +146,7 @@ void fontPrintf(Font *currentFont, const unsigned char * str, float x, float y, 
 	int       spaces       = -1;
 	int       increment    = 0;
 	int       incrementBuf = 0;
-	unsigned  c;
+	unsigned  c            = 0;
 	float     w            = 0.0;
 	float     h            = 0.0;
 	float     lastw        = 0.0;
@@ -185,30 +185,30 @@ void fontPrintf(Font *currentFont, const unsigned char * str, float x, float y, 
 		while(TRUE)
 		{
 			UNICODE_TO_INT(str, i, increment)
-			FontChar *fch = FontHash_get(hash, c);
-			if(NULL == fch)
-			{
-				i += increment;
-				continue;
-			}
 			switch(c)
 			{
 				case ' ':
-						last_space = i;
-						lastw = w;
-						spaces++;
-						w += spacew;
-						break;
+					last_space = i;
+					lastw = w;
+					spaces++;
+					w += spacew;
+					break;
 				case '\t':
-						w += spacew * 8;
-						last_space = i;
-						lastw = w;
-						break;
+					w += spacew * 8;
+					last_space = i;
+					lastw = w;
+					break;
 				case '\0':
-						end = TRUE;
-						break;
+					end = TRUE;
+					break;
 				default:
-						w += fch->w;
+					ch = FontHash_get(hash, c);
+					if(NULL == ch)
+					{
+						i += increment;
+						continue;
+					}
+					w += ch->w;
 			}
 			if(w > maxw || '\n' == c || TRUE == end)
 			{
@@ -234,16 +234,15 @@ void fontPrintf(Font *currentFont, const unsigned char * str, float x, float y, 
 						break;
 						default: x = 0;
 				}
-				if(buf == last_space) last_space++;
+				if(buf == last_space)
+					last_space++;
+				/* dropping invisible lines from top */
 				if((y + oldy + fontHeight) * currentFont->_scale > 0)
 				{
 					while(buf < last_space)
 					{
-						UNICODE_TO_INT(str,buf,incrementBuf)
-						ch = FontHash_get(hash, c);
+						UNICODE_TO_INT(str, buf, incrementBuf)
 						buf += incrementBuf;
-						if(NULL == ch)
-							continue;
 						if('\t' == c)
 								x += spacew * 8;
 						else if(' ' == c)
@@ -255,6 +254,9 @@ void fontPrintf(Font *currentFont, const unsigned char * str, float x, float y, 
 						}
 						else
 						{
+							ch = FontHash_get(hash, c);
+							if(NULL == ch)
+								continue;
 							DRAW_CHAR;
 						}
 					}
@@ -265,8 +267,9 @@ void fontPrintf(Font *currentFont, const unsigned char * str, float x, float y, 
 					break;
 				x = 0;
 				y += fontHeight;
-				/* fast dropping invisible lines */
-				if((y + oldy) * currentFont->_scale > screen->h) break;
+				/* dropping invisible lines from buttom */
+				if((y + oldy) * currentFont->_scale > screen->h)
+					break;
 				h = ceil(y);
 				increment = 0;
 				if(' ' == str[buf] || '\t' == str[buf] || '\n' == str[buf])
@@ -385,6 +388,9 @@ void fontSetGlyph(Font *ptr, const char *line) {
 		ptr->hash = (void *)FontHash_new();
 		new0(fch, FontChar, 1);
 		FontHash_set((FontHash*)ptr->hash, '\0', fch);
+		fch = NULL;
+		new0(fch, FontChar, 1);
+		FontHash_set((FontHash*)ptr->hash, '\n', fch);
 		fch = NULL;
 	}
 	new0(fch, FontChar, 1);
