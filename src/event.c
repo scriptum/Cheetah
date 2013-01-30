@@ -36,24 +36,24 @@ unsigned int getEventType() {
 	/* skip unneeded events */
 	while(SDL_PollEvent(&event)) {
 		switch(event.type) {
-			case SDL_QUIT: return 1;
-			case SDL_KEYDOWN: return 2;
-			case SDL_KEYUP: return 3;
-			case SDL_MOUSEBUTTONDOWN: return 4;
-			case SDL_MOUSEBUTTONUP: return 5;
-			case SDL_VIDEORESIZE: 
+			case SDL_QUIT:			return 1;
+			case SDL_KEYDOWN:		return 2;
+			case SDL_KEYUP:			return 3;
+			case SDL_MOUSEBUTTONDOWN:	return 4;
+			case SDL_MOUSEBUTTONUP:		return 5;
+			case SDL_VIDEORESIZE:
 				recomputeScreenScale(event.resize.w, event.resize.h);
 				globalTimers.rescaleTime = globalTimers.time + globalTimers.resizeDelay;
 				setWindowSize(event.resize.w, event.resize.h);
-				return 6;
+							return 6;
 			/* TODO to do something here */
-			case SDL_VIDEOEXPOSE: return 7;
-			case SDL_ACTIVEEVENT: return 8;
+			case SDL_VIDEOEXPOSE:		return 7;
+			case SDL_ACTIVEEVENT:		return 8;
 			case SDL_JOYAXISMOTION:
 			case SDL_JOYBALLMOTION:
 			case SDL_JOYHATMOTION:
 			case SDL_JOYBUTTONDOWN:
-			case SDL_JOYBUTTONUP: return 9;
+			case SDL_JOYBUTTONUP:		return 9;
 		}
 	}
 	return 0;

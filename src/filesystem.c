@@ -49,24 +49,23 @@ bool isPointer(void * ptr) {
 unsigned char * loadfile(const char * filename, unsigned int * length) {
 	unsigned char * result = NULL;
 	size_t size = 0;
-	FILE *f = fopen(filename, "rb");
-	if (!f) {
-		myError("can't load file %s", filename);
-		return 0;
-	}
-	fseek(f, 0, SEEK_END);
-	size = ftell(f);
-	fseek(f, 0, SEEK_SET);
+	FILE *file = fopen(filename, "rb");
+	ERROR_IF_NULL(file);
+	fseek(file, 0, SEEK_END);
+	size = ftell(file);
+	fseek(file, 0, SEEK_SET);
 	new(result, unsigned char, size);
-	if (size != fread(result, sizeof(unsigned char), size, f)) {
-		free(result);
-		myError("can't load file %s", filename);
-		return 0;
+	if (size != fread(result, sizeof(unsigned char), size, file)) {
+		goto error;
 	}
 	if (length)
 		*length = size;
-	fclose(f);
+	fclose(file);
 	return result;
+error:
+	delete(result);
+	myError("can't load file %s", filename);
+	return NULL;
 }
 
 #define filetime(var) int file ## var ## time(const char * filename) {         \
@@ -91,10 +90,10 @@ int filectime(const char * filename) {
 #endif
 
 DIR *openDir(const char *name) {
-	return opendir (name);
+	return opendir(name);
 }
 
-struct dirent *readDir (DIR *dirp) {
+struct dirent *readDir(DIR *dirp) {
 	return readdir(dirp);
 }
 

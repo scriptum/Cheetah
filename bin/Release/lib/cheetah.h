@@ -1,29 +1,34 @@
 typedef struct SDL_Rect {
-	short x, y;
-	unsigned short w, h;
+	short		x, y;
+	unsigned short	w, h;
 } SDL_Rect;
 struct {
-	unsigned int flags;
-	void *format;
-	int w, h;
-	unsigned short pitch;
-	void *pixels;
-	int offset;
+	unsigned int	flags;
+	void		*format;
+	int		w, h;
+	unsigned short	pitch;
+	void		*pixels;
+	int		offset;
 	struct private_hwdata *hwdata;
-	SDL_Rect clip_rect;
-	unsigned int unused1;
-	unsigned int locked;
+	SDL_Rect	clip_rect;
+	unsigned int	unused1;
+	unsigned int	locked;
 	struct SDL_BlitMap *map;
-	unsigned int format_version;
-	int refcount;
+	unsigned int	ormat_version;
+	int		refcount;
 } screen;
 typedef struct __dirstream {
 } DIR;
 struct {
-	char GLSL, BE, FBO, VBO, MT, PS;
+	bool		GLSL;
+	bool		BE;
+	bool		FBO;
+	bool		VBO;
+	bool		MT;
+	bool		PS;
 } supported;
 typedef struct Color {
-	unsigned char r, g, b, a;
+	unsigned char	r, g, b, a;
 } Color;
 typedef struct Point {
 	float x, y;
@@ -32,93 +37,101 @@ typedef struct Point3 {
 	float x, y, z;
 } Point3;
 typedef struct Image {
-	char *name;
-	char *options;
+	char		*name;
+	char		*options;
 	/* OpenGL texture id */
-	unsigned id;
+	unsigned	id;
 	/* width and height */
-	float w, h;
-	int channels;
-	int queued;
+	float		w, h;
+	int		channels;
+	int		queued;
 } Image;
 typedef struct ImageData {
-	int w, h, channels;
-	char *data;
+	int		w, h, channels;
+	char		*data;
 } ImageData;
 typedef struct BorderImage {
-	Image * image;
+	Image		*image;
 	/* image borders */
-	float top, right, bottom, left;
-	/* draw border only, without center */
-	bool borderOnly;
+	float		top;
+	float		right;
+	float		bottom;
+	float		left;
+	/* draw border only, without central part */
+	bool		borderOnly;
 } BorderImage;
 typedef struct Multitexture {
-	float w, h;
-	int size;
-	Image **images;
+	float		w, h;
+	int		size;
+	Image 		**images;
 } Multitexture;
 typedef struct ParticleForce {
-	unsigned maxParticles;
+	unsigned	maxParticles;
 } ParticleForce;
 typedef struct ParticleSystem {
-	ParticleForce *forces;
-	Point *position;
-	Point *speed;
-	Point emitterPosition;
-	unsigned maxParticles;
-	float direction;
-	float directionVariation;
-	float scale;
-	float scaleVariation;
-	unsigned emissionRate;
-	float gravity;
-	unsigned lifeTime;
-	Color color;
-	Color colorVariation;
+	ParticleForce	*forces;
+	Point		*position;
+	Point		*speed;
+	Point		emitterPosition;
+	unsigned	maxParticles;
+	float		direction;
+	float		directionVariation;
+	float		scale;
+	float		scaleVariation;
+	unsigned	emissionRate;
+	float		gravity;
+	unsigned	lifeTime;
+	Color		color;
+	Color		colorVariation;
 } ParticleSystem;
 typedef struct Atlas {
-	Image *image;
+	Image		*image;
 	/* original width and height */
-	float w, h;
+	float		w, h;
 	/* atlas width and height */
-	float aw, ah;
+	float		aw, ah;
 	/* offset on atlas*/
-	float x, y;
+	float		x, y;
 	/*texture coordinates*/
-	float tex[8];
+	float		tex[8];
 } Atlas;
 typedef struct Framebuffer {
-	unsigned id;
-	Image *image;
+	unsigned	id;
+	Image		*image;
 } Framebuffer;
 typedef struct FontChar
 {
 	/* Width of char */
-	float w;
-	float v[4], t[4];
+	float		w;
+	float		v[4];
+	float		t[4];
 } FontChar;
 typedef struct Font {
-	Image *image;
-	float _scale, height, _interval, spacew;
-	FontChar ***chars;
-	int allocated;
-	int mem;
-	bool scalable, unicode;
+	Image		*image;
+	float		_scale;
+	float		height;
+	float		_interval;
+	float		spacew;
+	FontChar	***chars;
+	int		allocated;
+	int		mem;
+	bool		scalable;
+	bool		unicode;
 } Font;
 typedef struct Shader {
-	unsigned int id;
+	unsigned	id;
 } Shader;
 typedef struct _Tilemap {
-	int w, h;            // size in tiles
-	int tw, th;          // single tile size
-	float **index;       // texture coords index
-	unsigned char **map; // tile indexes map
-	int scalable;        // should tilemap be scaled to screen size or drawed per-pixel
-	Image *img;
+	int		w, h;            // size in tiles
+	int		tw, th;          // single tile size
+	float		**index;       // texture coords index
+	unsigned char	**map; // tile indexes map
+	int		scalable;        // should tilemap be scaled to screen size or drawed per-pixel
+	Image		*img;
 } Tilemap;
 typedef struct Vbo {
-	unsigned int id, count, tex;
-	Point *data;
+	unsigned	id, count, tex;
+	Point		*data;
 } Vbo;
 enum {
 	blend_alpha,
@@ -149,19 +162,24 @@ enum {
 	align_justify
 };
 struct {
-	double scaleX, scaleY, offsetX, offsetY;
+	double		scaleX;
+	double		scaleY;
+	double		offsetX;
+	double		offsetY;
 	/* original (first-time defined) width and height, if auto-scale enabled*/
-	double origWidth, origHeight;
-	double aspect;
-	bool autoScale, autoScaleFont;
+	double		origWidth;
+	double		origHeight;
+	double		aspect;
+	bool		autoScale;
+	bool		autoScaleFont;
 } screenScale;
 struct {
-	unsigned rescaleTime;
-	unsigned time;
-	double timed;
-	double timeOffsetd;
-	double gameSpeed;
-	unsigned resizeDelay; /* 100 ms to avoid resize blinking */
+	unsigned	rescaleTime;
+	unsigned	time;
+	double		timed;
+	double		timeOffsetd;
+	double		gameSpeed;
+	unsigned	resizeDelay;
 } globalTimers;
 void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox, float oy);
 void atlasDrawxy(Atlas *p, float x, float y, float w, float h);
@@ -185,7 +203,7 @@ int fileatime(const char * filename);
 int filemtime(const char * filename);
 int filectime(const char * filename);
 DIR *openDir(const char *name);
-struct dirent *readDir (DIR *dirp);
+struct dirent *readDir(DIR *dirp);
 int closeDir(DIR *dirp);
 bool isDir(const char *name);
 bool mkDir(const char * path);

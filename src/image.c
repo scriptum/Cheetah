@@ -67,7 +67,7 @@ static unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 	if(TRUE == clamp)
 		flags = 0;
 	tex_id = SOIL_direct_load_DDS_from_memory(img, 0, flags, 0);
-	if(!tex_id)
+	if(0 == tex_id)
 		tex_id = SOIL_internal_create_OGL_texture(
 			img, width, height, channels,
 			0, flags,
@@ -92,11 +92,7 @@ static unsigned char * loadImageData(const char *name, int *width, int *height, 
 	unsigned char *myBuf;
 	NEEDED_INIT;
 	myBuf = loadfile(name, &file_size);
-	if(!myBuf)
-	{
-		MYERROR("cannot load image: empty file %s", name);
-		return NULL;
-	}
+	ERROR_IF_NULL(myBuf);
 	img = SOIL_load_image_from_memory(
 				myBuf, sizeof(unsigned char) * file_size,
 				width, height, channels,
@@ -104,6 +100,9 @@ static unsigned char * loadImageData(const char *name, int *width, int *height, 
 	if(img != myBuf)
 		delete(myBuf);
 	return img;
+error:
+	myError("cannot load image: empty file %s", name);
+	return NULL;
 }
 
 queue newQueue()
@@ -132,11 +131,12 @@ static int dequeue(queue q, QDATA *val)
 {
 	//~ SDL_mutexP(resQueueMutex);
 	node tmp = QHEAD(q);
-	if (!tmp) return 0;
+	if (NULL == tmp)
+		return 0;
 	*val = tmp->val;
-	//~ printf("%s\n", tmp->val.image->name);
 	QHEAD(q) = tmp->next;
-	if (QTAIL(q) == tmp) QTAIL(q) = 0;
+	if (QTAIL(q) == tmp)
+		QTAIL(q) = 0;
 	free(tmp);
 	//~ SDL_mutexV(resQueueMutex);
 	return 1;
@@ -229,11 +229,7 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *name
 	if(mask_img)
 	{
 		new_img = (unsigned char *)malloc(sizeof(unsigned char) * img_len * 4);
-		if(!new_img)
-		{
-			MYERROR("Cannot create mask image!");
-			return NULL;
-		}
+		ERROR_IF_NULL(new_img);
 		for(x = y = i = j = mask_step = img_step = 0; i < img_len; i++)
 		{
 			new_img[j++] = img[img_step++];
@@ -250,7 +246,8 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *name
 			{
 				x = mask_step = 0;
 				y++;
-				if(y >= mask_h) y = 0;
+				if(y >= mask_h)
+					y = 0;
 			}
 		}
 		free(mask_img);
@@ -258,6 +255,9 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *name
 		return new_img;
 	}
 	free(mask_name);
+	return NULL;
+error:
+	MYERROR("Cannot create mask image!");
 	return NULL;
 }
 
@@ -378,7 +378,7 @@ void newImageRaw(Image *ptr, int width, int height, const char *data, const char
 	else
 		TEX_REPEAT;
 	glTexImage2D(GL_TEXTURE_2D, level, format, width, height, border,
-							format, GL_UNSIGNED_BYTE, (void *)data);
+		format, GL_UNSIGNED_BYTE, (void *)data);
 	ptr->w = (float)width;
 	ptr->h = (float)height;
 	ptr->id = tex_id;

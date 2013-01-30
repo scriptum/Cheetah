@@ -40,7 +40,7 @@ void newImageRaw(Image *, int, int, const char *, const char *);
 for(j = h / 2; j < h; j++)                                                     \
 	for(i = 0; i <= w / 2; i++)                                                  \
 		*((int*)(buf + (j * h + i) * channels)) =                                  \
-														*((int*)(buf + ((h - j - 1) * h + i) * channels)); \
+		*((int*)(buf + ((h - j - 1) * h + i) * channels)); \
 for(j = 0; j < h; j++)                                                         \
 	for(i = w / 2; i < w; i++)                                                   \
 		if(channels == 3)                                                          \
@@ -96,33 +96,39 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 			*((int*)(buf + i * channels)) = rt88_trand(taus88);
 	}
 	#define COLOR_LIGHT                                                          \
-		if(channels==3) {                                                          \
+		if(channels == 3) {                                                          \
 			c = c | c << 8 | c << 16;                                                \
 			*((int*)(buf + (j * h + i) * channels)) = c;                             \
 		} else {                                                                   \
-			c = 0xffffff | c<<24;                                                    \
+			c = 0xffffff | c << 24;                                                  \
 			*((int*)(buf + (j * h + i) * channels)) = c;                             \
 		}
-	#define LIGHT c = 255 - 2 * 255 * sqrtf(DISTANCE);                           \
-		if (c < 0) c = 0;
 	else if(strcmp(imageType, "light") == 0) {
 		NEW;
-		LOOP_CIRCLE(LIGHT COLOR_LIGHT)
+		LOOP_CIRCLE(
+			c = 255 - 2 * 255 * sqrtf(DISTANCE);
+			if (c < 0)
+				c = 0;
+			COLOR_LIGHT
+		)
 	}
-	#define LIGHTEXP c = 255 * expf (- DISTANCE * MAGICK_CONSTANT);
 	else if(strcmp(imageType, "lightexp") == 0) {
 		NEW;
-		LOOP_CIRCLE(LIGHTEXP
-			COLOR_LIGHT)
+		LOOP_CIRCLE(
+			c = 255 * expf (- DISTANCE * MAGICK_CONSTANT);
+			COLOR_LIGHT
+		)
 	}
-	#define CIRCLE_COLOR                                                         \
-		c = (i - w / 2) * (i - w / 2) +                                            \
-		(j - h / 2) * (j - h / 2);                                                 \
-		if(c > (w / 4 * w)) c = 0; else c = 0xffffffff;                            \
-		*((int*)(buf + (j * h + i) * channels)) = c;
 	else if(strcmp(imageType, "circle") == 0) {
 		NEW;
-		LOOP_CIRCLE(CIRCLE_COLOR)
+		LOOP_CIRCLE(
+			c = (i - w / 2) * (i - w / 2) + (j - h / 2) * (j - h / 2);
+			if(c > (w / 4 * w))
+				c = 0;
+			else
+				c = 0xffffffff;
+			*((int*)(buf + (j * h + i) * channels)) = c;
+		)
 	}
 	else
 	{
