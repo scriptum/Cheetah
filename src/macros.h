@@ -138,7 +138,10 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);                  \
 #define vars(v) printf(DEBUG_MSG_FORMAT " %s = %s\n", LOCATION, #v, v);
 #define varf(v) printf(DEBUG_MSG_FORMAT " %s = %f\n", LOCATION, #v, v);
 
-/**********************************INIT ASSERT*********************************/
+/********************************ERROR CHECKING********************************/
+
+#define ERROR_IF_NULL(name) if(NULL == name) goto error
+
 bool isInit();
 
 #define _NEEDED_INIT_STR MYERROR("call init function before!")

@@ -38,7 +38,7 @@ static bool checkFramebufferStatus()
 {
 	GLenum status;
 	const char *error;
-	status = (GLenum) glCheckFramebufferStatus_(GL_FRAMEBUFFER_EXT);
+	status = (GLenum)glCheckFramebufferStatus_(GL_FRAMEBUFFER_EXT);
 	switch(status) {
 		case GL_FRAMEBUFFER_COMPLETE_EXT:
 			return TRUE;
@@ -110,20 +110,20 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 	
 	/* save current fbo */
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING_EXT, &current_fbo);
-	
+
 	new(ptr, Image, 1);
 	ptr->w = width;
 	ptr->h = height;
-	
+
 	/* generate texture save target */
 	glGenTextures(1, &ptr->id);
 	TEXTURE_BIND(ptr->id);
-	
+
 	if(TRUE == nearest)
 		TEX_NEAREST;
 	else 
 		TEX_LINEAR;
-	
+
 	if(TRUE == clamp)
 		TEX_CLAMP;
 	else 
@@ -131,7 +131,7 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 	
 	glTexImage2D(GL_TEXTURE_2D, 0, internal, width, height, 0, GL_RGBA, format, 0);
 	//~ glBindTexture(GL_TEXTURE_2D, 0);
-	
+
 	/* create framebuffer */
 	glGenFramebuffers_(1, &fboptr->id);
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, fboptr->id);
@@ -162,7 +162,8 @@ bool framebufferCheck(Framebuffer * ptr) {
 	return ptr->id;
 }
 
-/* Bind framebuffer object. Means, that now all graphics will be rendered to this framebuffer. */
+/* Bind framebuffer object. Means, that now all graphics will be rendered to
+ * this framebuffer. */
 void framebufferBind(Framebuffer * ptr) {
 	if(ptr->id)
 	{
@@ -177,7 +178,8 @@ void framebufferBind(Framebuffer * ptr) {
 	}
 }
 
-/* Unbind framebuffer object. Means, that now all graphics will be rendered to default screen. This function unbinds the current framebuffer object. */
+/* Unbind framebuffer object. Means, that now all graphics will be rendered to
+ * default screen. This function unbinds the current framebuffer object. */
 void framebufferUnbind(Framebuffer * ptr) {
 	FLUSH_BUFFER();
 	resetViewDefault();
@@ -203,5 +205,6 @@ void deleteFramebuffer(Framebuffer * ptr) {
 		glDeleteFramebuffers_(1, &ptr->id);
 		delete(ptr->image);
 	}
-	else myError("Trying to free a null-framebuffer. Maybe, you did it manually?");
+	else
+		myError("Trying to free a null-framebuffer. Maybe, you did it manually?");
 }

@@ -112,7 +112,7 @@ typedef struct BorderImage {
 	float		right;
 	float		bottom;
 	float		left;
-	/* draw border only, without center */
+	/* draw border only, without central part */
 	bool		borderOnly;
 } BorderImage;
 

@@ -37,7 +37,7 @@ void main()\
 	TexCoord = gl_MultiTexCoord0.xy;\
 }";
 
-static int compile(GLuint shader, const char* name)
+static bool compile(GLuint shader, const char* name)
 {
 	GLint compiled;
 	GLint blen = 0;
@@ -55,9 +55,9 @@ static int compile(GLuint shader, const char* name)
 			myError("Error while compiling shader %s: %s\n", name, compiler_log);
 			delete(compiler_log);
 		}
-		return 0;
+		return FALSE;
 	}
-	return 1;
+	return TRUE;
 }
 
 void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
@@ -75,9 +75,9 @@ void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
 	f = glCreateShaderObject_(GL_FRAGMENT_SHADER);
 	glShaderSource_(v, count, &ver, NULL);
 	glShaderSource_(f, count, &pix, NULL);
-	if(!compile(v, "string_shader"))
+	if(FALSE == compile(v, "string_shader"))
 		return;
-	if(!compile(f, "string_shader"))
+	if(FALSE == compile(f, "string_shader"))
 	{
 		glDeleteObject_(v);
 		return;
@@ -90,7 +90,7 @@ void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
 	glGetProgramiv_(p, GL_LINK_STATUS, &linked);
 	glDeleteObject_(v);
 	glDeleteObject_(f);
-	if (!linked)
+	if (0 == linked)
 	{
 		myError("Error while linking shader\n");
 		return;

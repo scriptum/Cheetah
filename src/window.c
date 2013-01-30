@@ -94,8 +94,10 @@ bool init(const char * appName, const char * options) {
 		SDL_EnableUNICODE(1);
 		//~ SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
-		if(TRUE == depth) SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-		if(TRUE == stencil) SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+		if(TRUE == depth)
+			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+		if(TRUE == stencil)
+			SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 		firstrun = TRUE;
 		/*Set screen auto-scale properties*/
 		screenScale.origWidth = width;
@@ -106,7 +108,7 @@ bool init(const char * appName, const char * options) {
 		screenScale.scaleY = 1.0f;
 		screenScale.offsetX = 0.0f;
 		screenScale.offsetY = 0.0f;
-		screenScale.aspect = (float)width/height;
+		screenScale.aspect = (float)width / height;
 	}
 	if(NULL != appName)
 		SDL_WM_SetCaption(appName, appName);
@@ -149,30 +151,29 @@ bool init(const char * appName, const char * options) {
 	//~ glDepthRange(-10000,10000);
 	if(TRUE == firstrun)
 	{
-		/* two main vertex buffers */
-		vertexCounter = 0;
-		new(texCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
-		new(vertexCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
-
-		glGenTextures(1, &rect_texture);
-		glBindTexture(GL_TEXTURE_2D, rect_texture);
-		TEX_CLAMP;
-		TEX_LINEAR;
-		/*
-		 * Texture for drawing device independent anti-aliased rectangle:
+		/* Texture for drawing device independent anti-aliased rectangle:
 		 * 0000
 		 * 0110
 		 * 0110
 		 * 0000
 		 * */
+		glGenTextures(1, &rect_texture);
+		glBindTexture(GL_TEXTURE_2D, rect_texture);
+		TEX_CLAMP;
+		TEX_LINEAR;
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4, 4, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 		"\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0\377"
 		"\377\377\377\377\377\377\377\377\377\377\0\377\377\377\0\377\377\377\377"
 		"\377\377\377\377\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0"
 		"\377\377\377\0");
+
+		/* create two main vertex buffers */
+		vertexCounter = 0;
+		new(texCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
+		new(vertexCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		/* fix vertex pointers to fixed memory area */
+		/* fix vertex pointers to main memory area */
 		glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
 		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
 	}
