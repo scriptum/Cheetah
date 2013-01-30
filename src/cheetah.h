@@ -178,7 +178,7 @@ typedef struct Font {
 	float		height;
 	float		_interval;
 	float		spacew;
-	FontChar	***chars;
+	void		*hash;
 	int		allocated;
 	int		mem;
 	bool		scalable;
