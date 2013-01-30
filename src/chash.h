@@ -113,4 +113,8 @@ inline bool hashName##_set(hashName *hash, keyType key, valType value) {       \
                                                                                \
 inline unsigned hashName##_length(hashName *hash) {                            \
     return hash->items;                                                        \
+}                                                                              \
+                                                                               \
+inline unsigned hashName##_size(hashName *hash) {                              \
+    return hash->size + 1;                                                     \
 }
