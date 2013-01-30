@@ -92,7 +92,7 @@ float Font_Width(Font *f, register const char *str)
 	texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];            \
 	texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];            \
 	texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];            \
-	w = ceil(x);                                                                 \
+	w = ceilf(x);                                                                 \
 	vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0] + w;    \
 	vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;  \
 	vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;  \
