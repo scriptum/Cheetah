@@ -171,18 +171,14 @@ void fontPrintf(Font *currentFont, const unsigned char * str, float x, float y, 
 	x = h = y = 0.0;
 
 	imageBind(currentFont->image);
-	#define CHAR_NOT_EXISTS (NULL == currentFont->chars[high] || NULL == currentFont->chars[high][low])
+	#define CHAR_NOT_EXISTS (high > currentFont->allocated || NULL == currentFont->chars[high] || NULL == currentFont->chars[high][low])
 	if(maxw > 0.0)
 	{
 		while(TRUE)
 		{
 			UNICODE_TO_INT(str, i, increment)
 			c = low | (high << 8);
-			if(CHAR_NOT_EXISTS)
-			{
-				i += increment;
-				continue;
-			}
+			
 			switch(c)
 			{
 				case ' ':
@@ -200,6 +196,11 @@ void fontPrintf(Font *currentFont, const unsigned char * str, float x, float y, 
 						end = TRUE;
 						break;
 				default:
+						if(CHAR_NOT_EXISTS)
+						{
+							i += increment;
+							continue;
+						}
 						w += currentFont->chars[high][low]->w;
 			}
 			if(w > maxw || '\n' == c || TRUE == end)
@@ -234,8 +235,7 @@ void fontPrintf(Font *currentFont, const unsigned char * str, float x, float y, 
 						UNICODE_TO_INT(str,buf,incrementBuf)
 						c = low | (high << 8);
 						buf += incrementBuf;
-						if(CHAR_NOT_EXISTS)
-							continue;
+						
 						if('\t' == c)
 								x += spacew * 8;
 						else if(' ' == c)
@@ -247,6 +247,8 @@ void fontPrintf(Font *currentFont, const unsigned char * str, float x, float y, 
 						}
 						else
 						{
+							if(CHAR_NOT_EXISTS)
+								continue;
 							ch = currentFont->chars[high][low];
 							DRAW_CHAR;
 						}
