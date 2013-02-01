@@ -45,7 +45,7 @@ for(j = 0; j < h; j++)                                                         \
 	for(i = w / 2; i < w; i++)                                                   \
 		if(channels == 3)                                                          \
 		{                                                                          \
-			*((int*)(buf + (j * h +          i)  * channels)) =                      \
+			*((int*)(buf + (j * h +          i)  * channels)) |=                      \
 			*((int*)(buf + (j * h + (w - i - 1)) * channels)) & 0xffffff;            \
 		}                                                                          \
 		else                                                                       \
@@ -83,7 +83,7 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 			channels = 4; new(buf, char, w * h * channels);                          \
 		}                                                                          \
 		else {                                                                     \
-			channels = 3; new(buf, char, w * h * channels + 1);                      \
+			channels = 3; new0(buf, char, w * h * channels + 1);                      \
 		}                                                                          \
 	} while(0)
 	if(strcmp(imageType, "dummy") == 0) {
@@ -98,7 +98,7 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 	#define COLOR_LIGHT                                                          \
 		if(channels == 3) {                                                          \
 			c = c | c << 8 | c << 16;                                                \
-			*((int*)(buf + (j * h + i) * channels)) = c;                             \
+			*((int*)(buf + (j * h + i) * channels)) |= c;                             \
 		} else {                                                                   \
 			c = 0xffffff | c << 24;                                                  \
 			*((int*)(buf + (j * h + i) * channels)) = c;                             \
