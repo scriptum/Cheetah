@@ -1,11 +1,11 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Test', 800, 600, 32, '')
+C.init('Test', '800x600')
 C.printFPS = true
 local img = C.generate('light', 4, 4)
 
-C.blendMode(1)
+C.blendMode(C.blendAdditive)
 --~ C.gameSpeed(5)
 for i=1,10000 do
 	E:new(screen)
@@ -17,9 +17,5 @@ for i=1,10000 do
 		s:animate({x=math.random(0,800-img.w),y=math.random(0,600-img.h)})
 	end)
 end
-
-E:new(screen):fps():delay(function()collectgarbage()
---~ C.gameSpeed(0.2)
-end)
 
 C.mainLoop()

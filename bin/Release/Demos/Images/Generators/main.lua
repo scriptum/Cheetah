@@ -2,7 +2,7 @@ require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
 local scr_w, scr_h = 640, 400
-C.init('Generators', scr_w, scr_h, 32, '')
+C.init('Generators', scr_w..'x'..scr_h)
 
 local generators = {'dummy', 'noise', 'light', 'lightexp', 'circle'}
 local sizes = {16, 64, 128}
