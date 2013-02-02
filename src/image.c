@@ -2,21 +2,21 @@
 
 Copyright (c) 2012-2013 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to 
-deal in the Software without restriction, including without limitation the 
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-sell copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions:  The above 
-copyright notice and this permission notice shall be included in all copies 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:  The above
+copyright notice and this permission notice shall be included in all copies
 or substantial portions of the Software.
- 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 
 *******************************************************************************/
@@ -126,7 +126,7 @@ static void enqueue(queue q, QDATA n)
 	//~ printf("%d\n", QEMPTY(resLoaderQueue));
 	//~ SDL_mutexV(resQueueMutex);
 }
- 
+
 static int dequeue(queue q, QDATA *val)
 {
 	//~ SDL_mutexP(resQueueMutex);
@@ -257,7 +257,7 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *name
 	free(mask_name);
 	return NULL;
 error:
-	MYERROR("Cannot create mask image!");
+	myError("Cannot create mask image!");
 	return NULL;
 }
 
@@ -304,7 +304,7 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 	NEEDED_INIT_VOID;
 	if(!name)
 	{
-		MYERROR("empty filename");
+		myError("empty filename");
 		return;
 	}
 	CHECK_OPTION(options, instant);
@@ -314,7 +314,7 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 		img = loadImageData(name, &width, &height, &channels);
 		if(img == NULL)
 		{
-			MYERROR("can't load image %s", name);
+			myError("can't load image %s", name);
 			return;
 		}
 		if(TRUE == mask)
@@ -543,7 +543,7 @@ void deleteImage(Image * ptr) {
 		printf("Freeing Image %d\n", ptr->id);
 	#endif
 	if(ptr && ptr->id > 1) glDeleteTextures(1, &ptr->id);
-	
+
 	//~ else MYERROR("Trying to free a null-image. Maybe, you did it manually?");
 }
 
