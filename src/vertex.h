@@ -66,8 +66,8 @@ extern float *vertexCoord;
 /**
  * Just checking if buffer grows over his size and flushing it.
  * */
-#define FLUSH_BUFFER_IF_OVERFLOW                                         \
-	if(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE)              \
+#define FLUSH_BUFFER_IF_OVERFLOW                                               \
+    if(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE)            \
 		FLUSH_BUFFER();
 
 /**
@@ -75,17 +75,17 @@ extern float *vertexCoord;
  * cos(0) and applies sincosf instead of four sin/cos calls. I checked assembly
  * for that.
  * */
-//~ inline float VERTEX_ROT_X(float x,float y,float a,float ox,float oy)
+//~ static inline float VERTEX_ROT_X(float x,float y,float a,float ox,float oy)
 //~ {
 	//~ return cosf(a)*((x)-(ox))-sinf(a)*((y)-(oy));
 //~ }
-//~ inline float VERTEX_ROT_Y(float x,float y,float a,float ox,float oy)
+//~ static inline float VERTEX_ROT_Y(float x,float y,float a,float ox,float oy)
 //~ {
 	//~ return sinf(a)*((x)-(ox))+cosf(a)*((y)-(oy));
 //~ }
 
-#define VERTEX_ROT_X(x,y,a,ox,oy) cosf(a)*((x)-(ox))-sinf(a)*((y)-(oy))
-#define VERTEX_ROT_Y(x,y,a,ox,oy) sinf(a)*((x)-(ox))+cosf(a)*((y)-(oy))
+#define VERTEX_ROT_X(x,y,a,ox,oy) cosf(a) * ((x) - (ox)) - sinf(a) * ((y) - (oy))
+#define VERTEX_ROT_Y(x,y,a,ox,oy) sinf(a) * ((x) - (ox)) + cosf(a) * ((y) - (oy))
 
 
 
