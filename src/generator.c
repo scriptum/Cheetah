@@ -36,7 +36,8 @@ IN THE SOFTWARE.
 
 void newImageRaw(Image *, int, int, const char *, const char *);
 
-inline void repeat(int w, int h, int channels, char *buf) {
+inline void repeat(int w, int h, int channels, char *buf)
+{
 	int i, j;
 	for(j = h / 2; j < h; j++)
 		for(i = 0; i <= w / 2; i++)
@@ -61,7 +62,8 @@ for(j = 0; j <= h / 2; j++) {                                                  \
     for(i = 0; i <= w / 2; i++) { code }}                                      \
 repeat(w, h, channels, buf);
 
-inline float distance(int i, int j, int w, int h) {
+inline float distance(int i, int j, int w, int h)
+{
 	return ((i - w / 2 + 0.5) * (i - w / 2 + 0.5) / (float)(w * w) +
 		(j - h / 2 + 0.5) * (j - h / 2 + 0.5) / (float)(h * h));
 }
