@@ -2,13 +2,13 @@ require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
 local scr_w, scr_h = 640, 400
-C.init('Generators', scr_w..'x'..scr_h)
+C.init('Generators', scr_w..'x'..scr_h..' vsync')
 
 local generators = {'dummy', 'noise', 'light', 'lightexp', 'circle'}
 local sizes = {16, 64, 128}
 
 E:new(screen):draw(function()
-local a = (math.cos(time) + 1)*0.1	
+local a = (math.cos(time) + 1)*0.1
 C.clearColor(a,a,a,1)
 end)
 local offy  = 0
