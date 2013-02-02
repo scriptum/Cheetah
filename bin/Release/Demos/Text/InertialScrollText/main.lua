@@ -6,8 +6,8 @@ C.init('Test', '1024x700 resizable')
 C.printFPS = true
 C.autoScale(false)
 --load font
-C.newFont('dejavuDF.fnt', true)
-local f = C.fonts["DejaVu Sans"][21]
+C.newFont('LiberationDF.fnt', true)
+local f = C.fonts["Liberation Sans"][23]
 --load DF shader
 local dfshader = C.newShader('distance_field.glsl')
 --load text as string
@@ -19,7 +19,7 @@ local textarea = E:new(screen)
 	gamma = 0.4,     --gamma for Distance Field
 	sharpness = 0.18,--sharpness of DF antialiasing
 	_offset = 0, --others are internal
-	_velocity = 0, 
+	_velocity = 0,
 	_lasttime = time
 })
 :draw(function(s)

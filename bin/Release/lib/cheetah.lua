@@ -2,21 +2,21 @@
 
 Copyright (c) 2012 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to 
-deal in the Software without restriction, including without limitation the 
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-sell copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions:  The above 
-copyright notice and this permission notice shall be included in all copies 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:  The above
+copyright notice and this permission notice shall be included in all copies
 or substantial portions of the Software.
- 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 
 ******************************************************************************]]
@@ -117,7 +117,7 @@ C.mainLoop = function()
 		FPS = (FPS + 1) / (1 + (libcheetah.getRealTime() - realtime));
 		if time - lasttime > 0.5 then
 			lasttime = time
-			if C.printFPS then 
+			if C.printFPS then
 				print(C.FPS..' '..gcinfo())
 				C.setTitle(C.FPS..' '..gcinfo())
 			end
@@ -153,10 +153,10 @@ C.poll = function()
 	local a, b, c
 	if e == 'q' then
 		done = true
-	elseif e == 'kp' or e == 'kr' then 
+	elseif e == 'kp' or e == 'kr' then
 		a = libcheetah.getEventKey()
 		a, b = lua_keys[a] or 'key_' .. a, libcheetah.getEventKeyUnicode()
-	elseif e == 'mp' or e == 'mr' then 
+	elseif e == 'mp' or e == 'mr' then
 		c = libcheetah.getEventMouseButton()
 		a, b, c = libcheetah.getEventMouseX(), libcheetah.getEventMouseY(), button_names[c] or 'm_' .. c
 	elseif e == 'rz' then
@@ -267,11 +267,11 @@ end
 local drawq_general = function(d1, d2)
 	return function(s, x, y, w, h, qx, qy, qw, qh, a, ox, oy)
 		if angle then
-			d1(s, x or 0, y or 0, w or s.w, h or s.h, 
-				 qx or 0, qy or 0, qw or s.w, qh or s.h, 
+			d1(s, x or 0, y or 0, w or s.w, h or s.h,
+				 qx or 0, qy or 0, qw or s.w, qh or s.h,
 				 angle, ox or 0, oy or 0)
 		else
-			d2(s, x or 0, y or 0, w or s.w, h or s.h, 
+			d2(s, x or 0, y or 0, w or s.w, h or s.h,
 				 qx or 0, qy or 0, qw or s.w, qh or s.h)
 		end
 	end
@@ -299,7 +299,7 @@ ffi.metatype('Image', {
 		drawq = drawq_general(libcheetah.imageDrawqt, libcheetah.imageDrawqxy),
 		getWidth = function(s) return s.w end,
 		getHeight = function(s) return s.h end
-	}, 
+	},
 	__gc = libcheetah.deleteImage
 })
 
@@ -421,7 +421,7 @@ local texturesArchive = {}
 		--~ draw = function(s, x, y, angle, zoom, ox, oy)
 			--~ libcheetah.tilemapDraw(s, x or 0, y or 0, angle or 0, zoom or 1, ox or 0, oy or 0)
 		--~ end
-	--~ }, 
+	--~ },
 	--~ __gc = libcheetah.deleteTilemap
 --~ })
 
@@ -433,7 +433,12 @@ C.newFont = function(name, scalable)
 	local glyphs = 0
 	local bytes = 0
 	local p = ffi.new('float[8]')
+	local kerning = false
 	for line in io.lines(name) do
+		if line == 'kerning pairs:' then
+			print 'Kerning!'
+			kerning = true
+		end
 		a = line:match('^textures: (.+)')
 		if a then
 			n = name:gsub('[^/]+$', a)
@@ -458,7 +463,11 @@ C.newFont = function(name, scalable)
 				if not C.fonts[a] then C.fonts[a] = {} end
 				C.fonts[a][tonumber(b)] = font
 			else
-				libcheetah.fontSetGlyph(font, line)
+				if kerning then
+					libcheetah.fontSetKerning(font, line)
+				else
+					libcheetah.fontSetGlyph(font, line)
+				end
 				glyphs = glyphs + 1
 			end
 		end
@@ -512,7 +521,7 @@ local resLoadAtlasCallback = function (path, t, dir, name, ext)
 			libcheetah.newImageOpt(img, dir..'/'..imgname, '')
 			table.insert(texturesArchive, img)
 		else
-			imgname, x1, y1, x2, y2, cx, cy, w, h, r = 
+			imgname, x1, y1, x2, y2, cx, cy, w, h, r =
 					line:match('(.+)\t'..string.rep('(%d+)\t', 8)..'(r?)')
 			if h then
 				p = ffi.new('Atlas')
@@ -531,7 +540,7 @@ local resLoadAtlasCallback = function (path, t, dir, name, ext)
 				if r =='r' then
 					p.x, p.y = p.y, p.h - p.x - p.aw
 					p.aw, p.ah = p.ah, p.aw
-					p.tex[0], p.tex[1], p.tex[2], p.tex[3], p.tex[4], p.tex[5], p.tex[6], p.tex[7] = 
+					p.tex[0], p.tex[1], p.tex[2], p.tex[3], p.tex[4], p.tex[5], p.tex[6], p.tex[7] =
 					p.tex[6], p.tex[7], p.tex[0], p.tex[1], p.tex[2], p.tex[3], p.tex[4], p.tex[5]
 				end
 				a = t
@@ -592,7 +601,7 @@ C.resLoader = function(dirname, recursive)
 		return
 	end
 	local de = libcheetah.readDir(dir)
-	
+
 	local s, ext, n, name, callback
 	--~ resLoadedImages = {}
 	while libcheetah.isPointer(de) do

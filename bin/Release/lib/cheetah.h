@@ -108,15 +108,14 @@ typedef struct FontChar
 } FontChar;
 typedef struct Font {
 	Image		*image;
-	float		_scale;
-	float		height;
-	float		_interval;
-	float		spacew;
 	void		*hash;
-	int		allocated;
+	void		*kerningHash;
+	float		height;
+	float		_spacewidth;
+	float		_interval;
+	float		_scale;
 	int		mem;
 	bool		scalable;
-	bool		unicode;
 } Font;
 typedef struct Shader {
 	unsigned	id;
@@ -210,12 +209,13 @@ bool mkDir(const char * path);
 char *getDirentName(struct dirent * de);
 float fontWidth(Font *f, register const char *str);
 float fontHeight(Font *font);
-void fontPrintf(Font *currentFont, const unsigned char * str, float x, float y, float maxw, int align);
+void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align);
 void fontScale(Font *font, float scale);
 void fontInterval(Font *font, float interval);
 float fontGetScale(Font *font);
 float fontGetInterval(Font *font);
 void fontSetGlyph(Font *ptr, const char *line);
+void fontSetKerning(Font *ptr, const char *line);
 void deleteFont(Font * ptr);
 void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int height, const char * options);
 bool framebufferCheck(Framebuffer * ptr);
