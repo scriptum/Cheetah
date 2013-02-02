@@ -51,10 +51,7 @@ fi
 
 GCC_VERSION=$($COMPILER -v |& tail -1 | awk '{print $3}' | sed s/\\.//g)
 FLAGS_OPTIMIZE_GENERAL="-fomit-frame-pointer -funroll-loops -mmmx -msse -ftree-vectorize"
-if [ $GCC_VERSION -ge 450 ]
-then
-	FLAGS_OPTIMIZE_GENERAL="$FLAGS_OPTIMIZE_GENERAL -flto"
-fi
+
 if [ $GCC_VERSION -ge 460 ]
 then
 	FLAGS_OPTIMIZE="-Ofast $FLAGS_OPTIMIZE_GENERAL"
@@ -116,6 +113,10 @@ fi
 echo "$LAST $2" > $TMP
 if [ "$2" == "final" ]
 then
+	if [ $GCC_VERSION -ge 450 ]
+	then
+		FLAGS="$FLAGS -flto"
+	fi
 	$CLEAN
 	CFLAGS="$FLAGS -fprofile-generate" $MAKE && mv libcheetah.so $LIBPATH
 	pushd .
