@@ -2,21 +2,21 @@
 
 Copyright (c) 2013 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to 
-deal in the Software without restriction, including without limitation the 
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-sell copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions:  The above 
-copyright notice and this permission notice shall be included in all copies 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:  The above
+copyright notice and this permission notice shall be included in all copies
 or substantial portions of the Software.
- 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 
 *******************************************************************************/
@@ -78,7 +78,7 @@ hashName *hashName##_new() {                                                   \
     return hashName##_new_size(HASH_START_SIZE);                               \
 }                                                                              \
                                                                                \
-inline bool hashName##_set(hashName *hash, keyType key, valType value);        \
+static inline bool hashName##_set(hashName *hash, keyType key, valType value); \
                                                                                \
 bool hashName##_rehash(hashName *hash) {                                       \
     hashName *newhash = hashName##_new_size((hash->size + 1) * 2);             \
@@ -91,12 +91,12 @@ bool hashName##_rehash(hashName *hash) {                                       \
     return TRUE;                                                               \
 }                                                                              \
                                                                                \
-inline valType hashName##_get(hashName *hash, keyType key) {                   \
+static inline valType hashName##_get(hashName *hash, keyType key) {            \
     _HASH_INDEX(hashFunc, _HASH_NODE.busy && !cmpFunc(_HASH_NODE.key,key))     \
     return _HASH_NODE.value;                                                   \
 }                                                                              \
                                                                                \
-inline bool hashName##_set(hashName *hash, keyType key, valType value) {       \
+static inline bool hashName##_set(hashName *hash, keyType key, valType value) {\
     _HASH_INDEX(hashFunc, _HASH_NODE.busy)                                     \
     _HASH_NODE.key   = key;                                                    \
     _HASH_NODE.value = value;                                                  \
@@ -111,10 +111,10 @@ inline bool hashName##_set(hashName *hash, keyType key, valType value) {       \
     return TRUE;                                                               \
 }                                                                              \
                                                                                \
-inline unsigned hashName##_length(hashName *hash) {                            \
+static inline unsigned hashName##_length(hashName *hash) {                     \
     return hash->items;                                                        \
 }                                                                              \
                                                                                \
-inline unsigned hashName##_size(hashName *hash) {                              \
+static inline unsigned hashName##_size(hashName *hash) {                       \
     return hash->size + 1;                                                     \
 }
