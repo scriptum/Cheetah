@@ -59,7 +59,7 @@ inline unsigned kerningHashFunc(KerningPair key)
 
 inline unsigned kerningCmpFunc(KerningPair a, KerningPair b)
 {
-	return a.first == b.first && a.second == b.second;
+	return a.second == b.second && a.first == b.first;
 }
 
 HASH_TEMPLATE(KernHash, KerningPair, float, kerningHashFunc, kerningCmpFunc)
