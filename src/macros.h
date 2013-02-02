@@ -27,27 +27,42 @@ IN THE SOFTWARE.
 /***********************************DEBUGGING**********************************/
 
 /* Debug memory operations */
+#define DEBUG_MEMORY_ERRORS 0
 #define DEBUG_MEMORY 0
+#define DEBUG_FRAMEBUFFER 0
 
 #if DEBUG_MEMORY
-	#define dprintf_mem(...) printf(__VA_ARGS__)
+	#define dprintf_mem(...) myError(__VA_ARGS__)
 #else
 	#define dprintf_mem(...)
+#endif
+
+#if DEBUG_MEMORY_ERRORS
+	#define dprintf_memerr(...) myError(__VA_ARGS__)
+#else
+	#define dprintf_memerr(...)
+#endif
+
+#if DEBUG_FRAMEBUFFER
+	#define dprintf_fbo(...) myError(__VA_ARGS__)
+#else
+	#define dprintf_fbo(...)
 #endif
 
 /**********************************MEMOTY OPS**********************************/
 
 #define new(var, type, size) do {                                              \
     if(var){                                                                   \
-        myError("variable %s already contains data: %x."                       \
-                        " Delete it before allocating", #var, var);            \
+        dprintf_memerr("variable %s already contains data: %x."                \
+                       " Delete it before allocating", #var, var);             \
         exit(1);                                                               \
     }                                                                          \
     var = (type*)malloc(sizeof(type)*(size));                                  \
     /*initialize memory for small structures*/                                 \
     if(size == 1) memset(var, 0, sizeof(type));                                \
     if(!var) {                                                                 \
-        myError("cannot allocate %d bytes for %s", sizeof(type)*(size), #var); \
+        dprintf_memerr("cannot allocate %d bytes for %s",                      \
+                       sizeof(type)*(size), #var);                             \
         exit(1);                                                               \
     }                                                                          \
     dprintf_mem("Added: %s %d %s (%x) %d bytes\n",                             \
@@ -62,7 +77,7 @@ IN THE SOFTWARE.
 #define renew(var, type, size) do {                                            \
     var = (type*)realloc(var, sizeof(type)*(size));                            \
     if(!var) {                                                                 \
-        myError("cannot re-allocate %d bytes for %s", sizeof(type)*(size), #var);\
+        dprintf_memerr("cannot re-allocate %d bytes for %s", sizeof(type)*(size), #var);\
         exit(1);                                                               \
     }                                                                          \
     dprintf_mem("Reallocated: %s %d %s (%x) %d bytes\n",                       \

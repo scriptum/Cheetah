@@ -2,21 +2,21 @@
 
 Copyright (c) 2012-2013 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to 
-deal in the Software without restriction, including without limitation the 
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-sell copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions:  The above 
-copyright notice and this permission notice shall be included in all copies 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:  The above
+copyright notice and this permission notice shall be included in all copies
 or substantial portions of the Software.
- 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 
 *******************************************************************************/
@@ -37,8 +37,9 @@ void resetViewDefault();
 static bool checkFramebufferStatus()
 {
 	GLenum status;
-	const char *error;
 	status = (GLenum)glCheckFramebufferStatus_(GL_FRAMEBUFFER_EXT);
+	#if DEBUG_FRAMEBUFFER
+	const char *error;
 	switch(status) {
 		case GL_FRAMEBUFFER_COMPLETE_EXT:
 			return TRUE;
@@ -66,7 +67,11 @@ static bool checkFramebufferStatus()
 		default:
 			error = "FBO: unknown error\n";
 	}
-	myError(error);
+	dprintf_fbo(error);
+	#else
+	if(status == GL_FRAMEBUFFER_COMPLETE_EXT)
+		return TRUE;
+	#endif
 	return FALSE;
 }
 
@@ -76,13 +81,13 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 	GLint current_fbo;
 	GLenum internal, format;
 	bool status;
-	
+
 	fboptr->id = 0;
-	
+
 	NEEDED_INIT_VOID;
-	
+
 	if(!supported.FBO) {
-		myError("Framebuffers are not supported on this machine. You'd better to check it in script (try \"if cheetah.supported.FBO\")");
+		dprintf_fbo("Framebuffers are not supported on this machine. You'd better to check it in script (try \"if cheetah.supported.FBO\")");
 		return;
 	}
 
@@ -102,12 +107,12 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 		internal = alpha ? GL_RGBA16F_ARB : GL_RGB16F_ARB;
 		format = GL_HALF_FLOAT_ARB;
 	}
-	else 
+	else
 	{
 		internal = alpha ? GL_RGBA : GL_RGB;
 		format = GL_UNSIGNED_BYTE;
 	}
-	
+
 	/* save current fbo */
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING_EXT, &current_fbo);
 
@@ -121,14 +126,14 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 
 	if(TRUE == nearest)
 		TEX_NEAREST;
-	else 
+	else
 		TEX_LINEAR;
 
 	if(TRUE == clamp)
 		TEX_CLAMP;
-	else 
+	else
 		TEX_REPEAT;
-	
+
 	glTexImage2D(GL_TEXTURE_2D, 0, internal, width, height, 0, GL_RGBA, format, 0);
 	//~ glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -141,13 +146,13 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 
 	/* unbind framebuffer */
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, (GLuint)current_fbo);
-		
+
 	if(TRUE == status)
 	{
 		fboptr->image = ptr;
 		return;
 	}
-	else 
+	else
 	{
 		glDeleteTextures(1, &ptr->id);
 		glDeleteFramebuffers_(1, &fboptr->id);
@@ -206,5 +211,5 @@ void deleteFramebuffer(Framebuffer * ptr) {
 		delete(ptr->image);
 	}
 	else
-		myError("Trying to free a null-framebuffer. Maybe, you did it manually?");
+		dprintf_fbo("Trying to free a null-framebuffer. Maybe, you did it manually?");
 }
