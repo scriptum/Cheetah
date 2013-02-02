@@ -38,53 +38,53 @@ IN THE SOFTWARE.
 /**********************************MEMOTY OPS**********************************/
 
 #define new(var, type, size) do {                                              \
-	if(var){                                                                     \
-		myError("variable %s already contains data: %x."                           \
-						" Delete it before allocating", #var, var);                        \
-		exit(1);                                                                   \
-	}                                                                            \
-	var = (type*)malloc(sizeof(type)*(size));                                    \
-	/*initialize memory for small structures*/                                   \
-	if(size == 1) memset(var, 0, sizeof(type));                                  \
-	if(!var) {                                                                   \
-		myError("cannot allocate %d bytes for %s", sizeof(type)*(size), #var);     \
-		exit(1);                                                                   \
-	}                                                                            \
-	dprintf_mem("Added: %s %d %s (%x) %d bytes\n",                               \
-				 __FILE__, __LINE__, #var, var, sizeof(type)*(size));                  \
+    if(var){                                                                   \
+        myError("variable %s already contains data: %x."                       \
+                        " Delete it before allocating", #var, var);            \
+        exit(1);                                                               \
+    }                                                                          \
+    var = (type*)malloc(sizeof(type)*(size));                                  \
+    /*initialize memory for small structures*/                                 \
+    if(size == 1) memset(var, 0, sizeof(type));                                \
+    if(!var) {                                                                 \
+        myError("cannot allocate %d bytes for %s", sizeof(type)*(size), #var); \
+        exit(1);                                                               \
+    }                                                                          \
+    dprintf_mem("Added: %s %d %s (%x) %d bytes\n",                             \
+                 __FILE__, __LINE__, #var, var, sizeof(type)*(size));          \
 } while(0)
 
 #define new0(var, type, size) do {                                             \
-	new(var, type, size);                                                        \
-	memset(var, 0, sizeof(type) * (size));                                       \
+    new(var, type, size);                                                      \
+    memset(var, 0, sizeof(type) * (size));                                     \
 } while(0)
 
 #define renew(var, type, size) do {                                            \
-	var = (type*)realloc(var, sizeof(type)*(size));                              \
-	if(!var) {                                                                   \
-		myError("cannot re-allocate %d bytes for %s", sizeof(type)*(size), #var);  \
-		exit(1);                                                                   \
-	}                                                                            \
-	dprintf_mem("Reallocated: %s %d %s (%x) %d bytes\n",                         \
-				 __FILE__, __LINE__, #var, var, sizeof(type)*(size));                  \
+    var = (type*)realloc(var, sizeof(type)*(size));                            \
+    if(!var) {                                                                 \
+        myError("cannot re-allocate %d bytes for %s", sizeof(type)*(size), #var);\
+        exit(1);                                                               \
+    }                                                                          \
+    dprintf_mem("Reallocated: %s %d %s (%x) %d bytes\n",                       \
+                 __FILE__, __LINE__, #var, var, sizeof(type)*(size));          \
 } while(0)
 
 #define delete(var) do {                                                       \
-	if(var) {                                                                    \
-		free(var);                                                                 \
-		dprintf_mem("Removed: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var);    \
-		var = NULL;                                                                \
-	}                                                                            \
+    if(var) {                                                                  \
+        free(var);                                                             \
+        dprintf_mem("Removed: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var);\
+        var = NULL;                                                            \
+    }                                                                          \
 } while(0)
 
 #define renewif(condition, var, type, size) do {                               \
-	if(condition) {                                                              \
-		renew(var, type, size);                                                    \
-	}                                                                            \
+    if(condition) {                                                            \
+        renew(var, type, size);                                                \
+    }                                                                          \
 } while(0)
 
 #define fill(var, character, type, size) do {                                  \
-	memset(var, character, sizeof(type) * (size));                               \
+    memset(var, character, sizeof(type) * (size));                             \
 } while(0)
 
 /*********************************TEXTURE OPS**********************************/
@@ -113,12 +113,12 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);                  \
 /********************************OPTIONS CHECKER*******************************/
 
 #define CHECK_OPTION(options, o) char o = 0; do {                              \
-	typeof(options) _o = strstr(options, #o);                                    \
-	int l = strlen(#o);                                                          \
-	/* check bounds */                                                           \
-	if(NULL != _o && (' '==*(_o+l)||0==*(_o+l)) && (' '==*(_o-1)||0==*(_o-1))) { \
-		o = 1;                                                                     \
-	}                                                                            \
+    typeof(options) _o = strstr(options, #o);                                  \
+    int l = strlen(#o);                                                        \
+    /* check bounds */                                                         \
+    if(NULL != _o && (' '==*(_o+l)||0==*(_o+l)) && (' '==*(_o-1)||0==*(_o-1))){\
+        o = 1;                                                                 \
+    }                                                                          \
 } while(0)
 
 /**********************************DEBUG STUFF*********************************/
@@ -139,16 +139,16 @@ bool isInit();
 
 #define _NEEDED_INIT_STR "call init function before!"
 
-#define NEEDED_INIT do {                                                        \
-	if(!isInit()) {                                                                 \
-		myError(_NEEDED_INIT_STR); return 0;                                                 \
-	}                                                                             \
+#define NEEDED_INIT do {                                                       \
+    if(!isInit()) {                                                            \
+        myError(_NEEDED_INIT_STR); return 0;                                   \
+    }                                                                          \
 } while(0)
 
-#define NEEDED_INIT_VOID do {                                                   \
-	if(!isInit()) {                                                                 \
-		myError(_NEEDED_INIT_STR); return;                                                   \
-	}                                                                             \
+#define NEEDED_INIT_VOID do {                                                  \
+    if(!isInit()) {                                                            \
+        myError(_NEEDED_INIT_STR); return;                                     \
+    }                                                                          \
 } while(0)
 
 #endif //__MACROS_H__
