@@ -23,7 +23,10 @@ IN THE SOFTWARE.
 
 #ifndef __VERTEX_H__
 #define __VERTEX_H__
+
 #include <math.h>
+#include <SDL_opengl.h>
+
 #include "config.h"
 
 extern int vertexCounter;
@@ -32,24 +35,6 @@ extern float *vertexCoord;
 
 /**********************************VERTEX OPS**********************************/
 
-
-/******************************VERTEX ACCUMULATOR******************************/
-
-/******************************DRAW USING QUADS********************************/
-#define VERTICLES_PER_SPRITE 4 * 2
-
-/**
- * Flushing buffer accumulator. It doesn't send glFlush() or glFinish, it just
- * calls glDrawArrays to draw quads from buffer. Some functions as color, move,
- * bindShader need to flush buffer to avoid visual appearance corruption.
- * */
-#define FLUSH_BUFFER() do {                                                    \
-    if(vertexCounter) {                                                        \
-        glDrawArrays(GL_QUADS, 0, vertexCounter / 2);                          \
-        vertexCounter = 0;                                                     \
-    }                                                                          \
-} while(0)
-
 #define TEXTURE_BIND(tex) do {                                                 \
     if(prevImageId != (tex)) {                                                 \
         FLUSH_BUFFER();                                                        \
@@ -57,11 +42,6 @@ extern float *vertexCoord;
         prevImageId = tex;                                                     \
     }                                                                          \
 } while(0)
-
-//~ void PUSH_QUAD(float vx, float vy, float vw, float vh, float a, float ox, float oy);
-//~ void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h);
-//~ void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, float a, float ox, float oy);
-//~ void PUSH_QUAD_TEXTURE(float vx, float vy, float vw, float vh, float a, float ox, float oy, const float *texture);
 
 /**
  * Just checking if buffer grows over his size and flushing it.
@@ -91,8 +71,21 @@ extern float *vertexCoord;
 
 /******************************VERTEX ACCUMULATOR******************************/
 
+#ifdef GL_QUADS
 /******************************DRAW USING QUADS********************************/
 #define VERTICLES_PER_SPRITE 4 * 2
+
+/**
+ * Flushing buffer accumulator. It doesn't send glFlush() or glFinish, it just
+ * calls glDrawArrays to draw quads from buffer. Some functions as color, move,
+ * bindShader need to flush buffer to avoid visual appearance corruption.
+ * */
+#define FLUSH_BUFFER() do {                                                    \
+    if(vertexCounter) {                                                        \
+        glDrawArrays(GL_QUADS, 0, vertexCounter / 2);                          \
+        vertexCounter = 0;                                                     \
+    }                                                                          \
+} while(0)
 
 /**
  * Default texture coordinates.
@@ -132,6 +125,57 @@ static inline void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, f
 	texCoord[vertexCounter + 0] + tw / w;
 	vertexCounter += VERTICLES_PER_SPRITE;
 }
+
+#else
+/****************************DRAW USING TRIANGLES******************************/
+#define VERTICLES_PER_SPRITE 6 * 2
+
+#define FLUSH_BUFFER() do {                                                    \
+	if(vertexCounter) {                                                          \
+		glDrawArrays(GL_TRIANGLES, 0, vertexCounter / 2);                          \
+		vertexCounter = 0;                                                         \
+	}                                                                            \
+} while(0)
+
+static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
+
+static inline void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, float a, float ox, float oy) {
+	vertexCoord[vertexCounter + 10] =
+	vertexCoord[vertexCounter + 0]  = (vx) + VERTEX_ROT_X(0,  0,  a, ox, oy);
+	vertexCoord[vertexCounter + 11] =
+	vertexCoord[vertexCounter + 1]  = (vy) + VERTEX_ROT_Y(0,  0,  a, ox, oy);
+	vertexCoord[vertexCounter + 2]  = (vx) + VERTEX_ROT_X(0,  vh, a, ox, oy);
+	vertexCoord[vertexCounter + 3]  = (vy) + VERTEX_ROT_Y(0,  vh, a, ox, oy);
+	vertexCoord[vertexCounter + 6]  =
+	vertexCoord[vertexCounter + 4]  = (vx) + VERTEX_ROT_X(vw, vh, a, ox, oy);
+	vertexCoord[vertexCounter + 7]  =
+	vertexCoord[vertexCounter + 5]  = (vy) + VERTEX_ROT_Y(vw, vh, a, ox, oy);
+	vertexCoord[vertexCounter + 8]  = (vx) + VERTEX_ROT_X(vw, 0,  a, ox, oy);
+	vertexCoord[vertexCounter + 9]  = (vy) + VERTEX_ROT_Y(vw, 0,  a, ox, oy);
+}
+
+static inline void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h) {
+	FLUSH_BUFFER_IF_OVERFLOW
+	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
+	texCoord[vertexCounter + 10] =
+	texCoord[vertexCounter + 2] =
+	texCoord[vertexCounter + 0] = (tx) / (w);
+	texCoord[vertexCounter + 11] =
+	texCoord[vertexCounter + 9] =
+	texCoord[vertexCounter + 1] = (ty) / (h);
+	texCoord[vertexCounter + 7] =
+	texCoord[vertexCounter + 5] =
+	texCoord[vertexCounter + 3] =
+	texCoord[vertexCounter + 1] + (th) / (h);
+	texCoord[vertexCounter + 8] =
+	texCoord[vertexCounter + 6] =
+	texCoord[vertexCounter + 4] =
+	texCoord[vertexCounter + 0] + (tw) / (w);
+	vertexCounter += VERTICLES_PER_SPRITE;
+}
+
+#endif /* #ifdef GL_QUADS */
+
 static inline void PUSH_QUAD_TEXTURE(float vx, float vy, float vw, float vh, float a, float ox, float oy, const float *texture) {
 	FLUSH_BUFFER_IF_OVERFLOW
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
@@ -142,6 +186,5 @@ static inline void PUSH_QUAD_TEXTURE(float vx, float vy, float vw, float vh, flo
 static inline void PUSH_QUAD(float vx, float vy, float vw, float vh, float a, float ox, float oy) {
 	PUSH_QUAD_TEXTURE(vx, vy, vw, vh, a, ox, oy, DEFAULT_QUAD_TEX);
 }
-
 
 #endif
