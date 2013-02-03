@@ -440,7 +440,6 @@ void fontSetKerning(Font *ptr, const char *line) {
 	}
 	KerningPair kp = {first, second};
 	KernHash_set(ptr->kerningHash, kp, kerning);
-	//~ vard(KernHash_size((KernHash*)ptr->kerningHash));
 }
 
 void deleteFont(Font * ptr) {
