@@ -121,6 +121,12 @@ float fontWidth(Font *f, register const char *str) {
 		fch = FontHash_get(f->hash, c);
 		if(fch)
 			width += fch->w;
+		if(NULL != currentFont->kerningHash && prevChar > 0)
+		{
+			KerningPair kp = {prevChar, c};
+			float kerning = KernHash_get(currentFont->kerningHash, kp);
+			width += kerning;
+		}
 	}
 	if(width > maxwidth)
 		maxwidth = width;
@@ -305,23 +311,34 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 		while(str[i])
 		{
 			UNICODE_TO_INT(str, i, increment)
-			ch = FontHash_get(hash, c);
-			switch(c) {
+			i += increment;
+			switch(c)
+			{
+				case ' ':
+					x += spacew;
+					continue;
 				case '\n':
 					x = 0;
 					y += fontHeight;
-					if((y + oldy) * currentFont->_scale > screen->h) break;
+					if((y + oldy) * currentFont->_scale > screen->h)
+						break;
 					h = ceil(y);
-					goto end_loop;
+					continue;
 				case '\t':
 					x += spacew * 8;
-					goto end_loop;
+					continue;
 			}
+			ch = FontHash_get(hash, c);
 			if(NULL == ch)
-				goto end_loop;
+				continue;
+			if(NULL != currentFont->kerningHash && prevChar > 0)
+			{
+				KerningPair kp = {prevChar, c};
+				float kerning = KernHash_get(currentFont->kerningHash, kp);
+				x += kerning;
+			}
 			DRAW_CHAR;
-			end_loop:
-			i += increment;
+			prevChar = c;
 		}
 	}
 	FLUSH_BUFFER();
@@ -402,9 +419,9 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	cy2 = cy1 + y2;
 	x2 = x1 + x2 / (float)ptr->image->w;
 	y2 = y1 + y2 / (float)ptr->image->h;
-	float vert[] = {cx1,cy1,cx2,cy2};
-	float tex[] = {x1,y1,x2,y2};
-	memcpy(fch->v, vert, sizeof(vert));
+	float ver[] = {cx1, cy1, cx2, cy2};
+	float tex[] = {x1,  y1,  x2,  y2};
+	memcpy(fch->v, ver, sizeof(ver));
 	memcpy(fch->t, tex, sizeof(tex));
 	fch->w = w;
 	FontHash_set((FontHash*)ptr->hash, c, fch);
