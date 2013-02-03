@@ -489,7 +489,7 @@ ffi.metatype('Font', {
 		getHeight = libcheetah.fontHeight,
 		getStringWidth = libcheetah.fontWidth
 	},
-	--~ __gc = libcheetah.deleteFont
+	__gc = libcheetah.deleteFont
 })
 
 --------------------------------------------------------------------------------
