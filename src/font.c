@@ -99,6 +99,7 @@ float fontWidth(Font *f, register const char *str) {
 	int	i;
 	int	increment;
 	FontChar *fch;
+	unsigned prevChar = 0;
 	while(str[i])
 	{
 		UNICODE_TO_INT(str, i, increment)
@@ -121,10 +122,10 @@ float fontWidth(Font *f, register const char *str) {
 		fch = FontHash_get(f->hash, c);
 		if(fch)
 			width += fch->w;
-		if(NULL != currentFont->kerningHash && prevChar > 0)
+		if(NULL != f->kerningHash && prevChar > 0)
 		{
 			KerningPair kp = {prevChar, c};
-			float kerning = KernHash_get(currentFont->kerningHash, kp);
+			float kerning = KernHash_get(f->kerningHash, kp);
 			width += kerning;
 		}
 	}
