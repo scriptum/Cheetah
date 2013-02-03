@@ -104,6 +104,10 @@ then
 	popd
 fi
 
+if [ "$CFLAGS" ]
+then FLAGS="$FLAGS $CFLAGS"
+fi
+
 echo "Building on $CORES cores with flags: $FLAGS"
 
 if [ "`cat $TMP`" != "$LAST $2" ]

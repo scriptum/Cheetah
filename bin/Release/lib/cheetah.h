@@ -105,6 +105,7 @@ typedef struct FontChar
 	float		w;
 	float		v[4];
 	float		t[4];
+	bool kerning;
 } FontChar;
 typedef struct Font {
 	Image		*image;
@@ -207,7 +208,7 @@ int closeDir(DIR *dirp);
 bool isDir(const char *name);
 bool mkDir(const char * path);
 char *getDirentName(struct dirent * de);
-float fontWidth(Font *f, register const char *str);
+float fontWidth(Font *f, const char *str);
 float fontHeight(Font *font);
 void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align);
 void fontScale(Font *font, float scale);

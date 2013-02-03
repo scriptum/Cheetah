@@ -17,7 +17,7 @@ local textarea = E:new(screen)
 :set({
 	fontScale = 0.5, --50% font scale (21/2=10pt)
 	gamma = 0.4,     --gamma for Distance Field
-	sharpness = 0.18,--sharpness of DF antialiasing
+	sharpness = 0.18,--sharpness of Distance Field anti-aliasing
 	_offset = 0, --others are internal
 	_velocity = 0,
 	_lasttime = time
@@ -37,7 +37,7 @@ local textarea = E:new(screen)
 	dfshader:set('gamma', s.gamma)
 	dfshader:set('sharpness', s.sharpness / s.fontScale)
 	f:setScale(s.fontScale)
-	f:print(str,s.x,s.y - s._offset / s.fontScale,s.w, C.alignJustify)
+	f:print(str,s.x,s.y - s._offset / s.fontScale, s.w, C.alignCenter)
 	dfshader:unbind()
 end):size(C.getWindowWidth(),C.getWindowHeight())
 :mousepressed(function(s, x, y, b)
@@ -76,4 +76,5 @@ screen:keypress(function(s, key)
 		textarea:stop():animate({fontScale = textarea.fontScale / fontScaleStep})
 	end
 end)
+
 C.mainLoop()

@@ -170,6 +170,7 @@ typedef struct FontChar
 	float		w;
 	float		v[4];
 	float		t[4];
+	bool kerning;
 } FontChar;
 
 typedef struct Font {

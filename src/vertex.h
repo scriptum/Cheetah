@@ -131,10 +131,10 @@ static inline void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, f
 #define VERTICLES_PER_SPRITE 6 * 2
 
 #define FLUSH_BUFFER() do {                                                    \
-	if(vertexCounter) {                                                          \
-		glDrawArrays(GL_TRIANGLES, 0, vertexCounter / 2);                          \
-		vertexCounter = 0;                                                         \
-	}                                                                            \
+    if(vertexCounter) {                                                        \
+        glDrawArrays(GL_TRIANGLES, 0, vertexCounter / 2);                      \
+        vertexCounter = 0;                                                     \
+    }                                                                          \
 } while(0)
 
 static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
