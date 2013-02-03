@@ -92,7 +92,7 @@ else if((a[i] & 0b11111000) == 0b11110000) {                                   \
 }
 
 /* Calculate width of string. */
-float fontWidth(Font *f, register const char *str) {
+float fontWidth(Font *f, const char *str) {
 	float	width = 0;
 	float	maxwidth = 0;
 	int	c;
@@ -266,7 +266,8 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 							KerningPair kp = {prevChar, c};
 							float kerning = KernHash_get(currentFont->kerningHash, kp);
 							x += kerning;
-							kerningAccumulator -= kerning;
+							if(align == alignJustify)
+								kerningAccumulator -= kerning;
 						}
 						if('\t' == c)
 							x += spacew * 8;
@@ -467,6 +468,10 @@ void deleteFont(Font * ptr) {
 		{
 			HASH_EACH(((FontHash*)ptr->hash), delete(hashnode->value);)
 			FontHash_destroy((FontHash*)ptr->hash);
+		}
+		if(NULL != ptr->kerningHash)
+		{
+			KernHash_destroy((KernHash*)ptr->kerningHash);
 		}
 	}
 	else
