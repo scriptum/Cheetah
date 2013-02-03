@@ -435,10 +435,7 @@ C.newFont = function(name, scalable)
 	local p = ffi.new('float[8]')
 	local kerning = false
 	for line in io.lines(name) do
-		if line == 'kerning pairs:' then
-			print 'Kerning!'
-			kerning = true
-		end
+		if line == 'kerning pairs:' then kerning = true end
 		a = line:match('^textures: (.+)')
 		if a then
 			n = name:gsub('[^/]+$', a)
@@ -489,7 +486,8 @@ ffi.metatype('Font', {
 		setScale = libcheetah.fontScale,
 		getInterval = libcheetah.fontGetInterval,
 		getScale = libcheetah.fontGetScale,
-		getHeight = libcheetah.fontHeight
+		getHeight = libcheetah.fontHeight,
+		getStringWidth = libcheetah.fontWidth
 	},
 	--~ __gc = libcheetah.deleteFont
 })
