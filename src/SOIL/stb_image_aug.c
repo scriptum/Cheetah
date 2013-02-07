@@ -834,7 +834,7 @@ static uint32 get32(stbi *s)
    return (z << 16) + get16(s);
 }
 
-static int get16le(stbi *s)
+static uint32 get16le(stbi *s)
 {
    int z = get8(s);
    return z + (get8(s) << 8);
@@ -1232,7 +1232,7 @@ stbi_inline static uint8 clamp(int x)
    return (uint8) x;
 }
 
-#define f2f(x)  (int) (((x) * 4096 + 0.5))
+#define f2f(x)  (int) (((x) * 4096 + 0.5f))
 #define fsh(x)  ((x) << 12)
 
 // derived from jidctint -- DCT_ISLOW
@@ -1771,7 +1771,7 @@ static uint8 *resample_row_generic(uint8 *out, uint8 *in_near, uint8 *in_far, in
    return out;
 }
 
-#define float2fixed(x)  ((int) ((x) * 65536 + 0.5))
+#define float2fixed(x)  ((int) ((x) * 65536 + 0.5f))
 
 // 0.38 seconds on 3*anemones.jpg   (0.25 with processor = Pro)
 // VC6 without processor=Pro is generating multiple LEAs per multiply!
@@ -3578,7 +3578,7 @@ stbi_uc *dds_load(stbi *s, int *x, int *y, int *comp, int req_comp)
 	stbi_uc *dds_data = s->img_buffer_original;
 //	stbi_uc block[16*4];
 //	stbi_uc compressed[8];
-	int flags/*, DXT_family*/;
+	unsigned flags/*, DXT_family*/;
 //	int has_alpha, has_mipmap;
 //	int is_compressed, cubemap_faces;
 //	int block_pitch, num_blocks;

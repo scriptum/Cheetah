@@ -2,21 +2,21 @@
 
 Copyright (c) 2012-2013 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to 
-deal in the Software without restriction, including without limitation the 
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-sell copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions:  The above 
-copyright notice and this permission notice shall be included in all copies 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:  The above
+copyright notice and this permission notice shall be included in all copies
 or substantial portions of the Software.
- 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 
 *******************************************************************************/
@@ -40,13 +40,13 @@ Vbo * newVbo(Point * data, Point * tex, unsigned int count) {
 
 void vboDraw(Vbo * ptr) {
 	//~ glEnable(GL_TEXTURE_2D);
-	glEnableClientState(GL_VERTEX_ARRAY); 
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY); 
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
 	glVertexPointer(2, GL_FLOAT, 0, (char *) NULL);
 	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->tex);
 	glTexCoordPointer(2, GL_FLOAT, 0, (char *) NULL);
-	glDrawArrays(GL_QUADS, 0, ptr->count*4); 
+	glDrawArrays(GL_QUADS, 0, ptr->count*4);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	//~ glDisable(GL_TEXTURE_2D);
@@ -82,7 +82,7 @@ Vbo * newVboPoints(Point * data, unsigned int count) {
 		ptr->data = data;
 		printf("No Point Sprite support: falling down to quads.\n");
 	}
-	
+
 	return ptr;
 }
 void vboDrawSprites(Vbo * ptr, Image * img, float size) {
@@ -94,13 +94,13 @@ void vboDrawSprites(Vbo * ptr, Image * img, float size) {
 		glPointSize(size);
 		glEnable(GL_POINT_SPRITE);
 		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-		
+
 		if(supported.VBO)
 		{
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
 			glVertexPointer(2, GL_FLOAT, 0, (char *) NULL);
-			glDrawArrays(GL_POINTS, 0, ptr->count); 
+			glDrawArrays(GL_POINTS, 0, ptr->count);
 			glDisableClientState(GL_VERTEX_ARRAY);
 		}
 		else
@@ -117,7 +117,7 @@ void vboDrawSprites(Vbo * ptr, Image * img, float size) {
 			glPopMatrix();
 		}
 	}
-	
+
 	//~ glDisable(GL_TEXTURE_2D);
 }
 
@@ -139,9 +139,9 @@ void vboDrawSprites3(Vbo * ptr, Image * img, float size) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer_(GL_ARRAY_BUFFER_ARB, ptr->id);
 	glVertexPointer(3, GL_FLOAT, 0, (char *) NULL);
-	glDrawArrays(GL_POINTS, 0, ptr->count); 
+	glDrawArrays(GL_POINTS, 0, ptr->count);
 	glDisableClientState(GL_VERTEX_ARRAY);
-	
+
 	//~ glDisable(GL_TEXTURE_2D);
 }
 

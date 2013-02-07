@@ -258,7 +258,7 @@ void push();
 void pop();
 void reset();
 void rectanglexy(float x, float y, float w, float h);
-void circlexy(float x, float y, double rad, double segments, bool filled);
+void circlexy(float x, float y, float rad, float segments, bool filled);
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void colorf(float r, float g, float b, float a);
 void clearColor(float r, float g, float b, float a);

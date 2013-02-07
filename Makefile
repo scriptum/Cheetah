@@ -1,5 +1,7 @@
 TARGET := libcheetah.so
-CFLAGS += -W -Wall -Wextra -Winline -Wdouble-promotion -Wno-unused-parameter -std=gnu99 -pipe -fPIC
+CFLAGS += -W -Wall -Wextra -Winline -Wdouble-promotion -Wno-unused-parameter \
+-Wdisabled-optimization -pipe -fPIC
+
 LDFLAGS += -shared -L"lib" -lSDL -lGL
 INCLUDES := -I"inc"
 SOURCEDIR := $(shell find src -type d)

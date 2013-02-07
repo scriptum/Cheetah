@@ -73,7 +73,7 @@
 			//~ 0, SOIL_FLAG_TEXTURE_REPEATS,
 			//~ GL_TEXTURE_2D, GL_TEXTURE_2D,
 			//~ GL_MAX_TEXTURE_SIZE );
-	//~ 
+	//~
 	//~ while(*options)
 	//~ {
 		//~ ch = *options;
@@ -90,7 +90,7 @@
 	//~ ptr->h = height;
 	//~ return ptr;
 //~ }
-//~ 
+//~
 //~ /**
  //~ * @descr Load image from disc
  //~ * @group image
@@ -395,7 +395,7 @@ unsigned int
 				//~ /*	not allowed for any other uses (yes, I'm looking at you, cubemaps!)	*/
 				//~ flags &= ~SOIL_FLAG_TEXTURE_RECTANGLE;
 			//~ }
-//~ 
+//~
 		//~ } else
 		//~ {
 			//~ /*	can't do it, and that is a breakable offense (uv coords use pixels instead of [0,1]!)	*/
@@ -754,7 +754,7 @@ unsigned int
 	//~ unsigned char *pixel_data;
 	//~ int i, j;
 	//~ int save_result;
-//~ 
+//~
 	//~ /*	error checks	*/
 	//~ if( (width < 1) || (height < 1) )
 	//~ {
@@ -771,11 +771,11 @@ unsigned int
 		//~ result_string_pointer = "Invalid screenshot filename";
 		//~ return 0;
 	//~ }
-//~ 
+//~
     //~ /*  Get the data from OpenGL	*/
     //~ pixel_data = (unsigned char*)malloc( 3*width*height );
     //~ glReadPixels (x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixel_data);
-//~ 
+//~
     //~ /*	invert the image	*/
     //~ for( j = 0; j*2 < height; ++j )
 	//~ {
@@ -790,10 +790,10 @@ unsigned int
 			//~ ++index2;
 		//~ }
 	//~ }
-//~ 
+//~
     //~ /*	save the image	*/
     //~ save_result = SOIL_save_image( filename, image_type, width, height, 3, pixel_data);
-//~ 
+//~
     //~ /*  And free the memory	*/
     //~ SOIL_free_image_data( pixel_data );
 	//~ return save_result;
@@ -852,7 +852,7 @@ unsigned char*
 	//~ )
 //~ {
 	//~ int save_result;
-//~ 
+//~
 	//~ /*	error check	*/
 	//~ if( (width < 1) || (height < 1) ||
 		//~ (channels < 1) || (channels > 4) ||

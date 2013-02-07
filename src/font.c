@@ -398,7 +398,7 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	int i    = 0;
 	unsigned c = 0;
 	FontChar *fch = NULL;
-	if(sscanf(line, "%d %f %f %f %f %f %f %f %f", &ch, &x1, &y1, &x2, &y2, &cx1, &cy1, &w, &h) == -1)
+	if(sscanf(line, "%u %f %f %f %f %f %f %f %f", &ch, &x1, &y1, &x2, &y2, &cx1, &cy1, &w, &h) == -1)
 		return;
 	UNICODE_TO_INT(raw2utf8(ch), i)
 	else
@@ -449,7 +449,7 @@ void fontSetKerning(Font *ptr, const char *line) {
 	float		kerning;
 	unsigned	c = 0;
 	int		i = 0;
-	if(sscanf(line, "%d %d %f", &first, &second, &kerning) == -1)
+	if(sscanf(line, "%u %u %f", &first, &second, &kerning) == -1)
 		return;
 	UNICODE_TO_INT(raw2utf8(first), i)
 	first = c;
