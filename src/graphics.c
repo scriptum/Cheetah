@@ -2,21 +2,21 @@
 
 Copyright (c) 2012-2013 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to 
-deal in the Software without restriction, including without limitation the 
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-sell copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions:  The above 
-copyright notice and this permission notice shall be included in all copies 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:  The above
+copyright notice and this permission notice shall be included in all copies
 or substantial portions of the Software.
- 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 
 *******************************************************************************/
@@ -44,7 +44,6 @@ GLuint quadlist, pointlist, null_texture, rect_texture, vboVer, vboTex;
 GLuint prevImageId = 0;
 
 bool antiAliasing = 1;
-
 int vertexCounter;
 float *texCoord = NULL;
 float *vertexCoord = NULL;
@@ -327,16 +326,16 @@ void rectanglexy(float x, float y, float w, float h) {
  * @var is circle filled
  * @see color circle
  * */
-void circlexy(float x, float y, double rad, double segments, bool filled) {
+void circlexy(float x, float y, float rad, float segments, bool filled) {
 	int i;
-	const double DBLPI = 3.1415926 * 2;
-	GLdouble angle;
+	const float DBLPI = 3.1415926 * 2;
+	GLfloat angle;
 	glBegin(filled ? GL_TRIANGLE_FAN : GL_LINE_LOOP);
 	int max = segments;
 	for (i = 0; i <= max; i++)
 	{
-		angle = DBLPI / segments * (double)i;
-		glVertex2d(sin(angle) * rad + x, cos(angle) * rad + y);
+		angle = DBLPI / segments * (float)i;
+		glVertex2d(sinf(angle) * rad + x, cosf(angle) * rad + y);
 	}
 	glEnd();
 }
@@ -351,7 +350,7 @@ void circlexy(float x, float y, double rad, double segments, bool filled) {
  * @see colorf
  * */
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
-	int color = r << 24 | g << 16 | b << 8 | a;
+	unsigned color = r << 24 | g << 16 | b << 8 | a;
 	if(color != prevColor)
 	{
 		FLUSH_BUFFER();
@@ -370,7 +369,7 @@ void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
  * @see color
  * */
 void colorf(float r, float g, float b, float a) {
-	int color = ((unsigned char)r) << 24 | ((unsigned char)g) << 16 | ((unsigned char)b) << 8 | ((unsigned char)a);
+	unsigned color = ((unsigned char)r) << 24 | ((unsigned char)g) << 16 | ((unsigned char)b) << 8 | ((unsigned char)a);
 	if(color != prevColor)
 	{
 		FLUSH_BUFFER();
@@ -449,7 +448,7 @@ void blendEquation(int mode) {
 /**
  * @descr Specify pixel arithmetic. Equivalent to glBlendFunc(sourcefactor, destinationfactor);
  * @group graphics/drawing
- * @var Specifies how the red, green, blue, and alpha source blending factors are computed. The following symbolic constants are accepted: 
+ * @var Specifies how the red, green, blue, and alpha source blending factors are computed. The following symbolic constants are accepted:
  *  * cheetah.GL_ZERO
  *  * cheetah.GL_ONE
  *  * cheetah.GL_DST_COLOR
@@ -459,7 +458,7 @@ void blendEquation(int mode) {
  *  * cheetah.GL_DST_ALPHA
  *  * cheetah.GL_ONE_MINUS_DST_ALPHA
  *  * cheetah.GL_SRC_ALPHA_SATURATE
- * @var Specifies how the red, green, blue, and alpha destination blending factors are computed. Eight symbolic constants are accepted: 
+ * @var Specifies how the red, green, blue, and alpha destination blending factors are computed. Eight symbolic constants are accepted:
  *  * cheetah.GL_ZERO
  *  * cheetah.GL_ONE
  *  * cheetah.GL_SRC_COLOR

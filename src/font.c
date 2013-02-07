@@ -158,9 +158,9 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	int       buf          = 0;
 	int       spaces       = -1;
 	unsigned  c            = 0;
-	float     w            = 0.0;
-	float     h            = 0.0;
-	float     lastw        = 0.0;
+	float     w            = 0.0f;
+	float     h            = 0.0f;
+	float     lastw        = 0.0f;
 	float     justifyWidth = currentFont->_spacewidth;
 	float     spacew       = currentFont->_spacewidth;
 	float     fontHeight   = currentFont->height * currentFont->_interval;
@@ -171,10 +171,10 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	FontChar *fontPrevChar = NULL;
 	if(NULL == hash)
 		return;
-	if(maxw > 0.0)
+	if(maxw > 0.0f)
 	{
 		maxw = maxw / currentFont->_scale * screenScale.scaleX;
-		if(maxw == 0.0) maxw = 0.0001;
+		if(maxw == 0.0f) maxw = 0.0001f;
 	}
 	FLUSH_BUFFER();
 	glPushMatrix();
@@ -192,7 +192,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	x = h = y = 0.0;
 
 	imageBind(currentFont->image);
-	if(maxw > 0.0)
+	if(maxw > 0.0f)
 	{
 		while(TRUE)
 		{
@@ -230,7 +230,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 				switch(align)
 				{
 					case alignCenter:
-						x = (maxw - lastw) * 0.5;
+						x = (maxw - lastw) * 0.5f;
 						break;
 					case alignRight:
 						x = maxw - lastw;
@@ -366,7 +366,7 @@ float fontGetInterval(Font *font) {
 	return font->_interval;
 }
 
-inline unsigned char *raw2utf8(unsigned ch)
+static inline unsigned char *raw2utf8(unsigned ch)
 {
 	int i = 0;
 	static unsigned char buffer[9];

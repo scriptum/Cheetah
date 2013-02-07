@@ -82,6 +82,10 @@ typedef struct Point {
 	float x, y;
 } Point;
 
+typedef struct Size {
+	short w, h;
+} Size;
+
 typedef struct Point3 {
 	float x, y, z;
 } Point3;
@@ -124,22 +128,30 @@ typedef struct Multitexture {
 
 /*================================particles===================================*/
 typedef struct ParticleForce {
+	Point		position;
 	unsigned	maxParticles;
 } ParticleForce;
 
+typedef struct Particle {
+	Point		position;
+	Point		speed;
+} Particle;
+
 typedef struct ParticleSystem {
 	ParticleForce	*forces;
-	Point		*position;
-	Point		*speed;
+	Particle	*particles;
 	Point		emitterPosition;
 	unsigned	maxParticles;
 	float		direction;
 	float		directionVariation;
+	float		startSpeed;
+	float		startSpeedVariation;
 	float		scale;
 	float		scaleVariation;
 	unsigned	emissionRate;
 	float		gravity;
 	unsigned	lifeTime;
+	unsigned	lifeTimeVariation;
 	Color		color;
 	Color		colorVariation;
 } ParticleSystem;
@@ -239,14 +251,14 @@ enum {
 };
 
 struct {
-	double		scaleX;
-	double		scaleY;
-	double		offsetX;
-	double		offsetY;
+	float		scaleX;
+	float		scaleY;
+	float		offsetX;
+	float		offsetY;
 	/* original (first-time defined) width and height, if auto-scale enabled*/
-	double		origWidth;
-	double		origHeight;
-	double		aspect;
+	float		origWidth;
+	float		origHeight;
+	float		aspect;
 	bool		autoScale;
 	bool		autoScaleFont;
 } screenScale;
@@ -267,4 +279,5 @@ struct {
 #ifndef FALSE
 #define FALSE	(bool) 0
 #endif
+
 #endif //__CHEETAH_H__

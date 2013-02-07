@@ -1,5 +1,5 @@
 TARGET := libcheetah.so
-CFLAGS += -Wall -Winline -pipe -fPIC
+CFLAGS += -W -Wall -Wextra -Winline -Wdouble-promotion -Wno-unused-parameter -std=gnu99 -pipe -fPIC
 LDFLAGS += -shared -L"lib" -lSDL -lGL
 INCLUDES := -I"inc"
 SOURCEDIR := $(shell find src -type d)
@@ -9,7 +9,7 @@ OBJECTS := $(SOURCES:.c=.o)
 HEADERS := $(wildcard $(addsuffix /*.h*, $(SOURCEDIR)))
 
 all : $(TARGET)
- 
+
 $(TARGET) : $(OBJECTS)
 	@echo "Linking $(TARGET)";\
 	$(CC) -o $@ $(OBJECTS) $(CFLAGS) $(LDFLAGS)
@@ -17,7 +17,7 @@ $(TARGET) : $(OBJECTS)
 %.o : %.c $(HEADERS)
 	@echo "Building $<";\
 	$(CC) $(CFLAGS) $(INCLUDES) -o "$@" -c "$<"
- 
+
 clean :
 	@echo "Cleaning...";\
 	rm -f $(OBJECTS)

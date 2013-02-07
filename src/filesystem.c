@@ -2,21 +2,21 @@
 
 Copyright (c) 2012-2013 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to 
-deal in the Software without restriction, including without limitation the 
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-sell copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions:  The above 
-copyright notice and this permission notice shall be included in all copies 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:  The above
+copyright notice and this permission notice shall be included in all copies
 or substantial portions of the Software.
- 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 
 *******************************************************************************/
@@ -46,8 +46,8 @@ bool isPointer(void * ptr) {
 }
 
 
-unsigned char * loadfile(const char * filename, unsigned int * length) {
-	unsigned char * result = NULL;
+unsigned char *loadfile(const char *filename, unsigned int *length) {
+	unsigned char *result = NULL;
 	size_t size = 0;
 	FILE *file = fopen(filename, "rb");
 	ERROR_IF_NULL(file);
@@ -69,14 +69,14 @@ error:
 }
 
 #define filetime(var) int file ## var ## time(const char * filename) {         \
-	static struct stat buf;                                                      \
-	int result = stat( filename, &buf );                                         \
-	if( result != 0 ) {                                                          \
-		myError("can't get information about file %s", filename);                  \
-		return -1;                                                                 \
-	}                                                                            \
-	else                                                                         \
-		return buf.st_ ## var ## time;                                             \
+    static struct stat buf;                                                    \
+    int result = stat(filename, &buf);                                         \
+    if( result != 0 ) {                                                        \
+        myError("can't get information about file %s", filename);              \
+        return -1;                                                             \
+    }                                                                          \
+    else                                                                       \
+        return buf.st_ ## var ## time;                                         \
 }
 
 filetime(m)

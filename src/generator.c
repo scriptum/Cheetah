@@ -64,8 +64,8 @@ repeat(w, h, channels, buf);
 
 inline float distance(int i, int j, int w, int h)
 {
-	return ((i - w / 2 + 0.5) * (i - w / 2 + 0.5) / (float)(w * w) +
-		(j - h / 2 + 0.5) * (j - h / 2 + 0.5) / (float)(h * h));
+	return ((i - w / 2 + 0.5f) * (i - w / 2 + 0.5f) / (float)(w * w) +
+		(j - h / 2 + 0.5f) * (j - h / 2 + 0.5f) / (float)(h * h));
 }
 
 static void generateImageData(ImageData *ptr, int w, int h, const char *imageType, bool alpha) {

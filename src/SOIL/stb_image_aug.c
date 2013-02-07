@@ -80,7 +80,7 @@
 // Basic usage (see HDR discussion below):
 //    int x,y,n;
 //    unsigned char *data = stbi_load(filename, &x, &y, &n, 0);
-//    // ... process data if not NULL ... 
+//    // ... process data if not NULL ...
 //    // ... x = width, y = height, n = # 8-bit components per pixel ...
 //    // ... replace '0' with '1'..'4' to force that many components per pixel
 //    // ... but 'n' will always be the number that it would have been if you said 0
@@ -156,7 +156,7 @@
 // (linear) floats to preserve the full dynamic range:
 //
 //    float *data = stbi_loadf(filename, &x, &y, &n, 0);
-// 
+//
 // If you load LDR images through this interface, those images will
 // be promoted to floating point values, run through the inverse of
 // constants corresponding to the above:
@@ -178,7 +178,7 @@
 // I/O callbacks allow you to read from arbitrary sources, like packaged
 // files or some other source. Data read from callbacks are processed
 // through a small internal buffer (currently 128 bytes) to try to reduce
-// overhead. 
+// overhead.
 //
 // The three functions you must define are "read" (reads some bytes of data),
 // "skip" (skips some bytes of data), "eof" (reports if the stream is at the end).
@@ -269,7 +269,7 @@ extern int      stbi_is_hdr_from_file(FILE *f);
 
 // get a VERY brief reason for failure
 // NOT THREADSAFE
-extern const char *stbi_failure_reason  (void); 
+extern const char *stbi_failure_reason  (void);
 
 // free the loaded image -- this is just free()
 extern void     stbi_image_free      (void *retval_from_stbi_load);
@@ -2151,7 +2151,7 @@ static int length_base[31] = {
    15,17,19,23,27,31,35,43,51,59,
    67,83,99,115,131,163,195,227,258,0,0 };
 
-static int length_extra[31]= 
+static int length_extra[31]=
 { 0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0,0,0 };
 
 static int dist_base[32] = { 1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,
@@ -4378,22 +4378,22 @@ static int stbi_gif_info(stbi *s, int *x, int *y, int *comp)
 		 //~ return 0;
    //~ return 1;
 //~ }
-//~ 
+//~
 //~ static int stbi_hdr_test(stbi* s)
 //~ {
    //~ int r = hdr_test(s);
    //~ stbi_rewind(s);
    //~ return r;
 //~ }
-//~ 
+//~
 //~ #define HDR_BUFLEN  1024
 //~ static char *hdr_gettoken(stbi *z, char *buffer)
 //~ {
    //~ int len=0;
    //~ char c = '\0';
-//~ 
+//~
    //~ c = (char) get8(z);
-//~ 
+//~
    //~ while (!at_eof(z) && c != '\n') {
 	  //~ buffer[len++] = c;
 	  //~ if (len == HDR_BUFLEN-1) {
@@ -4404,11 +4404,11 @@ static int stbi_gif_info(stbi *s, int *x, int *y, int *comp)
 	  //~ }
 	  //~ c = (char) get8(z);
    //~ }
-//~ 
+//~
    //~ buffer[len] = 0;
    //~ return buffer;
 //~ }
-//~ 
+//~
 //~ static void hdr_convert(float *output, stbi_uc *input, int req_comp)
 //~ {
    //~ if ( input[3] != 0 ) {
@@ -4435,7 +4435,7 @@ static int stbi_gif_info(stbi *s, int *x, int *y, int *comp)
 	  //~ }
    //~ }
 //~ }
-//~ 
+//~
 //~ static float *hdr_load(stbi *s, int *x, int *y, int *comp, int req_comp)
 //~ {
    //~ char buffer[HDR_BUFLEN];
@@ -4447,8 +4447,8 @@ static int stbi_gif_info(stbi *s, int *x, int *y, int *comp)
    //~ int len;
    //~ unsigned char count, value;
    //~ int i, j, k, c1,c2, z;
-//~ 
-//~ 
+//~
+//~
    //~ // Check identifier
    //~ if (strcmp(hdr_gettoken(s,buffer), "#?RADIANCE") != 0)
 	  //~ return epf("not HDR", "Corrupt HDR image");
@@ -4459,9 +4459,9 @@ static int stbi_gif_info(stbi *s, int *x, int *y, int *comp)
 	  //~ if (token[0] == 0) break;
 	  //~ if (strcmp(token, "FORMAT=32-bit_rle_rgbe") == 0) valid = 1;
    //~ }
-//~ 
+//~
    //~ if (!valid)    return epf("unsupported format", "Unsupported HDR format");
-//~ 
+//~
    //~ // Parse width and height
    //~ // can't use sscanf() if we're not using stdio!
    //~ token = hdr_gettoken(s,buffer);
@@ -4472,16 +4472,16 @@ static int stbi_gif_info(stbi *s, int *x, int *y, int *comp)
    //~ if (strncmp(token, "+X ", 3))  return epf("unsupported data layout", "Unsupported HDR format");
    //~ token += 3;
    //~ width = strtol(token, NULL, 10);
-//~ 
+//~
    //~ *x = width;
    //~ *y = height;
-//~ 
+//~
    //~ *comp = 3;
    //~ if (req_comp == 0) req_comp = 3;
-//~ 
+//~
    //~ // Read data
    //~ hdr_data = (float *) malloc(height * width * req_comp * sizeof(float));
-//~ 
+//~
    //~ // Load image data
    //~ // image data is stored as some number of sca
    //~ if ( width < 8 || width >= 32768) {
@@ -4497,7 +4497,7 @@ static int stbi_gif_info(stbi *s, int *x, int *y, int *comp)
    //~ } else {
 	  //~ // Read RLE-encoded data
 	  //~ scanline = NULL;
-//~ 
+//~
 	  //~ for (j = 0; j < height; ++j) {
 		 //~ c1 = get8(s);
 		 //~ c2 = get8(s);
@@ -4543,32 +4543,32 @@ static int stbi_gif_info(stbi *s, int *x, int *y, int *comp)
 	  //~ }
 	  //~ free(scanline);
    //~ }
-//~ 
+//~
    //~ return hdr_data;
 //~ }
-//~ 
+//~
 //~ static float *stbi_hdr_load(stbi *s, int *x, int *y, int *comp, int req_comp)
 //~ {
    //~ return hdr_load(s,x,y,comp,req_comp);
 //~ }
-//~ 
+//~
 //~ static int stbi_hdr_info(stbi *s, int *x, int *y, int *comp)
 //~ {
    //~ char buffer[HDR_BUFLEN];
    //~ char *token;
    //~ int valid = 0;
-//~ 
+//~
    //~ if (strcmp(hdr_gettoken(s,buffer), "#?RADIANCE") != 0) {
 	   //~ stbi_rewind( s );
 	   //~ return 0;
    //~ }
-//~ 
+//~
    //~ for(;;) {
 	  //~ token = hdr_gettoken(s,buffer);
 	  //~ if (token[0] == 0) break;
 	  //~ if (strcmp(token, "FORMAT=32-bit_rle_rgbe") == 0) valid = 1;
    //~ }
-//~ 
+//~
    //~ if (!valid) {
 	   //~ stbi_rewind( s );
 	   //~ return 0;
@@ -4650,14 +4650,14 @@ static int stbi_bmp_info(stbi *s, int *x, int *y, int *comp)
    //~ *comp = 4;
    //~ return 1;
 //~ }
-//~ 
+//~
 //~ static int stbi_pic_info(stbi *s, int *x, int *y, int *comp)
 //~ {
    //~ int act_comp=0,num_packets=0,chained;
    //~ pic_packet_t packets[10];
-//~ 
+//~
    //~ skip(s, 92);
-//~ 
+//~
    //~ *x = get16(s);
    //~ *y = get16(s);
    //~ if (at_eof(s))  return 0;
@@ -4665,22 +4665,22 @@ static int stbi_bmp_info(stbi *s, int *x, int *y, int *comp)
 	   //~ stbi_rewind( s );
 	   //~ return 0;
    //~ }
-//~ 
+//~
    //~ skip(s, 8);
-//~ 
+//~
    //~ do {
 	  //~ pic_packet_t *packet;
-//~ 
+//~
 	  //~ if (num_packets==sizeof(packets)/sizeof(packets[0]))
 		 //~ return 0;
-//~ 
+//~
 	  //~ packet = &packets[num_packets++];
 	  //~ chained = get8(s);
 	  //~ packet->size    = get8u(s);
 	  //~ packet->type    = get8u(s);
 	  //~ packet->channel = get8u(s);
 	  //~ act_comp |= packet->channel;
-//~ 
+//~
 	  //~ if (at_eof(s)) {
 		  //~ stbi_rewind( s );
 		  //~ return 0;
@@ -4690,9 +4690,9 @@ static int stbi_bmp_info(stbi *s, int *x, int *y, int *comp)
 		  //~ return 0;
 	  //~ }
    //~ } while (chained);
-//~ 
+//~
    //~ *comp = (act_comp & 0x10 ? 4 : 3);
-//~ 
+//~
    //~ return 1;
 //~ }
 

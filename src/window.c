@@ -291,21 +291,21 @@ void prepare() {
 		glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void recomputeScreenScale(double w, double h)
+void recomputeScreenScale(float w, float h)
 {
 	if(screenScale.autoScale)
 	{
-		screenScale.aspect = w/h;
-		if(screenScale.aspect > (double)4/3)
+		screenScale.aspect = w / h;
+		if(screenScale.aspect > (float)4/3)
 		{
 			screenScale.scaleX = screenScale.scaleY = h/screenScale.origHeight;
-			screenScale.offsetX = floor((w - screenScale.origWidth * screenScale.scaleX) * 0.5);
+			screenScale.offsetX = floorf((w - screenScale.origWidth * screenScale.scaleX) * 0.5f);
 			screenScale.offsetY = 0;
 		}
 		else
 		{
 			screenScale.scaleX = screenScale.scaleY = w/screenScale.origWidth;
-			screenScale.offsetY = floor((h - screenScale.origHeight * screenScale.scaleY) * 0.5);
+			screenScale.offsetY = floorf((h - screenScale.origHeight * screenScale.scaleY) * 0.5f);
 			screenScale.offsetX = 0;
 		}
 	}

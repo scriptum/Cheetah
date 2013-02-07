@@ -211,5 +211,7 @@ void deleteFramebuffer(Framebuffer * ptr) {
 		delete(ptr->image);
 	}
 	else
+	{
 		dprintf_fbo("Trying to free a null-framebuffer. Maybe, you did it manually?");
+	}
 }

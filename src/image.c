@@ -442,7 +442,7 @@ void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, fl
 	float r  = borderImage->right;\
 	float b  = borderImage->bottom;\
 	float l  = borderImage->left;\
-	if(t > 0.0)\
+	if(t > 0.0f)\
 	{\
 		PUSH_QUADT(x,  y,  l,          t,          a, ox,         oy,          0,       0,       l,            t,          ow, oh);\
 		PUSH_QUADT(x,  y,  w - l - r,  t,          a, ox - l,     oy,          l,       0,       ow - l - r,   t,          ow, oh);\
@@ -452,7 +452,7 @@ void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, fl
 	if(FALSE == borderImage->borderOnly)\
 		PUSH_QUADT(x,  y,  w - l - r,  h - t - b,  a, ox - l,     oy - t,      l,       t,        ow - l - r,  oh - t - b, ow, oh);\
 	PUSH_QUADT(x,    y,  r,          h - t - b,  a, ox - w + r, oy - t,      ow - r,  t,        r,           oh - t - b, ow, oh);\
-	if(b > 0.0)\
+	if(b > 0.0f)\
 	{\
 		PUSH_QUADT(x,  y,  l,          b,          a, ox,         oy - h + b,  0,       oh - b,   l,           b,          ow, oh);\
 		PUSH_QUADT(x,  y,  w - l - r,  b,          a, ox - l,     oy - h + b,  l,       oh - b,   ow - l - r,  b,          ow, oh);\

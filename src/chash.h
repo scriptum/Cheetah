@@ -26,7 +26,7 @@ IN THE SOFTWARE.
 #define HASH_PROBING (index + (probes))
 
 #define HASH_EACH(hash, CODE) {                                                \
-    int __i;                                                                   \
+    unsigned __i;                                                              \
     typeof(hash->nodes) hashnode;                                              \
     for(__i = 0; __i <= hash->size; __i++) {                                   \
         hashnode = &(hash->nodes[__i]);                                        \
@@ -53,8 +53,8 @@ typedef struct hashName##Node {                                                \
 } hashName##Node;                                                              \
                                                                                \
 typedef struct {                                                               \
-    unsigned        size;                                                      \
-    unsigned        items;                                                     \
+    size_t          size;                                                      \
+    size_t          items;                                                     \
     hashName##Node *nodes;                                                     \
 } hashName;                                                                    \
                                                                                \
@@ -63,7 +63,7 @@ void hashName##_destroy(hashName *hash) {                                      \
     if(hash)           free(hash);                                             \
 }                                                                              \
                                                                                \
-hashName *hashName##_new_size(unsigned size) {                                 \
+hashName *hashName##_new_size(size_t size) {                                   \
     hashName *hash = calloc(1, sizeof(hashName));                              \
     if(NULL == hash) goto error;                                               \
     hash->size     = size - 1;                                                 \
