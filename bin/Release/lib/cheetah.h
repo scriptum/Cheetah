@@ -87,12 +87,15 @@ typedef struct ParticleSystem {
 	float		startSpeedVariation;
 	float		scale;
 	float		scaleVariation;
-	unsigned	emissionRate;
+	float		emissionRate;
 	float		gravity;
 	unsigned	lifeTime;
 	unsigned	lifeTimeVariation;
 	Color		color;
 	Color		colorVariation;
+	unsigned	_lastmillis;
+	double		_lasttime;
+	unsigned	_aliveParticles;
 } ParticleSystem;
 typedef struct Atlas {
 	Image		*image;

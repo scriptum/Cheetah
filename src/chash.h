@@ -21,6 +21,9 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
+#ifndef __CHASH_H__
+#define __CHASH_H__
+
 #define HASH_START_SIZE 128
 
 #define HASH_PROBING (index + (probes))
@@ -118,3 +121,5 @@ static inline unsigned hashName##_length(hashName *hash) {                     \
 static inline unsigned hashName##_size(hashName *hash) {                       \
     return hash->size + 1;                                                     \
 }
+
+#endif /*__CHASH_H__*/

@@ -148,12 +148,15 @@ typedef struct ParticleSystem {
 	float		startSpeedVariation;
 	float		scale;
 	float		scaleVariation;
-	unsigned	emissionRate;
+	float		emissionRate;
 	float		gravity;
 	unsigned	lifeTime;
 	unsigned	lifeTimeVariation;
 	Color		color;
 	Color		colorVariation;
+	unsigned	_lastmillis;
+	double		_lasttime;
+	unsigned	_aliveParticles;
 } ParticleSystem;
 
 /*=================================atlas======================================*/
@@ -280,4 +283,4 @@ struct {
 #define FALSE	(bool) 0
 #endif
 
-#endif //__CHEETAH_H__
+#endif /*__CHEETAH_H__*/

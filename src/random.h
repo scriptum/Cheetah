@@ -21,6 +21,9 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
+#ifndef __RANDOM_H__
+#define __RANDOM_H__
+
 /**
  * Set of some xorshift RNG's. They are all fast as hell, period differs only.
  * http://en.wikipedia.org/wiki/Xorshift
@@ -116,3 +119,5 @@ static inline float randf2(uint32_t random_integer)
 	u.i = 0x40000000 | (random_integer >> 9);
 	return u.f - 3.f;
 }
+
+#endif /*__RANDOM_H__*/
