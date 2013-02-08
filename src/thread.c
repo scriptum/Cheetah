@@ -26,8 +26,6 @@ IN THE SOFTWARE.
 
 #include "cheetah.h"
 
-extern double globalTimed;
-
 /**
  * @descr Gets the number of milliseconds past from the execution time. Equivalent to SDL_GetTicks();
  * @group timer
