@@ -25,12 +25,14 @@ IN THE SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 #include "cheetah.h"
 #include "render.h"
 #include "config.h"
 #include "macros.h"
 #include "vertex.h"
+#include "random.h"
 
 #include <SDL.h>
 
@@ -176,6 +178,9 @@ bool init(const char * appName, const char * options) {
 		/* fix vertex pointers to main memory area */
 		glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
 		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
+
+		/* init random generator */
+		random_hash_seed(time(0));
 	}
 	return TRUE;
 }

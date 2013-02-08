@@ -30,7 +30,7 @@ IN THE SOFTWARE.
 #include "cheetah.h"
 #include "macros.h"
 #include "render.h"
-#include "random-taus88.h"
+#include "random.h"
 
 #define MAGICK_CONSTANT 20
 
@@ -71,12 +71,6 @@ inline float distance(int i, int j, int w, int h)
 static void generateImageData(ImageData *ptr, int w, int h, const char *imageType, bool alpha) {
 	int i, j, c, channels;
 	char *buf = NULL;
-	static rt88_state *taus88 = NULL;
-	if(!taus88)
-	{
-		new(taus88, rt88_state, 1);
-		rt88_init(taus88, time(0));
-	}
 
 	if(!ptr)
 	{
@@ -98,7 +92,7 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 	else if(strcmp(imageType, "noise") == 0){
 		NEW;
 		for(i = 0; i < w * h; i++)
-			*((int*)(buf + i * channels)) = rt88_trand(taus88);
+			*((int*)(buf + i * channels)) = rand128();
 	}
     #define COLOR_LIGHT                                                        \
         if(channels == 3) {                                                    \
