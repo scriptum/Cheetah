@@ -69,22 +69,22 @@ extern SDL_Surface *screen;
 
 #define UNICODE_TO_INT(a, i)                                                   \
 if((a[i] & 0b10000000) == 0) {                                                 \
-    c = a[i++];                                                                \
+    c  =  a[i++];                                                              \
 }                                                                              \
-else if((a[i] & 0b11100000) == 0b11000000) {                                   \
-    c = (a[i++] & 0b00011111) << 6;                                            \
-    c |= a[i++] & 0b00111111;                                                  \
+else if ((a[i]   & 0b11100000) == 0b11000000) {                                \
+    c =  (a[i++] & 0b00011111) << 6;                                           \
+    c |=  a[i++] & 0b00111111;                                                 \
 }                                                                              \
-else if((a[i] & 0b11110000) == 0b11100000) {                                   \
-    c = (a[i++] & 0b00001111) << 12;                                           \
+else if ((a[i]   & 0b11110000) == 0b11100000) {                                \
+    c =  (a[i++] & 0b00001111) << 12;                                          \
     c |= (a[i++] & 0b00111111) << 6;                                           \
-    c |= a[i++] & 0b00111111;                                                  \
+    c |=  a[i++] & 0b00111111;                                                 \
 }                                                                              \
-else if((a[i] & 0b11111000) == 0b11110000) {                                   \
-    c = (a[i++] & 0b00000111) << 18;                                           \
+else if ((a[i]   & 0b11111000) == 0b11110000) {                                \
+    c =  (a[i++] & 0b00000111) << 18;                                          \
     c |= (a[i++] & 0b00111111) << 12;                                          \
     c |= (a[i++] & 0b00111111) << 6;                                           \
-    c |= a[i++] & 0b00111111;                                                  \
+    c |=  a[i++] & 0b00111111;                                                 \
 }
 
 /* Calculate width of string. */
@@ -140,7 +140,7 @@ float fontHeight(Font *font) {
     texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];          \
     texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];          \
     texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];          \
-    w = FONT_CEIL(currentFont, x);                                                                   \
+    w = FONT_CEIL(currentFont, x);                                             \
     vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0] + w;  \
     vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;\
     vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;\
