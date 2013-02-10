@@ -275,7 +275,8 @@ static void imageCheckResLoader(Image * image)
 
 static void multitextureBind(Multitexture * multitexture)
 {
-	//~ if(prevImageId == image->id) return;
+	if(NULL == multitexture || NULL == multitexture->images)
+		return;
 	FLUSH_BUFFER();
 	Image * image;
 	int i;
@@ -283,8 +284,10 @@ static void multitextureBind(Multitexture * multitexture)
 	{
 		image = multitexture->images[i];
 		glActiveTexture_(GL_TEXTURE0 + i);
+		if(NULL == image)
+			continue;
 		imageCheckResLoader(image);
-		if (image->id)
+		if(image->id)
 			glBindTexture(GL_TEXTURE_2D, image->id);
 	}
 	prevImageId = 0;
@@ -467,6 +470,14 @@ void borderImageDrawt(BorderImage * borderImage, float x, float y, float w, floa
 
 void borderImageDrawxy(BorderImage * borderImage, float x, float y, float w, float h) {
 	borderImageDrawInternal(borderImage, x, y, w, h, 0, 0, 0);
+}
+
+void initMultitexture(Multitexture * multitexture) {
+	new(multitexture->images, Image*, multitexture->size);
+}
+
+void deleteMultitexture(Multitexture * multitexture) {
+	delete(multitexture->images);
 }
 
 void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, float h) {

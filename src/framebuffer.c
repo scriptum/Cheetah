@@ -205,7 +205,8 @@ void framebufferSaveBMP(Framebuffer * ptr, const char* name) {
 
 /* Delete framebuffer and free memory. */
 void deleteFramebuffer(Framebuffer * ptr) {
-	if(ptr) {
+	if(ptr)
+	{
 		glDeleteTextures(1, &ptr->image->id);
 		glDeleteFramebuffers_(1, &ptr->id);
 		delete(ptr->image);

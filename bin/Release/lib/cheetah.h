@@ -298,6 +298,8 @@ void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, f
 void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy);
 void borderImageDrawt(BorderImage * borderImage, float x, float y, float w, float h, float a, float ox, float oy);
 void borderImageDrawxy(BorderImage * borderImage, float x, float y, float w, float h);
+void initMultitexture(Multitexture * multitexture);
+void deleteMultitexture(Multitexture * multitexture);
 void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, float h);
 void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy);
 void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
