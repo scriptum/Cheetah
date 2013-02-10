@@ -24,6 +24,14 @@ IN THE SOFTWARE.
 #ifndef __CHASH_H__
 #define __CHASH_H__
 
+#define DEBUG_CHASH 0
+
+#if DEBUG_CHASH
+	#define dprintf_chash(...) printf(__VA_ARGS__)
+#else
+	#define dprintf_chash(...)
+#endif
+
 #define HASH_START_SIZE 128
 
 #define HASH_PROBING (index + (probes))
@@ -71,8 +79,10 @@ hashName *hashName##_new_size(size_t size) {                                   \
     if(NULL == hash) goto error;                                               \
     hash->size     = size - 1;                                                 \
     hash->nodes    = calloc(hash->size + 1, sizeof(hashName##Node));           \
+    dprintf_chash("Hash %s created of size %u\n", #hashName, size);            \
     return hash;                                                               \
 error:                                                                         \
+    dprintf_chash("Hash %s error: cannot allocate memory\n", #hashName);       \
     hashName##_destroy(hash);                                                  \
     return NULL;                                                               \
 }                                                                              \
@@ -102,6 +112,8 @@ static inline valType hashName##_get(hashName *hash, keyType key) {            \
 static inline bool hashName##_set(hashName *hash, keyType key, valType value) {\
     _HASH_INDEX(hashFunc, _HASH_NODE.busy)                                     \
     _HASH_NODE.key   = key;                                                    \
+    dprintf_chash("%s: insert key %5u using %4d probes\n",                     \
+                  #hashName, key, probes);                                     \
     _HASH_NODE.value = value;                                                  \
     _HASH_NODE.busy  = TRUE;                                                   \
     hash->items++;                                                             \
