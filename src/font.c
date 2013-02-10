@@ -35,12 +35,12 @@ IN THE SOFTWARE.
 #include "vertex.h"
 #include "chash.h"
 
-inline unsigned fontHashFunc(unsigned key)
+static inline unsigned fontHashFunc(unsigned key)
 {
 	return key ^ (key << 7) ^ (key >> 5);
 }
 
-inline unsigned fontCmpFunc(unsigned a, unsigned b)
+static inline unsigned fontCmpFunc(unsigned a, unsigned b)
 {
 	return a == b;
 }
@@ -52,12 +52,12 @@ typedef struct KerningPair {
 	unsigned second;
 } KerningPair;
 
-inline unsigned kerningHashFunc(KerningPair key)
+static inline unsigned kerningHashFunc(KerningPair key)
 {
 	return key.first * key.second;
 }
 
-inline unsigned kerningCmpFunc(KerningPair a, KerningPair b)
+static inline unsigned kerningCmpFunc(KerningPair a, KerningPair b)
 {
 	return a.second == b.second && a.first == b.first;
 }
