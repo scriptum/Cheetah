@@ -187,6 +187,7 @@ void framebufferBind(Framebuffer * ptr) {
  * default screen. This function unbinds the current framebuffer object. */
 void framebufferUnbind(Framebuffer * ptr) {
 	FLUSH_BUFFER();
+	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, 0);
 	resetViewDefault();
 }
 
