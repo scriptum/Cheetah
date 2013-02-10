@@ -20,7 +20,7 @@ local ent = E:new(screen):set({scale = 1.0})
 	local w, h = s.img.w * s.scale, s.img.h * s.scale
 	s.img:draw(scr_w * 0.5 , scr_h * 0.5, w, h, time * 0.01, w * 0.5, h * 0.5)
 	if bic then shader:unbind() end
-	C.fonts.default:scale(2)
+	C.fonts.default:setScale(2)
 	if bg then C.color(0,0,0,255)
 	else C.color(255,255,255,255) end
 	C.fonts.default:print("Toggle bicubic filter: f\nToggle zoom: z\nToggle image: t\nToggle background: g")
