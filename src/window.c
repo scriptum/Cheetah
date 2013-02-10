@@ -65,7 +65,7 @@ void setWindowSize(unsigned w, unsigned h) {
 }
 
 /* Create window and initialize all OpenGL's stuff. */
-bool init(const char * appName, const char * options) {
+bool cheetahInit(const char * appName, const char * options) {
 	unsigned flags = SDL_OPENGL | SDL_DOUBLEBUF;
 	bool firstrun = FALSE;
 	int width = 800, height = 600;
@@ -282,7 +282,8 @@ void prepare() {
 	globalTimers.time = SDL_GetTicks();
 	delta = globalTimers.time - delta;
 	globalTimers.timeOffsetd += (1.0 - globalTimers.gameSpeed) * delta / 1000.0;
-	globalTimers.timed = globalTimers.time / 1000.0 - globalTimers.timeOffsetd;
+	globalTimers.timed = globalTimers.time / 1000.0;
+	globalTimers.gameTimed = globalTimers.timed - globalTimers.timeOffsetd;
 	doAutoScale();
 	resLoaderMainThread();
 	if(globalTimers.rescaleTime && globalTimers.time > globalTimers.rescaleTime)

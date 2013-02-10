@@ -73,7 +73,7 @@ else
 	#clang has faster compile time than gcc and produces good code w/o -O3
 	which clang > /dev/null 2>&1
 	if [ "$?" = "0" ]
-		then export CC="clang"
+		then export CC=clang
 	fi
 fi
 

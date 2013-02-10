@@ -391,7 +391,8 @@ void newImageRaw(Image *ptr, int width, int height, const char *data, const char
  * @advanced
  * */
 void imageBind(Image * image) {
-	if(!image) return;
+	if(!image)
+		return;
 	imageCheckResLoader(image);
 	TEXTURE_BIND(image->id);
 }

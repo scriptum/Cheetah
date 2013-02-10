@@ -24,6 +24,8 @@ IN THE SOFTWARE.
 #ifndef __RANDOM_H__
 #define __RANDOM_H__
 
+#include <stdint.h>
+
 /**
  * Set of some xorshift RNG's. They are all fast as hell, period differs only.
  * http://en.wikipedia.org/wiki/Xorshift
@@ -33,9 +35,6 @@ static uint32_t _xor_seed;
 
 static inline uint32_t hash_uint32 (uint32_t hash)
 {
-	// Thomas Wang's integer hash.
-	// http://www.concentric.net/~Ttwang/tech/inthash.htm
-	// a faster hash for integers. also very good.
 	hash += ~(hash << 15);
 	hash ^=   hash >> 10;
 	hash +=   hash << 3;
@@ -55,8 +54,13 @@ static inline void random_hash_seed(uint32_t seed)
 	_xor_seed = hash_uint32(seed);
 }
 
+static inline uint32_t random_get_seed()
+{
+	return _xor_seed;
+}
+
 /**
- * Period: 2^128-1
+ * Period: 2^128-1. Fastest: 646M rn/sec @ Intel Pentium 4 3.0 GHz
  **/
 static inline uint32_t rand128()
 {
@@ -71,7 +75,7 @@ static inline uint32_t rand128()
 }
 
 /**
- * Period: 2^192-2^32
+ * Period: 2^192-2^32. Fast enough: 555M rn/sec @ Intel Pentium 4 3.0 GHz
  **/
 static inline uint32_t rand192()
 {
@@ -85,7 +89,7 @@ static inline uint32_t rand192()
 
 /**
  * Small period, needs 64bit integer... Without seed!
- * It does not pass all tests, so I kept it just as example.
+ * It does not pass all tests, it slow, so I kept it just as example.
  **/
 static inline uint32_t rand32()
 {
