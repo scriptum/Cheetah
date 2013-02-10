@@ -431,6 +431,11 @@ function gameSpeed(number speed)
 @return number of frames per second
 number function getFps()
 
+@descr Draw all quads accumulated in engine's quad buffer (flush vertex accumulator). Cheetah 2D engine uses its own buffer to batch drawing of huge amount of quads with one shared texture. Usually engine flushes this buffer automatically.
+@group graphics
+@advanced
+function flushBuffer()
+
 @descr Enables depth test. Useless if you didn't pass 'depth' option to cheetah.init. Equivalent to glEnable(GL_DEPTH_TEST);
 @group graphics
 @see disableDepthTest
@@ -490,6 +495,46 @@ function setScissor(number x, number y, number w, number h)
 @advanced
 function flush()
 
+@descr Enable or disable blending. Drawing without blending usually faster, but textures with alpha-channel will loose its opacity. Blending is enabled by default.
+@group graphics
+@var blend mode
+@see enableBlend disableBlend blendMode
+@advanced
+function blend(bool blendMode)
+
+@descr Enable blending. Blending is enabled by default.
+@group graphics
+@see disableBlend blend blendMode
+@advanced
+function enableBlend()
+
+@descr Disable blending.
+@group graphics
+@see enableBlend blend blendMode
+@advanced
+function disableBlend()
+
+@descr Push the transformation matrix to stack. Equivalent to glPushMatrix();
+@note This function is slow. Avoid to use it for object positioning.
+@group graphics
+@see pop reset
+@advanced
+function push()
+
+@descr Pop the transformation matrix from stack. Equivalent to glPopMatrix();
+@note This function is slow. Avoid to use it for object positioning.
+@group graphics
+@see push reset
+@advanced
+function pop()
+
+@descr Reset the transformation matrix. Equivalent to glLoadIdentity();
+@note This function is slow. Avoid to use it for object positioning.
+@group graphics
+@see push pop
+@advanced
+function reset()
+
 @descr Move object relatively to the current matrix position (in pixels). This function must be called between cheetah.push and cheetah.pop functions.
 @note This function is slow. Avoid to use it for object positioning.
 @group graphics
@@ -530,8 +575,106 @@ function rotate(number angle)
 @advanced
 function translateObject(number x, number y, number angle, number width, number height, number origin_x, number origin_y)
 
-
 @descr Enable or disable autoscale. Autoscale allows you to draw stuff in the fixed coordinates, and engine automatically translates all coordinates if window changes his size. Is you want to control screen size yourself, disable this.
 @group graphics
 @var enable or disable autoscale
 function autoScale(bool autoScale)
+
+@descr Set the color. All graphics below will be painted with this color.
+@group graphics
+@var red component (0-255)
+@var green component (0-255)
+@var blue component (0-255)
+@var alpha component, opacity (0-255)
+@see colorf clearColor
+function color(number red, number green, number blue, number alpha)
+
+@descr Set the color in floating-point mode. All graphics below will be painted with this color.
+@group graphics
+@var red component (0-1)
+@var green component (0-1)
+@var blue component (0-1)
+@var alpha component, opacity (0-1)
+@see color clearColor
+function colorf(number red, number green, number blue, number alpha)
+
+@descr Set the color used to clear screen (default background color).
+@group graphics
+@var red component (0-1)
+@var green component (0-1)
+@var blue component (0-1)
+@var alpha component, opacity (0-1)
+@see color colorf
+function clearColor(number red, number green, number blue, number alpha)
+
+@descr Sets the blending mode. Blending modes allow you to create some cool effects.
+@group graphics
+@var One of possible blending modes. Use pre-defined blending modes:
+ * cheetah.blendAlpha - default
+ * cheetah.blendMultiplicative
+ * cheetah.blendAdditive
+ * cheetah.blendSubstractive
+ * cheetah.blendMask - render inverse alpha channel
+ * cheetah.blendScreen - as PhotoShop's Screen mode
+ * cheetah.blendDetail - interesting effect, allows to use gray detail textures. Gray color does not change lighness, white color increases lightness, black color makes dark places. This mode may be used to produce lighting effects without shaders.
+@see blend enableBlend disableBlend
+function blendMode(enumerate mode)
+
+@descr Specify the equation used for both the RGB blend equation and the Alpha blend equation. Equivalent to glBlendEquation(mode);
+@group graphics/drawing
+@var Specifies how source and destination colors are combined. It must be:
+ * cheetah.GL_FUNC_ADD
+ * cheetah.GL_FUNC_SUBTRACT
+ * cheetah.GL_FUNC_REVERSE_SUBTRACT
+ * cheetah.GL_MIN
+ * cheetah.GL_MAX
+@advanced
+function blendEquation(enumerate mode)
+
+@descr Specify pixel arithmetic. Equivalent to glBlendFunc(sourcefactor, destinationfactor);
+@group graphics
+@var Specifies how the red, green, blue, and alpha source blending factors are computed. The following symbolic constants are accepted:
+ * cheetah.GL_ZERO
+ * cheetah.GL_ONE
+ * cheetah.GL_DST_COLOR
+ * cheetah.GL_ONE_MINUS_DST_COLOR
+ * cheetah.GL_SRC_ALPHA
+ * cheetah.GL_ONE_MINUS_SRC_ALPHA
+ * cheetah.GL_DST_ALPHA
+ * cheetah.GL_ONE_MINUS_DST_ALPHA
+ * cheetah.GL_SRC_ALPHA_SATURATE
+@var Specifies how the red, green, blue, and alpha destination blending factors are computed. Eight symbolic constants are accepted:
+ * cheetah.GL_ZERO
+ * cheetah.GL_ONE
+ * cheetah.GL_SRC_COLOR
+ * cheetah.GL_ONE_MINUS_SRC_COLOR
+ * cheetah.GL_SRC_ALPHA
+ * cheetah.GL_ONE_MINUS_SRC_ALPHA
+ * cheetah.GL_DST_ALPHA
+ * cheetah.GL_ONE_MINUS_DST_ALPHA
+function blendFunc(enumerate sourcefactor, enumerate destinationfactor)
+
+@descr Clear screen. Do not use it if you have background image. Cheetah 2D engine clears screen automatically, but you may use this to clear framebuffer.
+@group graphics
+@see clearColor clearColorDepth clearColorStencil clearDepth clearStencil
+function clear()
+
+@descr Clear screen and depth buffer. Usually used in lQuery.addhook(cheetah.clearColorDepth). Slow.
+@group graphics
+@see clearColor clear clearColorStencil clearDepth clearStencil
+function clearColorDepth()
+
+@descr Clear screen and stencil buffer. Usually used in lQuery.addhook(cheetah.clearColorStencil). Slow.
+@group graphics
+@see clearColor clear clearColorDepth clearDepth clearStencil
+function clearColorStencil()
+
+@descr Clear depth buffer. Usually used in lQuery.addhook(cheetah.clearDepth). Slow.
+@group graphics
+@see clearColor clear clearColorDepth clearColorStencil clearStencil
+function clearDepth()
+
+@descr Clear stencil buffer. Usually used in lQuery.addhook(cheetah.clearStencil). Slow.
+@group graphics
+@see clearColor clear clearColorDepth clearColorStencil clearDepth
+function clearStencil()
