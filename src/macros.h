@@ -24,6 +24,8 @@ IN THE SOFTWARE.
 #ifndef __MACROS_H__
 #define __MACROS_H__
 
+#include <stdlib.h>
+
 /***********************************DEBUGGING**********************************/
 
 /* Debug memory operations */
@@ -32,7 +34,7 @@ IN THE SOFTWARE.
 #define DEBUG_FRAMEBUFFER 0
 
 #if DEBUG_MEMORY
-	#define dprintf_mem(...) myError(__VA_ARGS__)
+	#define dprintf_mem(...) printf(__VA_ARGS__)
 #else
 	#define dprintf_mem(...)
 #endif
