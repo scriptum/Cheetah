@@ -104,19 +104,19 @@ local FPS = 60
 C.FPS = "60"
 C.printFPS = false
 time = 0
-local lasttime = 0
-local realtime
+systemTime = 0
+local lastFpsTime = 0
 C.mainLoop = function()
 	assert(libcheetah.isInit(), 'You forgot about cheetah.init')
 	while done == false do
-		time = libcheetah.getTime()
-		realtime = libcheetah.getRealTime()
+		time = libcheetah.getGameTime()
+		systemTime = libcheetah.getTime()
 		libcheetah.prepare()
 		if C.render then C.render() end
 		libcheetah.swapBuffers()
-		FPS = (FPS + 1) / (1 + (libcheetah.getRealTime() - realtime));
-		if time - lasttime > 0.5 then
-			lasttime = time
+		FPS = (FPS + 1) / (1 + (libcheetah.getTime() - systemTime));
+		if systemTime - lastFpsTime > 0.5 then
+			lastFpsTime = systemTime
 			if C.printFPS then
 				print(C.FPS..' '..gcinfo())
 				C.setTitle(C.FPS..' '..gcinfo())
@@ -634,7 +634,7 @@ C.resLoader = function(dirname, recursive)
 end
 
 C.init = function(title, options)
-	libcheetah.init(title or 'Cheetah 2D Engine', options or 'vsync')
+	libcheetah.cheetahInit(title or 'Cheetah 2D Engine', options or 'vsync')
 	C.newFont('lib/font/DICE.fnt')
 	C.fonts.default = C.fonts.DICE[6]
 end

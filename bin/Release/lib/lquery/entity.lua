@@ -2,21 +2,21 @@
 
 Copyright (c) 2012 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to 
-deal in the Software without restriction, including without limitation the 
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-sell copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions:  The above 
-copyright notice and this permission notice shall be included in all copies 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:  The above
+copyright notice and this permission notice shall be included in all copies
 or substantial portions of the Software.
- 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 
 ******************************************************************************]]
@@ -28,7 +28,7 @@ local C = cheetah
 local mHover
 local mPressOwn = false
 
-local _lQuery 
+local _lQuery
 _lQuery = {
 	fx = true,
 	hooks = {},
@@ -278,7 +278,7 @@ function Entity:append(child)
 	return self --so we can chain methods
 end
 
---Animates all values of entity to the given values in keys with the given speed
+--Animate all values of entity to the given values in keys with the given speed
 --examples:
 --ent:animate({x=100,y=100}, 0.3) - move entity to 100, 100 for 300 msecs
 --ent:animate({r=0,g=0,b=0,a=0}, {speed=0.3, easing='linear'}) - fade down with given easing function
@@ -291,12 +291,12 @@ function Entity:animate(keys, options)
 		local keys_int = {}
 		for k, v in pairs(keys) do
 			if not self[k] then self[k] = 0 end
-			assert(type(v) == 'number' and type(self[k]) == 'number', 
+			assert(type(v) == 'number' and type(self[k]) == 'number',
 				'Animation key must be a number, got '..type(v)..', self['..k..'] = '..type(self[k]))
 			table.insert(keys_int, k)
 			table.insert(keys_int, v)
 		end
-		if not options then 
+		if not options then
 			options = emptyArray
 		--each option has different type
 		elseif type(options) == "number" then
@@ -366,9 +366,9 @@ Entity.bounds = {
 	rectangle = function(ent, mouseX, mouseY)
 		local x, y = ent.x - (ent.ox or 0), ent.y - (ent.oy or 0)
 		return ent.w and ent.h
-						and x < mouseX 
-						and y < mouseY 
-						and x + ent.w > mouseX 
+						and x < mouseX
+						and y < mouseY
+						and x + ent.w > mouseX
 						and y + ent.h > mouseY
 	end,
 	circle = function(ent, mouseX, mouseY)
@@ -383,7 +383,6 @@ function Entity:bound(callback)
 	return self --so we can chain methods
 end
 
---до сих пор охреневаю как я это сделал. Куча методов в пяти строчках кода
 --callbacks
 for k, v in ipairs({'click', 'dblclick', 'mousepress', 'mouserelease', 'mouseover', 'mouseout', 'mousemove', 'keypress', 'keyrelease', 'keyrepeat', 'wheel'}) do
 	Entity[v] = function (self, callback, a, b, c)
@@ -467,19 +466,12 @@ local stdDrawColor = function(s)
 end
 
 function Entity:draw(callback)
-	--~ print(type(callback))
-	--~ if type(callback) == 'function' then
-		if not self._draw then
-			self._draw = callback
-		else
-			if type(self._draw) ~= 'table' then self._draw = {self._draw} end
-			table.insert(self._draw, callback)
-		end
-		--~ if not self._draw then
-			--~ self._draw = {}
-		--~ end
-		--~ table.insert(self._draw, callback)
-	--~ end
+	if not self._draw then
+		self._draw = callback
+	else
+		if type(self._draw) ~= 'table' then self._draw = {self._draw} end
+		table.insert(self._draw, callback)
+	end
 	return self --so we can chain methods
 end
 
@@ -553,9 +545,14 @@ screen = Entity:new()
 local function animate(ent)
 	local bool = true
 	local key
-	--~ print(1)
+	local animTime
+	if ent._useSysTime then
+		animTime = systemTime
+	else
+		animTime = time
+	end
 	for i, j in ipairs(ent._animQueue) do
-		if j[1] then 
+		if j[1] then
 			bool = false
 			local aq = j[1]
 			--~ if not aq[10] then --keys copy
@@ -566,13 +563,13 @@ local function animate(ent)
 				--~ end
 			--~ end
 			if not aq[4] then
-				aq[4] = time --lasttime
+				aq[4] = animTime --lasttime
 				for k = 2, #aq[1], 2 do --old
 					aq[2][k] = ent[aq[1][k - 1]]
 				end
 			end
-			--[[speed]]
-			if aq[4] + aq[3] <= time or _lQuery.fx == false then
+
+			if aq[4] + aq[3] <= animTime or _lQuery.fx == false then
 				for k = 1, #aq[1] - 1, 2 do
 					ent[aq[1][k]] = aq[1][k + 1]
 				end
@@ -580,7 +577,7 @@ local function animate(ent)
 					--~ aq[10] = nil
 					aq[4] = nil
 					aq[2] = {}
-					table.insert(j, aq) 
+					table.insert(j, aq)
 				end
 				table.remove(j, 1)
 				--~ if #j == 0 then
@@ -590,21 +587,21 @@ local function animate(ent)
 					--~ end
 				--~ end
 				if aq[7] then aq[7](ent) end --callback
-				
+
 				--~ animate(ent)
 			else
 				for k = 2, #aq[1], 2 do
 					--easing
 					key = aq[1][k-1]
 					if ent[key] then
-						ent[key] = aq[5](time - aq[4], aq[2][k], 
-						aq[1][k] - 
+						ent[key] = aq[5](animTime - aq[4], aq[2][k],
+						aq[1][k] -
 						aq[2][k], aq[3], aq[8], aq[9])
 					end
 				end
-			end --if aq.lasttime + vv.speed <= time
+			end
 		end --if j[1]
-	end --for 
+	end --for
 	if bool then ent._anim = false end
 end
 
@@ -612,7 +609,7 @@ end
 --some events
 local function events(v)
 	if v == screen or v._focus or _lQuery._globalFocus == false then
-		if _lQuery.KeyPressed == true then 
+		if _lQuery.KeyPressed == true then
 			if v._keypress then
 				if not v._key or v._key ~= _lQuery.KeyPressedKey then
 					v._keypress(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
@@ -621,16 +618,16 @@ local function events(v)
 			if not v._key or v._key ~= _lQuery.KeyPressedKey then
 				v._KeyPressedCounter = 1
 			end
-			if v._keyrepeat and (v._KeyPressedCounter == 1 or 
+			if v._keyrepeat and (v._KeyPressedCounter == 1 or
 					 v._KeyPressedCounter == 2 and time - v._KeyPressedTime > 0.3 or
-					 v._KeyPressedCounter > 2 and time - v._KeyPressedTime > 0.05) then 
+					 v._KeyPressedCounter > 2 and time - v._KeyPressedTime > 0.05) then
 				v._KeyPressedTime = time
 				v._KeyPressedCounter = v._KeyPressedCounter + 1
 				v._keyrepeat(v, _lQuery.KeyPressedKey, _lQuery.KeyPressedUni)
 			end
 			--v._key = _lQuery.KeyPressedKey
 		end
-		if _lQuery.KeyReleased == true then 
+		if _lQuery.KeyReleased == true then
 			if v._keyrelease then
 				v._keyrelease(v, _lQuery.KeyReleasedKey, _lQuery.KeyReleasedUni)
 			end
@@ -638,25 +635,25 @@ local function events(v)
 		end
 	end
 	if v._bound and v._bound(v, mX, mY) or v == screen then
-		if v._mousemove then 
+		if v._mousemove then
 			v._mousemove(v, mX, mY)
-		end 
-		if _lQuery.MouseButton == "wu" and _lQuery.MousePressed == true then 
+		end
+		if _lQuery.MouseButton == "wu" and _lQuery.MousePressed == true then
 			if v._wheel then
 				v._wheel(v, mX, mY, "u")
 				_lQuery.MouseButton = nil
 			end
-		elseif _lQuery.MouseButton == "wd" and _lQuery.MousePressed == true then 
+		elseif _lQuery.MouseButton == "wd" and _lQuery.MousePressed == true then
 			if v._wheel then
 				v._wheel(v, mX, mY, "d")
 				_lQuery.MouseButton = nil
 			end
-		elseif _lQuery.MousePressed == true and mPressOwn == true then 
+		elseif _lQuery.MousePressed == true and mPressOwn == true then
 			_lQuery.MousePressedOwner = v
 		end
 		mHover = v
 	--~ else
-		--~ if _lQuery._hover == v then 
+		--~ if _lQuery._hover == v then
 			--~ _lQuery._hover = nil
 			--~ mHover = nil
 			--~ if v._mouseout then v._mouseout(v, mX, mY) end
@@ -666,9 +663,9 @@ local function events(v)
 end
 
 local function process_entities(s)
-	if not s._hidden then 
-		if s._anim then 
-			animate(s) 
+	if not s._hidden then
+		if s._anim then
+			animate(s)
 		end
 		if s._control then --if controlled
 			events(s)
@@ -676,7 +673,7 @@ local function process_entities(s)
 		if s._draw then
 			if s.r then C.color(s.r or 255, s.g or 255, s.b or 255, s.a or 255) end
 			if s._blend then C.blendMode(s._blend) end
-			if s._translate then 
+			if s._translate then
 				s._translate(s)
 			end
 			if type(s._draw) == 'function' then
@@ -687,16 +684,16 @@ local function process_entities(s)
 				end
 			end
 			if s._blend then C.blendMode(0) end
-			if s._translate then 
+			if s._translate then
 				C.pop()
 			end
 		end
-		if s._child then 
+		if s._child then
 			for i = 1, #s._child do
 				process_entities(s._child[i])
 			end
 		end
-		if s._end then 
+		if s._end then
 			s:_end()
 		end
 	end
@@ -707,18 +704,18 @@ _lQuery.event = function(e, a, b, c)
 		_lQuery.MousePressed = true
 		_lQuery.MouseButton = c
 		mPressOwn = true
-	elseif e == "mr" then 
+	elseif e == "mr" then
 		_lQuery.MousePressed = false
 		_lQuery.MouseButton = c
 		--click handler
 		local v = _lQuery.MousePressedOwner
 		if v --[[and v._bound and v._bound(v, mX, mY)]] then
 			local v = _lQuery.MousePressedOwner
-			if v._mouserelease then 
+			if v._mouserelease then
 				v._mouserelease(v, mX, mY, c)
 			end
-			if v._bound and v._bound(v, mX, mY) then 
-				if  _lQuery._last_click_millis + _lQuery.dblclickInterval > time 
+			if v._bound and v._bound(v, mX, mY) then
+				if  _lQuery._last_click_millis + _lQuery.dblclickInterval > time
 				and _lQuery._last_clickX == mX and _lQuery._last_clickY == mY then
 					if v._dblclick then v._dblclick(v, mX, mY, c) end
 				else
@@ -754,19 +751,19 @@ end
 
 _lQuery.process = function(x, y)
 	mX, mY = x, y
-	
+
 	for _, v in ipairs(_lQuery.hooks) do v() end
 	mHover = nil
 	if screen then process_entities(screen) end
-	
+
 	--fix mousepress bug
 	local v = _lQuery.MousePressedOwner
 	if v and mPressOwn == true then
-		if v._mousepress then 
+		if v._mousepress then
 			v._mousepress(v, mX, mY, _lQuery.MouseButton)
 		end
 	end
-	
+
 	local v = _lQuery.lasthover
 	if v ~= mHover then
 		if v and v._mouseout then v._mouseout(v, mX, mY) end --out MUST be before over

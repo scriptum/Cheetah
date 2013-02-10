@@ -26,46 +26,27 @@ IN THE SOFTWARE.
 
 #include "cheetah.h"
 
-/**
- * @descr Gets the number of milliseconds past from the execution time. Equivalent to SDL_GetTicks();
- * @group timer
- * */
+/* Get the number of milliseconds past from the execution time. Equivalent to SDL_GetTicks(); */
 unsigned int getTicks() {
 	return SDL_GetTicks();
 }
 
-/**
- * @descr Gets the time in seconds past from the execution time. This function returns the time in view of game speed!
- * @group timer
- * */
+/* Get the time in seconds past from the execution time. This time may change its speed! */
+double getGameTime() {
+	return globalTimers.gameTimed;
+}
+
+/* Get the time in seconds past from the execution time. Returns system's (without game speed). */
 double getTime() {
 	return globalTimers.timed;
 }
 
-/**
- * @descr Gets the time in seconds past from the execution time. Returns "pure" time (no game speed).
- * @group timer
- * */
-double getRealTime() {
-	return SDL_GetTicks() / 1000.0;
-}
-
-/**
- * @descr Do nothing some time.
- * @group timer
- * @var delay in milliseconds (1/1000 s)
- * @see sleep
- * */
+/* Do nothing some time. */
 void delay(unsigned int ms) {
 	SDL_Delay(ms);
 }
 
-/**
- * @descr Do nothing some time.
- * @group timer
- * @var delay in seconds
- * @see delay
- * */
+/* Do nothing some time. */
 void sleep(unsigned int sec) {
 	SDL_Delay(sec * 1000);
 }

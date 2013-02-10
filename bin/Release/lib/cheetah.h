@@ -75,26 +75,32 @@ typedef struct ParticleForce {
 typedef struct Particle {
 	Point		position;
 	Point		speed;
+	float		age;
+	/* Cheetah engine uses one random seed to generate all other parameters procedurally */
+	unsigned	seed;
 } Particle;
 typedef struct ParticleSystem {
 	ParticleForce	*forces;
 	Particle	*particles;
+	Image		*image;
 	Point		emitterPosition;
 	unsigned	maxParticles;
+	float		emissionRate;
 	float		direction;
 	float		directionVariation;
 	float		startSpeed;
 	float		startSpeedVariation;
 	float		scale;
 	float		scaleVariation;
-	float		emissionRate;
 	float		gravity;
-	unsigned	lifeTime;
-	unsigned	lifeTimeVariation;
+	float		gravityVariation;
+	float		particleLife;
+	float		particleLifeVariation;
+	double		lifeTime;
 	Color		color;
 	Color		colorVariation;
-	unsigned	_lastmillis;
 	double		_lasttime;
+	double		_startTime;
 	unsigned	_aliveParticles;
 } ParticleSystem;
 typedef struct Atlas {
@@ -187,9 +193,13 @@ struct {
 	bool		autoScaleFont;
 } screenScale;
 struct {
+	/* Used to check window resizing */
 	unsigned	rescaleTime;
+	/* System timers: usigned (milliseconds) and double (seconds) */
 	unsigned	time;
 	double		timed;
+	/* Game time: may be stopped/run faster/run slower than system time */
+	double		gameTimed;
 	double		timeOffsetd;
 	double		gameSpeed;
 	unsigned	resizeDelay;
@@ -293,6 +303,10 @@ void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, f
 void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
 void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy);
 void deleteImage(Image * ptr);
+void newParticleSystem(ParticleSystem *ptr, int maxParticles, const char *options);
+void particleSystemUpdate(ParticleSystem *ptr);
+void particleSystemDraw(ParticleSystem *ptr, float x, float y);
+void deleteParticleSystem(ParticleSystem *ptr);
 void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver);
 void newFragmentShader(Shader * ptr, const char * frag);
 bool shaderCheck(Shader * ptr);
@@ -306,8 +320,8 @@ void Uniform2f(unsigned int location, float var, float var1);
 void Uniform3f(unsigned int location, float var, float var1, float var2);
 void Uniform4f(unsigned int location, float var, float var1, float var2, float var3);
 unsigned int getTicks();
+double getGameTime();
 double getTime();
-double getRealTime();
 void delay(unsigned int ms);
 void sleep(unsigned int sec);
 void newTilmapInternal(Tilemap *t, const char *name);
@@ -321,7 +335,7 @@ Vbo * newVboPoints3(Point3 * data, unsigned int count);
 void vboDrawSprites3(Vbo * ptr, Image * img, float size);
 void deleteVbo(Vbo * ptr);
 void setWindowSize(unsigned w, unsigned h);
-bool init(const char * appName, const char * options);
+bool cheetahInit(const char * appName, const char * options);
 bool isInit();
 int getWindowWidth();
 int getWindowHeight();

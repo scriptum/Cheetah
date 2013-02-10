@@ -135,27 +135,33 @@ typedef struct ParticleForce {
 typedef struct Particle {
 	Point		position;
 	Point		speed;
+	float		age;
+	/* Cheetah engine uses one random seed to generate all other parameters procedurally */
+	unsigned	seed;
 } Particle;
 
 typedef struct ParticleSystem {
 	ParticleForce	*forces;
 	Particle	*particles;
+	Image		*image;
 	Point		emitterPosition;
 	unsigned	maxParticles;
+	float		emissionRate;
 	float		direction;
 	float		directionVariation;
 	float		startSpeed;
 	float		startSpeedVariation;
 	float		scale;
 	float		scaleVariation;
-	float		emissionRate;
 	float		gravity;
-	unsigned	lifeTime;
-	unsigned	lifeTimeVariation;
+	float		gravityVariation;
+	float		particleLife;
+	float		particleLifeVariation;
+	double		lifeTime;
 	Color		color;
 	Color		colorVariation;
-	unsigned	_lastmillis;
 	double		_lasttime;
+	double		_startTime;
 	unsigned	_aliveParticles;
 } ParticleSystem;
 
@@ -267,9 +273,13 @@ struct {
 } screenScale;
 
 struct {
+	/* Used to check window resizing */
 	unsigned	rescaleTime;
+	/* System timers: usigned (milliseconds) and double (seconds) */
 	unsigned	time;
 	double		timed;
+	/* Game time: may be stopped/run faster/run slower than system time */
+	double		gameTimed;
 	double		timeOffsetd;
 	double		gameSpeed;
 	unsigned	resizeDelay;

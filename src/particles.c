@@ -21,27 +21,88 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-//~ #include <math.h>
-//~ #include <SDL.h>
-//~
-//~ #include "cheetah.h"
-//~ #include "render.h"
+#include <math.h>
+#include <string.h>
 
-/**
- * @descr Load image from disc with specific options.
- * @group graphics/image
- * @var file name
- * @var string of options. This is depends on image loading module you use. Supported options:
- *  * _n_ - use nearest interpolation
- *  * _m_ - generate mip-maps (automatically sets mip-map interpolation)
- *  * _i_ - load instantly without delayed resource loader
- * @return Image object
- * */
-//~ void newParticleSystem(ParticleSystem *ptr, const char *name, const char *options) {
-	//~ NEEDED_INIT_VOID;
-	//~
-//~ }
+#include "cheetah.h"
+#include "macros.h"
+#include "render.h"
+#include "vertex.h"
+#include "random.h"
 
-//~ particleSystemUpdate(ParticleSystem *ptr) {
-	//~
-//~ }
+void imageBind(Image * image);
+
+void newParticleSystem(ParticleSystem *ptr, int maxParticles, const char *options) {
+	NEEDED_INIT_VOID;
+	Particle *particles = NULL;
+	new0(particles, Particle, maxParticles);
+	ptr->_lasttime = globalTimers.timed;
+	ptr->startSpeed = 1.0;
+	ptr->directionVariation = 0.5;
+}
+
+void particleSystemUpdate(ParticleSystem *ptr) {
+	unsigned	i;
+	unsigned	seed = random_get_seed();
+	Particle	*particle = ptr->particles;
+	float		deltaTime;
+	deltaTime = globalTimers.gameTimed - ptr->_lasttime;
+	ptr->_lasttime = globalTimers.gameTimed;
+	for(i = 0; i < ptr->_aliveParticles; i++)
+	{
+		particle->age += deltaTime;
+		random_seed(particle->seed);
+		if(particle->age >= ptr->particleLife + randf2(rand128()) * ptr->particleLifeVariation)
+		{
+			ptr->_aliveParticles--;
+			memcpy(particle, &ptr->particles[ptr->_aliveParticles], sizeof(Particle));
+			i--;
+			continue;
+		}
+		particle->position.x += particle->speed.x * deltaTime;
+		particle->position.y += particle->speed.y * deltaTime;
+		particle++;
+	}
+	random_seed(seed);
+	if(globalTimers.gameTimed - ptr->_startTime < ptr->lifeTime || ptr->lifeTime < 0)
+	{
+		unsigned particlesNeeded = ptr->emissionRate * deltaTime;
+		particle = &ptr->particles[ptr->_aliveParticles];
+		for(i = 0; i < particlesNeeded; i++)
+		{
+			if(ptr->_aliveParticles >= ptr->maxParticles) break;
+			particle->age = 0.0f;
+			float angle = ptr->direction + randf2(rand128()) * ptr->directionVariation;
+			particle->speed.x = cosf(angle);
+			particle->speed.y = sinf(angle);
+			float startSpeed = ptr->startSpeed + randf2(rand128()) * ptr->startSpeedVariation;
+			particle->speed.x *= startSpeed;
+			particle->speed.y *= startSpeed;
+			particle++;
+			ptr->_aliveParticles++;
+		}
+	}
+}
+void particleSystemDraw(ParticleSystem *ptr, float x, float y) {
+	unsigned	i;
+	Particle	*particle = ptr->particles;
+	if(globalTimers.timed - ptr->_lasttime > 1.0/60.0)
+	{
+		particleSystemUpdate(ptr);
+	}
+	imageBind(ptr->image);
+	glPushMatrix();
+	glTranslatef(x, y, 0);
+	for(i = 0; i < ptr->_aliveParticles; i++)
+	{
+		PUSH_QUAD(particle->position.x, particle->position.y, ptr->image->w, ptr->image->h, 0, ptr->image->w * 0.5f, ptr->image->h * 0.5f);
+		particle++;
+	}
+	glPopMatrix();
+}
+
+
+void deleteParticleSystem(ParticleSystem *ptr) {
+	if(ptr)
+		delete(ptr->particles);
+}
