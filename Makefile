@@ -1,6 +1,5 @@
 TARGET := libcheetah.so
-CFLAGS += -W -Wall -Wextra -Winline -Wdouble-promotion -Wno-unused-parameter \
--Wdisabled-optimization -pipe -fPIC
+CFLAGS += -Wall -Wno-unused-parameter -pipe -fPIC
 
 LDFLAGS += -shared -L"lib" -lSDL -lGL
 INCLUDES := -I"inc"

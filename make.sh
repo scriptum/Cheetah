@@ -50,7 +50,7 @@ then
 fi
 
 GCC_VERSION=$($COMPILER -v |& tail -1 | awk '{print $3}' | sed s/\\.//g)
-FLAGS_OPTIMIZE_GENERAL="-fomit-frame-pointer -funroll-loops -mmmx -msse -ftree-vectorize"
+FLAGS_OPTIMIZE_GENERAL="-fomit-frame-pointer -funroll-loops -mmmx -msse"
 
 if [ $GCC_VERSION -ge 460 ]
 then
@@ -61,13 +61,19 @@ fi
 
 if [ "$2" == "release" -o "$2" == "final" ]
 then
-	FLAGS="$FLAGS_OPTIMIZE"
+	#add extra flags for gcc
+	FLAGS="$FLAGS_OPTIMIZE -Winline -Wdouble-promotion -Wdisabled-optimization -W -Wextra"
 else
 	if [ "$2" == "debug" ]
 	then
 		FLAGS=-g
 	else
 		FLAGS=""
+	fi
+	#clang has faster compile time than gcc and produces good code w/o -O3
+	which clang > /dev/null 2>&1
+	if [ "$?" = "0" ]
+		then export CC="clang"
 	fi
 fi
 
