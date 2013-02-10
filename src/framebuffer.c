@@ -34,6 +34,11 @@ IN THE SOFTWARE.
 void resetView(unsigned w, unsigned h);
 void resetViewDefault();
 
+static inline void bindFramebuffer(unsigned id)
+{
+	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, id);
+}
+
 static bool checkFramebufferStatus()
 {
 	GLenum status;
@@ -139,13 +144,13 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 
 	/* create framebuffer */
 	glGenFramebuffers_(1, &fboptr->id);
-	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, fboptr->id);
+	bindFramebuffer(fboptr->id);
 	glFramebufferTexture2D_(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, ptr->id, 0);
 	status = checkFramebufferStatus();
 
 	/* unbind framebuffer */
-	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, (GLuint)current_fbo);
+	bindFramebuffer((GLuint)current_fbo);
 
 	if(TRUE == status)
 	{
@@ -173,7 +178,7 @@ void framebufferBind(Framebuffer * ptr) {
 	if(ptr->id)
 	{
 		FLUSH_BUFFER();
-		glBindFramebuffer_(GL_FRAMEBUFFER_EXT, ptr->id);
+		bindFramebuffer(ptr->id);
 		glViewport(0, 0, (GLsizei)ptr->image->w, (GLsizei)ptr->image->h);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -187,7 +192,7 @@ void framebufferBind(Framebuffer * ptr) {
  * default screen. This function unbinds the current framebuffer object. */
 void framebufferUnbind(Framebuffer * ptr) {
 	FLUSH_BUFFER();
-	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, 0);
+	bindFramebuffer(0);
 	resetViewDefault();
 }
 
@@ -196,7 +201,7 @@ void framebufferSaveBMP(Framebuffer * ptr, const char* name) {
 	unsigned char* img = NULL;
 	int w = (int)ptr->image->w, h = (int)ptr->image->h;
 	new(img, unsigned char, 3 * w * h);
-	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, ptr->id);
+	bindFramebuffer(ptr->id);
 	TEXTURE_BIND(ptr->image->id);
 	glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
 	glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, img);
