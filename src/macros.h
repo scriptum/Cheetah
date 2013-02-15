@@ -32,6 +32,7 @@ IN THE SOFTWARE.
 #define DEBUG_MEMORY_ERRORS 0
 #define DEBUG_MEMORY 0
 #define DEBUG_FRAMEBUFFER 0
+#define DEBUG_SHADERS 0
 
 #if DEBUG_MEMORY
 	#define dprintf_mem(...) printf(__VA_ARGS__)
@@ -49,6 +50,12 @@ IN THE SOFTWARE.
 	#define dprintf_fbo(...) myError(__VA_ARGS__)
 #else
 	#define dprintf_fbo(...)
+#endif
+
+#if DEBUG_SHADERS
+	#define dprintf_shader(...) myError(__VA_ARGS__)
+#else
+	#define dprintf_shader(...)
 #endif
 
 /**********************************MEMOTY OPS**********************************/

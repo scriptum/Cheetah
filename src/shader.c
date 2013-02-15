@@ -2,21 +2,21 @@
 
 Copyright (c) 2012-2013 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to 
-deal in the Software without restriction, including without limitation the 
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-sell copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions:  The above 
-copyright notice and this permission notice shall be included in all copies 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:  The above
+copyright notice and this permission notice shall be included in all copies
 or substantial portions of the Software.
- 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 
 *******************************************************************************/
@@ -47,7 +47,7 @@ static bool compile(GLuint shader, const char* name)
 	glGetShaderiv_(shader, GL_COMPILE_STATUS, &compiled);
 	if (!compiled)
 	{
-		glGetShaderiv_(shader, GL_INFO_LOG_LENGTH , &blen);       
+		glGetShaderiv_(shader, GL_INFO_LOG_LENGTH , &blen);
 		if (blen > 1)
 		{
 			new(compiler_log, GLchar, blen);
@@ -68,7 +68,7 @@ void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
 	ptr->id = 0;
 	if(!supported.GLSL)
 	{
-		myError("Trying to create shader, but system doesn't support shaders.");
+		dprintf_shader("Trying to create shader, but system doesn't support shaders.");
 		return;
 	}
 	v = glCreateShaderObject_(GL_VERTEX_SHADER);
@@ -86,13 +86,13 @@ void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
 	glAttachObject_(p,v);
 	glAttachObject_(p,f);
 	glLinkProgram_(p);
-  
+
 	glGetProgramiv_(p, GL_LINK_STATUS, &linked);
 	glDeleteObject_(v);
 	glDeleteObject_(f);
 	if (0 == linked)
 	{
-		myError("Error while linking shader\n");
+		dprintf_shader("Error while linking shader\n");
 		return;
 	}
 	ptr->id = p;
@@ -111,7 +111,8 @@ void deleteShader(Shader * ptr) {
 		if(supported.GLSL && ptr->id)
 			glDeleteObject_(ptr->id);
 	}
-	else myError("Trying to free a null-shader. Maybe, you did it manually?");
+	else
+		dprintf_shader("Trying to free a null-shader. Maybe, you did it manually?");
 }
 
 void shaderBind(Shader * ptr) {
