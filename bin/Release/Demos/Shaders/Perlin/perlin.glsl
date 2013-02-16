@@ -9,7 +9,7 @@ uniform vec2 noiseSize;
 varying vec2 TexCoord;
 
 /* Перлин работает на векторах, ориентированных случайным образом в пространстве.
-* У нас простой случай, 2D, поэтому просто берём единичный двумерный вектор и 
+* У нас простой случай, 2D, поэтому просто берём единичный двумерный вектор и
 * поворачиваем его на случайный угол. Для большей точности можно соединить две-три
 * компоненты пикселя (если брать только одну, случайных вращений будет всего 256). */
 //~ vec2 noise2d(vec2 c)
@@ -43,11 +43,6 @@ float fade(float t) {
 	return smoothstep(0., 1., t);
 }
 
-float perm(vec2 a, vec2 b)
-{
-	return dot(a, b);
-}
-
 /*
  * 2D классический шум Перлина. Наилучшее соотношение скорость/качество.
  */
@@ -64,12 +59,12 @@ float noisePerlin2D(vec2 c, vec2 rep)
 	/* хитрый способ добиться бесшовности: используем возможность OpenGL повторять текстуру шума */
 	vec4 Pi = (x11.xyxy + offset) / min(noiseSize.xyxy, rep.xyxy);
 	vec4 Pf = (pixelPosition.xyxy - offset);
-	
+
 	/* выборка четырёх значений - расстояния векторов от текущей точки */
-	float n00 = perm(noise2d(Pi.xy), Pf.xy);
-	float n10 = perm(noise2d(Pi.zy), Pf.zy);
-	float n01 = perm(noise2d(Pi.xw), Pf.xw);
-	float n11 = perm(noise2d(Pi.zw), Pf.zw);
+	float n00 = dot(noise2d(Pi.xy), Pf.xy);
+	float n10 = dot(noise2d(Pi.zy), Pf.zy);
+	float n01 = dot(noise2d(Pi.xw), Pf.xw);
+	float n11 = dot(noise2d(Pi.zw), Pf.zw);
 
 	/* Смешивание по оси Х */
 	vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade(pixelPosition.x));
@@ -94,5 +89,5 @@ void main( void )
 		mul *= 2.0;
 		mul2 *= persist;
 	}
-	gl_FragColor = vec4((vec3(n) * contrast + 1.0 + brightness)*0.5, 1.0);
+	gl_FragColor = vec4((vec3(n) * contrast + 1.0 + brightness) * 0.5, 1.0);
 }
