@@ -3,7 +3,7 @@ require 'lib.lquery.init'
 local C = cheetah
 C.init('Perlin noise', '1024x1024')
 C.printFPS = true
-local noiseSize = 32
+local noiseSize = 512
 local noise = C.generate('noise', noiseSize, noiseSize, 'nearest')
 --~ local noisePrepare = C.newShader([[#version 120
 --~ uniform sampler2D noiseTex;
@@ -18,7 +18,7 @@ local noise = C.generate('noise', noiseSize, noiseSize, 'nearest')
 --~ ]])
 local fbo = C.newFramebuffer(1024,1024)
 local shader = C.newShader('perlin.glsl')
-local scale, persist, steps, contrast, brightness = 4, 0.5, 8, 1, 0
+local scale, persist, steps, contrast, brightness = 16, 0.5, 16, 1, 0
 E:new(screen):draw(function()
 	shader:bind()
 	shader:set('scale', scale, scale)
