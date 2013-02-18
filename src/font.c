@@ -285,7 +285,6 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 					buf = last_space;
 				if(TRUE == end)
 					break;
-				x = 0;
 				y += fontHeight;
 				/* dropping invisible lines from buttom */
 				if((y + oldy) * currentFont->_scale > screen->h)
