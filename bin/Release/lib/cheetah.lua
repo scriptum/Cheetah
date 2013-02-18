@@ -92,7 +92,7 @@ int (*grabCursor)(int mode);
 local libcheetah = C.loadDLL 'cheetah'
 assert(libcheetah, 'Cannot load cheetah library!')
 
-require "lib.gl"
+--~ require "lib.gl"
 
 local lua_keys = require 'lib.keys'
 local keys_reverse = require 'lib.keys_reverse'
