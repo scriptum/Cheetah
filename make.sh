@@ -40,7 +40,6 @@ then
 	else
 		MINGWGCC=i586-mingw32msvc-gcc
 	fi
-	export CC=$MINGWGCC
 	COMPILER=$MINGWGCC
 	OS=win
 	MACHINE_NAME=32
@@ -73,9 +72,20 @@ else
 	#clang has faster compile time than gcc and produces good code w/o -O3
 	which clang > /dev/null 2>&1
 	if [ "$?" = "0" ]
-		then export CC=clang
+	then
+		COMPILER=clang
+		echo "Using clang"
 	fi
 fi
+
+which ccache > /dev/null 2>&1
+if [ "$?" = "0" ]
+then
+	COMPILER="ccache $COMPILER"
+	echo "Using ccache"
+fi
+
+export CC="$COMPILER"
 
 if [ "$1" == "linux32" ]
 then
