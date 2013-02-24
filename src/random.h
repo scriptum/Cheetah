@@ -33,7 +33,7 @@ IN THE SOFTWARE.
 
 static uint32_t _xor_seed;
 
-static inline uint32_t hash_uint32 (uint32_t hash)
+static inline uint32_t hash_uint32(uint32_t hash)
 {
 	hash += ~(hash << 15);
 	hash ^=   hash >> 10;

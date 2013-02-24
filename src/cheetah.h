@@ -160,6 +160,7 @@ typedef struct ParticleSystem {
 	double		lifeTime;
 	Color		color;
 	Color		colorVariation;
+	float		_particlesNeeded;
 	double		_lasttime;
 	double		_startTime;
 	unsigned	_aliveParticles;

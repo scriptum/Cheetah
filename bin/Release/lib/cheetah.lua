@@ -668,6 +668,23 @@ ffi.metatype('Framebuffer', {
 })
 
 --------------------------------------------------------------------------------
+--                                  PARTICLES                                 --
+--------------------------------------------------------------------------------
+
+C.newParticleSystem = function(image, maxParticles, options)
+	local ptr = ffi.new('ParticleSystem')
+	libcheetah.newParticleSystem(ptr, image, maxParticles or 1024, options or '')
+	return ptr
+end
+
+ffi.metatype('ParticleSystem', {
+	__index = {
+		draw = libcheetah.particleSystemDraw
+	},
+	__gc = libcheetah.deleteParticleSystem
+})
+
+--------------------------------------------------------------------------------
 --                                  SHADERS                                   --
 --------------------------------------------------------------------------------
 

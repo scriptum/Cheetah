@@ -23,6 +23,7 @@ IN THE SOFTWARE.
 
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "cheetah.h"
 #include "macros.h"
@@ -32,22 +33,29 @@ IN THE SOFTWARE.
 
 void imageBind(Image * image);
 
-void newParticleSystem(ParticleSystem *ptr, int maxParticles, const char *options) {
+void newParticleSystem(ParticleSystem *ptr, Image *image, int maxParticles, const char *options) {
 	NEEDED_INIT_VOID;
-	Particle *particles = NULL;
-	new0(particles, Particle, maxParticles);
+	new0(ptr->particles, Particle, maxParticles);
+	ptr->maxParticles = maxParticles;
+	ptr->image = image;
 	ptr->_lasttime = globalTimers.timed;
-	ptr->startSpeed = 1.0;
-	ptr->directionVariation = 0.5;
+	ptr->startSpeed = 100.0;
+	ptr->directionVariation = 1;
+	ptr->emissionRate = 100;
+	ptr->particleLife = 5.0;
+	ptr->particleLifeVariation = 1.0;
 }
 
-void particleSystemUpdate(ParticleSystem *ptr) {
+static void particleSystemUpdate(ParticleSystem *ptr) {
 	unsigned	i;
 	unsigned	seed = random_get_seed();
 	Particle	*particle = ptr->particles;
 	float		deltaTime;
+	if(globalTimers.timed - ptr->_lasttime < 1.0/100.0)
+		return;
 	deltaTime = globalTimers.gameTimed - ptr->_lasttime;
 	ptr->_lasttime = globalTimers.gameTimed;
+	ptr->_particlesNeeded += ptr->emissionRate * deltaTime;
 	for(i = 0; i < ptr->_aliveParticles; i++)
 	{
 		particle->age += deltaTime;
@@ -64,41 +72,43 @@ void particleSystemUpdate(ParticleSystem *ptr) {
 		particle++;
 	}
 	random_seed(seed);
-	if(globalTimers.gameTimed - ptr->_startTime < ptr->lifeTime || ptr->lifeTime < 0)
+
+	bool alive = globalTimers.gameTimed - ptr->_startTime < ptr->lifeTime;
+	if((alive || ptr->lifeTime <= 0) && ptr->_particlesNeeded >= 1.0)
 	{
-		unsigned particlesNeeded = ptr->emissionRate * deltaTime;
-		particle = &ptr->particles[ptr->_aliveParticles];
+		unsigned particlesNeeded = ptr->_particlesNeeded;
+		//~ vard(ptr->_aliveParticles);
+		ptr->_particlesNeeded -= particlesNeeded;
+		particle = &(ptr->particles[ptr->_aliveParticles]);
+		//~ vard(ptr->particles);
 		for(i = 0; i < particlesNeeded; i++)
 		{
+			//~ printf("%d %d\n", ptr->_aliveParticles, ptr->maxParticles);
 			if(ptr->_aliveParticles >= ptr->maxParticles) break;
-			particle->age = 0.0f;
+			memset(particle, 0, sizeof(Particle));
 			float angle = ptr->direction + randf2(rand128()) * ptr->directionVariation;
 			particle->speed.x = cosf(angle);
 			particle->speed.y = sinf(angle);
 			float startSpeed = ptr->startSpeed + randf2(rand128()) * ptr->startSpeedVariation;
 			particle->speed.x *= startSpeed;
 			particle->speed.y *= startSpeed;
+			particle->seed = rand128();
 			particle++;
 			ptr->_aliveParticles++;
 		}
 	}
 }
+
 void particleSystemDraw(ParticleSystem *ptr, float x, float y) {
 	unsigned	i;
 	Particle	*particle = ptr->particles;
-	if(globalTimers.timed - ptr->_lasttime > 1.0/60.0)
-	{
-		particleSystemUpdate(ptr);
-	}
+	particleSystemUpdate(ptr);
 	imageBind(ptr->image);
-	glPushMatrix();
-	glTranslatef(x, y, 0);
 	for(i = 0; i < ptr->_aliveParticles; i++)
 	{
-		PUSH_QUAD(particle->position.x, particle->position.y, ptr->image->w, ptr->image->h, 0, ptr->image->w * 0.5f, ptr->image->h * 0.5f);
+		PUSH_QUAD(particle->position.x + x, particle->position.y + y, ptr->image->w, ptr->image->h, 0, ptr->image->w * 0.5f, ptr->image->h * 0.5f);
 		particle++;
 	}
-	glPopMatrix();
 }
 
 

@@ -99,6 +99,7 @@ typedef struct ParticleSystem {
 	double		lifeTime;
 	Color		color;
 	Color		colorVariation;
+	float		_particlesNeeded;
 	double		_lasttime;
 	double		_startTime;
 	unsigned	_aliveParticles;
@@ -303,8 +304,8 @@ void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, f
 void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh);
 void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy);
 void deleteImage(Image * ptr);
-void newParticleSystem(ParticleSystem *ptr, int maxParticles, const char *options);
-void particleSystemUpdate(ParticleSystem *ptr);
+void newParticleSystem(ParticleSystem *ptr, Image *image, int maxParticles, const char *options);
+static void particleSystemUpdate(ParticleSystem *ptr);
 void particleSystemDraw(ParticleSystem *ptr, float x, float y);
 void deleteParticleSystem(ParticleSystem *ptr);
 void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver);
