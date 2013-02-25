@@ -38,13 +38,13 @@ Windows:
 Building on windows is not supported. Windows version is cross-compiled using gcc, but you may try mingw...
 
 Android:
-Building for Android will be in nearest future.
+Building for Android will be avaiable in nearest future.
 
 ============================== Cross-compilation ===============================
 
 Cheetah 2D engine may work on most known platforms. Oficially supported: Linux, Windows.
 
-Building for all ofitial platforms is possible with Linux x86_64 operating system.
+Building for all official platforms is possible with Linux x86_64 operating system.
 You need:
 1. gcc compiler
 2. SDL and OpenGL for x86 and x86_64 platforms
