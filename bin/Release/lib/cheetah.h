@@ -75,6 +75,8 @@ typedef struct ParticleForce {
 typedef struct Particle {
 	Point		position;
 	Point		speed;
+	float		scale;
+	float		angle;
 	float		age;
 	/* Cheetah engine uses one random seed to generate all other parameters procedurally */
 	unsigned	seed;

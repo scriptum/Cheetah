@@ -32,6 +32,24 @@ IN THE SOFTWARE.
 #include "random.h"
 
 void imageBind(Image * image);
+void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+
+
+/* RNG push/pop functions to avoid internal state corruption */
+static xor_state rng_state;
+static inline void rng_push()
+{
+	memcpy(&rng_state, random_get_state(), sizeof(xor_state));
+}
+static inline void rng_pop()
+{
+	random_set_state(&rng_state);
+}
+
+static void particleSystemApplyForces(ParticleSystem *ptr, Particle *particle)
+{
+
+}
 
 void newParticleSystem(ParticleSystem *ptr, Image *image, int maxParticles, const char *options) {
 	NEEDED_INIT_VOID;
@@ -39,27 +57,28 @@ void newParticleSystem(ParticleSystem *ptr, Image *image, int maxParticles, cons
 	ptr->maxParticles = maxParticles;
 	ptr->image = image;
 	ptr->_lasttime = globalTimers.timed;
-	ptr->startSpeed = 100.0;
-	ptr->directionVariation = 1;
+	ptr->startSpeed = 50.0;
+	ptr->directionVariation = M_PI;
 	ptr->emissionRate = 100;
-	ptr->particleLife = 5.0;
-	ptr->particleLifeVariation = 1.0;
+	ptr->particleLife = 3.0;
+	memset(&ptr->color, 255, sizeof(Color));
+	//~ memset(&ptr->colorVariation, 255, sizeof(Color));
 }
 
 static void particleSystemUpdate(ParticleSystem *ptr) {
 	unsigned	i;
-	unsigned	seed = random_get_seed();
 	Particle	*particle = ptr->particles;
-	float		deltaTime;
 	if(globalTimers.timed - ptr->_lasttime < 1.0/100.0)
 		return;
-	deltaTime = globalTimers.gameTimed - ptr->_lasttime;
+	rng_push();
+	float deltaTime = globalTimers.gameTimed - ptr->_lasttime;
 	ptr->_lasttime = globalTimers.gameTimed;
 	ptr->_particlesNeeded += ptr->emissionRate * deltaTime;
 	for(i = 0; i < ptr->_aliveParticles; i++)
 	{
 		particle->age += deltaTime;
-		random_seed(particle->seed);
+		random_seed128(particle->seed, 362436069, 521288629, 88675123);
+		/* handle particles life cycle */
 		if(particle->age >= ptr->particleLife + randf2(rand128()) * ptr->particleLifeVariation)
 		{
 			ptr->_aliveParticles--;
@@ -67,23 +86,21 @@ static void particleSystemUpdate(ParticleSystem *ptr) {
 			i--;
 			continue;
 		}
+		particleSystemApplyForces(ptr, particle);
 		particle->position.x += particle->speed.x * deltaTime;
 		particle->position.y += particle->speed.y * deltaTime;
 		particle++;
 	}
-	random_seed(seed);
+	rng_pop();
 
 	bool alive = globalTimers.gameTimed - ptr->_startTime < ptr->lifeTime;
 	if((alive || ptr->lifeTime <= 0) && ptr->_particlesNeeded >= 1.0)
 	{
 		unsigned particlesNeeded = ptr->_particlesNeeded;
-		//~ vard(ptr->_aliveParticles);
 		ptr->_particlesNeeded -= particlesNeeded;
 		particle = &(ptr->particles[ptr->_aliveParticles]);
-		//~ vard(ptr->particles);
 		for(i = 0; i < particlesNeeded; i++)
 		{
-			//~ printf("%d %d\n", ptr->_aliveParticles, ptr->maxParticles);
 			if(ptr->_aliveParticles >= ptr->maxParticles) break;
 			memset(particle, 0, sizeof(Particle));
 			float angle = ptr->direction + randf2(rand128()) * ptr->directionVariation;
@@ -102,13 +119,34 @@ static void particleSystemUpdate(ParticleSystem *ptr) {
 void particleSystemDraw(ParticleSystem *ptr, float x, float y) {
 	unsigned	i;
 	Particle	*particle = ptr->particles;
+	Color c;
+	union {
+		Color cv;
+		uint32_t cvi;
+	} u;
 	particleSystemUpdate(ptr);
+	rng_push();
 	imageBind(ptr->image);
+	c = ptr->color;
+	u.cv = ptr->colorVariation;
 	for(i = 0; i < ptr->_aliveParticles; i++)
 	{
+		if(u.cvi) /* if have randomized color */
+		{
+			random_seed128(particle->seed, 362436069, 521288629, 88675123);
+			#define RNDC(T) int T = (int)c.T + (((int)(rand128() & 255) - 128) * (int)u.cv.T) / 256;
+			RNDC(r) RNDC(g) RNDC(b) RNDC(a)
+			#undef RNDC
+			color(r, g, b, a);
+		}
+		else
+		{
+			color(c.r, c.g, c.b, c.a);
+		}
 		PUSH_QUAD(particle->position.x + x, particle->position.y + y, ptr->image->w, ptr->image->h, 0, ptr->image->w * 0.5f, ptr->image->h * 0.5f);
 		particle++;
 	}
+	rng_pop();
 }
 
 
