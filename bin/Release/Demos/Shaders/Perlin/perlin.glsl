@@ -12,24 +12,24 @@ varying vec2 TexCoord;
 * У нас простой случай, 2D, поэтому просто берём единичный двумерный вектор и
 * поворачиваем его на случайный угол. Для большей точности можно соединить две-три
 * компоненты пикселя (если брать только одну, случайных вращений будет всего 256). */
-//~ vec2 noise2d(vec2 c)
-//~ {
-	//~ vec4 tex = texture2D(noiseTex, c);
-	//~ float angle = (tex.r + tex.g * 390625e-8 /* + tex.b * 15258789e-12 */) * 8.0 * 3.1415926;
-	//~ return vec2(cos(angle), sin(angle));
-//~ }
-
-/* Вариат с выборкой просто двух значений быстрее, но мы получаем ненормированный вектор */
 vec2 noise2d(vec2 c)
 {
 	vec4 tex = texture2D(noiseTex, c);
-	return (vec2(tex.r, tex.g) - vec2(0.5)) * 4.0;
+	float angle = (tex.r + tex.g * 390625e-8 /* + tex.b * 15258789e-12 */) * 8.0 * 3.1415926;
+	return vec2(cos(angle), sin(angle));
 }
+
+/* Вариат с выборкой просто двух значений быстрее, но мы получаем ненормированный вектор */
+//~ vec2 noise2d(vec2 c)
+//~ {
+	//~ vec4 tex = texture2D(noiseTex, c);
+	//~ return normalize(vec2(tex.r, tex.g) - vec2(0.5));
+//~ }
 
 /* безтекстурный вариант на случай, если синус на видеокарте будет дешевле чем 4 текстурных выборки */
 //~ vec2 noise2d(vec2 c)
 //~ {
-	//~ float angle = fract(sin(dot(c, vec2(12.9898, 78.233))) * 43758.5453) * 8.0 * 3.1415926;
+	//~ float angle = fract(sin(dot(c, vec2(12.9898, 78.233))) * 43758.5453) * 4.0 * 3.1415926;
 	//~ return vec2(cos(angle), sin(angle));
 //~ }
 
@@ -55,16 +55,19 @@ float noisePerlin2D(vec2 c, vec2 rep)
 	vec2 x11 = floor(cc);
 	/* округление вектора сс даёт дискретные отсчёты шума с шагом rep */
 	const vec4 offset = vec4(0., 0., 1., 1.);
-	//~ vec4 Pi = mod(x11.xyxy + offset, rep.xyxy) * texel.xyxy;
+	/* mod нужен для бесшовности, чтобы шум был бесконечным, mod можно убрать */
+	vec4 Pi = mod(x11.xyxy + offset, rep.xyxy) * texel.xyxy;
+	//~ vec4 Pi = (x11.xyxy + offset) * texel.xyxy * rep.xyxy;
 	/* хитрый способ добиться бесшовности: используем возможность OpenGL повторять текстуру шума */
-	vec4 Pi = (x11.xyxy + offset) / min(noiseSize.xyxy, rep.xyxy);
+	//~ vec4 Pi = (x11.xyxy + offset) / min(noiseSize.xyxy, rep.xyxy);
+	//~ vec4 Pi = (x11.xyxy + offset) / rep.xyxy;
 	vec4 Pf = (pixelPosition.xyxy - offset);
 
 	/* выборка четырёх значений - расстояния векторов от текущей точки */
-	float n00 = dot(noise2d(Pi.xy), Pf.xy);
-	float n10 = dot(noise2d(Pi.zy), Pf.zy);
-	float n01 = dot(noise2d(Pi.xw), Pf.xw);
-	float n11 = dot(noise2d(Pi.zw), Pf.zw);
+	float n00 = dot(noise2d(Pi.xy) * 2.0, Pf.xy);
+	float n10 = dot(noise2d(Pi.zy) * 2.0, Pf.zy);
+	float n01 = dot(noise2d(Pi.xw) * 2.0, Pf.xw);
+	float n11 = dot(noise2d(Pi.zw) * 2.0, Pf.zw);
 
 	/* Смешивание по оси Х */
 	vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade(pixelPosition.x));
