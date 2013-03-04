@@ -25,13 +25,23 @@ IN THE SOFTWARE.
 #define __RANDOM_H__
 
 #include <stdint.h>
+#include <string.h>
 
 /**
  * Set of some xorshift RNG's. They are all fast as hell, period differs only.
  * http://en.wikipedia.org/wiki/Xorshift
  **/
 
-static uint32_t _xor_seed;
+typedef struct xor_state {
+	uint32_t x;
+	uint32_t y;
+	uint32_t z;
+	uint32_t w;
+	uint32_t v;
+	uint32_t d;
+} xor_state;
+
+static xor_state _xor_ = {123456789, 362436069, 521288629, 88675123, 5783321, 6615241};
 
 static inline uint32_t hash_uint32(uint32_t hash)
 {
@@ -44,19 +54,65 @@ static inline uint32_t hash_uint32(uint32_t hash)
 	return hash;
 }
 
+static inline xor_state *random_get_state()
+{
+	return &_xor_;
+}
+
+static inline void random_set_state(xor_state *state)
+{
+	memcpy(&_xor_, state, sizeof(xor_state));
+}
+
 static inline void random_seed(uint32_t seed)
 {
-	_xor_seed = seed;
+	_xor_.x = seed;
 }
 
 static inline void random_hash_seed(uint32_t seed)
 {
-	_xor_seed = hash_uint32(seed);
+	_xor_.x = hash_uint32(seed);
+}
+
+static inline void random_seed128(uint32_t x, uint32_t y, uint32_t z, uint32_t w)
+{
+	_xor_.x = x;
+	_xor_.y = y;
+	_xor_.z = z;
+	_xor_.w = w;
+}
+
+static inline void random_hash_seed128(uint32_t x, uint32_t y, uint32_t z, uint32_t w)
+{
+	_xor_.x = hash_uint32(x);
+	_xor_.y = hash_uint32(y);
+	_xor_.z = hash_uint32(z);
+	_xor_.w = hash_uint32(w);
+}
+
+static inline void random_seed192(uint32_t x, uint32_t y, uint32_t z, uint32_t w, uint32_t v, uint32_t d)
+{
+	_xor_.x = x;
+	_xor_.y = y;
+	_xor_.z = z;
+	_xor_.w = w;
+	_xor_.v = v;
+	_xor_.d = d;
+}
+
+static inline void random_hash_seed192(uint32_t x, uint32_t y, uint32_t z, uint32_t w, uint32_t v, uint32_t d)
+{
+	_xor_.x = hash_uint32(x);
+	_xor_.y = hash_uint32(y);
+	_xor_.z = hash_uint32(z);
+	_xor_.w = hash_uint32(w);
+	_xor_.v = hash_uint32(v);
+	_xor_.d = hash_uint32(d);
 }
 
 static inline uint32_t random_get_seed()
 {
-	return _xor_seed;
+	return _xor_.x;
 }
 
 /**
@@ -64,14 +120,12 @@ static inline uint32_t random_get_seed()
  **/
 static inline uint32_t rand128()
 {
-	static uint32_t y = 362436069;
-	static uint32_t z = 521288629;
-	static uint32_t w = 88675123;
 	uint32_t t;
-
-	t = _xor_seed ^ (_xor_seed << 11);
-	_xor_seed = y; y = z; z = w;
-	return w = w ^ (w >> 19) ^ (t ^ (t >> 8));
+	t = _xor_.x ^ (_xor_.x << 11);
+	_xor_.x = _xor_.y;
+	_xor_.y = _xor_.z;
+	_xor_.z = _xor_.w;
+	return _xor_.w = _xor_.w ^ (_xor_.w >> 19) ^ (t ^ (t >> 8));
 }
 
 /**
@@ -79,12 +133,14 @@ static inline uint32_t rand128()
  **/
 static inline uint32_t rand192()
 {
-	static uint32_t y = 362436069, z = 521288629, w = 88675123, v = 5783321, d = 6615241;
 	uint32_t t;
-	t = (_xor_seed ^ (_xor_seed >> 2));
-	_xor_seed = y;	y = z;	z = w;	w = v;
-	v = (v ^ (v << 4)) ^ (t ^ (t << 1));
-	return (d += 362437) + v;
+	t = (_xor_.x ^ (_xor_.x >> 2));
+	_xor_.x = _xor_.y;
+	_xor_.y = _xor_.z;
+	_xor_.z = _xor_.w;
+	_xor_.w = _xor_.v;
+	_xor_.v = (_xor_.v ^ (_xor_.v << 4)) ^ (t ^ (t << 1));
+	return (_xor_.d += 362437) + _xor_.v;
 }
 
 /**
@@ -93,7 +149,18 @@ static inline uint32_t rand192()
  **/
 static inline uint32_t rand32()
 {
-	static unsigned long y = 123456789;
+	static uint64_t y = 123456789;
+	y ^= (y << 13);
+	y = (y >> 17);
+	return (y ^= (y << 5));
+}
+
+/**
+ * A faster variant with limited period
+ **/
+static inline uint32_t rand16()
+{
+	static uint64_t y = 123456789;
 	y ^= (y << 13);
 	y = (y >> 17);
 	return (y ^= (y << 5));
