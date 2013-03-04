@@ -49,7 +49,7 @@ then
 fi
 
 GCC_VERSION=$($COMPILER -v |& tail -1 | awk '{print $3}' | sed s/\\.//g)
-FLAGS_OPTIMIZE_GENERAL="-fomit-frame-pointer -funroll-loops -mmmx -msse"
+FLAGS_OPTIMIZE_GENERAL="-fomit-frame-pointer -funroll-loops -mmmx -msse -mtune=generic"
 
 if [ $GCC_VERSION -ge 460 ]
 then
