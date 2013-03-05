@@ -61,7 +61,7 @@ fi
 if [ "$2" == "release" -o "$2" == "final" ]
 then
 	#add extra flags for gcc
-	FLAGS="$FLAGS_OPTIMIZE -Winline -Wdouble-promotion -Wdisabled-optimization -W -Wextra"
+	FLAGS="$FLAGS_OPTIMIZE -Winline -Wdisabled-optimization -W -Wextra"
 else
 	if [ "$2" == "debug" ]
 	then
@@ -78,12 +78,12 @@ else
 	fi
 fi
 
-which ccache > /dev/null 2>&1
-if [ "$?" = "0" ]
-then
-	COMPILER="ccache $COMPILER"
-	echo "Using ccache"
-fi
+#~ which ccache > /dev/null 2>&1
+#~ if [ "$?" = "0" ]
+#~ then
+	#~ COMPILER="ccache $COMPILER"
+	#~ echo "Using ccache"
+#~ fi
 
 export CC="$COMPILER"
 
