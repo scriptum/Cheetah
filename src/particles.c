@@ -94,7 +94,7 @@ static void particleSystemUpdate(ParticleSystem *ptr) {
 	rng_pop();
 
 	bool alive = globalTimers.gameTimed - ptr->_startTime < ptr->lifeTime;
-	if((alive || ptr->lifeTime <= 0) && ptr->_particlesNeeded >= 1.0)
+	if((alive || ptr->lifeTime <= 0) && ptr->_particlesNeeded >= 1.0f)
 	{
 		unsigned particlesNeeded = ptr->_particlesNeeded;
 		ptr->_particlesNeeded -= particlesNeeded;
