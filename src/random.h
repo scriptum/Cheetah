@@ -24,7 +24,7 @@ IN THE SOFTWARE.
 #ifndef __RANDOM_H__
 #define __RANDOM_H__
 
-#include <stdint.h>
+//~ #include <stdint.h>
 #include <string.h>
 
 /**
@@ -147,24 +147,24 @@ static inline uint32_t rand192()
  * Small period, needs 64bit integer... Without seed!
  * It does not pass all tests, it slow, so I kept it just as example.
  **/
-static inline uint32_t rand32()
-{
-	static uint64_t y = 123456789;
-	y ^= (y << 13);
-	y = (y >> 17);
-	return (y ^= (y << 5));
-}
+//~ static inline uint32_t rand32()
+//~ {
+	//~ static uint64_t y = 123456789;
+	//~ y ^= (y << 13);
+	//~ y = (y >> 17);
+	//~ return (y ^= (y << 5));
+//~ }
 
 /**
  * A faster variant with limited period
  **/
-static inline uint32_t rand16()
-{
-	static uint64_t y = 123456789;
-	y ^= (y << 13);
-	y = (y >> 17);
-	return (y ^= (y << 5));
-}
+//~ static inline uint32_t rand16()
+//~ {
+	//~ static uint64_t y = 123456789;
+	//~ y ^= (y << 13);
+	//~ y = (y >> 17);
+	//~ return (y ^= (y << 5));
+//~ }
 
 /**
  * Return a float from 0.0 to 0.999...
