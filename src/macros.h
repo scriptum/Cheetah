@@ -25,38 +25,7 @@ IN THE SOFTWARE.
 #define __MACROS_H__
 
 #include <stdlib.h>
-
-/***********************************DEBUGGING**********************************/
-
-/* Debug memory operations */
-#define DEBUG_MEMORY_ERRORS 0
-#define DEBUG_MEMORY 0
-#define DEBUG_FRAMEBUFFER 0
-#define DEBUG_SHADERS 0
-
-#if DEBUG_MEMORY
-	#define dprintf_mem(...) printf(__VA_ARGS__)
-#else
-	#define dprintf_mem(...)
-#endif
-
-#if DEBUG_MEMORY_ERRORS
-	#define dprintf_memerr(...) myError(__VA_ARGS__)
-#else
-	#define dprintf_memerr(...)
-#endif
-
-#if DEBUG_FRAMEBUFFER
-	#define dprintf_fbo(...) myError(__VA_ARGS__)
-#else
-	#define dprintf_fbo(...)
-#endif
-
-#if DEBUG_SHADERS
-	#define dprintf_shader(...) myError(__VA_ARGS__)
-#else
-	#define dprintf_shader(...)
-#endif
+#include "debug.h"
 
 /**********************************MEMOTY OPS**********************************/
 
@@ -144,16 +113,6 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);                  \
         o = 1;                                                                 \
     }                                                                          \
 } while(0)
-
-/**********************************DEBUG STUFF*********************************/
-
-#define DEBUG_MSG_FORMAT "%s (%d) - %s: "
-
-#define LOCATION __FILE__, __LINE__, __FUNCTION__
-
-#define vard(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
-#define vars(v) printf(DEBUG_MSG_FORMAT " %s = %s\n", LOCATION, #v, v);
-#define varf(v) printf(DEBUG_MSG_FORMAT " %s = %f\n", LOCATION, #v, v);
 
 /********************************ERROR CHECKING********************************/
 
