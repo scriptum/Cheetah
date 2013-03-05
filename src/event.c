@@ -26,34 +26,64 @@ IN THE SOFTWARE.
 #include <SDL.h>
 
 #include "cheetah.h"
+#include "debug.h"
 
 SDL_Event event;
 
 void recomputeScreenScale(double w, double h);
 void setWindowSize(unsigned w, unsigned h);
 
+enum {
+	EVENT_QUIT = 1,
+	EVENT_KEYDOWN,
+	EVENT_KEYUP,
+	EVENT_MOUSEBUTTONDOWN,
+	EVENT_MOUSEBUTTONUP,
+	EVENT_RESIZE,
+	EVENT_EXPOSE,
+	EVENT_ACTIVE,
+	EVENT_JOY
+};
+
 unsigned int getEventType() {
 	/* skip unneeded events */
 	while(SDL_PollEvent(&event)) {
 		switch(event.type) {
-			case SDL_QUIT:			return 1;
-			case SDL_KEYDOWN:		return 2;
-			case SDL_KEYUP:			return 3;
-			case SDL_MOUSEBUTTONDOWN:	return 4;
-			case SDL_MOUSEBUTTONUP:		return 5;
+			case SDL_QUIT:
+				dprintf_event("Event: Quit");
+				return EVENT_QUIT;
+			case SDL_KEYDOWN:
+				dprintf_event("Event: Key down");
+				return EVENT_KEYDOWN;
+			case SDL_KEYUP:
+				dprintf_event("Event: Key up");
+				return EVENT_KEYUP;
+			case SDL_MOUSEBUTTONDOWN:
+				dprintf_event("Event: Mouse down");
+				return EVENT_MOUSEBUTTONDOWN;
+			case SDL_MOUSEBUTTONUP:
+				dprintf_event("Event: Mouse up");
+				return EVENT_MOUSEBUTTONUP;
 			case SDL_VIDEORESIZE:
+				dprintf_event("Event: Resize");
 				recomputeScreenScale(event.resize.w, event.resize.h);
 				globalTimers.rescaleTime = globalTimers.time + globalTimers.resizeDelay;
 				setWindowSize(event.resize.w, event.resize.h);
-							return 6;
+				return EVENT_RESIZE;
 			/* TODO to do something here */
-			case SDL_VIDEOEXPOSE:		return 7;
-			case SDL_ACTIVEEVENT:		return 8;
+			case SDL_VIDEOEXPOSE:
+				dprintf_event("Event: Expose");
+				return EVENT_EXPOSE;
+			case SDL_ACTIVEEVENT:
+				dprintf_event("Event: Active");
+				return EVENT_ACTIVE;
 			case SDL_JOYAXISMOTION:
 			case SDL_JOYBALLMOTION:
 			case SDL_JOYHATMOTION:
 			case SDL_JOYBUTTONDOWN:
-			case SDL_JOYBUTTONUP:		return 9;
+			case SDL_JOYBUTTONUP:
+				dprintf_event("Event: Joystick");
+				return EVENT_JOY;
 		}
 	}
 	return 0;
