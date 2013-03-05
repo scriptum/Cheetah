@@ -112,7 +112,9 @@ void deleteShader(Shader * ptr) {
 			glDeleteObject_(ptr->id);
 	}
 	else
+	{
 		dprintf_shader("Trying to free a null-shader. Maybe, you did it manually?");
+	}
 }
 
 void shaderBind(Shader * ptr) {
