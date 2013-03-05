@@ -38,13 +38,13 @@ Windows:
 Building on windows is not supported. Windows version is cross-compiled using gcc, but you may try mingw...
 
 Android:
-Building for Android will be in nearest future.
+Building for Android will be avaiable in nearest future.
 
 ============================== Cross-compilation ===============================
 
 Cheetah 2D engine may work on most known platforms. Oficially supported: Linux, Windows.
 
-Building for all ofitial platforms is possible with Linux x86_64 operating system.
+Building for all official platforms is possible with Linux x86_64 operating system.
 You need:
 1. gcc compiler
 2. SDL and OpenGL for x86 and x86_64 platforms
@@ -53,11 +53,12 @@ You need:
 To build Cheetah itself you must use make.sh script. This script takes two parameters:
 ./make.sh <Target Platform> <Optimization level>
 
-<Target Platform> - one of __native__, __windows__ or __linux32__. Note that to buid engine for
-Linux x86_64 you must do it on Linux x86_64 platform and run ./make.sh native. Running 
-./make.sh native on Linux x86 platform is equivalent of ./make.sh linux32
+<Target Platform> - one of: native, windows, linux32. Note that buiding for
+Linux x86_64 only possible on Linux x86_64 by running run ./make.sh native. Running 
+./make.sh native on Linux x86 platform is equivalent of ./make.sh linux32.
+You cannot compile linux64 release on linux32 platform.
 
-<Optimization level> - one of __release__, __final__, __debug__. Also you 
+<Optimization level> - one of: release, final, debug. Also you 
 may leave it empty - smallest build time (without any optimizations). 
 Release - enables -Ofast (or -O3 if not possible) and some other 
 optimizations. Final - builds engine as release with profiling information,
