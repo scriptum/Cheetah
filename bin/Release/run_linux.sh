@@ -1,6 +1,7 @@
 #!/bin/sh
 
-DIR=$(dirname $(readlink -f "${0}"))
+READLINK="$(readlink -f \"${0}\")"
+DIR=$(dirname "$READLINK")
 
 MACHINE_NAME=`uname -m`
 case ${MACHINE_NAME} in
@@ -42,7 +43,7 @@ HAS_ZENITY=`whereis -b zenity | grep usr | wc -l`
 if [ $HAS_ZENITY -eq 1 ]
 then
 	MSG='zenity --info --text'
-else 
+else
 	MSG=echo
 fi
 
