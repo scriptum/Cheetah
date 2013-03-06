@@ -13,4 +13,6 @@ Entity:new(screen)
 :animate({x = 0})
 :draggable()
 
+--~ C.playMusic('Demos/Sound/Music/Stars.ogg')
+
 C.mainLoop()
