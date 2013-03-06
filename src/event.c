@@ -30,7 +30,7 @@ IN THE SOFTWARE.
 
 SDL_Event event;
 
-void recomputeScreenScale(double w, double h);
+void recomputeScreenScale(float w, float h);
 void setWindowSize(unsigned w, unsigned h);
 
 enum {

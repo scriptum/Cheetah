@@ -302,7 +302,7 @@ void recomputeScreenScale(float w, float h)
 	if(screenScale.autoScale)
 	{
 		screenScale.aspect = w / h;
-		if(screenScale.aspect > (float)4/3)
+		if(screenScale.aspect > 4.0f/3.0f)
 		{
 			screenScale.scaleX = screenScale.scaleY = h/screenScale.origHeight;
 			screenScale.offsetX = floorf((w - screenScale.origWidth * screenScale.scaleX) * 0.5f);
