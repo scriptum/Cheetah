@@ -88,13 +88,13 @@ cheetah.newSound = function(file)
 	return ptr
 end
 
-cheetah.playMusic = function(file)
+cheetah.playMusic = function(file, loops)
 	if not cheetah.fileExists(file) then
 		print('Music file "'..file..'" not found!')
 		return nil
 	end
 	local mus = Mix.Mix_LoadMUS(file)
-	Mix.Mix_PlayMusic(mus, 0)
+	Mix.Mix_PlayMusic(mus, loops or 0)
 end
 
 cheetah.soundVolume = function(volume)

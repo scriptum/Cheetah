@@ -1,5 +1,7 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
+require 'lib.gl'
+
 local C = cheetah
 C.init('Blend modes', '1024x512 vsync')
 
