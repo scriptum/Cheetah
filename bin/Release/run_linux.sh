@@ -1,7 +1,7 @@
 #!/bin/sh
 
-READLINK="$(readlink -f \"${0}\")"
-DIR=$(dirname "$READLINK")
+READLINK="$(readlink -f "$0")"
+DIR="$(dirname "$READLINK")"
 
 MACHINE_NAME=`uname -m`
 case ${MACHINE_NAME} in
@@ -56,15 +56,15 @@ then
   then
 		if [ ! -d "$DIRNAME/bin/" ]
 		then
-			ln -s ${DIR}/bin "$DIRNAME"
+			ln -s "${DIR}/bin" "$DIRNAME"
 		fi
 		if [ ! -d "$DIRNAME/lib/" ]
 		then
-			ln -s ${DIR}/lib "$DIRNAME"
+			ln -s "${DIR}/lib" "$DIRNAME"
 		fi
 		cd "$DIRNAME"
 	fi
-  $LUAJIT "$BASENAME" $*
+  $LUAJIT "$BASENAME" "$@"
 else
   $MSG "Your platform does not have a pre-compiled Cheetah engine."
   exit 1
