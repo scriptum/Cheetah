@@ -1,5 +1,28 @@
 #!/usr/bin/lua
 
+local meta = getmetatable("") -- get the string metatable
+
+function string.split(str, pat)
+  local t = {}
+  local fpat = "(.-)" .. pat
+  local last_end = 1
+  local s, e, cap = str:find(fpat, 1)
+  while s do
+    if s ~= 1 or cap ~= "" then
+  table.insert(t,cap)
+    end
+    last_end = e+1
+    s, e, cap = str:find(fpat, last_end)
+  end
+  if last_end <= #str then
+    cap = str:sub(last_end)
+    table.insert(t, cap)
+  end
+  return t
+end
+
+meta.__div = string.split -- the / operator
+
 table.print = function(tt, indent, done)
   done = done or {}
   indent = indent or 0
@@ -141,10 +164,12 @@ clear_vars()
 
 local doc_classes = {} --functions by classes
 local doc_functions = {} --functions by groups
+docKeyWords = {} --to index missing keywords
 
 local function add_func(funcname, func)
 	--~ table.print({funcname, description, vars, group, seealso, examples, class, advanced, varreturn, constructor})
 	--~ print('--------------------------------')
+	docKeyWords[funcname] = true
 	if class then
 		for cls in class:gmatch('[a-zA-Z]+') do
 			--add new class (if not exists)
@@ -160,6 +185,7 @@ local function add_func(funcname, func)
 	clear_vars()
 end
 
+--parser
 for line in io.lines('cheetah.doc') do
 	local line1 = line:sub(0,1)
 	if line:sub(0,2) ~= '--' then
@@ -241,17 +267,18 @@ local function format_doc(t)
 		print('#### '..t.funcname..' <a name="'..t.class..':'..t.funcname..'"></a>\n')
 	else
 		local constructor = ''
-		if t.constructor then constructor = ' (constructor)' end
+		if t.constructor then constructor = ' <font color="gray">(constructor)</font>' end
 		print('#### cheetah.'..t.funcname..constructor..' <a name="'..t.funcname..'"></a>\n')
 		func = t.func:gsub('function ', 'cheetah.')
 	end
 	print('<pre>'..process_func(func, t.class)..'</pre>\n')
 	print(process_description(table.concat(t.description, '\n'), t.class))
-	if #t.vars > 0 then
-		print '\n\n**Parameters**\n'
-		for i = 1, #t.vars do
-			text = text .. '\n* **'..t.vars[i]..'** <br />\n'..vars[i]
-		end
+	
+	print '\n\n**Parameters**\n'
+	for _, v in ipairs(t.vars) do
+		table.print(vars)
+		print('* '..table.concat(v, '\n'))
+		--text = text..'\n* **'..table.concat(v, '\n') --..'** <br />\n'..vars[i]
 	end
 	print()
 end
@@ -259,7 +286,101 @@ end
 print('## Classes')
 for cls, functions in pairs(doc_classes) do
 	print('\n### '..cls..'  <a name="'..cls..'"></a>\n')
-	for key, value in ipairs(functions) do
+	for _, value in ipairs(functions) do
 		format_doc(value)
+	end
+end
+
+_blackList = [[
+newVbo
+vboDraw
+newVboPoints
+vboDrawSprites
+newVboPoints3
+vboDrawSprites3
+deleteVbo
+prepare
+atlasDrawt
+atlasDrawxy
+myError
+framebufferCheck
+framebufferBind
+framebufferUnbind
+framebufferSaveBMP
+imageDrawxy
+imageDrawt
+imageDrawqxy
+imageDrawqt
+borderImageDrawt
+borderImageDrawxy
+initMultitexture
+deleteMultitexture
+multitextureDrawxy
+multitextureDrawt
+multitextureDrawqxy
+multitextureDrawqt
+deleteImage
+newParticleSystem
+particleSystemUpdate
+particleSystemDraw
+deleteParticleSystem
+newFragmentVertexShader
+newFragmentShader
+shaderCheck
+deleteShader
+shaderBind
+shaderUnbind
+GetUniformLocation
+Uniform1i
+Uniform1f
+Uniform2f
+Uniform3f
+Uniform4f
+deleteFont
+newFramebufferOpt
+deleteFramebuffer
+generateImageData
+generateImage
+newImageOpt
+newImageRaw
+imageBind
+fontWidth
+fontHeight
+fontPrintf
+fontScale
+fontInterval
+fontGetScale
+fontGetInterval
+fontSetGlyph
+fontSetKerning
+newTilmapInternal
+tilemapDraw
+deleteTilemap
+getModesSDL
+loadfile
+stencilFunc
+stencilOp
+drawToStencil
+drawUsingStencil
+enableTexture
+disableTexture
+]]
+blackList = {}
+for line in _blackList:gmatch("([^%s]+)") do
+	blackList[line] = true
+end
+
+table.print(blackList)
+
+local missingKeysFirstTime = true
+
+for line in io.lines '../bin/Release/lib/cheetah.h' do
+	local key = line:match('([A-Za-z0-9_]+)%(')
+	if key and not blackList[key] and not docKeyWords[key] then
+		if missingKeysFirstTime then
+			io.stderr:write('WARNING! There is missing functions:\n\n')
+			missingKeysFirstTime = false
+		end
+		io.stderr:write(key, '\n')
 	end
 end
