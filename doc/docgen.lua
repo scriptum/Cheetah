@@ -274,7 +274,9 @@ local function format_doc(t)
 	print('<pre>'..process_func(func, t.class)..'</pre>\n')
 	print(process_description(table.concat(t.description, '\n'), t.class))
 	
-	print '\n\n**Parameters**\n'
+	if #t.vars > 0 then
+		print '\n\n**Parameters**\n'
+	end
 	for _, v in ipairs(t.vars) do
 		table.print(vars)
 		print('* '..table.concat(v, '\n'))
@@ -369,8 +371,6 @@ blackList = {}
 for line in _blackList:gmatch("([^%s]+)") do
 	blackList[line] = true
 end
-
-table.print(blackList)
 
 local missingKeysFirstTime = true
 
