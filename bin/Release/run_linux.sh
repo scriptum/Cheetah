@@ -39,12 +39,18 @@ else
 	SCRIPT=main.lua
 fi
 
-HAS_ZENITY=`whereis -b zenity | grep usr | wc -l`
-if [ $HAS_ZENITY -eq 1 ]
+which zenit > /dev/null 2>&1
+if [ $? = "0" ]
 then
 	MSG='zenity --info --text'
 else
-	MSG=echo
+	which notify-send > /dev/null 2>&1
+	if [ $? = "0" ]
+	then
+		MSG='notify-send Error'
+	else
+		MSG='echo -n'
+	fi
 fi
 
 DIRNAME=`dirname "$SCRIPT"`
@@ -52,8 +58,8 @@ BASENAME=`basename "$SCRIPT"`
 LUAJIT=${DIR}/bin/${SYSTEM_NAME}${MACHINE_NAME}/luajit
 if [ -x $LUAJIT ]
 then
-  if [ "$DIRNAME" ]
-  then
+	if [ "$DIRNAME" ]
+	then
 		if [ ! -d "$DIRNAME/bin/" ]
 		then
 			ln -s "${DIR}/bin" "$DIRNAME"
@@ -64,8 +70,13 @@ then
 		fi
 		cd "$DIRNAME"
 	fi
-  $LUAJIT "$BASENAME" "$@"
+	$LUAJIT "$BASENAME" "$@" 2> /tmp/cheetah-engine-errors
+	if [ $? != "0" ]
+	then
+		$MSG "Cannot run engine!\n`cat /tmp/cheetah-engine-errors`"
+	fi
+	rm -f /tmp/cheetah-engine-errors
 else
-  $MSG "Your platform does not have a pre-compiled Cheetah engine."
-  exit 1
+	$MSG "Your platform does not have a pre-compiled Cheetah engine."
+	exit 1
 fi
