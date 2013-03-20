@@ -84,55 +84,6 @@ string.kwgmatch = function(s, a)
 	return s:gmatch(kw(a))
 end
 
---~ for i in res:gmatch '[^\n]+' do
-	--~ local c = getFile('cheetah.doc')
-	--~ local desc, group, gr, sgr, ret, see, fname, fnametrim, farg, text
-	--~ for doc, func in c:gmatch '/%*%*(.-) %* %*/%s*([%d%a* _.]+%([%d%a,* _]*%))' do
-		--~ doc = doc:gsub('\n %* ', '\n')
-		--~ desc = doc:kwmatch('descr')
-		--~ assert(desc, 'No @descr secton for function\n\t'..func..'\n')
-		--~ group = doc:kwmatch('group')
-		--~ assert(group, 'No @group secton for function\n\t'..func..'\n')
-		--~ gr, sgr = group:match '([^%s]+)%s*/%s*([^%s]+)'
-		--~ if not gr then
-			--~ gr, sgr = group, 'nogroup'
-		--~ end
-		--~ ret = doc:kwmatch('return')
-		--~ see = doc:kwmatch('see')
-		--~ local vars, varnames = {}, {}
-		--~ for k in doc:kwgmatch 'var' do
-			--~ table.insert(vars, k:match '^%s*(.-)%s*$')
-		--~ end
-		--~ fname, farg = func:match '%s*([%d%a* _.]-)%s*%(([%d%a,* _]*)%)'
-		--~ fname = fname:gsub('%s*=%s*function%s*$', '')
-		--~ fnametrim = fname:match '([%d%a_.]+)%s*$'
-		--~ for k in farg:gmatch '[^,]+' do
-			--~ table.insert(varnames, k:match'([%d%a_]+)%s*$')
-		--~ end
-		--~ assert(#varnames == #vars, 'Error in vars count for function\n\t'..func..'\n')
-		--~ text = 
-		--~ '### cheetah.'..fnametrim ..
-		--~ ' <a name="'..fnametrim..'"></a>\n\n' ..
-		--~ '`cheetah.'..fnametrim..'('..table.concat(varnames, ', ')..')`\n\n' ..
-		--~ desc
-		--~ if #varnames > 0 then
-			--~ text = text .. '\n\n**Parameters**\n'
-			--~ for i = 1, #varnames do
-				--~ text = text .. '\n* **'..varnames[i]..'** <br />\n'..vars[i]
-			--~ end
-		--~ end
-		--~ if ret then
-			--~ text = text .. '\n\n**Return value**\n\n'..ret
-		--~ end
-		--~ if see then
-			--~ text = text .. '\n\n**See also**\n\n'..see:gsub(' ?([^, ]+)', '* <a href="#wiki-%1">%1</a>\n')
-		--~ end
-		--~ if not docum[gr] then docum[gr] = {} end
-		--~ if not docum[gr][sgr] then docum[gr][sgr] = {} end
-		--~ table.insert(docum[gr][sgr], text)
-	--~ end
---~ end
-
 --~ local docfiles = {}
 --~ 
 --~ for k, v in pairs(docum) do
@@ -243,12 +194,8 @@ end
 local function subst_class(str, class)
 	return str:gsub('%%class', '<a href="#wiki-'..class..'">'..class..'</a>')
 end
-
-local function process_func(func, class)
-	local ret = subst_class_general(func)
-	if class then
-		ret = subst_class(ret, class)
-	end
+local function subst_method(str)
+	local ret = str:gsub('([a-zA-Z0-9_]+)</a>:([a-zA-Z0-9_]+)%(', '%1</a>:<a href="#wiki-%1-%2">%2</a>(')
 	return ret
 end
 
@@ -257,29 +204,35 @@ local function process_description(descr, class)
 	if class then
 		ret = subst_class(ret, class)
 	end
-	return ret
+	return subst_method(ret)
 end
 
 local function format_doc(t)
 	local func
 	if t.class and not t.constructor then
 		func = t.func:gsub('function ', ':')
-		print('#### '..t.funcname..' <a name="'..t.class..':'..t.funcname..'"></a>\n')
+		print('<a name="'..t.class..'-'..t.funcname..'"></a>\n#### <font color="gray">'..t.class..':</font>'..t.funcname..'\n')
 	else
 		local constructor = ''
 		if t.constructor then constructor = ' <font color="gray">(constructor)</font>' end
-		print('#### cheetah.'..t.funcname..constructor..' <a name="'..t.funcname..'"></a>\n')
+		print('<a name="'..t.funcname..'"></a>\n#### cheetah.'..t.funcname..constructor..'\n')
 		func = t.func:gsub('function ', 'cheetah.')
 	end
-	print('<pre>'..process_func(func, t.class)..'</pre>\n')
+	local funcname, args = func:match('^([^%(]+)%((.*)%)$')
+	arg_split = args / ',%s+'
+	if #arg_split > 2 or #args > 30 then
+		func = funcname.."(\n\t"..table.concat(arg_split, ",\n\t").."\n)"
+	end
+	-- table.print(arg_split)
+	-- print(funcname, args)
+	print('<pre>'..process_description(func, t.class)..'</pre>\n')
 	print(process_description(table.concat(t.description, '\n'), t.class))
 	
 	if #t.vars > 0 then
 		print '\n\n**Parameters**\n'
 	end
 	for _, v in ipairs(t.vars) do
-		table.print(vars)
-		print('* '..table.concat(v, '\n'))
+		print('* '..process_description(table.concat(v, '\n'), t.class))
 		--text = text..'\n* **'..table.concat(v, '\n') --..'** <br />\n'..vars[i]
 	end
 	print()
@@ -287,7 +240,7 @@ end
 
 print('## Classes')
 for cls, functions in pairs(doc_classes) do
-	print('\n### '..cls..'  <a name="'..cls..'"></a>\n')
+	print('\n<a name="'..cls..'"></a>\n### '..cls..'\n')
 	for _, value in ipairs(functions) do
 		format_doc(value)
 	end
