@@ -16,9 +16,10 @@
  * _instant_ - load instantly without delayed resource loader
  * _clamp_ - force texture clamp (default is repeat)
 @return %class object
+@see generate newBorderImage
 %class function newImage(string filename, string options = '')
 
-@descr Procedural generation of %class. Engine generates specified in _type_ procedural texture loads it as %class object. Fast and simple way to create some simple demosntrations and effects.
+@descr Procedural generation of %class. Engine generates procedural texture specified in _type_ and loads it as %class object. Fast and simple way to create simple demosntrations and effects withount using even external files.
 @class Image
 @constructor
 @var type of procedural contet. Following types are supported:
@@ -29,11 +30,12 @@
  * _circle_ - generates ugly aliased circle
 @var width of %class
 @var height of generated %class
-@var string of generated options. Supported options:
- * _alpha_ - generate image with alpha channel instead of making 24-bit RPG image
- * _nearest_ - use nearest interpolation instead of default linear interpolation
- * _clamp_ - force texture clamp (default is repeat)
+@var string of generator's options. Supported options:
+ * _alpha_ - generate 32-bit image with alpha channel instead of making 24-bit RGB image
+ * _nearest_ - use nearest interpolation instead of linear interpolation which is by default
+ * _clamp_ - enable texture clamp (default is repeat)
 @return %class object
+@see newImage newBorderImage
 %class function generate(string type, number width, number height, string options = '')
 
 @descr Create new %class from file. This class is based on %class(Image) and used for displaying sliced images. Image will be splitted into 9 different parts. Useful used for GUI elements.
@@ -46,6 +48,7 @@
 @var left slice position
 @var string of options. Same as %class(Image).
 @return %class object
+@see generate newImage
 %class function newBorderImage(string filename, number top, number right, number bottom, number left, string options)
 
 @descr Create new %class from several %class(Image) classes. Multitexturing - a technique often used with shaders to combine up to 8 images in one shader (see %class(Shader)).
@@ -181,7 +184,7 @@ function set(string uniform, ...)
 @var is font scalable (if true, uses linear interpolation, nearest otherwise)
 function newFont(string filename, bool scalable = true)
 
-@descr Get height of %class in pixels, takes into account screen scale.
+@descr Get height of %class in pixels, takes into account screen scale. Usually this is full height of font.
 @class Font
 @return height of %class
 %class function getHeight()
@@ -189,22 +192,26 @@ function newFont(string filename, bool scalable = true)
 @descr Get scale of %class.
 @class Font
 @return scale of %class
+@see setScale
 number function getScale()
-
-@descr Get interval of %class in pixels (interval between lines).
-@class Font
-@return interval of %class
-number function getInerval()
 
 @descr Set scale of %class in pixels.
 @class Font
-@var height
+@var scale of the %class
+@see getScale
 function setScale(number scale)
+
+@descr Set interval of %class in pixels (interval between lines). Default interval is 0 (standart interval between lines), you may increase or decrease it by using positive or negative values of interval.
+@class Font
+@var interval
+@see getInterval
+function setInterval(number interval)
 
 @descr Get interval of %class in pixels (interval between lines).
 @class Font
-@var interval
-function setInerval(number interval)
+@return interval between lines
+@see setInterval
+number function getInterval()
 
 @descr Print text using %class with alignment. This function akes into account scaling factor, if font scalable x and y coordinates are floating-point, otherwise x and y are decimal to fit screen pixel grid.
 @class Font
@@ -217,7 +224,7 @@ cheeath.alignLeft
 cheeath.alignRight
 cheeath.alignCenter
 cheeath.alignJustify
-function setInerval(string text = 'undefined', number x = 0, number y = 0, number width = 0, Align align = cheetah.alignLeft)
+function print(string text = 'undefined', number x = 0, number y = 0, number width = 0, Align align = cheetah.alignLeft)
 
 --------------------------------------------------------------------------------
 --                                  FUNCTIONS                                 --
