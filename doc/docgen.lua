@@ -32,10 +32,10 @@ table.print = function(tt, indent, done)
       if type (value) == "table" and not done [value] then
         done [value] = true
         io.write(string.format("[%s] => table\n", tostring (key)));
-        io.write(string.rep (" ", indent+4)) -- indent it
+        io.write(string.rep (" ", indent + 4)) -- indent it
         io.write("(\n");
         table.print (value, indent + 7, done)
-        io.write(string.rep (" ", indent+4)) -- indent it
+        io.write(string.rep (" ", indent + 4)) -- indent it
         io.write(")\n");
       else
         io.write(string.format("[%s] => %s\n",
@@ -223,8 +223,6 @@ local function format_doc(t)
 	if #arg_split > 2 or #args > 30 then
 		func = funcname.."(\n\t"..table.concat(arg_split, ",\n\t").."\n)"
 	end
-	-- table.print(arg_split)
-	-- print(funcname, args)
 	print('<pre>'..process_description(func, t.class)..'</pre>\n')
 	print(process_description(table.concat(t.description, '\n'), t.class))
 	
@@ -331,7 +329,7 @@ for line in io.lines '../bin/Release/lib/cheetah.h' do
 	local key = line:match('([A-Za-z0-9_]+)%(')
 	if key and not blackList[key] and not docKeyWords[key] then
 		if missingKeysFirstTime then
-			io.stderr:write('WARNING! There is missing functions:\n\n')
+			io.stderr:write('WARNING! There are missing functions:\n\n')
 			missingKeysFirstTime = false
 		end
 		io.stderr:write(key, '\n')
