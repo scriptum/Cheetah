@@ -115,6 +115,7 @@ clear_vars()
 
 local doc_classes = {} --functions by classes
 local doc_functions = {} --functions by groups
+local doc_func_index = {} --index of all functions
 docKeyWords = {} --to index missing keywords
 
 local function add_func(funcname, func)
@@ -126,10 +127,14 @@ local function add_func(funcname, func)
 			--add new class (if not exists)
 			if not doc_classes[cls] then doc_classes[cls] = {} end
 			table.insert(doc_classes[cls], {funcname = funcname, func = func, description = description, vars = vars, group = group, seealso = seealso, examples = examples, class = cls, advanced = advanced, varreturn = varreturn, constructor = constructor})
+			if constructor then
+				doc_func_index[funcname] = true
+			end
 		end
 	elseif group then
 		if not doc_functions[group] then doc_functions[group] = {} end
 		table.insert(doc_functions[group], {funcname = funcname, func = func, description = description, vars = vars, group = group, seealso = seealso, examples = examples, class = class, advanced = advanced, varreturn = varreturn, constructor = constructor})
+		doc_func_index[funcname] = true
 	else
 		io.write(io.stderr, 'Function'..funcname..' is without class or group!')
 	end
@@ -195,7 +200,18 @@ local function subst_class(str, class)
 	return str:gsub('%%class', '<a href="#wiki-'..class..'">'..class..'</a>')
 end
 local function subst_method(str)
-	local ret = str:gsub('([a-zA-Z0-9_]+)</a>:([a-zA-Z0-9_]+)%(', '%1</a>:<a href="#wiki-%1-%2">%2</a>(')
+	local ret = str:gsub('([a-zA-Z0-9_]+)</a>:([a-zA-Z0-9_]+)%(', '%1</a>:<a href="#wiki-%1-%2">%2</a>('):gsub('([a-zA-Z0-9_]+):([a-zA-Z0-9_]+)%(', '<a href="#wiki-%1">%1</a>:<a href="#wiki-%1-%2">%2</a>(')
+	return ret
+end
+local function subst_functions_callback(str)
+	if doc_func_index[str] then
+		return '<a href="#wiki-cheetah-'..str..'">cheetah.'..str..'</a>'
+	else
+		return 'cheetah.'..str
+	end
+end
+local function subst_functions(str)
+	local ret = str:gsub('cheetah%.([a-zA-Z0-9_]+)', subst_functions_callback)
 	return ret
 end
 
@@ -204,18 +220,18 @@ local function process_description(descr, class)
 	if class then
 		ret = subst_class(ret, class)
 	end
-	return subst_method(ret)
+	return subst_method(subst_functions(ret))
 end
 
 local function format_doc(t)
 	local func
 	if t.class and not t.constructor then
-		func = t.func:gsub('function ', ':')
+		func = t.func:gsub('function ', t.class..':')
 		print('<a name="'..t.class..'-'..t.funcname..'"></a>\n#### <font color="gray">'..t.class..':</font>'..t.funcname..'\n')
 	else
 		local constructor = ''
 		if t.constructor then constructor = ' <font color="gray">(constructor)</font>' end
-		print('<a name="'..t.funcname..'"></a>\n#### cheetah.'..t.funcname..constructor..'\n')
+		print('<a name="cheetah-'..t.funcname..'"></a>\n#### cheetah.'..t.funcname..constructor..'\n')
 		func = t.func:gsub('function ', 'cheetah.')
 	end
 	local funcname, args = func:match('^([^%(]+)%((.*)%)$')
