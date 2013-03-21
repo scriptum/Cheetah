@@ -244,6 +244,15 @@ for cls, functions in pairs(doc_classes) do
 	end
 end
 
+print("\n## Functions")
+
+for group, functions in pairs(doc_functions) do
+	group = group:gsub("^.", string.upper)
+	print('\n<a name="'..group..'"></a>\n### '..group..'\n')
+	for _, value in ipairs(functions) do
+		format_doc(value)
+	end
+end
 _blackList = [[
 newVbo
 vboDraw
