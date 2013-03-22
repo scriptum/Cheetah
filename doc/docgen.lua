@@ -114,6 +114,7 @@ end
 clear_vars()
 
 local doc_classes = {} --functions by classes
+local doc_groups = {} --to keep groups in order
 local doc_functions = {} --functions by groups
 local doc_func_index = {} --index of all functions
 docKeyWords = {} --to index missing keywords
@@ -132,7 +133,10 @@ local function add_func(funcname, func)
 			end
 		end
 	elseif group then
-		if not doc_functions[group] then doc_functions[group] = {} end
+		if not doc_functions[group] then 
+			doc_functions[group] = {}
+			table.insert(doc_groups, group)
+		end
 		table.insert(doc_functions[group], {funcname = funcname, func = func, description = description, vars = vars, group = group, seealso = seealso, examples = examples, class = class, advanced = advanced, varreturn = varreturn, constructor = constructor})
 		doc_func_index[funcname] = true
 	else
@@ -223,22 +227,36 @@ local function process_description(descr, class)
 	return subst_method(subst_functions(ret))
 end
 
+local function func_type_replace(str)
+	local ret
+	if str == 'bool' or
+	   str == 'number' or
+	   str == 'string' then
+		ret = '<a href="http://www.lua.org/manual/5.1/manual.html#2.2">'..str..'</a>'
+	else
+		ret = str
+	end
+	return ret..' function'
+end
+
 local function format_doc(t)
 	local func
+	func = t.func:gsub('([a-z]+)%s+function', func_type_replace)
 	if t.class and not t.constructor then
-		func = t.func:gsub('function ', t.class..':')
+		func = func:gsub('function ', t.class..':')
 		print('<a name="'..t.class..'-'..t.funcname..'"></a>\n#### <font color="gray">'..t.class..':</font>'..t.funcname..'\n')
 	else
 		local constructor = ''
 		if t.constructor then constructor = ' <font color="gray">(constructor)</font>' end
 		print('<a name="cheetah-'..t.funcname..'"></a>\n#### cheetah.'..t.funcname..constructor..'\n')
-		func = t.func:gsub('function ', 'cheetah.')
+		func = func:gsub('function ', 'cheetah.')
 	end
 	local funcname, args = func:match('^([^%(]+)%((.*)%)$')
 	arg_split = args / ',%s+'
 	if #arg_split > 2 or #args > 30 then
 		func = funcname.."(\n\t"..table.concat(arg_split, ",\n\t").."\n)"
 	end
+	
 	print('<pre>'..process_description(func, t.class)..'</pre>\n')
 	print(process_description(table.concat(t.description, '\n'), t.class))
 	
@@ -248,6 +266,10 @@ local function format_doc(t)
 	for _, v in ipairs(t.vars) do
 		print('* '..process_description(table.concat(v, '\n'), t.class))
 		--text = text..'\n* **'..table.concat(v, '\n') --..'** <br />\n'..vars[i]
+	end
+	if t.seealso then
+		local see = t.seealso:gsub('([a-zA-Z0-9_]+)', 'cheetah.%1')
+		print('\n\n**See also**: '..process_description(table.concat(see / ' ', ', ')))
 	end
 	print()
 end
@@ -262,7 +284,8 @@ end
 
 print("\n## Functions")
 
-for group, functions in pairs(doc_functions) do
+for _, group in ipairs(doc_groups) do
+	functions = doc_functions[group]
 	group = group:gsub("^.", string.upper)
 	print('\n<a name="'..group..'"></a>\n### '..group..'\n')
 	for _, value in ipairs(functions) do
