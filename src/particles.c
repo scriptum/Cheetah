@@ -30,6 +30,7 @@ IN THE SOFTWARE.
 #include "render.h"
 #include "vertex.h"
 #include "random.h"
+#include "test.h"
 
 void imageBind(Image * image);
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);

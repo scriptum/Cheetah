@@ -28,9 +28,9 @@ IN THE SOFTWARE.
 #ifndef __CHASH_H__
 #define __CHASH_H__
 
-#define DEBUG_CHASH 0
+/* #define DEBUG_CHASH 0 */
 
-#if DEBUG_CHASH
+#ifdef CHASH_DEBUG
 	#define dprintf_chash(...) printf(__VA_ARGS__)
 #else
 	#define dprintf_chash(...)
@@ -45,7 +45,7 @@ IN THE SOFTWARE.
     typeof(hash->nodes) hashnode;                                              \
     for(__i = 0; __i <= hash->size; __i++) {                                   \
         hashnode = &(hash->nodes[__i]);                                        \
-        if(hashnode->busy) { CODE }                                            \
+        if(hashnode->exists) { CODE }                                          \
     }                                                                          \
 }
 
@@ -64,7 +64,7 @@ while (condition) {                                                            \
 typedef struct hashName##Node {                                                \
     keyType         key;                                                       \
     valType         value;                                                     \
-    bool            busy;                                                      \
+    bool            exists;                                                    \
 } hashName##Node;                                                              \
                                                                                \
 typedef struct {                                                               \
@@ -109,17 +109,17 @@ bool hashName##_rehash(hashName *hash) {                                       \
 }                                                                              \
                                                                                \
 static inline valType hashName##_get(hashName *hash, keyType key) {            \
-    _HASH_INDEX(hashFunc, _HASH_NODE.busy && !cmpFunc(_HASH_NODE.key,key))     \
+    _HASH_INDEX(hashFunc, _HASH_NODE.exists && !cmpFunc(_HASH_NODE.key,key))   \
     return _HASH_NODE.value;                                                   \
 }                                                                              \
                                                                                \
 static inline bool hashName##_set(hashName *hash, keyType key, valType value) {\
-    _HASH_INDEX(hashFunc, _HASH_NODE.busy)                                     \
+    _HASH_INDEX(hashFunc, _HASH_NODE.exists)                                   \
     _HASH_NODE.key   = key;                                                    \
     dprintf_chash("%s: insert key %5u using %4d probes\n",                     \
                   #hashName, key, probes);                                     \
     _HASH_NODE.value = value;                                                  \
-    _HASH_NODE.busy  = TRUE;                                                   \
+    _HASH_NODE.exists  = TRUE;                                                 \
     hash->items++;                                                             \
     /* rehash if space is limited */                                           \
     if(hash->items > hash->size * 2 / 3)                                       \

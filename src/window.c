@@ -36,6 +36,8 @@ IN THE SOFTWARE.
 
 #include <SDL.h>
 
+#include "test.h"
+
 SDL_Surface *screen = NULL;
 bool clearScreenFlag = 1;
 

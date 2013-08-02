@@ -207,6 +207,7 @@ typedef struct Font {
 	float		_scale;
 	int		mem;
 	bool		scalable;
+	bool		_kerning;
 } Font;
 
 

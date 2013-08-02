@@ -31,6 +31,7 @@ IN THE SOFTWARE.
 #include "render.h"
 #include "vertex.h"
 #include "SOIL/SOIL.h"
+#include "test.h"
 
 void delay();
 

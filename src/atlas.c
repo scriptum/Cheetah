@@ -27,6 +27,7 @@ IN THE SOFTWARE.
 #include "cheetah.h"
 #include "render.h"
 #include "vertex.h"
+#include "test.h"
 
 void imageBind(Image * image);
 
@@ -41,8 +42,8 @@ void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox,
 }
 
 void atlasDrawxy(Atlas *p, float x, float y, float w, float h) {
-	float scalex = w/p->w;
-	float scaley = h/p->h;
+	float scalex = w / p->w;
+	float scaley = h / p->h;
 	imageBind(p->image);
 	PUSH_QUAD_TEXTURE(x + p->x * scalex, y + p->y * scaley, p->aw * scalex, p->ah * scaley, 0.0, 0.0, 0.0, p->tex);
 }

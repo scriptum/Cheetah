@@ -29,6 +29,7 @@ IN THE SOFTWARE.
 #include "render.h"
 #include "macros.h"
 #include "vertex.h"
+#include "test.h"
 
 const char * std_vertex_shader = "varying vec2 TexCoord;\
 void main()\

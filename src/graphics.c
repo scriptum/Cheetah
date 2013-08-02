@@ -27,6 +27,7 @@ IN THE SOFTWARE.
 #include "cheetah.h"
 #include "render.h"
 #include "vertex.h"
+#include "test.h"
 
 extern void resLoaderMainThread();
 int getWindowHeight();

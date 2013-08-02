@@ -31,6 +31,7 @@ IN THE SOFTWARE.
 #include "macros.h"
 #include "render.h"
 #include "random.h"
+#include "test.h"
 
 #define MAGICK_CONSTANT 20
 

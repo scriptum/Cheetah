@@ -25,6 +25,7 @@ IN THE SOFTWARE.
 #include <SDL.h>
 
 #include "cheetah.h"
+#include "test.h"
 
 /* Get the number of milliseconds past from the execution time. Equivalent to SDL_GetTicks(); */
 unsigned int getTicks() {

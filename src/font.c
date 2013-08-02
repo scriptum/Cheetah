@@ -34,6 +34,7 @@ IN THE SOFTWARE.
 #include "render.h"
 #include "vertex.h"
 #include "chash.h"
+#include "test.h"
 
 static inline unsigned fontHashFunc(unsigned key)
 {
@@ -68,7 +69,7 @@ void imageBind(Image * image);
 extern SDL_Surface *screen;
 
 #define UNICODE_TO_INT(a, i)                                                   \
-if((a[i] & 0b10000000) == 0) {                                                 \
+if(((a[i] & 0b10000000) == 0)) {                                                 \
     c  =  a[i++];                                                              \
 }                                                                              \
 else if ((a[i]   & 0b11100000) == 0b11000000) {                                \
@@ -140,25 +141,27 @@ float fontHeight(Font *font) {
     texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];          \
     texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];          \
     texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];          \
-    w = FONT_CEIL(currentFont, x);                                             \
-    vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0] + w;  \
+    width = FONT_CEIL(currentFont, x);                                         \
+    vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0]+width;\
     vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;\
     vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;\
-    vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6] = ch->v[2] + w;\
+    vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6]=ch->v[2]+width;\
     vertexCounter += 8;                                                        \
     x += ch->w;                                                                \
 }                                                                              \
 while(0)
 
+#define KERNING_CONDITION (TRUE == currentFont->_kerning && NULL != currentFont->kerningHash && prevChar > 0 && fontPrevChar && fontPrevChar->kerning)
+
 void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align) {
-	FontChar *ch;
+	FontChar *ch           = NULL;
 	int       i            = 0;
 	int       j;
 	int       last_space   = 0;
 	int       buf          = 0;
 	int       spaces       = -1;
 	unsigned  c            = 0;
-	float     w            = 0.0f;
+	float     width        = 0.0f;
 	float     h            = 0.0f;
 	float     lastw        = 0.0f;
 	float     justifyWidth = currentFont->_spacewidth;
@@ -166,6 +169,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	float     fontHeight   = currentFont->height * currentFont->_interval;
 	float     oldy         = y;
 	bool      end          = FALSE;
+	bool      yOutScreen;
 	FontHash *hash         = (FontHash*)currentFont->hash;
 	unsigned  prevChar     = 0;
 	FontChar *fontPrevChar = NULL;
@@ -202,14 +206,14 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 			{
 				case ' ':
 					last_space = j;
-					lastw = w;
+					lastw = width;
 					spaces++;
-					w += spacew;
+					width += spacew;
 					break;
 				case '\t':
-					w += spacew * 8;
+					width += spacew * 8;
 					last_space = j;
-					lastw = w;
+					lastw = width;
 					break;
 				case '\0':
 					end = TRUE;
@@ -218,42 +222,55 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 					ch = FontHash_get(hash, c);
 					if(NULL == ch)
 						continue;
-					w += ch->w;
+					width += ch->w;
 			}
-			if(w > maxw || '\n' == c || TRUE == end)
+			/* drop invisible lines - great performance improvement for long texts */
+			yOutScreen = (y + oldy + fontHeight) * currentFont->_scale > 0.0f;
+			/* drop kerning computation for invisible lines - speed +15% */
+			if(yOutScreen)
+				if(KERNING_CONDITION)
+				{
+					KerningPair kp = {prevChar, c};
+					width += KernHash_get(currentFont->kerningHash, kp);
+				}
+			prevChar = c;
+			fontPrevChar = ch;
+			if(width > maxw || '\n' == c || TRUE == end)
 			{
+				prevChar = 0;
+				fontPrevChar = NULL;
 				if(0 == last_space || '\n' == c || TRUE == end)
 				{
 					last_space = j;
-					lastw = w;
-				}
-				switch(align)
-				{
-					case alignCenter:
-						x = (maxw - lastw) * 0.5f;
-						break;
-					case alignRight:
-						x = maxw - lastw;
-						break;
-					case alignJustify:
-						if('\n' == c || TRUE == end)
-							justifyWidth = spacew;
-						else
-							justifyWidth = (maxw + spacew * (spaces) - lastw) / (float)(spaces);
-						x = 0;
-						break;
-						default: x = 0;
+					lastw = width;
 				}
 				if(buf == last_space)
 					last_space++;
 				/* dropping invisible lines from top */
-				if((y + oldy + fontHeight) * currentFont->_scale > 0)
+				if(yOutScreen)
 				{
+					switch(align)
+					{
+						case alignCenter:
+							x = (maxw - lastw) * 0.5f;
+							break;
+						case alignRight:
+							x = maxw - lastw;
+							break;
+						case alignJustify:
+							if('\n' == c || TRUE == end)
+								justifyWidth = spacew;
+							else
+								justifyWidth = (maxw + spacew * (spaces) - lastw) / (float)(spaces);
+							x = 0;
+							break;
+							default: x = 0;
+					}
 					float kerningAccumulator = 0.0;
 					while(buf < last_space)
 					{
 						UNICODE_TO_INT(str, buf)
-						if(NULL != currentFont->kerningHash && prevChar > 0 && fontPrevChar && fontPrevChar->kerning)
+						if(KERNING_CONDITION)
 						{
 							KerningPair kp = {prevChar, c};
 							float kerning = KernHash_get(currentFont->kerningHash, kp);
@@ -290,7 +307,6 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 				if((y + oldy) * currentFont->_scale > screen->h)
 					break;
 				h = FONT_CEIL(currentFont, y);
-				//~ increment = 0;
 				switch(str[buf])
 				{
 					case ' ':
@@ -302,8 +318,10 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 						i = buf = last_space;
 				}
 				last_space = 0;
-				w = 0;
+				width = 0;
 				spaces = -1;
+				prevChar = 0;
+				fontPrevChar = NULL;
 			}
 
 		}
@@ -365,23 +383,6 @@ float fontGetInterval(Font *font) {
 	return font->_interval;
 }
 
-static inline unsigned char *raw2utf8(unsigned ch)
-{
-	int i = 0;
-	static unsigned char buffer[9];
-	while(ch)
-	{
-		if(ch & 0xff000000)
-		{
-			buffer[i] = (ch & 0xff000000) >> 24;
-			i++;
-		}
-		ch <<= 8;
-	}
-	buffer[i] = 0;
-	return buffer;
-}
-
 void fontSetGlyph(Font *ptr, const char *line) {
 	float cx2 = 0.0;
 	float cy2 = 0.0;
@@ -394,17 +395,9 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	float w   = 0.0;
 	float h   = 0.0;
 	unsigned ch = 0;
-	int i    = 0;
-	unsigned c = 0;
 	FontChar *fch = NULL;
 	if(sscanf(line, "%u %f %f %f %f %f %f %f %f", &ch, &x1, &y1, &x2, &y2, &cx1, &cy1, &w, &h) == -1)
 		return;
-	UNICODE_TO_INT(raw2utf8(ch), i)
-	else
-	{
-		myError("character %d is out of range", ch);
-		return;
-	}
 	if(NULL == ptr->hash)
 	{
 		ptr->hash = (void *)FontHash_new();
@@ -428,9 +421,9 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	memcpy(fch->v, ver, sizeof(ver));
 	memcpy(fch->t, tex, sizeof(tex));
 	fch->w = w;
-	FontHash_set((FontHash*)ptr->hash, c, fch);
+	FontHash_set((FontHash*)ptr->hash, ch, fch);
 	ptr->mem += sizeof(FontChar);
-	if(' ' == c)
+	if(' ' == ch)
 	{
 		ptr->_spacewidth = w;
 		fch = NULL;
@@ -446,15 +439,8 @@ void fontSetKerning(Font *ptr, const char *line) {
 	unsigned	first;
 	unsigned	second;
 	float		kerning;
-	unsigned	c = 0;
-	int		i = 0;
 	if(sscanf(line, "%u %u %f", &first, &second, &kerning) == -1)
 		return;
-	UNICODE_TO_INT(raw2utf8(first), i)
-	first = c;
-	i = 0;
-	UNICODE_TO_INT(raw2utf8(second), i)
-	second = c;
 	if(NULL == ptr->kerningHash)
 	{
 		ptr->kerningHash = (void *)KernHash_new_size(64);

@@ -111,7 +111,7 @@ then
 	else
 		if [ "$1" == "linux32" ]
 		then
-			CFLAGS=-m32 make
+			CFLAGS="$CFLAGS -m32 make"
 		else
 			make
 		fi

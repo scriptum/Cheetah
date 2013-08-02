@@ -182,7 +182,7 @@ function set(string uniform, ...)
 @constructor
 @var font file name
 @var is font scalable (if true, uses linear interpolation, nearest otherwise)
-function newFont(string filename, bool scalable = true)
+%class function newFont(string filename, bool scalable = true)
 
 @descr Get height of %class in pixels, takes into account screen scale. Usually this is full height of font.
 @class Font
@@ -257,7 +257,7 @@ function delay(number ms)
 @group timer
 @var delay in seconds
 @see delay
-void function sleep(number sec)
+function sleep(number sec)
 
 -------------------------------------FILES--------------------------------------
 
@@ -347,8 +347,8 @@ bool function mkDir(string dirname)
 @example
 local dirptr = cheetah.openDir("/tmp")
 if cheetah.isPointer(dirptr) then
-	while cheetah.readDir(dirptr) do 
-		
+	while cheetah.readDir(dirptr) do
+
 	end
 end
 @see readDir closeDir isDir
@@ -771,7 +771,7 @@ function blendEquation(enumerate mode)
  * cheetah.GL_ONE_MINUS_DST_ALPHA
 function blendFunc(enumerate sourcefactor, enumerate destinationfactor)
 
-@descr Clear screen. Do not use it if you have background image. Cheetah 2D engine clears screen automatically, but you may use this to clear framebuffer.
+@descr Clear screen. Do not use it if you have background image. Cheetah 2D engine clears screen automatically, but you may want to use this to clear framebuffer.
 @group graphics
 @see clearColor clearColorDepth clearColorStencil clearDepth clearStencil
 function clear()

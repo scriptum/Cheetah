@@ -2,21 +2,21 @@
 
 Copyright (c) 2012-2013 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to 
-deal in the Software without restriction, including without limitation the 
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-sell copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions:  The above 
-copyright notice and this permission notice shall be included in all copies 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:  The above
+copyright notice and this permission notice shall be included in all copies
 or substantial portions of the Software.
- 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 
 *******************************************************************************/
@@ -32,7 +32,7 @@ IN THE SOFTWARE.
 // GL_ARB_shading_language_100, GL_ARB_shader_objects, GL_ARB_fragment_shader, GL_ARB_vertex_shader
 PFNGLCREATEPROGRAMOBJECTARBPROC       glCreateProgramObject_      = NULL;
 PFNGLDELETEOBJECTARBPROC              glDeleteObject_             = NULL;
-PFNGLUSEPROGRAMOBJECTARBPROC          glUseProgramObject_         = NULL; 
+PFNGLUSEPROGRAMOBJECTARBPROC          glUseProgramObject_         = NULL;
 PFNGLCREATESHADEROBJECTARBPROC        glCreateShaderObject_       = NULL;
 PFNGLSHADERSOURCEARBPROC              glShaderSource_             = NULL;
 PFNGLCOMPILESHADERARBPROC             glCompileShader_            = NULL;
@@ -101,7 +101,7 @@ void initRenderer()
 	const char *version	= (const char *)glGetString(GL_VERSION);
 	printf("Renderer: %s (%s)\n", renderer, vendor);
 	printf("Driver: %s\n", version);
-	
+
 	printf("Checking extensions...\n");
 	printf("Shaders:\t");
 	supported.GLSL = FALSE;
@@ -137,7 +137,7 @@ void initRenderer()
 	}
 	else
 		puts("no");
-	
+
 	printf("Minmax blend:\t");
 	supported.BE = FALSE;
 	if(strstr(exts, "GL_EXT_blend_minmax"))
@@ -150,7 +150,7 @@ void initRenderer()
 	}
 	else
 		puts("no");
-	
+
 	printf("Framebuffer:\t");
 	supported.FBO = 0;
 	if(strstr(exts, "GL_EXT_framebuffer_object"))
@@ -171,7 +171,7 @@ void initRenderer()
 	}
 	else
 		puts("no");
-	
+
 	printf("Multitexture:\t");
 	supported.MT = FALSE;
 	if(strstr(exts, "GL_ARB_multitexture"))
@@ -186,7 +186,7 @@ void initRenderer()
 	}
 	else
 		puts("no");
-	
+
 	printf("Vertex Buffer:\t");
 	supported.VBO = FALSE;
 	if(strstr(exts, "GL_ARB_vertex_buffer_object"))
@@ -204,7 +204,7 @@ void initRenderer()
 	}
 	else
 		puts("no");
-	
+
 	printf("Point Sprite:\t");
 	supported.PS = FALSE;
 	if(strstr(exts, "GL_ARB_point_sprite"))

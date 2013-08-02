@@ -434,6 +434,7 @@ C.newFont = function(name, scalable)
 	local bytes = 0
 	local p = ffi.new('float[8]')
 	local kerning = false
+	local fontFirst
 	for line in io.lines(name) do
 		if line == 'kerning pairs:' then kerning = true end
 		a = line:match('^textures: (.+)')
@@ -457,8 +458,10 @@ C.newFont = function(name, scalable)
 				font._scale = 1
 				font._interval = 1
 				font.scalable = scalable == true or false
+				font._kerning = true
 				if not C.fonts[a] then C.fonts[a] = {} end
 				C.fonts[a][tonumber(b)] = font
+				if not fontFirst then fontFirst = font end
 			else
 				if kerning then
 					libcheetah.fontSetKerning(font, line)
@@ -470,7 +473,8 @@ C.newFont = function(name, scalable)
 		end
 	end
 	if font then bytes = bytes + font.mem end
-	print('Loaded font '..name..' ('..glyphs..' glyphs, '..bytes..' bytes) in '..(C.getTicks()-millis)..' ms')
+	-- print('Loaded font '..name..' ('..glyphs..' glyphs, '..bytes..' bytes) in '..(C.getTicks()-millis)..' ms')
+	return fontFirst
 end
 
 C.getFont = function(name, size)
@@ -487,7 +491,9 @@ ffi.metatype('Font', {
 		getInterval = libcheetah.fontGetInterval,
 		getScale = libcheetah.fontGetScale,
 		getHeight = libcheetah.fontHeight,
-		getStringWidth = libcheetah.fontWidth
+		getStringWidth = libcheetah.fontWidth,
+		enableKerning = function(font) font._kerning = true end,
+		disableKerning = function(font) font._kerning = false end
 	},
 	__gc = libcheetah.deleteFont
 })

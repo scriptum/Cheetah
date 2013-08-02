@@ -31,6 +31,7 @@ IN THE SOFTWARE.
 
 #include "cheetah.h"
 #include "macros.h"
+#include "test.h"
 
 void myError(const char *fmt, ...) {
 	va_list args;

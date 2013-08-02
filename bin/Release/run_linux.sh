@@ -75,6 +75,7 @@ then
 	then
 		$MSG "Cannot run engine!\n`cat /tmp/cheetah-engine-errors`"
 	fi
+	cat /tmp/cheetah-engine-errors
 	rm -f /tmp/cheetah-engine-errors
 else
 	$MSG "Your platform does not have a pre-compiled Cheetah engine."

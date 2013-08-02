@@ -30,6 +30,7 @@ IN THE SOFTWARE.
 #include "render.h"
 #include "vertex.h"
 #include "image_write.h"
+#include "test.h"
 
 void resetView(unsigned w, unsigned h);
 void resetViewDefault();
