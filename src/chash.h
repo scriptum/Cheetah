@@ -28,9 +28,9 @@ IN THE SOFTWARE.
 #ifndef __CHASH_H__
 #define __CHASH_H__
 
-/* #define DEBUG_CHASH 0 */
+/* #define HASH_DEBUG */
 
-#ifdef CHASH_DEBUG
+#ifdef HASH_DEBUG
 	#define dprintf_chash(...) printf(__VA_ARGS__)
 #else
 	#define dprintf_chash(...)
@@ -38,6 +38,10 @@ IN THE SOFTWARE.
 
 #ifndef HASH_START_SIZE
 #define HASH_START_SIZE 128
+#endif
+
+#ifndef HASH_REHASH_RATIO
+#define HASH_REHASH_RATIO 2 / 3
 #endif
 
 #ifndef HASH_PROBING
@@ -117,6 +121,11 @@ static inline valType hashName##_get(hashName *hash, keyType key) {            \
     return _HASH_NODE.value;                                                   \
 }                                                                              \
                                                                                \
+static inline valType *hashName##_getptr(hashName *hash, keyType key) {        \
+    _HASH_INDEX(hashFunc, _HASH_NODE.exists && !cmpFunc(_HASH_NODE.key,key))   \
+    return _HASH_NODE.exists ? &(_HASH_NODE.value) : NULL;                     \
+}                                                                              \
+                                                                               \
 static inline bool hashName##_set(hashName *hash, keyType key, valType value) {\
     _HASH_INDEX(hashFunc, _HASH_NODE.exists)                                   \
     _HASH_NODE.key   = key;                                                    \
@@ -126,7 +135,7 @@ static inline bool hashName##_set(hashName *hash, keyType key, valType value) {\
     _HASH_NODE.exists  = TRUE;                                                 \
     hash->items++;                                                             \
     /* rehash if space is limited */                                           \
-    if(hash->items > hash->size * 2 / 3)                                       \
+    if(hash->items > hash->size * HASH_REHASH_RATIO)                           \
         return hashName##_rehash(hash);                                        \
     /* rehash if too much collisions */                                        \
     if(probes > (hash->size >> 4) && hash->items > (hash->size / 3))           \
