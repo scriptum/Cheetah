@@ -36,9 +36,13 @@ IN THE SOFTWARE.
 	#define dprintf_chash(...)
 #endif
 
+#ifndef HASH_START_SIZE
 #define HASH_START_SIZE 128
+#endif
 
+#ifndef HASH_PROBING
 #define HASH_PROBING (index + (probes))
+#endif
 
 #define HASH_EACH(hash, CODE) {                                                \
     unsigned __i;                                                              \
