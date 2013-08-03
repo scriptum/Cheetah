@@ -69,7 +69,7 @@ void imageBind(Image * image);
 extern SDL_Surface *screen;
 
 #define UNICODE_TO_INT(a, i)                                                   \
-if(((a[i] & 0b10000000) == 0)) {                                                 \
+if((a[i] & 0b10000000) == 0) {                                                 \
     c  =  a[i++];                                                              \
 }                                                                              \
 else if ((a[i]   & 0b11100000) == 0b11000000) {                                \
@@ -86,6 +86,8 @@ else if ((a[i]   & 0b11111000) == 0b11110000) {                                \
     c |= (a[i++] & 0b00111111) << 12;                                          \
     c |= (a[i++] & 0b00111111) << 6;                                           \
     c |=  a[i++] & 0b00111111;                                                 \
+} else { /* Error! */                                                          \
+    c = 0;                                                                     \
 }
 
 /* Calculate width of string. */
