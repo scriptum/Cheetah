@@ -69,8 +69,20 @@ typedef struct Multitexture {
 	Image 		**images;
 } Multitexture;
 typedef struct ParticleForce {
-	Point		position;
-	unsigned	maxParticles;
+	float		particeStartTime;
+	float		particleDuration;
+	float		systemStartTime;
+	float		systemDuration;
+	void		(*function)(void *);
+	struct ParticleForce	*next;
+	union {
+		void *p;
+		int i;
+		unsigned u;
+		float f;
+		Color c;
+		Point v;
+	} data;
 } ParticleForce;
 typedef struct Particle {
 	Point		position;
@@ -78,8 +90,7 @@ typedef struct Particle {
 	float		scale;
 	float		angle;
 	float		age;
-	/* Cheetah engine uses one random seed to generate all other parameters procedurally */
-	unsigned	seed;
+	Color		color;
 } Particle;
 typedef struct ParticleSystem {
 	ParticleForce	*forces;
@@ -94,8 +105,6 @@ typedef struct ParticleSystem {
 	float		startSpeedVariation;
 	float		scale;
 	float		scaleVariation;
-	float		gravity;
-	float		gravityVariation;
 	float		particleLife;
 	float		particleLifeVariation;
 	double		lifeTime;
@@ -147,8 +156,8 @@ typedef struct Shader {
 typedef struct _Tilemap {
 	int		w, h;            // size in tiles
 	int		tw, th;          // single tile size
-	float		**index;       // texture coords index
-	unsigned char	**map; // tile indexes map
+	float		**index;         // texture coords index
+	unsigned char	**map;           // tile indexes map
 	int		scalable;        // should tilemap be scaled to screen size or drawed per-pixel
 	Image		*img;
 } Tilemap;
@@ -189,7 +198,7 @@ struct {
 	float		scaleY;
 	float		offsetX;
 	float		offsetY;
-	/* original (first-time defined) width and height, if auto-scale enabled*/
+	/* original (first-time defined) width and height, if auto-scale enabled */
 	float		origWidth;
 	float		origHeight;
 	float		aspect;
@@ -308,7 +317,7 @@ void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w,
 void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy);
 void deleteImage(Image * ptr);
 void newParticleSystem(ParticleSystem *ptr, Image *image, int maxParticles, const char *options);
-static void particleSystemUpdate(ParticleSystem *ptr);
+static void particleSystemUpdate(ParticleSystem *pSystem);
 void particleSystemDraw(ParticleSystem *ptr, float x, float y);
 void deleteParticleSystem(ParticleSystem *ptr);
 void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver);

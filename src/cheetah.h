@@ -21,11 +21,6 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-//~ #include <stdio.h>
-//~ #include <stdlib.h>
-//~ #include <string.h>
-//~ #include <stdarg.h>
-
 #ifndef __CHEETAH_H__
 #define __CHEETAH_H__
 
@@ -128,8 +123,20 @@ typedef struct Multitexture {
 
 /*================================particles===================================*/
 typedef struct ParticleForce {
-	Point		position;
-	unsigned	maxParticles;
+	float		particeStartTime;
+	float		particleDuration;
+	float		systemStartTime;
+	float		systemDuration;
+	void		(*function)(void *);
+	struct ParticleForce	*next;
+	union {
+		void *p;
+		int i;
+		unsigned u;
+		float f;
+		Color c;
+		Point v;
+	} data;
 } ParticleForce;
 
 typedef struct Particle {
@@ -138,8 +145,7 @@ typedef struct Particle {
 	float		scale;
 	float		angle;
 	float		age;
-	/* Cheetah engine uses one random seed to generate all other parameters procedurally */
-	unsigned	seed;
+	Color		color;
 } Particle;
 
 typedef struct ParticleSystem {
@@ -155,8 +161,6 @@ typedef struct ParticleSystem {
 	float		startSpeedVariation;
 	float		scale;
 	float		scaleVariation;
-	float		gravity;
-	float		gravityVariation;
 	float		particleLife;
 	float		particleLifeVariation;
 	double		lifeTime;
@@ -220,8 +224,8 @@ typedef struct Shader {
 typedef struct _Tilemap {
 	int		w, h;            // size in tiles
 	int		tw, th;          // single tile size
-	float		**index;       // texture coords index
-	unsigned char	**map; // tile indexes map
+	float		**index;         // texture coords index
+	unsigned char	**map;           // tile indexes map
 	int		scalable;        // should tilemap be scaled to screen size or drawed per-pixel
 	Image		*img;
 } Tilemap;
@@ -268,7 +272,7 @@ struct {
 	float		scaleY;
 	float		offsetX;
 	float		offsetY;
-	/* original (first-time defined) width and height, if auto-scale enabled*/
+	/* original (first-time defined) width and height, if auto-scale enabled */
 	float		origWidth;
 	float		origHeight;
 	float		aspect;

@@ -58,61 +58,62 @@ void newParticleSystem(ParticleSystem *ptr, Image *image, int maxParticles, cons
 	ptr->maxParticles = maxParticles;
 	ptr->image = image;
 	ptr->_lasttime = globalTimers.timed;
-	ptr->startSpeed = 50.0;
+	ptr->startSpeed = 50.0f;
 	ptr->directionVariation = M_PI;
-	ptr->emissionRate = 100;
-	ptr->particleLife = 3.0;
+	ptr->emissionRate = 100.0f;
+	ptr->particleLife = 3.0f;
+	ptr->scale = 1.0f;
 	memset(&ptr->color, 255, sizeof(Color));
 	//~ memset(&ptr->colorVariation, 255, sizeof(Color));
 }
 
-static void particleSystemUpdate(ParticleSystem *ptr) {
+static void particleSystemUpdate(ParticleSystem *pSystem) {
 	unsigned	i;
-	Particle	*particle = ptr->particles;
-	if(globalTimers.timed - ptr->_lasttime < 1.0/100.0)
+	Particle	*particle = pSystem->particles;
+	if(globalTimers.timed - pSystem->_lasttime < 1.0/100.0)
 		return;
-	rng_push();
-	float deltaTime = globalTimers.gameTimed - ptr->_lasttime;
-	ptr->_lasttime = globalTimers.gameTimed;
-	ptr->_particlesNeeded += ptr->emissionRate * deltaTime;
-	for(i = 0; i < ptr->_aliveParticles; i++)
+	float deltaTime = globalTimers.gameTimed - pSystem->_lasttime;
+	pSystem->_lasttime = globalTimers.gameTimed;
+	pSystem->_particlesNeeded += pSystem->emissionRate * deltaTime;
+	for(i = 0; i < pSystem->_aliveParticles; i++)
 	{
-		particle->age += deltaTime;
-		random_seed128(particle->seed, 362436069, 521288629, 88675123);
-		/* handle particles life cycle */
-		if(particle->age >= ptr->particleLife + randf2(rand128()) * ptr->particleLifeVariation)
+		particle->age -= deltaTime;
+		if(particle->age < 0.0f)
 		{
-			ptr->_aliveParticles--;
-			memcpy(particle, &ptr->particles[ptr->_aliveParticles], sizeof(Particle));
+			pSystem->_aliveParticles--;
+			memcpy(particle, &pSystem->particles[pSystem->_aliveParticles], sizeof(Particle));
 			i--;
 			continue;
 		}
-		particleSystemApplyForces(ptr, particle);
+		particleSystemApplyForces(pSystem, particle);
 		particle->position.x += particle->speed.x * deltaTime;
 		particle->position.y += particle->speed.y * deltaTime;
 		particle++;
 	}
-	rng_pop();
 
-	bool alive = globalTimers.gameTimed - ptr->_startTime < ptr->lifeTime;
-	if((alive || ptr->lifeTime <= 0) && ptr->_particlesNeeded >= 1.0f)
+	bool alive = globalTimers.gameTimed - pSystem->_startTime < pSystem->lifeTime;
+	if((alive || pSystem->lifeTime <= 0) && pSystem->_particlesNeeded >= 1.0f)
 	{
-		unsigned particlesNeeded = ptr->_particlesNeeded;
-		ptr->_particlesNeeded -= particlesNeeded;
-		particle = &(ptr->particles[ptr->_aliveParticles]);
+		unsigned particlesNeeded = pSystem->_particlesNeeded;
+		pSystem->_particlesNeeded -= particlesNeeded;
+		particle = &(pSystem->particles[pSystem->_aliveParticles]);
 		for(i = 0; i < particlesNeeded; i++)
 		{
-			if(ptr->_aliveParticles >= ptr->maxParticles) break;
+			if(pSystem->_aliveParticles >= pSystem->maxParticles) break;
 			memset(particle, 0, sizeof(Particle));
-			float angle = ptr->direction + randf2(rand128()) * ptr->directionVariation;
+			float angle = pSystem->direction + randf2(rand128()) * pSystem->directionVariation;
 			particle->speed.x = cosf(angle);
 			particle->speed.y = sinf(angle);
-			float startSpeed = ptr->startSpeed + randf2(rand128()) * ptr->startSpeedVariation;
+			float startSpeed = pSystem->startSpeed + randf2(rand128()) * pSystem->startSpeedVariation;
 			particle->speed.x *= startSpeed;
 			particle->speed.y *= startSpeed;
-			particle->seed = rand128();
+			#define RNDC(T) particle->color.T = (int)pSystem->color.T + (((int)(rand128() & 255) - 128) * (int)pSystem->colorVariation.T) / 256;
+			RNDC(r) RNDC(g) RNDC(b) RNDC(a)
+			#undef RNDC
+			particle->age = pSystem->particleLife + randf2(rand128()) * pSystem->particleLifeVariation;
+			particle->scale = pSystem->scale + randf2(rand128()) * pSystem->scaleVariation;
 			particle++;
-			ptr->_aliveParticles++;
+			pSystem->_aliveParticles++;
 		}
 	}
 }
@@ -120,34 +121,14 @@ static void particleSystemUpdate(ParticleSystem *ptr) {
 void particleSystemDraw(ParticleSystem *ptr, float x, float y) {
 	unsigned	i;
 	Particle	*particle = ptr->particles;
-	Color c;
-	union {
-		Color cv;
-		uint32_t cvi;
-	} u;
 	particleSystemUpdate(ptr);
-	rng_push();
 	imageBind(ptr->image);
-	c = ptr->color;
-	u.cv = ptr->colorVariation;
 	for(i = 0; i < ptr->_aliveParticles; i++)
 	{
-		if(u.cvi) /* if have randomized color */
-		{
-			random_seed128(particle->seed, 362436069, 521288629, 88675123);
-			#define RNDC(T) int T = (int)c.T + (((int)(rand128() & 255) - 128) * (int)u.cv.T) / 256;
-			RNDC(r) RNDC(g) RNDC(b) RNDC(a)
-			#undef RNDC
-			color(r, g, b, a);
-		}
-		else
-		{
-			color(c.r, c.g, c.b, c.a);
-		}
+		color(particle->color.r, particle->color.g, particle->color.b, particle->color.a);
 		PUSH_QUAD(particle->position.x + x, particle->position.y + y, ptr->image->w, ptr->image->h, 0, ptr->image->w * 0.5f, ptr->image->h * 0.5f);
 		particle++;
 	}
-	rng_pop();
 }
 
 

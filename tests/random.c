@@ -29,5 +29,6 @@ int main() {
 	TEST("Stupid simple fastrand()", fastrand())
 	TEST("Xorshift 128", rand128())
 	TEST("Xorshift 192", rand192())
+	TEST("Xorshift 32", rand32())
 	return 0;
 }
