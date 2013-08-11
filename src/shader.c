@@ -38,6 +38,12 @@ void main()\
 	TexCoord = gl_MultiTexCoord0.xy;\
 }";
 
+Shader * initShader() {
+	Shader * ptr = NULL;
+	new(ptr, Shader, 1);
+	return ptr;
+}
+
 static bool compile(GLuint shader, const char* name)
 {
 	GLint compiled;
