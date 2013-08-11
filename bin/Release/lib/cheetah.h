@@ -238,6 +238,7 @@ void gameSpeed(double speed);
 void myError(const char *fmt, ...);
 bool isPointer(void * ptr);
 unsigned char *loadfile(const char *filename, unsigned int *length);
+bool fileExists(const char * filename);
 int fileatime(const char * filename);
 int filemtime(const char * filename);
 int filectime(const char * filename);

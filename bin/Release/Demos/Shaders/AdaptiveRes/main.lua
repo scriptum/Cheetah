@@ -4,7 +4,7 @@ local C = cheetah
 C.init('Ajustable shader', '800x600 resizable')
 C.printFPS = true
 
-local shader = C.newShader("volcanic.glsl")
+local shader = C.newShader("fire.glsl")
 local dummy = C.generate('noise', 256, 256)
 local fbo = C.newFramebuffer(800,600)
 local s = 0

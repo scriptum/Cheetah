@@ -36,6 +36,7 @@ IN THE SOFTWARE.
 // #define DEBUG_FRAMEBUFFER
 // #define DEBUG_SHADERS
 // #define DEBUG_EVENTS
+#define DEBUG_GRAPHICS
 
 /**********************************DEBUG STUFF*********************************/
 
@@ -67,6 +68,12 @@ IN THE SOFTWARE.
 	#define dprintf_event(...) printf("Event: ");printf(__VA_ARGS__)
 #else
 	#define dprintf_event(...)
+#endif
+
+#ifdef DEBUG_GRAPHICS
+	#define dprintf_graphics(...) printf("Graphics: ");printf(__VA_ARGS__)
+#else
+	#define dprintf_graphics(...)
 #endif
 
 /******************************************************************************/

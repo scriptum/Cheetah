@@ -69,6 +69,17 @@ error:
 	return NULL;
 }
 
+bool fileExists(const char * filename) {
+	FILE *file = fopen(filename, "rb");
+	if(NULL == file)
+		return FALSE;
+	else
+	{
+		fclose(file);
+		return TRUE;
+	}
+}
+
 #define filetime(var) int file ## var ## time(const char * filename) {         \
     static struct stat buf;                                                    \
     int result = stat(filename, &buf);                                         \

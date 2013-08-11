@@ -54,9 +54,12 @@ queue resLoaderQueue;
 
 Resource *resShared;
 
+bool fileExists(const char * filename);
+
 /*******************************************************************************
 PRIVATE FUNCTIOS
 *******************************************************************************/
+static unsigned char * loadImageData(const char *name, int *width, int *height, int *channels, bool mask);
 
 static unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels)
 {
@@ -81,12 +84,62 @@ static unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 	return tex_id;
 }
 
+static unsigned char * loadImageMask(const unsigned char * img, const char *mask_name, int width, int height, int channels)
+{
+	// char *mask_name;
+	// const int masklen = 5;
+	unsigned char *mask_img;
+	unsigned char *new_img;
+	const int img_len = width * height;
+	int mask_w, mask_h, mask_channels;
+	int mask_step, img_step;
+	int x, y, j, i;
+	if(FALSE == fileExists(mask_name))
+		return NULL;
+	
+	/* try to load mask */
+	mask_img = loadImageData(mask_name, &mask_w, &mask_h, &mask_channels, TRUE);
+	if(mask_img)
+	{
+		new_img = (unsigned char *)malloc(sizeof(unsigned char) * img_len * 4);
+		ERROR_IF_NULL(new_img);
+		for(x = y = i = j = mask_step = img_step = 0; i < img_len; i++)
+		{
+			new_img[j++] = img[img_step++];
+			new_img[j++] = img[img_step++];
+			new_img[j++] = img[img_step++];
+			if(channels == 4)
+				img_step++;
+			new_img[j++] = 0xff - mask_img[(y * mask_h + x) * mask_channels];
+			x++;
+			if(x >= mask_h)
+				x = 0;
+			mask_step++;
+			if(mask_step >= width)
+			{
+				x = mask_step = 0;
+				y++;
+				if(y >= mask_h)
+					y = 0;
+			}
+		}
+		free(mask_img);
+		// free(mask_name);
+		return new_img;
+	}
+	// free(mask_name);
+	return NULL;
+error:
+	myError("Cannot create mask image!");
+	return NULL;
+}
+
 /**
  * Threaded image loader
  * */
 
 /* Load image in separate thread (if specified) */
-static unsigned char * loadImageData(const char *name, int *width, int *height, int *channels)
+static unsigned char * loadImageData(const char *name, int *width, int *height, int *channels, bool mask)
 {
 	unsigned int file_size;
 	unsigned char *img;
@@ -100,6 +153,36 @@ static unsigned char * loadImageData(const char *name, int *width, int *height, 
 				0 );
 	if(img != myBuf)
 		delete(myBuf);
+	if(FALSE == mask && NULL != img) /* avoid loading mask of mask */
+	{
+		/* gen mask name */
+		char *pch = strrchr(name, '.');
+		unsigned char *img_mask;
+		char *mask_name = NULL;
+		new(mask_name, char, strlen(name) + 5 + 1);
+		if(NULL != mask_name)
+		{
+			if(NULL != pch)
+			{
+				strncpy(mask_name, name, pch - name);
+				strcpy(mask_name + (pch - name), ".mask");
+				dprintf_graphics("Trying to load mask with name %s...\n", mask_name);
+				img_mask = loadImageMask(img, mask_name, *width, *height, *channels);
+				if(img_mask)
+				{
+					*channels = 4;
+					free(img);
+					img = img_mask;
+					dprintf_graphics("Success\n");
+				}
+				else
+				{
+					dprintf_graphics("Fail\n");
+				}
+			}
+			delete(mask_name);
+		}
+	}
 	return img;
 error:
 	myError("cannot load image: empty file %s", name);
@@ -177,7 +260,7 @@ int resLoaderThread(void *unused)
 			//~ printf("Queue: %d\n", QEMPTY(resLoaderQueue));
 			//~ SDL_mutexP(resQueueMutex);
 			dequeue(resLoaderQueue, &r);
-			img = loadImageData(r.image->name, &width, &height, &r.image->channels);
+			img = loadImageData(r.image->name, &width, &height, &r.image->channels, FALSE);
 			r.image->w = (float)width;
 			r.image->h = (float)height;
 			r.data = img;
@@ -207,59 +290,6 @@ void resLoaderMainThread()
 		delete(r->image->options);
 		resShared = NULL;
 	}
-}
-
-static unsigned char * loadImageMask(const unsigned char * img, const char *name, int width, int height, int channels)
-{
-	char *mask_name;
-	const int masklen = 5;
-	unsigned char *mask_img;
-	unsigned char *new_img;
-	int img_len = width * height;
-	int mask_w, mask_h, mask_channels;
-	int mask_step, img_step;
-	int x, y, j, i;
-	/* gen mask name */
-	char *pch = strrchr(name, '.');
-	mask_name = (char*)malloc(strlen(name) + masklen + 1);
-	strncpy(mask_name, name, pch - name);
-	strcpy(mask_name + (pch - name), "_mask");
-	strcpy(mask_name + (pch - name) + masklen, pch);
-	/* try to load mask */
-	mask_img = loadImageData(mask_name, &mask_w, &mask_h, &mask_channels);
-	if(mask_img)
-	{
-		new_img = (unsigned char *)malloc(sizeof(unsigned char) * img_len * 4);
-		ERROR_IF_NULL(new_img);
-		for(x = y = i = j = mask_step = img_step = 0; i < img_len; i++)
-		{
-			new_img[j++] = img[img_step++];
-			new_img[j++] = img[img_step++];
-			new_img[j++] = img[img_step++];
-			if(channels == 4)
-				img_step++;
-			new_img[j++] = 0xff - mask_img[(y * mask_h + x) * mask_channels];
-			x++;
-			if(x >= mask_h)
-				x = 0;
-			mask_step++;
-			if(mask_step >= width)
-			{
-				x = mask_step = 0;
-				y++;
-				if(y >= mask_h)
-					y = 0;
-			}
-		}
-		free(mask_img);
-		free(mask_name);
-		return new_img;
-	}
-	free(mask_name);
-	return NULL;
-error:
-	myError("Cannot create mask image!");
-	return NULL;
 }
 
 static void imageCheckResLoader(Image * image)
@@ -304,7 +334,8 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 	int width, height, channels;
 	unsigned int tex_id;
 	unsigned char *img;
-	unsigned char *img_mask;
+	
+	
 	NEEDED_INIT_VOID;
 	if(!name)
 	{
@@ -312,24 +343,14 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 		return;
 	}
 	CHECK_OPTION(options, instant);
-	CHECK_OPTION(options, mask);
+	// CHECK_OPTION(options, mask);
 	if(FALSE == resLoaderQueue || TRUE == instant)
 	{
-		img = loadImageData(name, &width, &height, &channels);
+		img = loadImageData(name, &width, &height, &channels, FALSE);
 		if(img == NULL)
 		{
 			myError("can't load image %s", name);
 			return;
-		}
-		if(TRUE == mask)
-		{
-			img_mask = loadImageMask(img, name, width, height, channels);
-			if(img_mask)
-			{
-				channels = 4;
-				free(img);
-				img = img_mask;
-			}
 		}
 		tex_id = loadImageTex(options, img, width, height, channels);
 		ptr->id = tex_id;

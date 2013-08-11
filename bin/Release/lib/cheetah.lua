@@ -596,7 +596,7 @@ C.resLoaderAddCallback = function(exts, callback)
 	end
 end
 
-local _res_ignore = {'_mask%.'}
+local _res_ignore = {'%.mask$'}
 
 C.resLoaderAddIgnore = function(regexp)
 	if type(regexp) == 'table' then
