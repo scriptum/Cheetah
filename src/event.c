@@ -51,40 +51,44 @@ unsigned int getEventType() {
 	while(SDL_PollEvent(&event)) {
 		switch(event.type) {
 			case SDL_QUIT:
-				dprintf_event("Event: Quit");
+				dprintf_event("Quit\n");
 				return EVENT_QUIT;
 			case SDL_KEYDOWN:
-				dprintf_event("Event: Key down");
+				dprintf_event("Key down\n");
 				return EVENT_KEYDOWN;
 			case SDL_KEYUP:
-				dprintf_event("Event: Key up");
+				dprintf_event("Key up\n");
 				return EVENT_KEYUP;
 			case SDL_MOUSEBUTTONDOWN:
-				dprintf_event("Event: Mouse down");
+				dprintf_event("Mouse down\n");
 				return EVENT_MOUSEBUTTONDOWN;
 			case SDL_MOUSEBUTTONUP:
-				dprintf_event("Event: Mouse up");
+				dprintf_event("Mouse up\n");
 				return EVENT_MOUSEBUTTONUP;
 			case SDL_VIDEORESIZE:
-				dprintf_event("Event: Resize");
+				dprintf_event("Resize\n");
+				if(event.resize.w < 1) event.resize.w = 1;
+				if(event.resize.h < 1) event.resize.h = 1;
 				recomputeScreenScale(event.resize.w, event.resize.h);
 				globalTimers.rescaleTime = globalTimers.time + globalTimers.resizeDelay;
 				setWindowSize(event.resize.w, event.resize.h);
 				return EVENT_RESIZE;
 			/* TODO to do something here */
 			case SDL_VIDEOEXPOSE:
-				dprintf_event("Event: Expose");
+				dprintf_event("Expose\n");
 				return EVENT_EXPOSE;
 			case SDL_ACTIVEEVENT:
-				dprintf_event("Event: Active");
+				dprintf_event("Active\n");
 				return EVENT_ACTIVE;
 			case SDL_JOYAXISMOTION:
 			case SDL_JOYBALLMOTION:
 			case SDL_JOYHATMOTION:
 			case SDL_JOYBUTTONDOWN:
 			case SDL_JOYBUTTONUP:
-				dprintf_event("Event: Joystick");
+				dprintf_event("Joystick\n");
 				return EVENT_JOY;
+			// default:
+				// dprintf_event("Event: Smth %d\n", event.type);
 		}
 	}
 	return 0;
