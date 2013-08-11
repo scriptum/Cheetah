@@ -25,45 +25,46 @@ IN THE SOFTWARE.
 #define __DEBUG_H__
 
 #include <stdlib.h>
+#include <stdio.h>
 
 /*******************************DEBUGGING OPTIONS******************************/
 
 /* Debug memory operations */
-#define DEBUG_MEMORY_ERRORS 0
-#define DEBUG_MEMORY 0
-
-#define DEBUG_FRAMEBUFFER 0
-#define DEBUG_SHADERS 0
-#define DEBUG_EVENTS 0
+// #define DEBUG_MEMORY_ERRORS
+// #define DEBUG_MEMORY
+// 
+// #define DEBUG_FRAMEBUFFER
+// #define DEBUG_SHADERS
+// #define DEBUG_EVENTS
 
 /**********************************DEBUG STUFF*********************************/
 
-#if DEBUG_MEMORY
-	#define dprintf_mem(...) printf(__VA_ARGS__)
+#ifdef DEBUG_MEMORY
+	#define dprintf_mem(...) printf("Memory: ");printf(__VA_ARGS__)
 #else
 	#define dprintf_mem(...)
 #endif
 
-#if DEBUG_MEMORY_ERRORS
+#ifdef DEBUG_MEMORY_ERRORS
 	#define dprintf_memerr(...) myError(__VA_ARGS__)
 #else
 	#define dprintf_memerr(...)
 #endif
 
-#if DEBUG_FRAMEBUFFER
-	#define dprintf_fbo(...) myError(__VA_ARGS__)
+#ifdef DEBUG_FRAMEBUFFER
+	#define dprintf_fbo(...) printf("Framebuffer: ");printf(__VA_ARGS__)
 #else
 	#define dprintf_fbo(...)
 #endif
 
-#if DEBUG_SHADERS
-	#define dprintf_shader(...) myError(__VA_ARGS__)
+#ifdef DEBUG_SHADERS
+	#define dprintf_shader(...) printf("Shaders: ");printf(__VA_ARGS__)
 #else
 	#define dprintf_shader(...)
 #endif
 
-#if DEBUG_EVENTS
-	#define dprintf_event(...) myError(__VA_ARGS__)
+#ifdef DEBUG_EVENTS
+	#define dprintf_event(...) printf("Event: ");printf(__VA_ARGS__)
 #else
 	#define dprintf_event(...)
 #endif
