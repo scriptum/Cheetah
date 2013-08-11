@@ -36,6 +36,32 @@ IN THE SOFTWARE.
 #include "chash.h"
 #include "test.h"
 
+bool fontShaderFailed = FALSE;
+Shader * df_shader = NULL;
+const char * fontShaderNormalSource = "#version 120\n\
+uniform sampler2D texture;\n\
+uniform float sharpness;\n\
+uniform float gamma;\n\
+varying vec2 TexCoord;\n\
+void main() {\n\
+	vec4 color = texture2D(texture, TexCoord);\n\
+	gl_FragColor = vec4(color.rgb, smoothstep(gamma - sharpness, gamma + sharpness, color.a));\n\
+}";
+
+const char * fontShaderFastSource = "#version 120\n\
+uniform sampler2D texture;\n\
+uniform float sharpness;\n\
+uniform float gamma;\n\
+varying vec2 TexCoord;\n\
+void main() {\n\
+	vec4 color = texture2D(texture, TexCoord);\n\
+	gl_FragColor = vec4(color.rgb, (color.a - 0.5) * sharpness + 0.5);\n\
+}";
+
+bool shaderCheck(Shader * ptr);
+Shader * initShader();
+void newFragmentShader(Shader * ptr, const char * frag);
+
 static inline unsigned fontHashFunc(unsigned key)
 {
 	return key ^ (key << 7) ^ (key >> 5);
@@ -90,6 +116,14 @@ else if ((a[i]   & 0b11111000) == 0b11110000) {                                \
     c = 0;                                                                     \
 }
 
+void fontEnableDistanceField(Font *f) {
+	f->distanceField = TRUE;
+}
+
+void fontDisableDistanceField(Font *f) {
+	f->distanceField = FALSE;
+}
+
 /* Calculate width of string. */
 float fontWidth(Font *f, const char *str) {
 	float	width = 0;
@@ -135,7 +169,7 @@ float fontHeight(Font *font) {
 	return font->height * font->_scale;
 }
 
-#define FONT_CEIL(font, x) font->scalable ? x : ceilf(x)
+#define FONT_CEIL(font, x) (font->scalable || font->distanceField) ? x : ceilf(x)
 
 #define DRAW_CHAR do {                                                         \
     FLUSH_BUFFER_IF_OVERFLOW                                                   \
@@ -169,7 +203,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	float     justifyWidth = currentFont->_spacewidth;
 	float     spacew       = currentFont->_spacewidth;
 	float     fontHeight   = currentFont->height * currentFont->_interval;
-	float     oldy         = y;
+	float     oldy         = y / currentFont->_scale;
 	bool      end          = FALSE;
 	bool      yOutScreen;
 	FontHash *hash         = (FontHash*)currentFont->hash;
@@ -177,22 +211,51 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	FontChar *fontPrevChar = NULL;
 	if(NULL == hash)
 		return;
-	if(maxw > 0.0f)
+	// if(maxw > 0.0f)
 	{
-		maxw = maxw / currentFont->_scale * screenScale.scaleX;
-		if(maxw == 0.0f) maxw = 0.0001f;
+		maxw = maxw / currentFont->_scale;
+		// if(maxw == 0.0f) maxw = 0.0001f;
 	}
 	FLUSH_BUFFER();
 	glPushMatrix();
-	if(FALSE == currentFont->scalable)
+	if(TRUE == currentFont->distanceField)
+	{
+		if(NULL == df_shader && FALSE == fontShaderFailed)
+		{
+			if(FALSE == supported.GLSL)
+				fontShaderFailed = TRUE;
+			else
+			{
+				df_shader = initShader();
+				newFragmentShader(df_shader, fontShaderFastSource);
+				if(FALSE == shaderCheck(df_shader))
+					fontShaderFailed = TRUE;
+			}
+		}
+		if(TRUE == fontShaderFailed)
+		{
+			glEnable(GL_ALPHA_TEST);
+			glAlphaFunc(GL_GREATER, currentFont->dfGamma);
+		}
+		else
+		{
+			glUseProgramObject_(df_shader->id);
+			glUniform1f_(glGetUniformLocation_(df_shader->id, "gamma"), currentFont->dfGamma);
+			glUniform1f_(glGetUniformLocation_(df_shader->id, "sharpness"), 4.f * currentFont->dfSharpness * currentFont->_scale * screenScale.scaleY);
+		}
+		glScalef(currentFont->_scale, currentFont->_scale, 1);
+		glTranslatef(x / currentFont->_scale, y / currentFont->_scale, 0);
+	}
+	else if(FALSE == currentFont->scalable)
 	{
 		glScalef(currentFont->_scale / screenScale.scaleX, currentFont->_scale / screenScale.scaleY, 1);
 		glTranslatef(floorf(x * screenScale.scaleX), floorf(y * screenScale.scaleY), 0);
+		maxw = maxw * screenScale.scaleX;
 	}
 	else
 	{
-		glScalef(currentFont->_scale, currentFont->_scale, 1);
 		glTranslatef(x, y, 0);
+		glScalef(currentFont->_scale, currentFont->_scale, 1);
 	}
 
 	x = h = y = 0.0;
@@ -367,9 +430,21 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	}
 	FLUSH_BUFFER();
 	glPopMatrix();
+	if(TRUE == currentFont->distanceField)
+	{
+		if(TRUE == fontShaderFailed)
+		{
+			glDisable(GL_ALPHA_TEST);
+		}
+		else
+		{
+			glUseProgramObject_(0);
+		}
+	}
 }
 
 void fontScale(Font *font, float scale) {
+	font->scalable = TRUE;
 	font->_scale = scale;
 }
 

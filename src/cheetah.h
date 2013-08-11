@@ -209,8 +209,11 @@ typedef struct Font {
 	float		_spacewidth;
 	float		_interval;
 	float		_scale;
+	float		dfGamma;
+	float		dfSharpness;
 	int		mem;
 	bool		scalable;
+	bool		distanceField;
 	bool		_kerning;
 } Font;
 
