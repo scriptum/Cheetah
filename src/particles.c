@@ -129,6 +129,36 @@ void particleSystemDraw(ParticleSystem *ptr, float x, float y) {
 		PUSH_QUAD(particle->position.x + x, particle->position.y + y, ptr->image->w, ptr->image->h, 0, ptr->image->w * 0.5f, ptr->image->h * 0.5f);
 		particle++;
 	}
+	// unsigned	i;
+	// Particle	*particle = ptr->particles;
+	// Color particleColor;
+	// union {
+		// Color particleColor;
+		// uint32_t colorUint;
+	// } colorUnion;
+	// particleSystemUpdate(ptr);
+	// rng_push();
+	// imageBind(ptr->image);
+	// particleColor = ptr->color;
+	// colorUnion.particleColor = ptr->colorVariation;
+	// for(i = 0; i < ptr->_aliveParticles; i++)
+	// {
+		// if(colorUnion.colorUint) /* if have randomized color */
+		// {
+			// random_hash_seed128((uint32_t)particle, 362436069, 521288629, 88675123);
+			// #define RNDC(T) int T = (int)particleColor.T + (((int)(rand128() & 255) - 128) * (int)colorUnion.particleColor.T) / 256;
+			// RNDC(r) RNDC(g) RNDC(b) RNDC(a)
+			// #undef RNDC
+			// color(r, g, b, a);
+		// }
+		// else
+		// {
+			// color(particleColor.r, particleColor.g, particleColor.b, particleColor.a);
+		// }
+		// PUSH_QUAD(particle->position.x + x, particle->position.y + y, ptr->image->w, ptr->image->h, 0, ptr->image->w * 0.5f, ptr->image->h * 0.5f);
+		// particle++;
+	// }
+	// rng_pop();
 }
 
 
