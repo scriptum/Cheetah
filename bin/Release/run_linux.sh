@@ -33,7 +33,10 @@ then
 	then
 		SCRIPT="$1"
 	else
-		SCRIPT=main.lua
+		if [ -f "$1/main.lua" ]
+		then SCRIPT="$1/main.lua"
+		else SCRIPT=main.lua
+		fi
 	fi
 else
 	SCRIPT=main.lua

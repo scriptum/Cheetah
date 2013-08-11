@@ -4,7 +4,7 @@ local C = cheetah
 --enable windows resizing and disable autoscale to avoid font corruption
 C.init('Test', '1024x700 resizable')
 C.printFPS = true
-C.autoScale(false)
+-- C.autoScale(false)
 --load font
 local f = C.newFont('MonotypeCorsiva.fnt', true)
 f.distanceField = true
@@ -42,7 +42,7 @@ local textarea = E:new(screen)
 	-- dfshader:set('size', f.image.w, f.image.h)
 	-- C.enableAlphaTest()
 	f:setScale(s.fontScale)
-	f:print(str, s.x, s.y - s._offset, s.w, C.alignCenter)
+	f:print(str, s.x, s.y - s._offset, s.w, C.alignJustify)
 	-- dfshader:unbind()
 end):size(C.getWindowWidth(),C.getWindowHeight())
 :mousepressed(function(s, x, y, b)
@@ -68,9 +68,9 @@ end)
 end)
 -----------------------------END SCROLL TEXT ENTITY-----------------------------
 --when window resizes, resize texarea too
-lQuery.onresize(function()
-	textarea:size(C.getWindowWidth(),C.getWindowHeight())
-end)
+-- lQuery.onresize(function()
+	-- textarea:size(C.getWindowWidth(),C.getWindowHeight())
+-- end)
 
 local fontScaleStep = 1.1
 --some key bindings

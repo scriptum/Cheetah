@@ -42,10 +42,6 @@ vec4 filter(sampler2D tex, vec2 texcoord)
 	return mix(mix(sample3, sample2, sx), mix(sample1, sample0, sx), sy);
 }
 
-
-
-
-
 void main() {
    gl_FragColor = filter(texture, TexCoord * size);
 }

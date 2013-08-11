@@ -146,8 +146,11 @@ typedef struct Font {
 	float		_spacewidth;
 	float		_interval;
 	float		_scale;
+	float		dfGamma;
+	float		dfSharpness;
 	int		mem;
 	bool		scalable;
+	bool		distanceField;
 	bool		_kerning;
 } Font;
 typedef struct Shader {
@@ -244,6 +247,8 @@ int closeDir(DIR *dirp);
 bool isDir(const char *name);
 bool mkDir(const char * path);
 char *getDirentName(struct dirent * de);
+void fontEnableDistanceField(Font *f);
+void fontDisableDistanceField(Font *f);
 float fontWidth(Font *f, const char *str);
 float fontHeight(Font *font);
 void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align);
@@ -320,6 +325,7 @@ void newParticleSystem(ParticleSystem *ptr, Image *image, int maxParticles, cons
 static void particleSystemUpdate(ParticleSystem *pSystem);
 void particleSystemDraw(ParticleSystem *ptr, float x, float y);
 void deleteParticleSystem(ParticleSystem *ptr);
+Shader * initShader();
 void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver);
 void newFragmentShader(Shader * ptr, const char * frag);
 bool shaderCheck(Shader * ptr);

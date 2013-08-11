@@ -442,9 +442,9 @@ C.newFont = function(name, scalable)
 			n = name:gsub('[^/]+$', a)
 			img = ffi.new('Image')
 			if scalable then
-				libcheetah.newImageOpt(img, n, 'i') --disable delayed loader
+				libcheetah.newImageOpt(img, n, 'instant') --disable delayed loader
 			else
-				libcheetah.newImageOpt(img, n, 'in') --disable delayed loader
+				libcheetah.newImageOpt(img, n, 'instant nearest') --disable delayed loader
 			end
 			table.insert(texturesArchive, img)
 		else
@@ -457,6 +457,8 @@ C.newFont = function(name, scalable)
 				font.image = img
 				font._scale = 1
 				font._interval = 1
+				font.dfGamma = 0.5
+				font.dfSharpness = 1
 				font.scalable = scalable == true or false
 				font._kerning = true
 				if not C.fonts[a] then C.fonts[a] = {} end
@@ -493,7 +495,9 @@ ffi.metatype('Font', {
 		getHeight = libcheetah.fontHeight,
 		getStringWidth = libcheetah.fontWidth,
 		enableKerning = function(font) font._kerning = true end,
-		disableKerning = function(font) font._kerning = false end
+		disableKerning = function(font) font._kerning = false end,
+		enableDistanceField = libcheetah.fontEnableDistanceField,
+		disableDistanceField = libcheetah.fontDisableDistanceField
 	},
 	__gc = libcheetah.deleteFont
 })
@@ -592,6 +596,18 @@ C.resLoaderAddCallback = function(exts, callback)
 	end
 end
 
+local _res_ignore = {'_mask%.'}
+
+C.resLoaderAddIgnore = function(regexp)
+	if type(regexp) == 'table' then
+		for _, v in ipairs(regexp) do
+			table.insert(_res_ignore, v)
+		end
+	else
+		table.insert(_res_ignore, regexp)
+	end
+end
+
 --recursive resource loader
 C.resLoader = function(dirname, recursive)
 	local res_tree = {}
@@ -612,7 +628,7 @@ C.resLoader = function(dirname, recursive)
 		local raw_n = libcheetah.getDirentName(de)
 		n = ffi.string(raw_n)
 		s = dirname..'/'..n
-		if raw_n[0] ~= 46 then -- "."
+		if raw_n[0] ~= 46 then -- skip dir named "."
 			if libcheetah.isDir(s) then
 				if recursive then
 					local n_num = tonumber(n)
@@ -623,13 +639,19 @@ C.resLoader = function(dirname, recursive)
 					end
 				end
 			else
-				name, ext = n:match('^(.*)%.([^.]+)$')
-				if ext then
-					ext = ext:lower()
-					--~ if not ext then print(name) end
-					callback = _exts[ext]
-					if callback then
-						callback(s, res_tree, dirname, name, ext)
+				local skipName = false
+				for _, v in ipairs(_res_ignore) do
+					if n:match(v) then skipName = true end
+				end
+				if not skipName then
+					name, ext = n:match('^(.*)%.([^.]+)$')
+					if ext then
+						ext = ext:lower()
+						--~ if not ext then print(name) end
+						callback = _exts[ext]
+						if callback then
+							callback(s, res_tree, dirname, name, ext)
+						end
 					end
 				end
 			end
@@ -641,8 +663,7 @@ end
 
 C.init = function(title, options)
 	libcheetah.cheetahInit(title or 'Cheetah 2D Engine', options or 'vsync')
-	C.newFont('lib/font/DICE.fnt')
-	C.fonts.default = C.fonts.DICE[6]
+	C.fonts.default = C.newFont('lib/font/DICE.fnt')
 end
 
 --------------------------------------------------------------------------------
