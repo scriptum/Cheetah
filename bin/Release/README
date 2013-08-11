@@ -1,0 +1,17 @@
+Hello! You downloaded Cheetah 2D Engine - LuaJIT-based engine for 2D games and
+applications. This is an experiment of putting OpenGL, SDL and LuaJIT together.
+
+This is very early and unstable engine. API may be changed unexpectedly! But it
+is ready to make some cool stuff.
+
+Primary goal of this engine - UNIX platforms. Windows version may be outdated
+some times.
+
+You may find much demos in Demos directory. To run a demo on UNIX just type:
+./run_linux.sh Demos/....../main.lua
+Easy running Demos on Windows is not supported yes. Much Demos may not work -
+this is normal. Contact to me if you found a bug: rpg89 (at) post.ru
+
+
+To create your own application just modify main.lua; to run an application type:
+./run_linux.sh
