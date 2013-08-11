@@ -10,3 +10,8 @@ luajit
 *.xcf
 bin/*
 !bin/Release*
+tests/bin/
+thirdparty
+*.tar.*
+papers/
+bin/Release/Demos/Tests/
