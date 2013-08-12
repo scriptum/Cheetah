@@ -30,7 +30,7 @@ IN THE SOFTWARE.
 #include <time.h>
 // #include <SDL.h>
 
-// #define CHASH_DEBUG
+// #define HASH_DEBUG
 
 typedef unsigned char bool;
 
@@ -68,19 +68,21 @@ typedef struct Image {
 	int		queued;
 } Image;
 
+#define FONT_CHAR_TYPE unsigned short
+
 typedef struct FontChar
 {
 	/* Width of char */
 	#ifdef TEST_UNSIGNED
-		unsigned short cx2 ;
-		unsigned short cy2 ;
-		unsigned short x1  ;
-		unsigned short y1  ;
-		unsigned short x2  ;
-		unsigned short y2  ;
-		unsigned short cx1 ;
-		unsigned short cy1 ;
-		unsigned short w   ;
+		// FONT_CHAR_TYPE cx2 ;
+		// FONT_CHAR_TYPE cy2 ;
+		FONT_CHAR_TYPE x1  ;
+		FONT_CHAR_TYPE y1  ;
+		FONT_CHAR_TYPE x2  ;
+		FONT_CHAR_TYPE y2  ;
+		FONT_CHAR_TYPE cx1 ;
+		FONT_CHAR_TYPE cy1 ;
+		FONT_CHAR_TYPE w   ;
 	#else
 		float		w;
 		float		v[4];
@@ -94,7 +96,7 @@ typedef struct Font {
 	void		*hash;
 	void		*kerningHash;
 	#ifdef TEST_UNSIGNED
-	unsigned short height;
+	FONT_CHAR_TYPE height;
 	#else
 	float		height;
 	#endif
@@ -185,19 +187,36 @@ HASH_TEMPLATE(KernHash, KerningPair, float, kerningHashFunc, kerningCmpFunc)
 #define FONT_CEIL(font, x) font->scalable ? x : ceilf(x)
 
 #ifndef TEST_NODRAW
-	#define DRAW_CHAR do {charsCount++;                                                         \
-	    texCoord[vertexCounter] = texCoord[vertexCounter+2] = ch->t[0];            \
-	    texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];          \
-	    texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];          \
-	    texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];          \
-	    width = FONT_CEIL(currentFont, x);                                         \
-	    vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0]+width;\
-	    vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;\
-	    vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;\
-	    vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6]=ch->v[2]+width;\
-	    x += ch->w;                                                                \
-	}                                                                              \
-	while(0)
+	#ifdef TEST_UNSIGNED
+		#define DRAW_CHAR do {charsCount++;                                                         \
+		    float ver[] = {(float)ch->cx1, (float)ch->cy1, (float)((float)ch->cx1 + (float)ch->x2), (float)((float)ch->cy1 + (float)ch->y2)};float tex[] = {(float)ch->x1 / imgw_1,  (float)ch->y1 / imgh_1,  (float)((float)ch->x1 + (float)ch->x2) / imgw_1,  (float)((float)ch->y1 + (float)ch->y2) / imgh_1};\
+		    texCoord[vertexCounter] = texCoord[vertexCounter+2] = tex[0];            \
+		    texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = tex[1];          \
+		    texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = tex[3];          \
+		    texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = tex[2];          \
+		    width = FONT_CEIL(currentFont, x);                                         \
+		    vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ver[0]+width;\
+		    vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ver[1] + h;\
+		    vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ver[3] + h;\
+		    vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6]=ver[2]+width;\
+		    x += (float)ch->w;                                                                \
+		}                                                                              \
+		while(0)
+	#else
+		#define DRAW_CHAR do {charsCount++;                                                         \
+		    texCoord[vertexCounter] = texCoord[vertexCounter+2] = ch->t[0];            \
+		    texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];          \
+		    texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];          \
+		    texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];          \
+		    width = FONT_CEIL(currentFont, x);                                         \
+		    vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0]+width;\
+		    vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;\
+		    vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;\
+		    vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6]=ch->v[2]+width;\
+		    x += ch->w;                                                                \
+		}                                                                              \
+		while(0)
+	#endif
 #else
 	/* "fake" drawing without writing to memory */
 	#define DRAW_CHAR do {charsCount++;                                                         \
@@ -207,8 +226,8 @@ HASH_TEMPLATE(KernHash, KerningPair, float, kerningHashFunc, kerningCmpFunc)
 	while(0)
 #endif
 
-// #define KERNING_CONDITION if(TRUE == currentFont->_kerning && NULL != currentFont->kerningHash && prevChar > 0 && fontPrevChar && fontPrevChar->kerning)
-#define KERNING_CONDITION if(TRUE == currentFont->_kerning)
+#define KERNING_CONDITION if(NULL != currentFont->kerningHash && fontPrevChar && fontPrevChar->kerning)
+// #define KERNING_CONDITION if(TRUE == currentFont->_kerning)
 
 void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align) {
 	FontChar *ch           = NULL;
@@ -230,6 +249,8 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	FontHash *hash         = (FontHash*)currentFont->hash;
 	unsigned  prevChar     = 0;
 	FontChar *fontPrevChar = NULL;
+	float imgw_1 = 1.0f / (float)currentFont->image->w;
+	float imgh_1 = 1.0f / (float)currentFont->image->h;
 	if(NULL == hash)
 		return;
 	// if(maxw > 0.0f)
@@ -324,6 +345,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 						{
 							KerningPair kp = {prevChar, c};
 							float kerning = KernHash_get(currentFont->kerningHash, kp);
+							// varf(kerning);
 							x += kerning;
 							if(align == alignJustify)
 								kerningAccumulator -= kerning;
@@ -424,16 +446,16 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 
 void fontSetGlyph(Font *ptr, const char *line) {
 	#ifdef TEST_UNSIGNED
-		unsigned short cx2 = 0.0;
-		unsigned short cy2 = 0.0;
-		unsigned short x1  = 0.0;
-		unsigned short y1  = 0.0;
-		unsigned short x2  = 0.0;
-		unsigned short y2  = 0.0;
-		unsigned short cx1 = 0.0;
-		unsigned short cy1 = 0.0;
-		unsigned short w   = 0.0;
-		unsigned short h   = 0.0;
+		// FONT_CHAR_TYPE cx2 = 0.0;
+		// FONT_CHAR_TYPE cy2 = 0.0;
+		FONT_CHAR_TYPE x1  = 0.0;
+		FONT_CHAR_TYPE y1  = 0.0;
+		FONT_CHAR_TYPE x2  = 0.0;
+		FONT_CHAR_TYPE y2  = 0.0;
+		FONT_CHAR_TYPE cx1 = 0.0;
+		FONT_CHAR_TYPE cy1 = 0.0;
+		FONT_CHAR_TYPE w   = 0.0;
+		FONT_CHAR_TYPE h   = 0.0;
 	#else
 		float cx2 = 0.0;
 		float cy2 = 0.0;
@@ -568,7 +590,6 @@ int main(int argc, char **argv)
 {
 	Font *font;
 	Image *img;
-	bool kerning = FALSE;
 	char line[128];
 	unsigned char *text = NULL;
 	size_t size = 0;
@@ -609,8 +630,15 @@ int main(int argc, char **argv)
 	font->_kerning = FALSE;
 	while(fgets(line, sizeof(line), fontFile))
 	{
+		if(strncmp(line, "kerning pairs:", strlen("kerning pairs:")) == 0)
+			font->_kerning = TRUE;
 		if(line[0] >= '0' && line[0] <= '9')
-			fontSetGlyph(font, line);
+		{
+			if(font->_kerning)
+				fontSetKerning(font, line);
+			else
+				fontSetGlyph(font, line);
+		}
 	}
 	begin = clock();
 	width = 1000;

@@ -35,6 +35,7 @@ const char * std_vertex_shader = "varying vec2 TexCoord;\
 void main()\
 {\
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\
+	gl_FrontColor = gl_Color;\
 	TexCoord = gl_MultiTexCoord0.xy;\
 }";
 

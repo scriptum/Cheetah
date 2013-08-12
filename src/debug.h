@@ -36,7 +36,7 @@ IN THE SOFTWARE.
 // #define DEBUG_FRAMEBUFFER
 // #define DEBUG_SHADERS
 // #define DEBUG_EVENTS
-#define DEBUG_GRAPHICS
+// #define DEBUG_GRAPHICS
 
 /**********************************DEBUG STUFF*********************************/
 

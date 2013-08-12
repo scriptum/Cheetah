@@ -44,8 +44,8 @@ uniform float sharpness;\n\
 uniform float gamma;\n\
 varying vec2 TexCoord;\n\
 void main() {\n\
-	vec4 color = texture2D(texture, TexCoord);\n\
-	gl_FragColor = vec4(color.rgb, smoothstep(gamma - sharpness, gamma + sharpness, color.a));\n\
+	float color = texture2D(texture, TexCoord).a;\n\
+	gl_FragColor = vec4(gl_Color.rgb, gl_Color.a * smoothstep(gamma - sharpness, gamma + sharpness, color));\n\
 }";
 
 const char * fontShaderFastSource = "#version 120\n\
@@ -54,8 +54,8 @@ uniform float sharpness;\n\
 uniform float gamma;\n\
 varying vec2 TexCoord;\n\
 void main() {\n\
-	vec4 color = texture2D(texture, TexCoord);\n\
-	gl_FragColor = vec4(color.rgb, (color.a - 0.5) * sharpness + 0.5);\n\
+	float color = texture2D(texture, TexCoord).a;\n\
+	gl_FragColor = vec4(gl_Color.rgb, gl_Color.a * clamp((color - 0.5) * sharpness + 0.5, 0., 1.));\n\
 }";
 
 bool shaderCheck(Shader * ptr);
@@ -187,8 +187,8 @@ float fontHeight(Font *font) {
 }                                                                              \
 while(0)
 
-#define KERNING_CONDITION (TRUE == currentFont->_kerning && NULL != currentFont->kerningHash && prevChar > 0 && fontPrevChar && fontPrevChar->kerning)
-
+// #define KERNING_CONDITION (TRUE == currentFont->_kerning && NULL != currentFont->kerningHash && prevChar > 0 && fontPrevChar && fontPrevChar->kerning)
+#define KERNING_CONDITION (NULL != currentFont->kerningHash && fontPrevChar && fontPrevChar->kerning)
 void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align) {
 	FontChar *ch           = NULL;
 	int       i            = 0;
@@ -241,7 +241,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 		{
 			glUseProgramObject_(df_shader->id);
 			glUniform1f_(glGetUniformLocation_(df_shader->id, "gamma"), currentFont->dfGamma);
-			glUniform1f_(glGetUniformLocation_(df_shader->id, "sharpness"), 4.f * currentFont->dfSharpness * currentFont->_scale * screenScale.scaleY);
+			glUniform1f_(glGetUniformLocation_(df_shader->id, "sharpness"), 4.18f * currentFont->dfSharpness * currentFont->_scale * screenScale.scaleY);
 		}
 		glScalef(currentFont->_scale, currentFont->_scale, 1);
 		glTranslatef(x / currentFont->_scale, y / currentFont->_scale, 0);

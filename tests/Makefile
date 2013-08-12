@@ -1,4 +1,4 @@
-CFLAGS += -Ofast -pipe
+CFLAGS += -Ofast -pipe -fomit-frame-pointer -mtune=generic
 
 LDFLAGS += -lm
 
@@ -13,17 +13,18 @@ HEADERS := $(wildcard ../src/*.h)
 all : $(TARGETS)
 
 % : %.c $(HEADERS)
-	$(CC) $(CFLAGS) -o $(OUT_DIR)/"$@" "$<"
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(OUT_DIR)/"$@" "$<"
 
 font_hash_1251: font_hash.c $(HEADERS)
-	$(CC) $(CFLAGS) -DTEST_NOUNICODE font_hash.c -o $(OUT_DIR)/font_hash_1251
+	$(CC) $(CFLAGS) $(LDFLAGS) -DTEST_NOUNICODE font_hash.c -o $(OUT_DIR)/font_hash_1251
 font_hash_nodraw: font_hash.c $(HEADERS)
-	$(CC) $(CFLAGS) -DTEST_NODRAW font_hash.c -o $(OUT_DIR)/font_hash_nodraw
+	$(CC) $(CFLAGS) $(LDFLAGS) -DTEST_NODRAW font_hash.c -o $(OUT_DIR)/font_hash_nodraw
 font_hash_noptr: font_hash.c $(HEADERS)
-	$(CC) $(CFLAGS) -DTEST_NOHASHPTR font_hash.c -o $(OUT_DIR)/font_hash_noptr
+	$(CC) $(CFLAGS) $(LDFLAGS) -DTEST_NOHASHPTR font_hash.c -o $(OUT_DIR)/font_hash_noptr
 
 test_font_hash_ru: font_hash $(FONT_ADD_TARGETS)
 	@./$(OUT_DIR)/font_hash font_data/font.fnt font_data/russian.txt "Cheetah hash rus, no kern"
+	./$(OUT_DIR)/font_hash font_data/font_kerning.fnt font_data/russian.txt "Cheetah hash rus, kerning"
 	@./$(OUT_DIR)/font_hash_noptr font_data/font.fnt font_data/russian.txt "Hash without ptrs rus"
 	@./$(OUT_DIR)/font_hash_1251 font_data/font_1251.fnt font_data/russian_1251.txt "1251 encoding rus"
 	@./$(OUT_DIR)/font_hash_nodraw font_data/font.fnt font_data/russian.txt "Drawing disabled rus"
