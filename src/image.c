@@ -64,7 +64,7 @@ static unsigned char * loadImageData(const char *name, int *width, int *height, 
 static unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels)
 {
 	unsigned int tex_id;
-	int flags = SOIL_FLAG_TEXTURE_REPEATS;
+	unsigned flags = SOIL_FLAG_TEXTURE_REPEATS;
 	NEEDED_INIT;
 	CHECK_OPTION(options, nearest);
 	CHECK_OPTION(options, clamp);
@@ -101,7 +101,7 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *mask
 	mask_img = loadImageData(mask_name, &mask_w, &mask_h, &mask_channels, TRUE);
 	if(mask_img)
 	{
-		new_img = (unsigned char *)malloc(sizeof(unsigned char) * img_len * 4);
+		new_img = (unsigned char *)malloc(sizeof(unsigned char) * (size_t)img_len * 4);
 		ERROR_IF_NULL(new_img);
 		for(x = y = i = j = mask_step = img_step = 0; i < img_len; i++)
 		{
@@ -110,7 +110,7 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *mask
 			new_img[j++] = img[img_step++];
 			if(channels == 4)
 				img_step++;
-			new_img[j++] = 0xff - mask_img[(y * mask_h + x) * mask_channels];
+			new_img[j++] = (unsigned char)(0xff - mask_img[(y * mask_h + x) * mask_channels]);
 			x++;
 			if(x >= mask_h)
 				x = 0;
@@ -141,14 +141,14 @@ error:
 /* Load image in separate thread (if specified) */
 static unsigned char * loadImageData(const char *name, int *width, int *height, int *channels, bool mask)
 {
-	unsigned int file_size;
+	long int file_size;
 	unsigned char *img;
 	unsigned char *myBuf;
 	NEEDED_INIT;
 	myBuf = loadfile(name, &file_size);
 	ERROR_IF_NULL(myBuf);
 	img = SOIL_load_image_from_memory(
-				myBuf, sizeof(unsigned char) * file_size,
+				myBuf, (int)sizeof(unsigned char) * (int)file_size,
 				width, height, channels,
 				0 );
 	if(img != myBuf)
@@ -164,7 +164,7 @@ static unsigned char * loadImageData(const char *name, int *width, int *height, 
 		{
 			if(NULL != pch)
 			{
-				strncpy(mask_name, name, pch - name);
+				strncpy(mask_name, name, (size_t)(pch - name));
 				strcpy(mask_name + (pch - name), ".mask");
 				dprintf_graphics("Trying to load mask with name %s...\n", mask_name);
 				img_mask = loadImageMask(img, mask_name, *width, *height, *channels);
@@ -285,7 +285,7 @@ void resLoaderMainThread()
 	if(resShared)
 	{
 		r = resShared;
-		r->image->id = loadImageTex(r->image->options, r->data, r->image->w, r->image->h, r->image->channels);
+		r->image->id = loadImageTex(r->image->options, r->data, (int)r->image->w, (int)r->image->h, r->image->channels);
 		delete(r->image->name);
 		delete(r->image->options);
 		resShared = NULL;
@@ -306,15 +306,15 @@ static void imageCheckResLoader(Image * image)
 
 static void multitextureBind(Multitexture * multitexture)
 {
+	Image * image;
 	if(NULL == multitexture || NULL == multitexture->images)
 		return;
 	FLUSH_BUFFER();
-	Image * image;
 	int i;
 	for(i = 0; i < multitexture->size; i++)
 	{
 		image = multitexture->images[i];
-		glActiveTexture_(GL_TEXTURE0 + i);
+		glActiveTexture_((GLenum)(GL_TEXTURE0 + i));
 		if(NULL == image)
 			continue;
 		imageCheckResLoader(image);
@@ -384,8 +384,8 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 void newImageRaw(Image *ptr, int width, int height, const char *data, const char *options) {
 	unsigned int tex_id;
 	GLenum format = GL_RGB;
-	const int level = 0;
-	const int border = 0;
+	const GLint level = 0;
+	const GLint border = 0;
 	NEEDED_INIT_VOID;
 	CHECK_OPTION(options, nearest);
 	CHECK_OPTION(options, alpha);
@@ -402,8 +402,8 @@ void newImageRaw(Image *ptr, int width, int height, const char *data, const char
 		TEX_CLAMP;
 	else
 		TEX_REPEAT;
-	glTexImage2D(GL_TEXTURE_2D, level, format, width, height, border,
-		format, GL_UNSIGNED_BYTE, (void *)data);
+	glTexImage2D(GL_TEXTURE_2D, level, (GLint)format, (GLsizei)width, (GLsizei)height, 
+		border, format, GL_UNSIGNED_BYTE, (const GLvoid *)data);
 	ptr->w = (float)width;
 	ptr->h = (float)height;
 	ptr->id = tex_id;

@@ -25,7 +25,7 @@ IN THE SOFTWARE.
 #define __CHEETAH_H__
 
 typedef unsigned char bool;
-unsigned char * loadfile(const char * filename, unsigned int * length);
+unsigned char * loadfile(const char * filename, long * length);
 
 
 void myError(const char *fmt, ...);
@@ -130,12 +130,14 @@ typedef struct ParticleForce {
 	void		(*function)(void *);
 	struct ParticleForce	*next;
 	union {
-		void *p;
-		int i;
-		unsigned u;
-		float f;
-		Color c;
-		Point v;
+		void    *ptrData;
+		int      intData;
+		long     longData;
+		unsigned uintData;
+		float    floatData;
+		double   doubleData;
+		Color    colorData;
+		Point    pointData;
 	} data;
 } ParticleForce;
 
@@ -211,7 +213,7 @@ typedef struct Font {
 	float		_scale;
 	float		dfGamma;
 	float		dfSharpness;
-	int		mem;
+	unsigned	mem;
 	bool		scalable;
 	bool		distanceField;
 	bool		_kerning;

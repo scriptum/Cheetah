@@ -47,16 +47,16 @@ bool isPointer(void * ptr) {
 }
 
 
-unsigned char *loadfile(const char *filename, unsigned int *length) {
+unsigned char *loadfile(const char *filename, long *length) {
 	unsigned char *result = NULL;
-	size_t size = 0;
+	long size = 0;
 	FILE *file = fopen(filename, "rb");
 	ERROR_IF_NULL(file);
 	fseek(file, 0, SEEK_END);
 	size = ftell(file);
 	fseek(file, 0, SEEK_SET);
 	new(result, unsigned char, size);
-	if (size != fread(result, sizeof(unsigned char), size, file)) {
+	if (size != (long)fread(result, sizeof(unsigned char), (size_t)size, file)) {
 		goto error;
 	}
 	if (length)
@@ -80,9 +80,9 @@ bool fileExists(const char * filename) {
 	}
 }
 
-#define filetime(var) int file ## var ## time(const char * filename) {         \
+#define filetime(var) long int file ## var ## time(const char * filename) {    \
     static struct stat buf;                                                    \
-    int result = stat(filename, &buf);                                         \
+    long int result = (long int)stat(filename, &buf);                          \
     if( result != 0 ) {                                                        \
         myError("can't get information about file %s", filename);              \
         return -1;                                                             \
@@ -96,9 +96,9 @@ filetime(a)
 filetime(c)
 
 #ifdef false
-int fileatime(const char * filename) {
-int filemtime(const char * filename) {
-int filectime(const char * filename) {
+long int fileatime(const char * filename) {
+long int filemtime(const char * filename) {
+long int filectime(const char * filename) {
 #endif
 
 DIR *openDir(const char *name) {

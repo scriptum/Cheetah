@@ -32,7 +32,7 @@ IN THE SOFTWARE.
 extern void resLoaderMainThread();
 int getWindowHeight();
 
-unsigned prevColor = 0xffffffff;
+uint32_t prevColor = 0xffffffff;
 
 void colorMask(bool r, bool g, bool b, bool a) {
 	glColorMask(r,g,b,a);
@@ -122,13 +122,13 @@ void translateObject(double x, double y, double angle, double width, double heig
 	flushBuffer();
 	if(x || y) glTranslated(x, y, 0);
 	if(angle) glRotated(angle, 0, 0, 1);
-	if(width != 1.0 || height != 1.0) glScalef(width, height, 1);
+	if(width != 1.0 || height != 1.0) glScaled(width, height, 1);
 	if(origin_x || origin_y) glTranslated(-origin_x/width, -origin_y/height, 0);
 }
 
-void blend(bool blend) {
+void blend(bool blendEnabled) {
 	FLUSH_BUFFER();
-	if(blend) glEnable(GL_BLEND);
+	if(blendEnabled) glEnable(GL_BLEND);
 	else glDisable(GL_BLEND);
 }
 
@@ -216,22 +216,38 @@ void reset() {
 //~ }
 
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
-	unsigned color = r << 24 | g << 16 | b << 8 | a;
-	if(color != prevColor)
+	union {
+		uint32_t uColor;
+		struct {
+			unsigned char r;
+			unsigned char g;
+			unsigned char b;
+			unsigned char a;
+		} ubColor;
+	} uniColor;
+	uniColor.ubColor.r = r;
+	uniColor.ubColor.g = g;
+	uniColor.ubColor.b = b;
+	uniColor.ubColor.a = a;
+	if(uniColor.uColor != prevColor)
 	{
 		FLUSH_BUFFER();
 		glColor4ub(r, g, b, a);
-		prevColor = color;
+		prevColor = uniColor.uColor;
 	}
 }
 
 void colorf(float r, float g, float b, float a) {
-	unsigned color = ((unsigned char)r) << 24 | ((unsigned char)g) << 16 | ((unsigned char)b) << 8 | ((unsigned char)a);
-	if(color != prevColor)
+	unsigned c = 
+		((unsigned)(r * 255.f)) << 24 | 
+		((unsigned)(g * 255.f)) << 16 | 
+		((unsigned)(b * 255.f)) << 8 | 
+		((unsigned)(a * 255.f));
+	if(c != prevColor)
 	{
 		FLUSH_BUFFER();
-		glColor4f(r,g,b,a);
-		prevColor = color;
+		glColor4f(r, g, b, a);
+		prevColor = c;
 	}
 }
 
@@ -266,12 +282,12 @@ void blendMode(int mode) {
 	}
 }
 
-void blendEquation(int mode) {
+void blendEquation(unsigned mode) {
 	FLUSH_BUFFER();
 	glBlendEquation_(mode);
 }
 
-void blendFunc(int sourcefactor, int destinationfactor) {
+void blendFunc(unsigned sourcefactor, unsigned destinationfactor) {
 	FLUSH_BUFFER();
 	glBlendFunc(sourcefactor, destinationfactor);
 }
@@ -316,11 +332,11 @@ void clearStencil() {
 	glClear(GL_STENCIL_BUFFER_BIT);
 }
 
-void stencilFunc(int func, int ref, unsigned int mask) {
+void stencilFunc(unsigned func, int ref, unsigned mask) {
 	glStencilFunc(func, ref, mask);
 }
 
-void stencilOp(int fail, int zfail, int zpass) {
+void stencilOp(unsigned fail, unsigned zfail, unsigned zpass) {
 	glStencilOp(fail, zfail, zpass);
 }
 

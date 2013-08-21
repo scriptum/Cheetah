@@ -96,22 +96,22 @@ extern SDL_Surface *screen;
 
 #define UNICODE_TO_INT(a, i)                                                   \
 if((a[i] & 0b10000000) == 0) {                                                 \
-    c  =  a[i++];                                                              \
+    c  =  (unsigned)a[i++];                                                              \
 }                                                                              \
-else if ((a[i]   & 0b11100000) == 0b11000000) {                                \
-    c =  (a[i++] & 0b00011111) << 6;                                           \
-    c |=  a[i++] & 0b00111111;                                                 \
+else if (((unsigned)a[i]   & 0b11100000) == 0b11000000) {                                \
+    c =  ((unsigned)a[i++] & 0b00011111) << 6;                                           \
+    c |=  (unsigned)a[i++] & 0b00111111;                                                 \
 }                                                                              \
-else if ((a[i]   & 0b11110000) == 0b11100000) {                                \
-    c =  (a[i++] & 0b00001111) << 12;                                          \
-    c |= (a[i++] & 0b00111111) << 6;                                           \
-    c |=  a[i++] & 0b00111111;                                                 \
+else if (((unsigned)a[i]   & 0b11110000) == 0b11100000) {                                \
+    c =  ((unsigned)a[i++] & 0b00001111) << 12;                                          \
+    c |= ((unsigned)a[i++] & 0b00111111) << 6;                                           \
+    c |=  (unsigned)a[i++] & 0b00111111;                                                 \
 }                                                                              \
-else if ((a[i]   & 0b11111000) == 0b11110000) {                                \
-    c =  (a[i++] & 0b00000111) << 18;                                          \
-    c |= (a[i++] & 0b00111111) << 12;                                          \
-    c |= (a[i++] & 0b00111111) << 6;                                           \
-    c |=  a[i++] & 0b00111111;                                                 \
+else if (((unsigned)a[i]   & 0b11111000) == 0b11110000) {                                \
+    c =  ((unsigned)a[i++] & 0b00000111) << 18;                                          \
+    c |= ((unsigned)a[i++] & 0b00111111) << 12;                                          \
+    c |= ((unsigned)a[i++] & 0b00111111) << 6;                                           \
+    c |=  (unsigned)a[i++] & 0b00111111;                                                 \
 } else { /* Error! */                                                          \
     c = 0;                                                                     \
 }
@@ -128,7 +128,7 @@ void fontDisableDistanceField(Font *f) {
 float fontWidth(Font *f, const char *str) {
 	float	width = 0;
 	float	maxwidth = 0;
-	int	c = 0;
+	unsigned	c = 0;
 	int	i = 0;
 	FontChar *fch;
 	unsigned prevChar = 0;
@@ -191,10 +191,10 @@ while(0)
 #define KERNING_CONDITION (NULL != currentFont->kerningHash && fontPrevChar && fontPrevChar->kerning)
 void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align) {
 	FontChar *ch           = NULL;
-	int       i            = 0;
-	int       j;
-	int       last_space   = 0;
-	int       buf          = 0;
+	unsigned       i            = 0;
+	unsigned       j;
+	unsigned       last_space   = 0;
+	unsigned       buf          = 0;
 	int       spaces       = -1;
 	unsigned  c            = 0;
 	float     width        = 0.0f;
@@ -202,7 +202,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	float     lastw        = 0.0f;
 	float     justifyWidth = currentFont->_spacewidth;
 	float     spacew       = currentFont->_spacewidth;
-	float     fontHeight   = currentFont->height * currentFont->_interval;
+	float     height   = currentFont->height * currentFont->_interval;
 	float     oldy         = y / currentFont->_scale;
 	bool      end          = FALSE;
 	bool      yOutScreen;
@@ -290,7 +290,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 					width += ch->w;
 			}
 			/* drop invisible lines - great performance improvement for long texts */
-			yOutScreen = (y + oldy + fontHeight) * currentFont->_scale > 0.0f;
+			yOutScreen = (y + oldy + height) * currentFont->_scale > 0.0f;
 			/* drop kerning computation for invisible lines - speed +15% */
 			if(yOutScreen)
 				if(KERNING_CONDITION)
@@ -326,7 +326,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 							if('\n' == c || TRUE == end)
 								justifyWidth = spacew;
 							else
-								justifyWidth = (maxw + spacew * (spaces) - lastw) / (float)(spaces);
+								justifyWidth = (maxw + spacew * ((float)spaces) - lastw) / (float)(spaces);
 							x = 0;
 							break;
 							default: x = 0;
@@ -367,7 +367,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 					buf = last_space;
 				if(TRUE == end)
 					break;
-				y += fontHeight;
+				y += height;
 				/* dropping invisible lines from buttom */
 				if((y + oldy) * currentFont->_scale > screen->h)
 					break;
@@ -404,7 +404,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 					break;
 				case '\n':
 					x = 0;
-					y += fontHeight;
+					y += height;
 					if((y + oldy) * currentFont->_scale > screen->h)
 						break;
 					h = FONT_CEIL(currentFont, y);

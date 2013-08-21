@@ -45,7 +45,7 @@ IN THE SOFTWARE.
 #endif
 
 #ifndef HASH_PROBING
-#define HASH_PROBING (index + (probes))
+#define HASH_PROBING (unsigned)(index + (probes))
 #endif
 
 #define HASH_EACH(hash, CODE) {                                                \
@@ -76,8 +76,8 @@ typedef struct hashName##Node {                                                \
 } hashName##Node;                                                              \
                                                                                \
 typedef struct {                                                               \
-    size_t          size;                                                      \
-    size_t          items;                                                     \
+    unsigned          size;                                                    \
+    unsigned          items;                                                   \
     hashName##Node *nodes;                                                     \
 } hashName;                                                                    \
                                                                                \
@@ -86,7 +86,7 @@ void hashName##_destroy(hashName *hash) {                                      \
     if(hash)           free(hash);                                             \
 }                                                                              \
                                                                                \
-hashName *hashName##_new_size(size_t size) {                                   \
+hashName *hashName##_new_size(unsigned size) {                                 \
     hashName *hash = calloc(1, sizeof(hashName));                              \
     if(NULL == hash) goto error;                                               \
     hash->size     = size - 1;                                                 \

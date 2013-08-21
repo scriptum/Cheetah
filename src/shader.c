@@ -141,21 +141,21 @@ void shaderUnbind(Shader * ptr) {
 	}
 }
 
-unsigned int GetUniformLocation(unsigned int program, const char * name) {
+int GetUniformLocation(unsigned program, const char * name) {
 	return glGetUniformLocation_(program, name);
 }
-void Uniform1i(unsigned int location, int var) {
+void Uniform1i(int location, int var) {
 	glUniform1i_(location, var);
 }
-void Uniform1f(unsigned int location, float var) {
+void Uniform1f(int location, float var) {
 	glUniform1f_(location, var);
 }
-void Uniform2f(unsigned int location, float var, float var1) {
+void Uniform2f(int location, float var, float var1) {
 	glUniform2f_(location, var, var1);
 }
-void Uniform3f(unsigned int location, float var, float var1, float var2) {
+void Uniform3f(int location, float var, float var1, float var2) {
 	glUniform3f_(location, var, var1, var2);
 }
-void Uniform4f(unsigned int location, float var, float var1, float var2, float var3) {
+void Uniform4f(int location, float var, float var1, float var2, float var3) {
 	glUniform4f_(location, var, var1, var2, var3);
 }

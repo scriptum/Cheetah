@@ -911,7 +911,7 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 		const unsigned char *const buffer,
 //		int buffer_length,
 		unsigned int reuse_texture_ID,
-		int flags,
+		unsigned int flags,
 		int loading_as_cubemap )
 {
 	/*	variables	*/
