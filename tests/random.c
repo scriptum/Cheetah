@@ -30,5 +30,6 @@ int main() {
 	TEST("Xorshift 128", rand128())
 	TEST("Xorshift 192", rand192())
 	TEST("Xorshift 32", rand32())
+	TEST("Tauss 88", rand_t88())
 	return 0;
 }
