@@ -1,4 +1,4 @@
-CFLAGS += -Ofast -pipe -fomit-frame-pointer -mtune=generic
+CFLAGS += -Ofast -pipe -fomit-frame-pointer -mtune=native
 
 LDFLAGS += -lm
 
