@@ -144,6 +144,19 @@ static inline uint32_t rand192()
 }
 
 /**
+ * Period: 2^88. Known as tauss generator. ~2 times slower than xorshift.
+ **/
+static inline uint32_t rand_t88()
+{
+	uint32_t s1 = _xor_.x, s2 = _xor_.y, s3 = _xor_.z;
+	s1 = ((s1 &  -2) << 12) ^ (((s1 << 13) ^  s1) >> 19);
+	s2 = ((s2 &  -8) <<  4) ^ (((s2 <<  2) ^  s2) >> 25);
+	s3 = ((s3 & -16) << 17) ^ (((s3 <<  3) ^  s3) >> 11);
+	_xor_.x = s1; _xor_.y = s2; _xor_.z = s3;
+	return s1 ^ s2 ^ s3;
+}
+
+/**
  * Small period, needs 64bit integer... Without seed!
  * It does not pass all tests, it slow, so I kept it just as example.
  **/
