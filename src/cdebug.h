@@ -31,7 +31,7 @@ IN THE SOFTWARE.
 
 /* Debug memory operations */
 // #define DEBUG_MEMORY_ERRORS
-// #define DEBUG_MEMORY
+#define DEBUG_MEMORY
 // 
 // #define DEBUG_FRAMEBUFFER
 // #define DEBUG_SHADERS

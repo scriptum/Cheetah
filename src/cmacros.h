@@ -30,37 +30,37 @@ IN THE SOFTWARE.
 /**********************************MEMOTY OPS**********************************/
 
 #define new(var, type, size) do {                                              \
-    if(NULL != var) {                                                          \
+    if(NULL != (var)) {                                                        \
         dprintf_memerr("variable %s already contains data: %x."                \
                        " Delete it before allocating", #var, var);             \
         exit(1);                                                               \
     }                                                                          \
     var = (type*)malloc((size_t)sizeof(type) * (size_t)(size));                \
     /*initialize memory for small structures*/                                 \
-    if((size_t)size == 1)                                                      \
+    if((size) == 1)                                                            \
         memset(var, 0, (size_t)sizeof(type));                                  \
     if(!var) {                                                                 \
-        dprintf_memerr("cannot allocate %z bytes for %s",                      \
+        dprintf_memerr("cannot allocate %zd bytes for %s",                      \
                        (size_t)sizeof(type) * (size_t)(size), #var);           \
         exit(1);                                                               \
     }                                                                          \
-    dprintf_mem("Added: %s %d %s (%x) %z bytes\n",                             \
+    dprintf_mem("Added: %s %d %s (%x) %zd bytes\n",                             \
            __FILE__, __LINE__, #var, var, (size_t)sizeof(type)*(size_t)(size));\
 } while(0)
 
 #define new0(var, type, size) do {                                             \
     new(var, type, size);                                                      \
-    memset(var, 0, sizeof(type) * (size_t)(size));                             \
+    memset(var, 0, (size_t)sizeof(type) * (size_t)(size));                     \
 } while(0)
 
 #define renew(var, type, size) do {                                            \
     var = (type*)realloc(var, (size_t)sizeof(type)*(size_t)(size));            \
     if(!var) {                                                                 \
-        dprintf_memerr("cannot re-allocate %z bytes for %s",                   \
+        dprintf_memerr("cannot re-allocate %zd bytes for %s",                   \
                        (size_t)sizeof(type) * (size_t)(size), #var);           \
         exit(1);                                                               \
     }                                                                          \
-    dprintf_mem("Reallocated: %s %d %s (%x) %z bytes\n",                       \
+    dprintf_mem("Reallocated: %s %d %s (%x) %zd bytes\n",                       \
          __FILE__, __LINE__, #var, var, (size_t)sizeof(type) * (size_t)(size));\
 } while(0)
 
