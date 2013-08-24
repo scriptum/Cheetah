@@ -26,9 +26,9 @@ IN THE SOFTWARE.
 #include <stdlib.h>
 
 #include "cheetah.h"
-#include "macros.h"
+#include "cmacros.h"
 #include "render.h"
-#include "vertex.h"
+#include "cvertex.h"
 #include "image_write.h"
 #include "test.h"
 

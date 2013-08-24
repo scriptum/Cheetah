@@ -26,7 +26,7 @@ IN THE SOFTWARE.
 #include <SDL.h>
 
 #include "cheetah.h"
-#include "debug.h"
+#include "cdebug.h"
 #include "test.h"
 
 SDL_Event event;

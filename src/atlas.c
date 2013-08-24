@@ -26,7 +26,7 @@ IN THE SOFTWARE.
 
 #include "cheetah.h"
 #include "render.h"
-#include "vertex.h"
+#include "cvertex.h"
 #include "test.h"
 
 void imageBind(Image * image);

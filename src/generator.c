@@ -28,9 +28,9 @@ IN THE SOFTWARE.
 #include <time.h>
 
 #include "cheetah.h"
-#include "macros.h"
+#include "cmacros.h"
 #include "render.h"
-#include "random.h"
+#include "crandom.h"
 #include "test.h"
 
 #define MAGICK_CONSTANT 20.0f

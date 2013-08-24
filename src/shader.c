@@ -27,8 +27,8 @@ IN THE SOFTWARE.
 
 #include "cheetah.h"
 #include "render.h"
-#include "macros.h"
-#include "vertex.h"
+#include "cmacros.h"
+#include "cvertex.h"
 #include "test.h"
 
 const char * std_vertex_shader = "varying vec2 TexCoord;\

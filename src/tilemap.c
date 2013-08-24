@@ -1,6 +1,6 @@
 #include "cheetah.h"
 #include "render.h"
-#include "macros.h"
+#include "cmacros.h"
 #include "test.h"
 
 /*

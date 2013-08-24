@@ -27,7 +27,7 @@ IN THE SOFTWARE.
 #include <math.h>
 #include <SDL_opengl.h>
 
-#include "config.h"
+#include "cconfig.h"
 
 extern int vertexCounter;
 extern float *texCoord;

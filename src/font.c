@@ -30,10 +30,10 @@ IN THE SOFTWARE.
 #include <SDL.h>
 
 #include "cheetah.h"
-#include "macros.h"
+#include "cmacros.h"
 #include "render.h"
-#include "vertex.h"
-#include "chash.h"
+#include "cvertex.h"
+#include "chashtable.h"
 #include "test.h"
 
 bool fontShaderFailed = FALSE;

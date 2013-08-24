@@ -29,10 +29,10 @@ IN THE SOFTWARE.
 
 #include "cheetah.h"
 #include "render.h"
-#include "config.h"
-#include "macros.h"
-#include "vertex.h"
-#include "random.h"
+#include "cconfig.h"
+#include "cmacros.h"
+#include "cvertex.h"
+#include "crandom.h"
 
 #include <SDL.h>
 
@@ -67,7 +67,7 @@ void setWindowSize(int w, int h) {
 }
 
 /* Create window and initialize all OpenGL's stuff. */
-bool cheetahInit(const char * appName, const char * options) {
+bool cheetahInit(const char *appName, const char *options) {
 	unsigned flags = SDL_OPENGL | SDL_DOUBLEBUF;
 	bool firstrun = FALSE;
 	int width = 800, height = 600;

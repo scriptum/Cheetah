@@ -26,10 +26,10 @@ IN THE SOFTWARE.
 #include <stdio.h>
 
 #include "cheetah.h"
-#include "macros.h"
+#include "cmacros.h"
 #include "render.h"
-#include "vertex.h"
-#include "random.h"
+#include "cvertex.h"
+#include "crandom.h"
 #include "test.h"
 
 void imageBind(Image * image);
@@ -145,7 +145,7 @@ void particleSystemDraw(ParticleSystem *ptr, float x, float y) {
 	// {
 		// if(colorUnion.colorUint) /* if have randomized color */
 		// {
-			// random_hash_seed128((uint32_t)particle, 362436069, 521288629, 88675123);
+			// crandom.hash_seed128((uint32_t)particle, 362436069, 521288629, 88675123);
 			// #define RNDC(T) int T = (int)particleColor.T + (((int)(rand128() & 255) - 128) * (int)colorUnion.particleColor.T) / 256;
 			// RNDC(r) RNDC(g) RNDC(b) RNDC(a)
 			// #undef RNDC

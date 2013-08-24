@@ -27,9 +27,9 @@ IN THE SOFTWARE.
 #include <string.h>
 
 #include "cheetah.h"
-#include "macros.h"
+#include "cmacros.h"
 #include "render.h"
-#include "vertex.h"
+#include "cvertex.h"
 #include "SOIL/SOIL.h"
 #include "test.h"
 

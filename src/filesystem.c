@@ -30,7 +30,7 @@ IN THE SOFTWARE.
 #include <dirent.h>
 
 #include "cheetah.h"
-#include "macros.h"
+#include "cmacros.h"
 #include "test.h"
 
 void myError(const char *fmt, ...) {

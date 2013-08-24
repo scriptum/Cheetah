@@ -25,7 +25,7 @@ IN THE SOFTWARE.
 #define __MACROS_H__
 
 #include <stdlib.h>
-#include "debug.h"
+#include "cdebug.h"
 
 /**********************************MEMOTY OPS**********************************/
 
