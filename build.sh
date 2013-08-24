@@ -24,21 +24,20 @@ LIB=libcheetah.so
 EXE=luajit
 COMPILER=gcc
 FLAGS_THIRDPARTY=""
+
+if [ "$1" == "clean" ]
+then
+	cd src
+	make clean
+	exit 0
+fi
 if [ "$1" == "win" -o "$1" == "windows" ]
 then
-	whereis i586-mingw32msvc-gcc | grep / > /dev/null
-	if [ $? = "1" ]
+	MINGWGCC=`ls /usr/bin/*mingw*gcc | head -1`
+	if [ ! -f "$MINGWGCC" ]
 	then
-		whereis i586-pc-mingw32-gcc | grep / > /dev/null
-		if [ $? = "1" ]
-		then
-			echo "You must install mingw32 - Minimalist GNU win32 (cross) compiler"
-			exit 1
-		else
-			MINGWGCC=i586-pc-mingw32-gcc
-		fi
-	else
-		MINGWGCC=i586-mingw32msvc-gcc
+		echo "You must install mingw32 - Minimalist GNU win32 (cross) compiler"
+		exit 1
 	fi
 	COMPILER=$MINGWGCC
 	OS=win
@@ -101,23 +100,23 @@ EXEPATH="./bin/$OS$MACHINE_NAME/$EXE"
 if [ ! -f "$DIR/bin/$OS$MACHINE_NAME/$EXE" ]
 then
 	echo "Building luajit..."
-	pushd .
-	cd thirdparty/LuaJIT
-	make clean
-	if [ "$1" == "win" -o "$1" == "windows" ]
-	then
-		make HOST_CC="gcc -m32" CROSS=`echo $MINGWGCC | sed s/-gcc/-/` TARGET_SYS=Windows
-		cp src/luajit.dll "../../$DIR/bin/$OS$MACHINE_NAME/"
-	else
-		if [ "$1" == "linux32" ]
+	(
+		cd thirdparty/LuaJIT
+		make clean
+		if [ "$1" == "win" -o "$1" == "windows" ]
 		then
-			CFLAGS="$CFLAGS -m32 make"
+			make HOST_CC="gcc -m32" CROSS=${MINGWGCC%-gcc} TARGET_SYS=Windows
+			cp src/luajit.dll "../../$DIR/bin/$OS$MACHINE_NAME/"
 		else
-			make
+			if [ "$1" == "linux32" ]
+			then
+				CFLAGS="$CFLAGS -m32 make"
+			else
+				make
+			fi
 		fi
-	fi
-	cp src/$EXE "../../$DIR/bin/$OS$MACHINE_NAME/"
-	popd
+		cp src/$EXE "../../$DIR/bin/$OS$MACHINE_NAME/"
+	)
 fi
 
 if [ "$CFLAGS" ]
@@ -151,9 +150,15 @@ then
 	popd
 	popd
 	$CLEAN
-	CFLAGS="$FLAGS -fprofile-use" $MAKE && mv libcheetah.so $LIBPATH
+	(
+		cd src
+		CFLAGS="$FLAGS -fprofile-use" $MAKE && mv libcheetah.so ../$LIBPATH
+	)
 else
-	CFLAGS="$FLAGS" $MAKE && mv libcheetah.so $LIBPATH
+	(
+		cd src
+		CFLAGS="$FLAGS" $MAKE && mv libcheetah.so ../$LIBPATH
+	)
 fi
 
 if [ "$2" != "debug" ]
