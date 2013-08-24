@@ -484,7 +484,9 @@ void fontSetGlyph(Font *ptr, const char *line) {
 		new0(fch, FontChar, 1);
 		FontHash_set((FontHash*)ptr->hash, '\n', fch);
 		fch = NULL;
-		ptr->mem += sizeof(FontHash) + sizeof(Font) + sizeof(FontChar) * 2 + FontHash_size((FontHash*)ptr->hash) * sizeof(FontHashNode);
+		ptr->mem += (unsigned)sizeof(FontHash)
+			+ (unsigned)sizeof(Font) + (unsigned)sizeof(FontChar) * 2
+			+ FontHash_size((FontHash*)ptr->hash) * (unsigned)sizeof(FontHashNode);
 	}
 	new0(fch, FontChar, 1);
 	x1 = x1 / (float)ptr->image->w;
@@ -499,7 +501,7 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	memcpy(fch->t, tex, sizeof(tex));
 	fch->w = w;
 	FontHash_set((FontHash*)ptr->hash, ch, fch);
-	ptr->mem += sizeof(FontChar);
+	ptr->mem += (unsigned)sizeof(FontChar);
 	if(' ' == ch)
 	{
 		ptr->_spacewidth = w;
@@ -507,7 +509,7 @@ void fontSetGlyph(Font *ptr, const char *line) {
 		new0(fch, FontChar, 1);
 		fch->w = w * 8;
 		FontHash_set((FontHash*)ptr->hash, '\t', fch);
-		ptr->mem += sizeof(FontChar);
+		ptr->mem += (unsigned)sizeof(FontChar);
 	}
 	ptr->height = h;
 }
@@ -521,7 +523,7 @@ void fontSetKerning(Font *ptr, const char *line) {
 	if(NULL == ptr->kerningHash)
 	{
 		ptr->kerningHash = (void *)KernHash_new_size(64);
-		ptr->mem += sizeof(KernHash) + KernHash_size((KernHash*)ptr->kerningHash) * sizeof(KernHashNode);
+		ptr->mem += (unsigned)sizeof(KernHash) + KernHash_size((KernHash*)ptr->kerningHash) * (unsigned)sizeof(KernHashNode);
 	}
 	KerningPair kp = {first, second};
 	KernHash_set(ptr->kerningHash, kp, kerning);

@@ -33,7 +33,7 @@ IN THE SOFTWARE.
 #include "random.h"
 #include "test.h"
 
-#define MAGICK_CONSTANT 20
+#define MAGICK_CONSTANT 20.0f
 
 void newImageRaw(Image *, int, int, const char *, const char *);
 
@@ -65,12 +65,14 @@ repeat(w, h, channels, buf);
 
 static inline float distance(int i, int j, int w, int h)
 {
-	return ((i - w / 2 + 0.5f) * (i - w / 2 + 0.5f) / (float)(w * w) +
-		(j - h / 2 + 0.5f) * (j - h / 2 + 0.5f) / (float)(h * h));
+	return (((float)i - (float)w / 2 + 0.5f) * ((float)i - (float)w / 2 + 0.5f) / (float)(w * w) +
+		((float)j - (float)h / 2 + 0.5f) * ((float)j - (float)h / 2 + 0.5f) / (float)(h * h));
 }
 
 static void generateImageData(ImageData *ptr, int w, int h, const char *imageType, bool alpha) {
-	int i, j, c, channels;
+	int i, j, channels;
+	int32_t c;
+	float buff;
 	char *buf = NULL;
 
 	if(!ptr)
@@ -80,20 +82,20 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 	}
     #define NEW do {                                                           \
         if(alpha) {                                                            \
-            channels = 4; new(buf, char, w * h * channels);                    \
+            channels = 4; new(buf, char, (size_t)(w * h * channels));          \
         }                                                                      \
         else {                                                                 \
-            channels = 3; new0(buf, char, w * h * channels + 1);               \
+            channels = 3; new0(buf, char, (size_t)(w * h * channels + 1));     \
         }                                                                      \
 	} while(0)
 	if(strcmp(imageType, "dummy") == 0) {
 		NEW;
-		memset(buf, 0xff, w * h * channels);
+		memset(buf, 0xff, (size_t)(w * h * channels));
 	}
 	else if(strcmp(imageType, "noise") == 0){
 		NEW;
 		for(i = 0; i < w * h; i++)
-			*((int*)(buf + i * channels)) = rand128();
+			*((unsigned*)(buf + i * channels)) = rand128();
 	}
     #define COLOR_LIGHT                                                        \
         if(channels == 3) {                                                    \
@@ -106,7 +108,8 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 	else if(strcmp(imageType, "light") == 0) {
 		NEW;
 		LOOP_CIRCLE(
-			c = 255 - 2 * 255 * sqrtf(distance(i, j, w, h));
+			buff = 2.0f * 255.0f * sqrtf(distance(i, j, w, h));
+			c = 255 - (int)buff;
 			if (c < 0)
 				c = 0;
 			COLOR_LIGHT
@@ -115,7 +118,8 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 	else if(strcmp(imageType, "lightexp") == 0) {
 		NEW;
 		LOOP_CIRCLE(
-			c = 255 * expf (- distance(i, j, w, h) * MAGICK_CONSTANT);
+			buff = 255.0f * expf(-distance(i, j, w, h) * MAGICK_CONSTANT);
+			c = (int)buff;
 			COLOR_LIGHT
 		)
 	}
@@ -123,10 +127,10 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 		NEW;
 		LOOP_CIRCLE(
 			c = (i - w / 2) * (i - w / 2) + (j - h / 2) * (j - h / 2);
-			if(c > (w / 4 * w))
+			if(c > (w * w / 4))
 				c = 0;
 			else
-				c = 0xffffffff;
+				c = (int32_t)0xffffffff;
 			*((int*)(buf + (j * h + i) * channels)) = c;
 		)
 	}

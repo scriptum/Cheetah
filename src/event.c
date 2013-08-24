@@ -69,9 +69,9 @@ unsigned int getEventType() {
 				dprintf_event("Resize\n");
 				if(event.resize.w < 1) event.resize.w = 1;
 				if(event.resize.h < 1) event.resize.h = 1;
-				recomputeScreenScale(event.resize.w, event.resize.h);
+				recomputeScreenScale((float)event.resize.w, (float)event.resize.h);
 				globalTimers.rescaleTime = globalTimers.time + globalTimers.resizeDelay;
-				setWindowSize(event.resize.w, event.resize.h);
+				setWindowSize((unsigned)event.resize.w, (unsigned)event.resize.h);
 				return EVENT_RESIZE;
 			/* TODO to do something here */
 			case SDL_VIDEOEXPOSE:
@@ -118,15 +118,15 @@ unsigned int getEventMouseButton() {
 	return event.button.button;
 }
 
-unsigned int getEventResizeW() {
+int getEventResizeW() {
 	return event.resize.w;
 }
 
-unsigned int getEventResizeH() {
+int getEventResizeH() {
 	return event.resize.h;
 }
 
-void setResizeDelay(int delay) {
+void setResizeDelay(unsigned delay) {
 	globalTimers.resizeDelay = delay;
 }
 

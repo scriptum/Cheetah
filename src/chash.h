@@ -51,7 +51,8 @@ IN THE SOFTWARE.
 #define HASH_EACH(hash, CODE) {                                                \
     unsigned __i;                                                              \
     typeof(hash->nodes) hashnode;                                              \
-    for(__i = 0; __i <= hash->size; __i++) {                                   \
+    for(__i = 0; __i <= hash->size; __i++)                                     \
+    {                                                                          \
         hashnode = &(hash->nodes[__i]);                                        \
         if(hashnode->exists) { CODE }                                          \
     }                                                                          \

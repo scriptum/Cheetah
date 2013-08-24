@@ -47,4 +47,3 @@ void atlasDrawxy(Atlas *p, float x, float y, float w, float h) {
 	imageBind(p->image);
 	PUSH_QUAD_TEXTURE(x + p->x * scalex, y + p->y * scaley, p->aw * scalex, p->ah * scaley, 0.0, 0.0, 0.0, p->tex);
 }
-

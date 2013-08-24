@@ -149,9 +149,9 @@ static inline uint32_t rand192()
 static inline uint32_t rand_t88()
 {
 	uint32_t s1 = _xor_.x, s2 = _xor_.y, s3 = _xor_.z;
-	s1 = ((s1 &  -2) << 12) ^ (((s1 << 13) ^  s1) >> 19);
-	s2 = ((s2 &  -8) <<  4) ^ (((s2 <<  2) ^  s2) >> 25);
-	s3 = ((s3 & -16) << 17) ^ (((s3 <<  3) ^  s3) >> 11);
+	s1 = (uint32_t)(((int32_t)s1 &  -2) << 12) ^ (((s1 << 13) ^  s1) >> 19);
+	s2 = (uint32_t)(((int32_t)s2 &  -8) <<  4) ^ (((s2 <<  2) ^  s2) >> 25);
+	s3 = (uint32_t)(((int32_t)s3 & -16) << 17) ^ (((s3 <<  3) ^  s3) >> 11);
 	_xor_.x = s1; _xor_.y = s2; _xor_.z = s3;
 	return s1 ^ s2 ^ s3;
 }
@@ -165,7 +165,7 @@ static inline uint32_t rand32()
 	static uint64_t y = 123456789;
 	y ^= (y << 13);
 	y = (y >> 17);
-	return (y ^= (y << 5));
+	return (uint32_t)(y ^= (y << 5));
 }
 
 

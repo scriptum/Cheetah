@@ -46,7 +46,7 @@ void initRenderer();
 void resLoaderInit(bool resloader);
 extern void resLoaderMainThread();
 
-void resetView(unsigned w, unsigned h)
+void resetView(int w, int h)
 {
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
@@ -61,7 +61,7 @@ void resetViewDefault()
 	resetView(screen->w, screen->h);
 }
 
-void setWindowSize(unsigned w, unsigned h) {
+void setWindowSize(int w, int h) {
 	screen->w = w;
 	screen->h = h;
 }
@@ -104,15 +104,15 @@ bool cheetahInit(const char * appName, const char * options) {
 			SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 		firstrun = TRUE;
 		/*Set screen auto-scale properties*/
-		screenScale.origWidth = width;
-		screenScale.origHeight = height;
+		screenScale.origWidth = (float)width;
+		screenScale.origHeight = (float)height;
 		screenScale.autoScale = TRUE;
 		screenScale.autoScaleFont = TRUE;
 		screenScale.scaleX = 1.0f;
 		screenScale.scaleY = 1.0f;
 		screenScale.offsetX = 0.0f;
 		screenScale.offsetY = 0.0f;
-		screenScale.aspect = (float)width / height;
+		screenScale.aspect = screenScale.origWidth / screenScale.origHeight;
 	}
 	if(NULL != appName)
 		SDL_WM_SetCaption(appName, appName);
@@ -182,7 +182,7 @@ bool cheetahInit(const char * appName, const char * options) {
 		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
 
 		/* init random generator */
-		random_hash_seed(time(0));
+		random_hash_seed((unsigned)time(0));
 	}
 	return TRUE;
 }
@@ -265,8 +265,8 @@ void clearScreen(bool enabled) {
  * @group graphics/drawing
  * @var enable or disable autoscale
  * */
-void autoScale(bool autoScale) {
-	screenScale.autoScale = autoScale;
+void autoScale(bool enableAutoScale) {
+	screenScale.autoScale = enableAutoScale;
 }
 
 static void doAutoScale()
@@ -291,7 +291,7 @@ void prepare() {
 	if(globalTimers.rescaleTime && globalTimers.time > globalTimers.rescaleTime)
 	{
 		SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
-		resetView(screen->w, screen->h);
+		resetView((int)screen->w, (int)screen->h);
 		doAutoScale();
 		globalTimers.rescaleTime = 0;
 	}

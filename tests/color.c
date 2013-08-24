@@ -13,7 +13,7 @@ typedef struct Colorf {
 volatile unsigned prevUColor;
 volatile Color prevCColor;
 
-#define TEST_FUNC void __attribute__ ((fastcall)) __attribute__ ((noinline))
+#define TEST_FUNC static void __attribute__ ((noinline))
 
 TEST_FUNC color_shift(unsigned r, unsigned g, unsigned b, unsigned a) {
 	unsigned low = b << 8 | (a & 0xff);

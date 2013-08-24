@@ -16,18 +16,20 @@ THIRDPARTY_TARGETS = $(THIRDPARTY_SOURCES:.c=.o)
 
 all : $(TARGET)
 
-$(TARGET) : $(OBJECTS)
+$(TARGET) : $(OBJECTS) $(THIRDPARTY_TARGETS)
 	@echo "Linking $(TARGET)";\
 	$(CC) -o $@ $(OBJECTS) $(CFLAGS) $(LDFLAGS)
 
 $(THIRDPARTY_TARGETS): %.o: %.c $(HEADERS)
+	mkdir -p .obj
 	@echo "Building thirdparty $<";\
 	$(CC) $(CFLAGS) $(INCLUDES) -o "$@" -c "$<"
 
 %.o : %.c $(HEADERS)
+	mkdir -p .obj
 	@echo "Building $<";\
 	$(CC) $(CFLAGS) $(EXTRA_WARNINGS) $(INCLUDES) -o "$@" -c "$<"
 
 clean :
 	@echo "Cleaning...";\
-	rm -f $(OBJECTS)
+	rm -f $(OBJECTS) $(THIRDPARTY_TARGETS)

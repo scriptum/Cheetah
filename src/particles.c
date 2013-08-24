@@ -52,14 +52,14 @@ static void particleSystemApplyForces(ParticleSystem *ptr, Particle *particle)
 
 }
 
-void newParticleSystem(ParticleSystem *ptr, Image *image, int maxParticles, const char *options) {
+void newParticleSystem(ParticleSystem *ptr, Image *image, unsigned maxParticles, const char *options) {
 	NEEDED_INIT_VOID;
 	new0(ptr->particles, Particle, maxParticles);
 	ptr->maxParticles = maxParticles;
 	ptr->image = image;
 	ptr->_lasttime = globalTimers.timed;
 	ptr->startSpeed = 50.0f;
-	ptr->directionVariation = M_PI;
+	ptr->directionVariation = (float)M_PI;
 	ptr->emissionRate = 100.0f;
 	ptr->particleLife = 3.0f;
 	ptr->scale = 1.0f;
@@ -72,7 +72,7 @@ static void particleSystemUpdate(ParticleSystem *pSystem) {
 	Particle	*particle = pSystem->particles;
 	if(globalTimers.timed - pSystem->_lasttime < 1.0/100.0)
 		return;
-	float deltaTime = globalTimers.gameTimed - pSystem->_lasttime;
+	float deltaTime = (float)(globalTimers.gameTimed - (double)pSystem->_lasttime);
 	pSystem->_lasttime = globalTimers.gameTimed;
 	pSystem->_particlesNeeded += pSystem->emissionRate * deltaTime;
 	for(i = 0; i < pSystem->_aliveParticles; i++)
@@ -94,8 +94,8 @@ static void particleSystemUpdate(ParticleSystem *pSystem) {
 	bool alive = globalTimers.gameTimed - pSystem->_startTime < pSystem->lifeTime;
 	if((alive || pSystem->lifeTime <= 0) && pSystem->_particlesNeeded >= 1.0f)
 	{
-		unsigned particlesNeeded = pSystem->_particlesNeeded;
-		pSystem->_particlesNeeded -= particlesNeeded;
+		unsigned particlesNeeded = (unsigned)pSystem->_particlesNeeded;
+		pSystem->_particlesNeeded -= (float)particlesNeeded;
 		particle = &(pSystem->particles[pSystem->_aliveParticles]);
 		for(i = 0; i < particlesNeeded; i++)
 		{
@@ -107,7 +107,7 @@ static void particleSystemUpdate(ParticleSystem *pSystem) {
 			float startSpeed = pSystem->startSpeed + randf2(rand128()) * pSystem->startSpeedVariation;
 			particle->speed.x *= startSpeed;
 			particle->speed.y *= startSpeed;
-			#define RNDC(T) particle->color.T = (int)pSystem->color.T + (((int)(rand128() & 255) - 128) * (int)pSystem->colorVariation.T) / 256;
+			#define RNDC(T) particle->color.T = (unsigned char)((int)pSystem->color.T + (((int)(rand128() & 255) - 128) * (int)pSystem->colorVariation.T) / 256);
 			RNDC(r) RNDC(g) RNDC(b) RNDC(a)
 			#undef RNDC
 			particle->age = pSystem->particleLife + randf2(rand128()) * pSystem->particleLifeVariation;

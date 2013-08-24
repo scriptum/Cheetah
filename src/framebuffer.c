@@ -85,7 +85,8 @@ static bool checkFramebufferStatus()
 void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int height, const char * options) {
 	Image *ptr = NULL;
 	GLint current_fbo;
-	GLenum internal, format;
+	GLint internal;
+	GLenum format;
 	bool status;
 
 	fboptr->id = 0;
@@ -123,8 +124,8 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING_EXT, &current_fbo);
 
 	new(ptr, Image, 1);
-	ptr->w = width;
-	ptr->h = height;
+	ptr->w = (float)width;
+	ptr->h = (float)height;
 
 	/* generate texture save target */
 	glGenTextures(1, &ptr->id);
@@ -140,7 +141,7 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 	else
 		TEX_REPEAT;
 
-	glTexImage2D(GL_TEXTURE_2D, 0, internal, width, height, 0, GL_RGBA, format, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, internal, (GLsizei)width, (GLsizei)height, 0, GL_RGBA, format, 0);
 	//~ glBindTexture(GL_TEXTURE_2D, 0);
 
 	/* create framebuffer */
@@ -169,13 +170,13 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 }
 
 /* Check, if framebuffer created without errors. */
-bool framebufferCheck(Framebuffer * ptr) {
-	return ptr->id;
+bool framebufferCheck(Framebuffer *ptr) {
+	return (bool)ptr->id;
 }
 
 /* Bind framebuffer object. Means, that now all graphics will be rendered to
  * this framebuffer. */
-void framebufferBind(Framebuffer * ptr) {
+void framebufferBind(Framebuffer *ptr) {
 	if(ptr->id)
 	{
 		FLUSH_BUFFER();
@@ -191,17 +192,18 @@ void framebufferBind(Framebuffer * ptr) {
 
 /* Unbind framebuffer object. Means, that now all graphics will be rendered to
  * default screen. This function unbinds the current framebuffer object. */
-void framebufferUnbind(Framebuffer * ptr) {
+void framebufferUnbind(Framebuffer *ptr) {
 	FLUSH_BUFFER();
 	bindFramebuffer(0);
 	resetViewDefault();
 }
 
 /* Save image from framebuffer to BMP format */
-void framebufferSaveBMP(Framebuffer * ptr, const char* name) {
-	unsigned char* img = NULL;
-	int w = (int)ptr->image->w, h = (int)ptr->image->h;
-	new(img, unsigned char, 3 * w * h);
+void framebufferSaveBMP(Framebuffer *ptr, const char *name) {
+	unsigned char *img = NULL;
+	GLsizei w = (GLsizei)ptr->image->w; 
+	GLsizei h = (GLsizei)ptr->image->h;
+	new(img, unsigned char, (size_t)(3 * w * h));
 	bindFramebuffer(ptr->id);
 	TEXTURE_BIND(ptr->image->id);
 	glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
@@ -211,7 +213,7 @@ void framebufferSaveBMP(Framebuffer * ptr, const char* name) {
 }
 
 /* Delete framebuffer and free memory. */
-void deleteFramebuffer(Framebuffer * ptr) {
+void deleteFramebuffer(Framebuffer *ptr) {
 	if(ptr)
 	{
 		glDeleteTextures(1, &ptr->image->id);
