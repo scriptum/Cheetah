@@ -1,7 +1,7 @@
 TARGET := libcheetah.so
 CFLAGS += -pipe -fPIC
 
-EXTRA_WARNINGS = -Wall -Wextra -Wno-unused-parameter -Wmissing-include-dirs -Wuninitialized -Wstrict-overflow=5 -Wshadow -Wbad-function-cast -Wcast-qual -Wconversion
+EXTRA_WARNINGS = -Wall -Wextra -Wno-unused-parameter -Wmissing-include-dirs -Wuninitialized -Wstrict-overflow -Wshadow -Wbad-function-cast -Wcast-qual -Wconversion
 
 LDFLAGS += -shared -L"../lib" -lSDL -lGL
 INCLUDES := -I"../inc"
@@ -17,7 +17,7 @@ all : $(TARGET)
 
 $(TARGET) : $(OBJECTS) $(THIRDPARTY_TARGETS)
 	@echo "Linking $(TARGET)";\
-	$(CC) -o $@ $(OBJECTS) $(CFLAGS) $(LDFLAGS)
+	$(CC) -o "$@" $^ $(CFLAGS) $(LDFLAGS)
 
 $(THIRDPARTY_TARGETS): %.o: %.c $(HEADERS)
 	@echo "Building thirdparty $<";\

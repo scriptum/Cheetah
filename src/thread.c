@@ -21,10 +21,13 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
+#include <string.h>
 #include <stddef.h>
 #include <SDL.h>
+#include <lua.h>
 
 #include "cheetah.h"
+#include "cmacros.h"
 #include "test.h"
 
 /* Get the number of milliseconds past from the execution time. Equivalent to SDL_GetTicks(); */
@@ -50,4 +53,37 @@ void delay(unsigned int ms) {
 /* Do nothing some time. */
 void sleep(unsigned int sec) {
 	SDL_Delay(sec * 1000);
+}
+
+/*================================threads=====================================*/
+typedef struct Thread {
+	const char *file;
+	lua_State  *L;
+} Thread;
+
+int Lua_Thread_create(void *data) 
+{
+	Thread *t = (Thread *)data;
+	printf("Thread %p opened\n", t);
+	int n = lua_gettop(t->L);
+	if (luaL_loadfile(t->L, t->file) != 0) {
+		delete(t);
+		return lua_error(t->L);
+	}
+	lua_call(t->L, 0, LUA_MULTRET);
+	lua_pop(t->L, lua_gettop(t->L) - n);
+	printf("Thread %p closed\n", t);
+	delete(t);
+	return 0;
+}
+
+void createThread(const char *file) {
+	Thread *t = NULL;
+	new1(t, Thread);
+	t->file = file;
+	lua_State *L = luaL_newstate();
+	luaL_openlibs(L);
+	t->L = (lua_State*)L;
+	printf("%p\n", t->L);
+	SDL_CreateThread(Lua_Thread_create, t);
 }

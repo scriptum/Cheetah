@@ -73,13 +73,14 @@ then
 		fi
 		cd "$DIRNAME"
 	fi
-	$LUAJIT "$BASENAME" "$@" 2> /tmp/cheetah-engine-errors
-	if [ $? != "0" ]
-	then
-		$MSG "Cannot run engine!\n`cat /tmp/cheetah-engine-errors`"
-	fi
-	cat /tmp/cheetah-engine-errors
-	rm -f /tmp/cheetah-engine-errors
+	$LUAJIT "$BASENAME" "$@"
+	# $LUAJIT "$BASENAME" "$@" 2> /tmp/cheetah-engine-errors
+	# if [ $? != "0" ]
+	# then
+		# $MSG "Cannot run engine!\n`cat /tmp/cheetah-engine-errors`"
+	# fi
+	# cat /tmp/cheetah-engine-errors
+	# rm -f /tmp/cheetah-engine-errors
 else
 	$MSG "Your platform does not have a pre-compiled Cheetah engine."
 	exit 1

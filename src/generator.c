@@ -80,14 +80,16 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 		myError("generateImageData: empty pointer");
 		return;
 	}
-    #define NEW do {                                                           \
-        if(alpha) {                                                            \
-            channels = 4; new(buf, char, (size_t)(w * h * channels));          \
-        }                                                                      \
-        else {                                                                 \
-            channels = 3; new0(buf, char, (size_t)(w * h * channels + 1));     \
-        }                                                                      \
+
+	#define NEW do {                                                       \
+		if(alpha) {                                                    \
+			channels = 4; new(buf, char, w * h * channels);        \
+		}                                                              \
+		else {                                                         \
+			channels = 3; new0(buf, char, w * h * channels + 1);   \
+		}                                                              \
 	} while(0)
+
 	if(strcmp(imageType, "dummy") == 0) {
 		NEW;
 		memset(buf, 0xff, (size_t)(w * h * channels));
@@ -97,14 +99,16 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 		for(i = 0; i < w * h; i++)
 			*((unsigned*)(buf + i * channels)) = rand128();
 	}
-    #define COLOR_LIGHT                                                        \
-        if(channels == 3) {                                                    \
-            c = c | c << 8 | c << 16;                                          \
-            *((int*)(buf + (j * h + i) * channels)) |= c;                      \
-        } else {                                                               \
-            c = 0xffffff | c << 24;                                            \
-            *((int*)(buf + (j * h + i) * channels)) = c;                       \
+
+	#define COLOR_LIGHT                                                    \
+		if(channels == 3) {                                            \
+			c = c | c << 8 | c << 16;                              \
+			*((int*)(buf + (j * h + i) * channels)) |= c;          \
+		} else {                                                       \
+			c = 0xffffff | c << 24;                                \
+			*((int*)(buf + (j * h + i) * channels)) = c;           \
 		}
+
 	else if(strcmp(imageType, "light") == 0) {
 		NEW;
 		LOOP_CIRCLE(

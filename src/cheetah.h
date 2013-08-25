@@ -219,7 +219,6 @@ typedef struct Font {
 	bool		_kerning;
 } Font;
 
-
 /*================================shaders=====================================*/
 typedef struct Shader {
 	unsigned	id;

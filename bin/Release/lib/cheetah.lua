@@ -89,6 +89,8 @@ int sscanf ( const char * str, const char * format, ...);
 int (*grabCursor)(int mode);
 ]]
 
+
+
 local libcheetah = C.loadDLL 'cheetah'
 assert(libcheetah, 'Cannot load cheetah library!')
 

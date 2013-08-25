@@ -127,7 +127,7 @@ echo "Building on $CORES cores with flags: $FLAGS"
 
 if [ "`cat $TMP`" != "$LAST $2" ]
 then
-	$CLEAN
+	(cd src; $CLEAN)
 fi
 echo "$LAST $2" > $TMP
 if [ "$2" == "final" ]
@@ -136,7 +136,7 @@ then
 	then
 		FLAGS="$FLAGS -flto"
 	fi
-	$CLEAN
+	(cd src; $CLEAN)
 	CFLAGS="$FLAGS -fprofile-generate" $MAKE && mv libcheetah.so $LIBPATH
 	pushd .
 	cd $DIR
@@ -149,9 +149,9 @@ then
 	$EXEPATH main.lua
 	popd
 	popd
-	$CLEAN
 	(
 		cd src
+		$CLEAN
 		CFLAGS="$FLAGS -fprofile-use" $MAKE && mv libcheetah.so ../$LIBPATH
 	)
 else

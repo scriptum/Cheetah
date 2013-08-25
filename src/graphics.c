@@ -32,7 +32,7 @@ IN THE SOFTWARE.
 extern void resLoaderMainThread();
 int getWindowHeight();
 
-uint32_t prevColor = 0xffffffff;
+unsigned prevColor = 0xffffffff;
 
 void colorMask(bool r, bool g, bool b, bool a) {
 	glColorMask(r,g,b,a);
@@ -217,7 +217,7 @@ void reset() {
 
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
 	union {
-		uint32_t uColor;
+		unsigned uColor;
 		struct {
 			unsigned char r;
 			unsigned char g;

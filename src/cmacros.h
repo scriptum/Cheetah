@@ -36,15 +36,15 @@ IN THE SOFTWARE.
         exit(1);                                                               \
     }                                                                          \
     var = (type*)malloc((size_t)sizeof(type) * (size_t)(size));                \
-    /*initialize memory for small structures*/                                 \
+    /* initialize memory for small structures */                               \
     if((size) == 1)                                                            \
         memset(var, 0, (size_t)sizeof(type));                                  \
     if(!var) {                                                                 \
-        dprintf_memerr("cannot allocate %zd bytes for %s",                      \
+        dprintf_memerr("cannot allocate %zd bytes for %s",                     \
                        (size_t)sizeof(type) * (size_t)(size), #var);           \
         exit(1);                                                               \
     }                                                                          \
-    dprintf_mem("Added: %s %d %s (%x) %zd bytes\n",                             \
+    dprintf_mem("Added: %s %d %s (%x) %zd bytes\n",                            \
            __FILE__, __LINE__, #var, var, (size_t)sizeof(type)*(size_t)(size));\
 } while(0)
 
@@ -53,14 +53,18 @@ IN THE SOFTWARE.
     memset(var, 0, (size_t)sizeof(type) * (size_t)(size));                     \
 } while(0)
 
+#define new1(var, type) do {                                                   \
+	new(var, type, 1);                                                     \
+} while(0)
+
 #define renew(var, type, size) do {                                            \
     var = (type*)realloc(var, (size_t)sizeof(type)*(size_t)(size));            \
     if(!var) {                                                                 \
-        dprintf_memerr("cannot re-allocate %zd bytes for %s",                   \
+        dprintf_memerr("cannot re-allocate %zd bytes for %s",                  \
                        (size_t)sizeof(type) * (size_t)(size), #var);           \
         exit(1);                                                               \
     }                                                                          \
-    dprintf_mem("Reallocated: %s %d %s (%x) %zd bytes\n",                       \
+    dprintf_mem("Reallocated: %s %d %s (%x) %zd bytes\n",                      \
          __FILE__, __LINE__, #var, var, (size_t)sizeof(type) * (size_t)(size));\
 } while(0)
 
@@ -107,9 +111,9 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);                  \
 
 /********************************OPTIONS CHECKER*******************************/
 
-#define CHECK_OPTION(options, o) char o = 0; do {                              \
+#define CHECK_OPTION(options, o) bool o = 0; do {                              \
     typeof(options) _o = strstr(options, #o);                                  \
-    int l = strlen(#o);                                                        \
+    size_t l = (size_t)strlen(#o);                                             \
     /* check bounds */                                                         \
     if(NULL != _o && (' '==*(_o+l)||0==*(_o+l)) && (' '==*(_o-1)||0==*(_o-1))){\
         o = 1;                                                                 \
