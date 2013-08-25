@@ -7,5 +7,5 @@ void sleep(unsigned int sec);
 -- require 'lib.cheetah'
 
 print("Hello from worker!")
-cheetah.sleep(1)
+ffi.C.sleep(1)
 print("Another hello from worker!")

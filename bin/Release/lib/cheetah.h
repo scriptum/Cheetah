@@ -346,6 +346,7 @@ double getGameTime();
 double getTime();
 void delay(unsigned int ms);
 void sleep(unsigned int sec);
+void createThread(const char *file);
 void newTilmapInternal(Tilemap *t, const char *name);
 void tilemapDraw(Tilemap *t, double x, double y, double r, double z, double ox, double oy);
 void deleteTilemap(Tilemap *t);

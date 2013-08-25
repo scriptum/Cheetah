@@ -63,27 +63,17 @@ typedef struct Thread {
 
 int Lua_Thread_create(void *data) 
 {
-	Thread *t = (Thread *)data;
-	printf("Thread %p opened\n", t);
-	int n = lua_gettop(t->L);
-	if (luaL_loadfile(t->L, t->file) != 0) {
-		delete(t);
-		return lua_error(t->L);
+	lua_State *L = luaL_newstate();
+	luaL_openlibs(L);
+	int n = lua_gettop(L);
+	if (luaL_loadfile(L, (const char*)data) != 0) {
+		return lua_error(L);
 	}
-	lua_call(t->L, 0, LUA_MULTRET);
-	lua_pop(t->L, lua_gettop(t->L) - n);
-	printf("Thread %p closed\n", t);
-	delete(t);
+	lua_call(L, 0, LUA_MULTRET);
+	lua_pop(L, lua_gettop(L) - n);
 	return 0;
 }
 
 void createThread(const char *file) {
-	Thread *t = NULL;
-	new1(t, Thread);
-	t->file = file;
-	lua_State *L = luaL_newstate();
-	luaL_openlibs(L);
-	t->L = (lua_State*)L;
-	printf("%p\n", t->L);
-	SDL_CreateThread(Lua_Thread_create, t);
+	SDL_CreateThread(Lua_Thread_create, (void*)file);
 }
