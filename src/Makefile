@@ -5,7 +5,6 @@ EXTRA_WARNINGS = -Wall -Wextra -Wno-unused-parameter -Wmissing-include-dirs -Wun
 
 LDFLAGS += -shared -L"../lib" -lSDL -lGL
 INCLUDES := -I"../inc"
-SOURCEDIR := $(shell find . -type d)
 
 SOURCES := $(wildcard *.c)
 OBJECTS := $(SOURCES:.c=.o)

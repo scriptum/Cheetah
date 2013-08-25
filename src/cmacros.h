@@ -107,9 +107,9 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);                  \
 
 /********************************OPTIONS CHECKER*******************************/
 
-#define CHECK_OPTION(options, o) bool o = 0; do {                              \
+#define CHECK_OPTION(options, o) char o = 0; do {                              \
     typeof(options) _o = strstr(options, #o);                                  \
-    size_t l = strlen(#o);                                                     \
+    int l = strlen(#o);                                                        \
     /* check bounds */                                                         \
     if(NULL != _o && (' '==*(_o+l)||0==*(_o+l)) && (' '==*(_o-1)||0==*(_o-1))){\
         o = 1;                                                                 \
