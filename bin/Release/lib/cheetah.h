@@ -307,6 +307,7 @@ void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void colorf(float r, float g, float b, float a);
 void colord(double r, double g, double b, double a);
 void clearColor(float r, float g, float b, float a);
+void setClearColor(float r, float g, float b, float a);
 void blendMode(int mode);
 void blendEquation(unsigned mode);
 void blendFunc(unsigned sourcefactor, unsigned destinationfactor);

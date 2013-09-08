@@ -34,6 +34,13 @@ extern int vertexCounter;
 extern float *texCoord;
 extern float *vertexCoord;
 
+#ifdef COLOR_ARRAYS
+extern unsigned char *colorArray;
+extern unsigned char colorArrayBuf[4 * 6];
+#endif
+
+
+
 /**********************************VERTEX OPS**********************************/
 
 #define TEXTURE_BIND(tex) do {                                                 \
@@ -124,6 +131,7 @@ static inline void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, f
 	texCoord[vertexCounter + 6] =
 	texCoord[vertexCounter + 4] =
 	texCoord[vertexCounter + 0] + tw / w;
+	memcpy(colorArray, colorArrayBuf, 4 * 4);
 	vertexCounter += VERTICLES_PER_SPRITE;
 }
 
@@ -172,6 +180,7 @@ static inline void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, f
 	texCoord[vertexCounter + 6] =
 	texCoord[vertexCounter + 4] =
 	texCoord[vertexCounter + 0] + (tw) / (w);
+	memcpy(colorArray, colorArrayBuf, 4 * 6);
 	vertexCounter += VERTICLES_PER_SPRITE;
 }
 

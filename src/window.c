@@ -134,11 +134,11 @@ bool cheetahInit(const char *appName, const char *options) {
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_TEXTURE_2D);
 		//~ glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-		// if(TRUE == resloader)
-		// {
-			// resLoaderInit(resloader);
-			// SDL_CreateThread(resLoaderThread, (void *)NULL);
-		// }
+		if(TRUE == resloader)
+		{
+			resLoaderInit(resloader);
+			SDL_CreateThread(resLoaderThread, (void *)NULL);
+		}
 		glGenTextures(1, &null_texture);
 		glBindTexture(GL_TEXTURE_2D, null_texture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, "\0\0\0\0");
@@ -177,9 +177,16 @@ bool cheetahInit(const char *appName, const char *options) {
 		new(vertexCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		#ifdef COLOR_ARRAYS
+		new(colorArray, unsigned char, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
+		glEnableClientState(GL_COLOR_ARRAY);
+		#endif
 		/* fix vertex pointers to main memory area */
 		glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
 		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
+		#ifdef COLOR_ARRAYS
+		glColorPointer(4, GL_UNSIGNED_BYTE, 0, colorArray);
+		#endif
 
 		/* init random generator */
 		random_hash_seed((unsigned)time(0));

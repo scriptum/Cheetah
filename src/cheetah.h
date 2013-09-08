@@ -24,6 +24,8 @@ IN THE SOFTWARE.
 #ifndef __CHEETAH_H__
 #define __CHEETAH_H__
 
+#define COLOR_ARRAYS
+
 typedef unsigned char bool;
 unsigned char * loadfile(const char * filename, long * length);
 

@@ -49,6 +49,11 @@ int vertexCounter;
 float *texCoord = NULL;
 float *vertexCoord = NULL;
 
+#ifdef COLOR_ARRAYS
+unsigned char *colorArray;
+unsigned char colorArrayBuf[4 * 6];
+#endif
+
 static void flushBuffer()
 {
 	FLUSH_BUFFER();
@@ -215,44 +220,42 @@ void reset() {
 	//~ glEnd();
 //~ }
 
-void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
-	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);
-	unsigned high = (unsigned)r << 8 | (unsigned)g;
-	unsigned c = (low & 0xffff) | (high << 16);
-	if(c != prevColor)
-	{
-		FLUSH_BUFFER();
-		glColor4ubv((const GLubyte *)&c);
-		prevColor = c;
+#ifdef COLOR_ARRAYS
+	#define COLOR_BODY                                                     \
+	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);                \
+	unsigned high = (unsigned)r << 8 | (unsigned)g;                        \
+	unsigned c = (low & 0xffff) | (high << 16);                            \
+	colorArrayBuf[0] = colorArrayBuf[0+4] = colorArrayBuf[0+8] = colorArrayBuf[0+12] = (unsigned char)r;\
+	colorArrayBuf[1] = colorArrayBuf[1+4] = colorArrayBuf[1+8] = colorArrayBuf[1+12] = (unsigned char)g;\
+	colorArrayBuf[2] = colorArrayBuf[2+4] = colorArrayBuf[2+8] = colorArrayBuf[2+12] = (unsigned char)b;\
+	colorArrayBuf[3] = colorArrayBuf[3+4] = colorArrayBuf[3+8] = colorArrayBuf[3+12] = (unsigned char)128;
+#else
+	#define COLOR_BODY                                                     \
+	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);                \
+	unsigned high = (unsigned)r << 8 | (unsigned)g;                        \
+	unsigned c = (low & 0xffff) | (high << 16);                            \
+	if(unlikely(c != prevColor))                                           \
+	{                                                                      \
+		FLUSH_BUFFER();                                                \
+		glColor4ub((GLubyte)r, (GLubyte)g, (GLubyte)b, (GLubyte)a);    \
+		prevColor = c;                                                 \
 	}
+#endif
+
+void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+	COLOR_BODY
 }
 
 void colorf(float r, float g, float b, float a) {
-	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);
-	unsigned high = (unsigned)r << 8 | (unsigned)g;
-	unsigned c = (low & 0xffff) | (high << 16);
-	if(unlikely(c != prevColor))
-	{
-		FLUSH_BUFFER();
-		glColor4ubv((const GLubyte *)&c);
-		prevColor = c;
-	}
+	COLOR_BODY
 }
 
 void colord(double r, double g, double b, double a) {
-	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);
-	unsigned high = (unsigned)r << 8 | (unsigned)g;
-	unsigned c = (low & 0xffff) | (high << 16);
-	if(unlikely(c != prevColor))
-	{
-		FLUSH_BUFFER();
-		glColor4ubv((const GLubyte *)&c);
-		prevColor = c;
-	}
+	COLOR_BODY
 }
 
 void clearColor(float r, float g, float b, float a) {
-	glClearColor(r,g,b,a);
+	glClearColor(r, g, b, a);
 }
 
 void setClearColor(float r, float g, float b, float a) {

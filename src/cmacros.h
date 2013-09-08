@@ -116,11 +116,17 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);                  \
 
 /********************************OPTIONS CHECKER*******************************/
 
-#define CHECK_OPTION(options, o) bool o = 0; do {                              \
-    typeof(options) _o = strstr(options, #o);                                  \
-    size_t l = (size_t)strlen(#o);                                             \
+#define CHECK_OPTION(options, o)                                               \
+bool o = 0;                                                                    \
+do {                                                                           \
+    typeof(options) _o_ = strstr(options, #o);                                 \
+    size_t _l_ = (size_t)strlen(#o);                                           \
     /* check bounds */                                                         \
-    if(NULL != _o && (' '==*(_o+l)||0==*(_o+l)) && (' '==*(_o-1)||0==*(_o-1))){\
+    if(NULL != _o_ &&                                                          \
+      (' '== *(_o_ + _l_) || '\0' == *(_o_ + _l_)) &&                          \
+      (' '== *(_o_ -  1 ) || '\0' == *(_o_ -  1 )))                            \
+    {                                                                          \
+        /* this is not mistype! */                                             \
         o = 1;                                                                 \
     }                                                                          \
 } while(0)
@@ -135,13 +141,15 @@ bool isInit();
 
 #define NEEDED_INIT do {                                                       \
     if(unlikely(!isInit())) {                                                  \
-        myError(_NEEDED_INIT_STR); return 0;                                   \
+        myError(_NEEDED_INIT_STR);                                             \
+        return 0;                                                              \
     }                                                                          \
 } while(0)
 
 #define NEEDED_INIT_VOID do {                                                  \
     if(unlikely(!isInit())) {                                                  \
-        myError(_NEEDED_INIT_STR); return;                                     \
+        myError(_NEEDED_INIT_STR);                                             \
+        return;                                                                \
     }                                                                          \
 } while(0)
 
