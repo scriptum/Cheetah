@@ -29,7 +29,8 @@ IN THE SOFTWARE.
 #include "cvertex.h"
 #include "test.h"
 
-#include "SDL_endian.h"
+#include "SDL_byteorder.h"
+
 extern void resLoaderMainThread();
 int getWindowHeight();
 
