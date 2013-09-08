@@ -271,6 +271,7 @@ float fontLineHeight(Font *currentFont) {
     vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;\
     vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;\
     vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6]=ch->v[2]+width;\
+    _DO_COLOR                                                                  \
     vertexCounter += 8;                                                        \
     x += ch->w;                                                                \
 }                                                                              \

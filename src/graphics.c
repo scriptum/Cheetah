@@ -35,6 +35,7 @@ int getWindowHeight();
 unsigned prevColor = 0xffffffff;
 
 void colorMask(bool r, bool g, bool b, bool a) {
+	FLUSH_BUFFER();
 	glColorMask(r,g,b,a);
 }
 
@@ -51,7 +52,7 @@ float *vertexCoord = NULL;
 
 #ifdef COLOR_ARRAYS
 unsigned char *colorArray;
-unsigned char colorArrayBuf[4 * 6];
+unsigned colorArrayBuf[4] = {0xffffffff,0xffffffff,0xffffffff,0xffffffff};
 #endif
 
 static void flushBuffer()
@@ -222,13 +223,10 @@ void reset() {
 
 #ifdef COLOR_ARRAYS
 	#define COLOR_BODY                                                     \
-	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);                \
-	unsigned high = (unsigned)r << 8 | (unsigned)g;                        \
+	unsigned low = (unsigned)g << 8 | ((unsigned)r & 0xff);                \
+	unsigned high = (unsigned)a << 8 | (unsigned)b;                        \
 	unsigned c = (low & 0xffff) | (high << 16);                            \
-	colorArrayBuf[0] = colorArrayBuf[0+4] = colorArrayBuf[0+8] = colorArrayBuf[0+12] = (unsigned char)r;\
-	colorArrayBuf[1] = colorArrayBuf[1+4] = colorArrayBuf[1+8] = colorArrayBuf[1+12] = (unsigned char)g;\
-	colorArrayBuf[2] = colorArrayBuf[2+4] = colorArrayBuf[2+8] = colorArrayBuf[2+12] = (unsigned char)b;\
-	colorArrayBuf[3] = colorArrayBuf[3+4] = colorArrayBuf[3+8] = colorArrayBuf[3+12] = (unsigned char)128;
+	colorArrayBuf[0] = colorArrayBuf[1] = colorArrayBuf[2] = colorArrayBuf[3] = c;
 #else
 	#define COLOR_BODY                                                     \
 	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);                \
@@ -255,7 +253,7 @@ void colord(double r, double g, double b, double a) {
 }
 
 void clearColor(float r, float g, float b, float a) {
-	glClearColor(r, g, b, a);
+	glClearColor(r,g,b,a);
 }
 
 void setClearColor(float r, float g, float b, float a) {

@@ -36,7 +36,18 @@ extern float *vertexCoord;
 
 #ifdef COLOR_ARRAYS
 extern unsigned char *colorArray;
-extern unsigned char colorArrayBuf[4 * 6];
+extern unsigned colorArrayBuf[4];
+
+#define _DO_COLOR memcpy(colorArray + 2*vertexCounter, colorArrayBuf, 4*4);
+
+// #define _DO_COLOR                                                              \
+// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 0))) = colorArrayBuf[0];    \
+// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 1))) = colorArrayBuf[1];    \
+// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 2))) = colorArrayBuf[2];    \
+// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 3))) = colorArrayBuf[3];
+
+#else
+#define _DO_COLOR
 #endif
 
 
@@ -89,7 +100,7 @@ extern unsigned char colorArrayBuf[4 * 6];
  * bindShader need to flush buffer to avoid visual appearance corruption.
  * */
 #define FLUSH_BUFFER() do {                                                    \
-    if(likely(vertexCounter)) {                                                \
+    if(likely(vertexCounter!= 0)) {                                            \
         glDrawArrays(GL_QUADS, 0, vertexCounter / 2);                          \
         vertexCounter = 0;                                                     \
     }                                                                          \
@@ -112,6 +123,7 @@ static inline void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, 
 	vertexCoord[vertexCounter + 5] = vy + VERTEX_ROT_Y(vw, vh, a, ox, oy);
 	vertexCoord[vertexCounter + 6] = vx + VERTEX_ROT_X(vw, 0,  a, ox, oy);
 	vertexCoord[vertexCounter + 7] = vy + VERTEX_ROT_Y(vw, 0,  a, ox, oy);
+	_DO_COLOR
 }
 
 /**
@@ -131,7 +143,11 @@ static inline void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, f
 	texCoord[vertexCounter + 6] =
 	texCoord[vertexCounter + 4] =
 	texCoord[vertexCounter + 0] + tw / w;
-	memcpy(colorArray, colorArrayBuf, 4 * 4);
+	// memcpy(colorArray + 2*vertexCounter, colorArrayBuf, 4*4);
+	// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 0))) = colorArrayBuf[0];
+	// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 1))) = colorArrayBuf[1];
+	// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 2))) = colorArrayBuf[2];
+	// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 3))) = colorArrayBuf[3];
 	vertexCounter += VERTICLES_PER_SPRITE;
 }
 
@@ -189,7 +205,7 @@ static inline void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, f
 static inline void PUSH_QUAD_TEXTURE(float vx, float vy, float vw, float vh, float a, float ox, float oy, const float *texture) {
 	FLUSH_BUFFER_IF_OVERFLOW
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
-	memcpy(texCoord+vertexCounter, texture, sizeof(float) * VERTICLES_PER_SPRITE);
+	memcpy(texCoord + vertexCounter, texture, sizeof(float) * VERTICLES_PER_SPRITE);
 	vertexCounter += VERTICLES_PER_SPRITE;
 }
 
