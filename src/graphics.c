@@ -29,6 +29,7 @@ IN THE SOFTWARE.
 #include "cvertex.h"
 #include "test.h"
 
+#include "SDL_endian.h"
 extern void resLoaderMainThread();
 int getWindowHeight();
 
@@ -221,21 +222,29 @@ void reset() {
 	//~ glEnd();
 //~ }
 
-#ifdef COLOR_ARRAYS
-	#define COLOR_BODY                                                     \
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	#define COLOR_UINT                                                     \
 	unsigned low = (unsigned)g << 8 | ((unsigned)r & 0xff);                \
 	unsigned high = (unsigned)a << 8 | (unsigned)b;                        \
-	unsigned c = (low & 0xffff) | (high << 16);                            \
+	unsigned c = (low & 0xffff) | (high << 16);
+#else
+	#define COLOR_UINT                                                     \
+	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);                \
+	unsigned high = (unsigned)r << 8 | (unsigned)g;                        \
+	unsigned c = (low & 0xffff) | (high << 16);
+#endif
+
+#ifdef COLOR_ARRAYS
+	#define COLOR_BODY                                                     \
+	COLOR_UINT                                                             \
 	colorArrayBuf[0] = colorArrayBuf[1] = colorArrayBuf[2] = colorArrayBuf[3] = c;
 #else
 	#define COLOR_BODY                                                     \
-	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);                \
-	unsigned high = (unsigned)r << 8 | (unsigned)g;                        \
-	unsigned c = (low & 0xffff) | (high << 16);                            \
+	COLOR_UINT                                                             \
 	if(unlikely(c != prevColor))                                           \
 	{                                                                      \
 		FLUSH_BUFFER();                                                \
-		glColor4ub((GLubyte)r, (GLubyte)g, (GLubyte)b, (GLubyte)a);    \
+		glColor4ubv((const GLubyte*)c);                                \
 		prevColor = c;                                                 \
 	}
 #endif

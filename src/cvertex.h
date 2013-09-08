@@ -38,13 +38,13 @@ extern float *vertexCoord;
 extern unsigned char *colorArray;
 extern unsigned colorArrayBuf[4];
 
-#define _DO_COLOR memcpy(colorArray + 2*vertexCounter, colorArrayBuf, 4*4);
+// #define _DO_COLOR memcpy(colorArray + 2*vertexCounter, colorArrayBuf, 4*4);
 
-// #define _DO_COLOR                                                              \
-// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 0))) = colorArrayBuf[0];    \
-// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 1))) = colorArrayBuf[1];    \
-// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 2))) = colorArrayBuf[2];    \
-// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 3))) = colorArrayBuf[3];
+#define _DO_COLOR                                                              \
+*((unsigned *)(colorArray + 4 * (vertexCounter/2 + 0))) = colorArrayBuf[0];    \
+*((unsigned *)(colorArray + 4 * (vertexCounter/2 + 1))) = colorArrayBuf[1];    \
+*((unsigned *)(colorArray + 4 * (vertexCounter/2 + 2))) = colorArrayBuf[2];    \
+*((unsigned *)(colorArray + 4 * (vertexCounter/2 + 3))) = colorArrayBuf[3];
 
 #else
 #define _DO_COLOR
