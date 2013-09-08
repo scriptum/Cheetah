@@ -28,6 +28,7 @@ IN THE SOFTWARE.
 #include <SDL_opengl.h>
 
 #include "cconfig.h"
+#include "cmacros.h"
 
 extern int vertexCounter;
 extern float *texCoord;
@@ -36,7 +37,7 @@ extern float *vertexCoord;
 /**********************************VERTEX OPS**********************************/
 
 #define TEXTURE_BIND(tex) do {                                                 \
-    if(prevImageId != (tex)) {                                                 \
+    if(unlikely(prevImageId != (tex))) {                                       \
         FLUSH_BUFFER();                                                        \
         glBindTexture(GL_TEXTURE_2D, tex);                                     \
         prevImageId = tex;                                                     \
@@ -47,7 +48,7 @@ extern float *vertexCoord;
  * Just checking if buffer grows over his size and flushing it.
  * */
 #define FLUSH_BUFFER_IF_OVERFLOW                                               \
-    if(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE)            \
+    if(unlikely(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE))  \
 		FLUSH_BUFFER();
 
 /**
@@ -81,7 +82,7 @@ extern float *vertexCoord;
  * bindShader need to flush buffer to avoid visual appearance corruption.
  * */
 #define FLUSH_BUFFER() do {                                                    \
-    if(vertexCounter) {                                                        \
+    if(likely(vertexCounter)) {                                                \
         glDrawArrays(GL_QUADS, 0, vertexCounter / 2);                          \
         vertexCounter = 0;                                                     \
     }                                                                          \
@@ -131,7 +132,7 @@ static inline void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, f
 #define VERTICLES_PER_SPRITE 6 * 2
 
 #define FLUSH_BUFFER() do {                                                    \
-    if(vertexCounter) {                                                        \
+    if(likely(vertexCounter)) {                                                \
         glDrawArrays(GL_TRIANGLES, 0, vertexCounter / 2);                      \
         vertexCounter = 0;                                                     \
     }                                                                          \

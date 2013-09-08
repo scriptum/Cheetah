@@ -91,12 +91,12 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *mask
 	int mask_w, mask_h, mask_channels;
 	int mask_step, img_step;
 	int x, y, j, i;
-	if(FALSE == fileExists(mask_name))
+	if(unlikely(FALSE == fileExists(mask_name)))
 		return NULL;
 	
 	/* try to load mask */
 	mask_img = loadImageData(mask_name, &mask_w, &mask_h, &mask_channels, TRUE);
-	if(mask_img)
+	if(unlikely(NULL != mask_img))
 	{
 		new_img = (unsigned char *)malloc(sizeof(unsigned char) * (size_t)img_len * 4);
 		ERROR_IF_NULL(new_img);
@@ -105,14 +105,14 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *mask
 			new_img[j++] = img[img_step++];
 			new_img[j++] = img[img_step++];
 			new_img[j++] = img[img_step++];
-			if(channels == 4)
+			if(unlikely(channels == 4))
 				img_step++;
 			new_img[j++] = (unsigned char)(0xff - mask_img[(y * mask_h + x) * mask_channels]);
 			x++;
-			if(x >= mask_h)
+			if(unlikely(x >= mask_h))
 				x = 0;
 			mask_step++;
-			if(mask_step >= width)
+			if(unlikely(mask_step >= width))
 			{
 				x = mask_step = 0;
 				y++;
@@ -140,12 +140,15 @@ static unsigned char * loadImageData(const char *name, int *width, int *height, 
 	unsigned char *img;
 	unsigned char *myBuf;
 	NEEDED_INIT;
+	printf("%d\n", SDL_GetTicks());
 	myBuf = loadfile(name, &file_size);
 	ERROR_IF_NULL(myBuf);
+	printf("%d\n", SDL_GetTicks());
 	img = SOIL_load_image_from_memory(
 				myBuf, (int)sizeof(unsigned char) * (int)file_size,
 				width, height, channels,
 				0 );
+	printf("%d\n", SDL_GetTicks());
 	if(img != myBuf)
 		delete(myBuf);
 	if(FALSE == mask && NULL != img) /* avoid loading mask of mask */
@@ -155,15 +158,15 @@ static unsigned char * loadImageData(const char *name, int *width, int *height, 
 		unsigned char *img_mask;
 		char *mask_name = NULL;
 		new(mask_name, char, strlen(name) + 5 + 1);
-		if(NULL != mask_name)
+		if(unlikely(NULL != mask_name))
 		{
-			if(NULL != pch)
+			if(unlikely(NULL != pch))
 			{
 				strncpy(mask_name, name, (size_t)(pch - name));
 				strcpy(mask_name + (pch - name), ".mask");
 				dprintf_graphics("Trying to load mask with name %s...\n", mask_name);
 				img_mask = loadImageMask(img, mask_name, *width, *height, *channels);
-				if(img_mask)
+				if(likely(NULL != img_mask))
 				{
 					*channels = 4;
 					free(img);
@@ -210,11 +213,11 @@ static int dequeue(queue q, QDATA *val)
 {
 	SDL_mutexP(resQueueMutex);
 	node tmp = QHEAD(q);
-	if (NULL == tmp)
+	if (unlikely(NULL == tmp))
 		return 0;
 	*val = tmp->val;
 	QHEAD(q) = tmp->next;
-	if (QTAIL(q) == tmp)
+	if(QTAIL(q) == tmp)
 		QTAIL(q) = 0;
 	free(tmp);
 	SDL_mutexV(resQueueMutex);
@@ -289,20 +292,21 @@ void resLoaderMainThread()
 
 static void imageCheckResLoader(Image * image)
 {
-	if(resLoaderQueue && image->id == null_texture && !image->queued)
-	{
-		Resource r;
-		memset(&r, 0, sizeof(Resource));
-		image->queued = 1;
-		r.image = image;
-		enqueue(resLoaderQueue, r);
-	}
+	if(resLoaderQueue) 
+		if(unlikely(image->id == null_texture && !image->queued))
+		{
+			Resource r;
+			memset(&r, 0, sizeof(Resource));
+			image->queued = 1;
+			r.image = image;
+			enqueue(resLoaderQueue, r);
+		}
 }
 
 static void multitextureBind(Multitexture * multitexture)
 {
 	Image * image;
-	if(NULL == multitexture || NULL == multitexture->images)
+	if(unlikely(NULL == multitexture || NULL == multitexture->images))
 		return;
 	FLUSH_BUFFER();
 	int i;
@@ -310,10 +314,10 @@ static void multitextureBind(Multitexture * multitexture)
 	{
 		image = multitexture->images[i];
 		glActiveTexture_((GLenum)(GL_TEXTURE0 + i));
-		if(NULL == image)
+		if(unlikely(NULL == image))
 			continue;
 		imageCheckResLoader(image);
-		if(image->id)
+		if(likely(0 != image->id))
 			glBindTexture(GL_TEXTURE_2D, image->id);
 	}
 	prevImageId = 0;
@@ -332,7 +336,7 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 	
 	
 	NEEDED_INIT_VOID;
-	if(!name)
+	if(unlikely(NULL == name))
 	{
 		myError("empty filename");
 		return;
@@ -390,11 +394,11 @@ void newImageRaw(Image *ptr, int width, int height, const char *data, const char
 		format = GL_RGBA;
 	glGenTextures(1, &tex_id);
 	TEXTURE_BIND(tex_id);
-	if(TRUE == nearest)
+	if(unlikely(TRUE == nearest))
 		TEX_NEAREST;
 	else
 		TEX_LINEAR;
-	if(TRUE == clamp)
+	if(unlikely(TRUE == clamp))
 		TEX_CLAMP;
 	else
 		TEX_REPEAT;
@@ -412,7 +416,7 @@ void newImageRaw(Image *ptr, int width, int height, const char *data, const char
  * @advanced
  * */
 void imageBind(Image * image) {
-	if(!image)
+	if(unlikely(NULL == image))
 		return;
 	imageCheckResLoader(image);
 	TEXTURE_BIND(image->id);
@@ -572,7 +576,8 @@ void deleteImage(Image * ptr) {
 	#ifdef MEMORY_TEST
 		printf("Freeing Image %d\n", ptr->id);
 	#endif
-	if(ptr && ptr->id > 1) glDeleteTextures(1, &ptr->id);
+	if(ptr && ptr->id > 1)
+		glDeleteTextures(1, &ptr->id);
 
 	//~ else MYERROR("Trying to free a null-image. Maybe, you did it manually?");
 }

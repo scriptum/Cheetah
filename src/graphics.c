@@ -216,43 +216,47 @@ void reset() {
 //~ }
 
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
-	union {
-		unsigned uColor;
-		struct {
-			unsigned char r;
-			unsigned char g;
-			unsigned char b;
-			unsigned char a;
-		} ubColor;
-	} uniColor;
-	uniColor.ubColor.r = r;
-	uniColor.ubColor.g = g;
-	uniColor.ubColor.b = b;
-	uniColor.ubColor.a = a;
-	if(uniColor.uColor != prevColor)
+	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);
+	unsigned high = (unsigned)r << 8 | (unsigned)g;
+	unsigned c = (low & 0xffff) | (high << 16);
+	if(c != prevColor)
 	{
 		FLUSH_BUFFER();
-		glColor4ub(r, g, b, a);
-		prevColor = uniColor.uColor;
+		glColor4ubv((const GLubyte *)&c);
+		prevColor = c;
 	}
 }
 
 void colorf(float r, float g, float b, float a) {
-	unsigned c = 
-		((unsigned)(r * 255.f)) << 24 | 
-		((unsigned)(g * 255.f)) << 16 | 
-		((unsigned)(b * 255.f)) << 8 | 
-		((unsigned)(a * 255.f));
-	if(c != prevColor)
+	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);
+	unsigned high = (unsigned)r << 8 | (unsigned)g;
+	unsigned c = (low & 0xffff) | (high << 16);
+	if(unlikely(c != prevColor))
 	{
 		FLUSH_BUFFER();
-		glColor4f(r, g, b, a);
+		glColor4ubv((const GLubyte *)&c);
+		prevColor = c;
+	}
+}
+
+void colord(double r, double g, double b, double a) {
+	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);
+	unsigned high = (unsigned)r << 8 | (unsigned)g;
+	unsigned c = (low & 0xffff) | (high << 16);
+	if(unlikely(c != prevColor))
+	{
+		FLUSH_BUFFER();
+		glColor4ubv((const GLubyte *)&c);
 		prevColor = c;
 	}
 }
 
 void clearColor(float r, float g, float b, float a) {
 	glClearColor(r,g,b,a);
+}
+
+void setClearColor(float r, float g, float b, float a) {
+	glClearColor(r / 255.f, g / 255.f, b / 255.f, a / 255.f);
 }
 
 void blendMode(int mode) {

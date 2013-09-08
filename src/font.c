@@ -188,7 +188,7 @@ float fontHeight(Font *currentFont, const char *str, float maxw) {
 
 	y = height;
 
-	if(maxw > 0.0f)
+	if(likely(maxw > 0.0f))
 	{
 		while(TRUE)
 		{
@@ -298,7 +298,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	FontHash *hash         = (FontHash*)currentFont->hash;
 	unsigned  prevChar     = 0;
 	FontChar *fontPrevChar = NULL;
-	if(NULL == hash)
+	if(unlikely(NULL == hash))
 		return;
 	// if(maxw > 0.0f)
 	{
@@ -309,7 +309,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	glPushMatrix();
 	if(TRUE == currentFont->distanceField)
 	{
-		if(NULL == df_shader && FALSE == fontShaderFailed)
+		if(unlikely(NULL == df_shader && FALSE == fontShaderFailed))
 		{
 			if(FALSE == supported.GLSL)
 				fontShaderFailed = TRUE;
@@ -321,7 +321,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 					fontShaderFailed = TRUE;
 			}
 		}
-		if(TRUE == fontShaderFailed)
+		if(unlikely(TRUE == fontShaderFailed))
 		{
 			glEnable(GL_ALPHA_TEST);
 			glAlphaFunc(GL_GREATER, currentFont->dfGamma);
@@ -350,7 +350,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	x = h = y = 0.0;
 
 	imageBind(currentFont->image);
-	if(maxw > 0.0f)
+	if(likely(maxw > 0.0f))
 	{
 		while(TRUE)
 		{
@@ -383,7 +383,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 			/* drop invisible lines - great performance improvement for long texts */
 			yOutScreen = (y + oldy + height) * currentFont->_scale > 0.0f;
 			/* drop kerning computation for invisible lines - speed +15% */
-			if(yOutScreen)
+			if(unlikely(yOutScreen))
 				if(unlikely(KERNING_CONDITION))
 				{
 					KerningPair kp = {prevChar, c};
@@ -403,7 +403,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 				if(buf == last_space)
 					last_space++;
 				/* dropping invisible lines from top */
-				if(yOutScreen)
+				if(unlikely(yOutScreen))
 				{
 					switch(align)
 					{
@@ -426,7 +426,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 					while(buf < last_space)
 					{
 						UNICODE_TO_INT(str, buf)
-						if(KERNING_CONDITION)
+						if(unlikely(KERNING_CONDITION))
 						{
 							KerningPair kp = {prevChar, c};
 							float kerning = KernHash_get(currentFont->kerningHash, kp);
@@ -447,7 +447,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 						else
 						{
 							ch = FontHash_get(hash, c);
-							if(NULL == ch)
+							if(unlikely(NULL == ch))
 								continue;
 							DRAW_CHAR;
 						}
@@ -457,11 +457,11 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 				}
 				else
 					buf = last_space;
-				if(TRUE == end)
+				if(unlikely(TRUE == end))
 					break;
 				y += height;
 				/* dropping invisible lines from buttom */
-				if((y + oldy) * currentFont->_scale > screen->h)
+				if(unlikely((y + oldy) * currentFont->_scale > screen->h))
 					break;
 				h = FONT_CEIL(currentFont, y);
 				if(unlikely(str[buf] == '\n' || str[buf] == '\t' || str[buf] == ' '))
@@ -504,9 +504,9 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 					break;
 				default:
 					ch = FontHash_get(hash, c);
-					if(NULL == ch)
+					if(unlikely(NULL == ch))
 						continue;
-					if(NULL != currentFont->kerningHash && prevChar > 0 && fontPrevChar && fontPrevChar->kerning)
+					if(unlikely(KERNING_CONDITION))
 					{
 						KerningPair kp = {prevChar, c};
 						float kerning = KernHash_get(currentFont->kerningHash, kp);
@@ -522,7 +522,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	glPopMatrix();
 	if(TRUE == currentFont->distanceField)
 	{
-		if(TRUE == fontShaderFailed)
+		if(unlikely(TRUE == fontShaderFailed))
 		{
 			glDisable(GL_ALPHA_TEST);
 		}

@@ -133,17 +133,30 @@ C.quit = function()
 	done = true
 end
 
---~ --first time when you try to load an image this function autoloads SOIL library
---~ C.newImage = function(name, opt)
-	--~ require 'lib.SOIL'
-	--~ return C.newImage(name, opt)
---~ end
-
-C.setColor = function(r,g,b,a)
+C.setColor = function(r, g, b, a)
 	if type(r) == 'table' then
-		libcheetah.color(r[1] or 255, r[2] or 255, r[3] or 255, r[4] or 255)
+		libcheetah.colord(r[1] or 255, r[2] or 255, r[3] or 255, r[4] or 255)
 	else
-		libcheetah.color(r or 255, g or 255, b or 255, a or 255)
+		libcheetah.colord(r or 255, g or 255, b or 255, a or 255)
+	end
+end
+
+local _blend_modes = {
+	additive = libcheetah.blend_additive,
+	alpha = libcheetah.blend_alpha,
+	multiplicative = libcheetah.blend_multiplicative,
+	screen = libcheetah.blend_screen,
+	detail = libcheetah.blend_detail,
+	substractive = libcheetah.blend_substractive,
+	difference = libcheetah.blend_difference,
+	mask = libcheetah.blend_mask,
+}
+
+C.setBlendMode = function(mode)
+	if type(r) == 'string' then
+		libcheetah.blendMode(_blend_modes[mode])
+	else
+		libcheetah.blendMode(mode)
 	end
 end
 

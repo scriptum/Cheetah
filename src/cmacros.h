@@ -27,10 +27,15 @@ IN THE SOFTWARE.
 #include <stdlib.h>
 #include "cdebug.h"
 
+/********************************OPTIMIZATIONS*********************************/
+
+#define likely(x)   __builtin_expect((x),1)
+#define unlikely(x) __builtin_expect((x),0)
+
 /**********************************MEMOTY OPS**********************************/
 
 #define new(var, type, size) do {                                              \
-    if(NULL != (var)) {                                                        \
+    if(unlikely(NULL != (var))) {                                              \
         dprintf_memerr("variable %s already contains data: %x."                \
                        " Delete it before allocating", #var, var);             \
         exit(1);                                                               \
@@ -39,7 +44,7 @@ IN THE SOFTWARE.
     /* initialize memory for small structures */                               \
     if((size) == 1)                                                            \
         memset(var, 0, (size_t)sizeof(type));                                  \
-    if(!var) {                                                                 \
+    if(unlikely(NULL == var)) {                                                \
         dprintf_memerr("cannot allocate %zd bytes for %s",                     \
                        (size_t)sizeof(type) * (size_t)(size), #var);           \
         exit(1);                                                               \
@@ -59,7 +64,7 @@ IN THE SOFTWARE.
 
 #define renew(var, type, size) do {                                            \
     var = (type*)realloc(var, (size_t)sizeof(type)*(size_t)(size));            \
-    if(!var) {                                                                 \
+    if(unlikely(NULL == var)) {                                                \
         dprintf_memerr("cannot re-allocate %zd bytes for %s",                  \
                        (size_t)sizeof(type) * (size_t)(size), #var);           \
         exit(1);                                                               \
@@ -69,7 +74,7 @@ IN THE SOFTWARE.
 } while(0)
 
 #define delete(var) do {                                                       \
-    if(var) {                                                                  \
+    if(likely(NULL != var)) {                                                  \
         free(var);                                                             \
         dprintf_mem("Removed: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var);\
         var = NULL;                                                            \
@@ -129,20 +134,15 @@ bool isInit();
 #define _NEEDED_INIT_STR "call init function before!"
 
 #define NEEDED_INIT do {                                                       \
-    if(!isInit()) {                                                            \
+    if(unlikely(!isInit())) {                                                  \
         myError(_NEEDED_INIT_STR); return 0;                                   \
     }                                                                          \
 } while(0)
 
 #define NEEDED_INIT_VOID do {                                                  \
-    if(!isInit()) {                                                            \
+    if(unlikely(!isInit())) {                                                  \
         myError(_NEEDED_INIT_STR); return;                                     \
     }                                                                          \
 } while(0)
 
 #endif /*__MACROS_H__*/
-
-/********************************OPTIMIZATIONS*********************************/
-
-#define likely(x)   __builtin_expect((x),1)
-#define unlikely(x) __builtin_expect((x),0)

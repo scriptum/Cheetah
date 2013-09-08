@@ -110,12 +110,12 @@ then
 		else
 			if [ "$1" == "linux32" ]
 			then
-				CFLAGS="$CFLAGS -m32 make"
+				make CC="gcc -m32"
 			else
 				make
 			fi
+			cp src/$EXE "../../$DIR/bin/$OS$MACHINE_NAME/"
 		fi
-		cp src/$EXE "../../$DIR/bin/$OS$MACHINE_NAME/"
 	)
 fi
 
