@@ -114,7 +114,7 @@ function Entity:text(text, font, scale)
 	else
 		self.scale = scale or 1
 	end
-	self.font:scale(self.scale)
+	self.font:setScale(self.scale)
 	self.text = text or ''
 	return self:draw(draw_text)
 end

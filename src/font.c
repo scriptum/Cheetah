@@ -96,22 +96,22 @@ extern SDL_Surface *screen;
 
 #define UNICODE_TO_INT(a, i)                                                   \
 if((a[i] & 0b10000000) == 0) {                                                 \
-    c  =  (unsigned)a[i++];                                                              \
+    c  =  (unsigned)a[i++];                                                    \
 }                                                                              \
-else if (((unsigned)a[i]   & 0b11100000) == 0b11000000) {                                \
-    c =  ((unsigned)a[i++] & 0b00011111) << 6;                                           \
-    c |=  (unsigned)a[i++] & 0b00111111;                                                 \
+else if (((unsigned)a[i]   & 0b11100000) == 0b11000000) {                      \
+    c =  ((unsigned)a[i++] & 0b00011111) << 6;                                 \
+    c |=  (unsigned)a[i++] & 0b00111111;                                       \
 }                                                                              \
-else if (((unsigned)a[i]   & 0b11110000) == 0b11100000) {                                \
-    c =  ((unsigned)a[i++] & 0b00001111) << 12;                                          \
-    c |= ((unsigned)a[i++] & 0b00111111) << 6;                                           \
-    c |=  (unsigned)a[i++] & 0b00111111;                                                 \
+else if (((unsigned)a[i]   & 0b11110000) == 0b11100000) {                      \
+    c =  ((unsigned)a[i++] & 0b00001111) << 12;                                \
+    c |= ((unsigned)a[i++] & 0b00111111) << 6;                                 \
+    c |=  (unsigned)a[i++] & 0b00111111;                                       \
 }                                                                              \
-else if (((unsigned)a[i]   & 0b11111000) == 0b11110000) {                                \
-    c =  ((unsigned)a[i++] & 0b00000111) << 18;                                          \
-    c |= ((unsigned)a[i++] & 0b00111111) << 12;                                          \
-    c |= ((unsigned)a[i++] & 0b00111111) << 6;                                           \
-    c |=  (unsigned)a[i++] & 0b00111111;                                                 \
+else if (((unsigned)a[i]   & 0b11111000) == 0b11110000) {                      \
+    c =  ((unsigned)a[i++] & 0b00000111) << 18;                                \
+    c |= ((unsigned)a[i++] & 0b00111111) << 12;                                \
+    c |= ((unsigned)a[i++] & 0b00111111) << 6;                                 \
+    c |=  (unsigned)a[i++] & 0b00111111;                                       \
 } else { /* Error! */                                                          \
     c = 0;                                                                     \
 }
@@ -124,14 +124,14 @@ void fontDisableDistanceField(Font *f) {
 	f->distanceField = FALSE;
 }
 
-/* Calculate width of string. */
+/* Calculate width of text block */
 float fontWidth(Font *f, const char *str) {
-	float	width = 0;
-	float	maxwidth = 0;
+	float		width = 0;
+	float		maxwidth = 0;
 	unsigned	c = 0;
-	int	i = 0;
-	FontChar *fch;
-	unsigned prevChar = 0;
+	int		i = 0;
+	FontChar	*fch;
+	unsigned	prevChar = 0;
 	while(str[i])
 	{
 		UNICODE_TO_INT(str, i)
@@ -140,15 +140,17 @@ float fontWidth(Font *f, const char *str) {
 			case ' ':
 				width += f->_spacewidth;
 				continue;
-			case '\t':
-				width += f->_spacewidth * 8;
-				continue;
 			case '\n':
 				if(width > maxwidth)
 					maxwidth = width;
 				width = 0;
 				continue;
+			case '\t':
+				width += f->_spacewidth * 8;
+				continue;
 		}
+		if(unlikely(c == 0))
+			continue;
 		fch = FontHash_get(f->hash, c);
 		if(fch)
 			width += fch->w;
@@ -164,16 +166,103 @@ float fontWidth(Font *f, const char *str) {
 	return maxwidth * f->_scale;
 }
 
-/* Calculate height of string. */
-float fontHeight(Font *font) {
-	return font->height * font->_scale;
+/* Calculate height of text block */
+float fontHeight(Font *currentFont, const char *str, float maxw) {
+	FontChar *ch           = NULL;
+	unsigned  i            = 0;
+	unsigned  j            = 0;
+	unsigned  last_space   = 0;
+	unsigned  c            = 0;
+	float     width        = 0.0f;
+	float     spacew       = currentFont->_spacewidth;
+	float     height       = currentFont->height * currentFont->_interval * currentFont->_scale;
+	float     y;
+	FontHash *hash         = (FontHash*)currentFont->hash;
+	if(NULL == hash)
+		return 0.f;
+	maxw /= currentFont->_scale;
+	if(FALSE == currentFont->scalable)
+	{
+		maxw = maxw * screenScale.scaleX;
+	}
+
+	y = height;
+
+	if(maxw > 0.0f)
+	{
+		while(TRUE)
+		{
+			j = i;
+			UNICODE_TO_INT(str, i)
+			if(unlikely(c == '\0'))
+			{
+				y += height;
+				goto out;
+			}
+			else if(unlikely(c == '\t'))
+			{
+				width += spacew * 8;
+				last_space = j;
+			}
+			else if(unlikely(c == ' '))
+			{
+				last_space = j;
+				width += spacew;
+			}
+			else
+			{
+				ch = FontHash_get(hash, c);
+				if(unlikely(NULL == ch))
+					continue;
+				width += ch->w;
+			}
+			
+			if(unlikely(width > maxw || '\n' == c))
+			{
+				if(0 == last_space || '\n' == c)
+				{
+					last_space = j;
+				}
+				y += height;
+				if(unlikely(str[last_space] == '\n' || str[last_space] == '\t' || str[last_space] == ' '))
+				{
+					i = last_space + 1;
+				}
+				else
+				{
+					i = last_space;
+				}
+				last_space = 0;
+				width = 0;
+			}
+
+		}
+	}
+	else
+	{
+		while(str[i])
+		{
+			UNICODE_TO_INT(str, i)
+			if(unlikely(c == '\0'))
+				goto out;
+			else if(unlikely(c == '\n'))
+				y += height;
+		}
+	}
+out:
+	return y;
+}
+
+/* Get font one line height */
+float fontLineHeight(Font *currentFont) {
+	return currentFont->height * currentFont->_interval * currentFont->_scale;
 }
 
 #define FONT_CEIL(font, x) (font->scalable || font->distanceField) ? x : ceilf(x)
 
 #define DRAW_CHAR do {                                                         \
     FLUSH_BUFFER_IF_OVERFLOW                                                   \
-    texCoord[vertexCounter] = texCoord[vertexCounter+2] = ch->t[0];            \
+    texCoord[vertexCounter]   = texCoord[vertexCounter+2] = ch->t[0];          \
     texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];          \
     texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];          \
     texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];          \
@@ -191,10 +280,10 @@ while(0)
 #define KERNING_CONDITION (NULL != currentFont->kerningHash && fontPrevChar && fontPrevChar->kerning)
 void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align) {
 	FontChar *ch           = NULL;
-	unsigned       i            = 0;
-	unsigned       j;
-	unsigned       last_space   = 0;
-	unsigned       buf          = 0;
+	unsigned  i            = 0;
+	unsigned  j            = 0;
+	unsigned  last_space   = 0;
+	unsigned  buf          = 0;
 	int       spaces       = -1;
 	unsigned  c            = 0;
 	float     width        = 0.0f;
@@ -202,10 +291,10 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 	float     lastw        = 0.0f;
 	float     justifyWidth = currentFont->_spacewidth;
 	float     spacew       = currentFont->_spacewidth;
-	float     height   = currentFont->height * currentFont->_interval;
+	float     height       = currentFont->height * currentFont->_interval;
 	float     oldy         = y / currentFont->_scale;
 	bool      end          = FALSE;
-	bool      yOutScreen;
+	bool      yOutScreen   = FALSE;
 	FontHash *hash         = (FontHash*)currentFont->hash;
 	unsigned  prevChar     = 0;
 	FontChar *fontPrevChar = NULL;
@@ -213,7 +302,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 		return;
 	// if(maxw > 0.0f)
 	{
-		maxw = maxw / currentFont->_scale;
+		maxw /= currentFont->_scale;
 		// if(maxw == 0.0f) maxw = 0.0001f;
 	}
 	FLUSH_BUFFER();
@@ -267,40 +356,42 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 		{
 			j = i;
 			UNICODE_TO_INT(str, i)
-			switch(c)
+			if(unlikely(c == '\0'))
 			{
-				case ' ':
-					last_space = j;
-					lastw = width;
-					spaces++;
-					width += spacew;
-					break;
-				case '\t':
-					width += spacew * 8;
-					last_space = j;
-					lastw = width;
-					break;
-				case '\0':
-					end = TRUE;
-					break;
-				default:
-					ch = FontHash_get(hash, c);
-					if(NULL == ch)
-						continue;
-					width += ch->w;
+				end = TRUE;
+			}
+			else if(unlikely(c == '\t'))
+			{
+				width += spacew * 8;
+				last_space = j;
+				lastw = width;
+			}
+			else if(unlikely(c == ' '))
+			{
+				last_space = j;
+				lastw = width;
+				spaces++;
+				width += spacew;
+			}
+			else
+			{
+				ch = FontHash_get(hash, c);
+				if(unlikely(NULL == ch))
+					continue;
+				width += ch->w;
 			}
 			/* drop invisible lines - great performance improvement for long texts */
 			yOutScreen = (y + oldy + height) * currentFont->_scale > 0.0f;
 			/* drop kerning computation for invisible lines - speed +15% */
 			if(yOutScreen)
-				if(KERNING_CONDITION)
+				if(unlikely(KERNING_CONDITION))
 				{
 					KerningPair kp = {prevChar, c};
 					width += KernHash_get(currentFont->kerningHash, kp);
 				}
 			prevChar = c;
 			fontPrevChar = ch;
-			if(width > maxw || '\n' == c || TRUE == end)
+			if(unlikely(width > maxw || '\n' == c || TRUE == end))
 			{
 				prevChar = 0;
 				fontPrevChar = NULL;
@@ -323,13 +414,13 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 							x = maxw - lastw;
 							break;
 						case alignJustify:
-							if('\n' == c || TRUE == end)
+							if(unlikely('\n' == c || TRUE == end))
 								justifyWidth = spacew;
 							else
 								justifyWidth = (maxw + spacew * ((float)spaces) - lastw) / (float)(spaces);
 							x = 0;
 							break;
-							default: x = 0;
+						default: x = 0;
 					}
 					float kerningAccumulator = 0.0;
 					while(buf < last_space)
@@ -344,20 +435,21 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 								kerningAccumulator -= kerning;
 						}
 						ch = NULL;
-						switch(c)
+						if(unlikely(c == '\t'))
 						{
-							case ' ':
-								x += justifyWidth + kerningAccumulator;
-								kerningAccumulator = 0.0;
-								break;
-							case '\t':
-								x += spacew * 8;
-								break;
-							default:
-								ch = FontHash_get(hash, c);
-								if(NULL == ch)
-									continue;
-								DRAW_CHAR;
+							x += spacew * 8;
+						}
+						else if (unlikely(c == ' '))
+						{
+							x += justifyWidth + kerningAccumulator;
+							kerningAccumulator = 0.0;
+						}
+						else
+						{
+							ch = FontHash_get(hash, c);
+							if(NULL == ch)
+								continue;
+							DRAW_CHAR;
 						}
 						prevChar = c;
 						fontPrevChar = ch;
@@ -372,15 +464,13 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 				if((y + oldy) * currentFont->_scale > screen->h)
 					break;
 				h = FONT_CEIL(currentFont, y);
-				switch(str[buf])
+				if(unlikely(str[buf] == '\n' || str[buf] == '\t' || str[buf] == ' '))
 				{
-					case ' ':
-					case '\t':
-					case '\n':
-						i = buf = last_space + 1;
-						break;
-					default:
-						i = buf = last_space;
+					i = buf = last_space + 1;
+				}
+				else
+				{
+					i = buf = last_space;
 				}
 				last_space = 0;
 				width = 0;

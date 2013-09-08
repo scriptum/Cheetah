@@ -198,6 +198,17 @@ enum {
 	align_right,
 	align_justify
 };
+enum {
+	EVENT_QUIT = 1,
+	EVENT_KEYDOWN,
+	EVENT_KEYUP,
+	EVENT_MOUSEBUTTONDOWN,
+	EVENT_MOUSEBUTTONUP,
+	EVENT_RESIZE,
+	EVENT_EXPOSE,
+	EVENT_ACTIVE,
+	EVENT_JOY
+};
 struct {
 	float		scaleX;
 	float		scaleY;
@@ -253,7 +264,8 @@ char *getDirentName(struct dirent * de);
 void fontEnableDistanceField(Font *f);
 void fontDisableDistanceField(Font *f);
 float fontWidth(Font *f, const char *str);
-float fontHeight(Font *font);
+float fontHeight(Font *currentFont, const char *str, float maxw);
+float fontLineHeight(Font *currentFont);
 void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align);
 void fontScale(Font *font, float scale);
 void fontInterval(Font *font, float interval);
@@ -345,8 +357,12 @@ unsigned int getTicks();
 double getGameTime();
 double getTime();
 void delay(unsigned int ms);
-void sleep(unsigned int sec);
-void createThread(const char *file);
+void sleep(double sec);
+bool newThread(const char *file);
+void threadMutexLock();
+void threadMutexUnlock();
+void threadSendStr(const char *message, const char *queue);
+const char *threadRecvStr(const char *queue);
 void newTilmapInternal(Tilemap *t, const char *name);
 void tilemapDraw(Tilemap *t, double x, double y, double r, double z, double ox, double oy);
 void deleteTilemap(Tilemap *t);

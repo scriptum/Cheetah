@@ -33,7 +33,7 @@ _lQuery = {
 	fx = true,
 	hooks = {},
 	_onresize = {},
-	addhook = function(hook)
+	addHook = function(hook)
 		table.insert(_lQuery.hooks, hook)
 	end,
 	onresize = function(func)
@@ -503,7 +503,7 @@ end
 _lQuery.drag_end = function(s)
 	_lQuery._drag_object = nil
 end
-_lQuery.addhook(function()
+_lQuery.addHook(function()
 	local s = _lQuery._drag_object
 	if s then
 		s.x = mX - s._drag_x

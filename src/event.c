@@ -34,18 +34,6 @@ SDL_Event event;
 void recomputeScreenScale(float w, float h);
 void setWindowSize(unsigned w, unsigned h);
 
-enum {
-	EVENT_QUIT = 1,
-	EVENT_KEYDOWN,
-	EVENT_KEYUP,
-	EVENT_MOUSEBUTTONDOWN,
-	EVENT_MOUSEBUTTONUP,
-	EVENT_RESIZE,
-	EVENT_EXPOSE,
-	EVENT_ACTIVE,
-	EVENT_JOY
-};
-
 unsigned int getEventType() {
 	/* skip unneeded events */
 	while(SDL_PollEvent(&event)) {
@@ -87,8 +75,8 @@ unsigned int getEventType() {
 			case SDL_JOYBUTTONUP:
 				dprintf_event("Joystick\n");
 				return EVENT_JOY;
-			// default:
-				// dprintf_event("Event: Smth %d\n", event.type);
+			default:
+				dprintf_event("Event: Smth %d\n", event.type);
 		}
 	}
 	return 0;

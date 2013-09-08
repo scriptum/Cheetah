@@ -25,6 +25,7 @@ IN THE SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SDL.h>
 
 #include "cheetah.h"
 #include "cmacros.h"
@@ -33,14 +34,11 @@ IN THE SOFTWARE.
 #include "SOIL/SOIL.h"
 #include "test.h"
 
-void delay();
-
 typedef struct Resource {
 	Image *image;
 	unsigned char *data;
 	char *name;
 	char *options;
-	int len;
 } Resource;
 
 #define QDATA Resource
@@ -53,6 +51,7 @@ queue newQueue();
 queue resLoaderQueue;
 
 Resource *resShared;
+SDL_mutex *resQueueMutex;
 
 bool fileExists(const char * filename);
 
@@ -86,8 +85,6 @@ static unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 
 static unsigned char * loadImageMask(const unsigned char * img, const char *mask_name, int width, int height, int channels)
 {
-	// char *mask_name;
-	// const int masklen = 5;
 	unsigned char *mask_img;
 	unsigned char *new_img;
 	const int img_len = width * height;
@@ -124,10 +121,8 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *mask
 			}
 		}
 		free(mask_img);
-		// free(mask_name);
 		return new_img;
 	}
-	// free(mask_name);
 	return NULL;
 error:
 	myError("Cannot create mask image!");
@@ -199,7 +194,7 @@ queue newQueue()
 static void enqueue(queue q, QDATA n)
 {
 	//~ printf("%s\n", n.image->name);
-	//~ SDL_mutexP(resQueueMutex);
+	SDL_mutexP(resQueueMutex);
 	node nd = malloc(sizeof(node_t));
 	nd->val = n;
 	if (!QHEAD(q)) QHEAD(q) = nd;
@@ -208,12 +203,12 @@ static void enqueue(queue q, QDATA n)
 	QTAIL(q) = nd;
 	nd->next = 0;
 	//~ printf("%d\n", QEMPTY(resLoaderQueue));
-	//~ SDL_mutexV(resQueueMutex);
+	SDL_mutexV(resQueueMutex);
 }
 
 static int dequeue(queue q, QDATA *val)
 {
-	//~ SDL_mutexP(resQueueMutex);
+	SDL_mutexP(resQueueMutex);
 	node tmp = QHEAD(q);
 	if (NULL == tmp)
 		return 0;
@@ -222,7 +217,7 @@ static int dequeue(queue q, QDATA *val)
 	if (QTAIL(q) == tmp)
 		QTAIL(q) = 0;
 	free(tmp);
-	//~ SDL_mutexV(resQueueMutex);
+	SDL_mutexV(resQueueMutex);
 	return 1;
 }
 
@@ -232,7 +227,7 @@ void resLoaderInit(bool resloader)
 	if(TRUE == resloader)
 	{
 		resLoaderQueue = newQueue();
-		//~ resQueueMutex = SDL_CreateMutex();
+		resQueueMutex = SDL_CreateMutex();
 		resShared = 0;
 	}
 }
@@ -251,10 +246,9 @@ int resLoaderThread(void *unused)
 	int width, height;
 	while(1)
 	{
-		//~ SDL_mutexP(resQueueMutex);
 		//~ empty = QEMPTY(resLoaderQueue)
-		//~ SDL_mutexV(resQueueMutex);
-		delay(10);
+		SDL_Delay(10);
+		SDL_mutexP(resQueueMutex);
 		if(!resShared && !QEMPTY(resLoaderQueue))
 		{
 			//~ printf("Queue: %d\n", QEMPTY(resLoaderQueue));
@@ -273,6 +267,7 @@ int resLoaderThread(void *unused)
 			//~ e.user.data1 = (void*)&r;
 			//~ SDL_PushEvent(&e);
 		}
+		SDL_mutexV(resQueueMutex);
 	}
 }
 
@@ -376,8 +371,9 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
  * @var width of image
  * @var height of image
  * @var string of options. This is depends on image loading module you use. Supported options:
- *  * _n_ - use nearest interpolation
- *  * _a_ - image with alpha (4 bytes per pixel)
+ *  * _nearest_ - use nearest interpolation
+ *  * _alpha_ - image with alpha (4 bytes per pixel)
+ *  * _clamp_ - clamp (don't repeat) texture
  * @return Image object
  * @advanced
  * */

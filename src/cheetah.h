@@ -271,6 +271,18 @@ enum {
 	align_justify
 };
 
+enum {
+	EVENT_QUIT = 1,
+	EVENT_KEYDOWN,
+	EVENT_KEYUP,
+	EVENT_MOUSEBUTTONDOWN,
+	EVENT_MOUSEBUTTONUP,
+	EVENT_RESIZE,
+	EVENT_EXPOSE,
+	EVENT_ACTIVE,
+	EVENT_JOY
+};
+
 struct {
 	float		scaleX;
 	float		scaleY;

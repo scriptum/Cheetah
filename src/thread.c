@@ -24,11 +24,15 @@ IN THE SOFTWARE.
 #include <string.h>
 #include <stddef.h>
 #include <SDL.h>
-#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 
 #include "cheetah.h"
 #include "cmacros.h"
 #include "test.h"
+#include "clist.h"
+#include "chashfunc.h"
+#include "chashtable.h"
 
 /* Get the number of milliseconds past from the execution time. Equivalent to SDL_GetTicks(); */
 unsigned int getTicks() {
@@ -51,8 +55,8 @@ void delay(unsigned int ms) {
 }
 
 /* Do nothing some time. */
-void sleep(unsigned int sec) {
-	SDL_Delay(sec * 1000);
+void sleep(double sec) {
+	SDL_Delay((unsigned)(sec * 1000.));
 }
 
 /*================================threads=====================================*/
@@ -61,19 +65,170 @@ typedef struct Thread {
 	lua_State  *L;
 } Thread;
 
+static inline bool threadCmpFunc(const char *a, const char *b)
+{
+	return strcmp(a, b) == 0;
+}
+// 
+// typedef struct threadMessage {
+	// const char *message;
+	// lua_State  *L; 
+// } threadMessage;
+
+HASH_TEMPLATE(threadHash, const char *, listDouble *, jenkins_one_at_a_time_hash, threadCmpFunc)
+
+threadHash *threadArray = NULL;
+SDL_mutex *threadMutex = NULL;
+
 int Lua_Thread_create(void *data) 
 {
-	lua_State *L = luaL_newstate();
+	// Thread *t = (Thread*)data;
+	lua_State *L;
+	if(NULL == data)
+		return -1;
+	L = luaL_newstate();
 	luaL_openlibs(L);
 	int n = lua_gettop(L);
-	if (luaL_loadfile(L, (const char*)data) != 0) {
+	if (luaL_loadfile(L, (const char*)data) != 0)
+	{
+		dprintf_thread("cannot load lua file: %s\n", (const char*)data);
 		return lua_error(L);
 	}
+	dprintf_thread("created thread: %s (%p)\n", (const char*)data, L);
 	lua_call(L, 0, LUA_MULTRET);
 	lua_pop(L, lua_gettop(L) - n);
+	lua_close(L);
+	dprintf_thread("closed thread: %s (%p)\n", (const char*)data, L);
 	return 0;
 }
 
-void createThread(const char *file) {
-	SDL_CreateThread(Lua_Thread_create, (void*)file);
+bool newThread(const char *file) {
+	// Thread t;
+	// t.file = file;
+	SDL_Thread *t;
+	if(NULL == file)
+		return FALSE;
+	if(NULL == threadMutex)
+	{
+		threadMutex = SDL_CreateMutex();
+		if(NULL == threadMutex)
+		{
+			dprintf_thread("failed to create new thread mutex\n");
+			return FALSE;
+		}
+		else
+		{
+			dprintf_thread("created new thread mutex\n");
+		}
+	}
+	t = SDL_CreateThread(Lua_Thread_create, (void*)file);
+	if(NULL == t)
+	{
+		dprintf_thread("failed created new thread!\n");
+		return FALSE;
+	}
+	return TRUE;
+}
+
+void threadMutexLock() {
+	dprintf_threadvv("lock mutex\n");
+	SDL_mutexP(threadMutex);
+}
+
+void threadMutexUnlock() {
+	dprintf_threadvv("unlock mutex\n");
+	SDL_mutexV(threadMutex);
+}
+
+// void threadSend(listDouble *messageItem) {
+	// threadMutexLock();
+	// listPush(threadMessages, messageItem);
+	// threadMutexUnlock();
+// }
+
+void threadSendStr(const char *message, const char *queue) {
+	listDouble *messageItem = NULL;
+	listDouble *threadMessages = NULL;
+	if(NULL == message || NULL == queue)
+		return;
+	threadMutexLock();
+	if(NULL == threadArray)
+	{
+		threadArray = threadHash_new();
+		dprintf_thread("created new thread hashtable\n");
+	}
+	threadMessages = threadHash_get(threadArray, queue);
+	if(NULL == threadMessages)
+	{
+		new1(threadMessages, listDouble);
+		threadHash_set(threadArray, queue, threadMessages);
+		dprintf_thread("created new thread queue: %s\n", queue);
+	}
+	new1(messageItem, listDouble);
+	messageItem->data = (void *)(message);
+	listPush(threadMessages, messageItem);
+	dprintf_threadv("sent message to queue: %s\n", queue);
+	dprintf_threadvv("message: %s\n", message);
+	threadMutexUnlock();
+}
+
+// const char *threadRecv() {
+	// const char *message = NULL;
+	// listDouble *messageItem;
+	// if(NULL == threadMessages)
+	// {
+		// return NULL;
+	// }
+	// threadMutexLock();
+	// messageItem = listPop(threadMessages);
+	// threadMutexUnlock();
+	// if(messageItem)
+	// {
+		// message = (const char*)messageItem->data;
+	// }
+	// return message;
+// }
+
+const char *threadRecvStr(const char *queue) {
+	const char *message = NULL;
+	listDouble *messageItem;
+	listDouble *threadMessages = NULL;
+	if(NULL == queue)
+	{
+		dprintf_thread("empty queue, assign \"main\"\n");
+		queue = "main";
+	}
+	dprintf_threadvv("waiting for queue: %s\n", queue);
+	threadMutexLock();
+	if(NULL == threadArray)
+	{
+		dprintf_thread("hashtable isn't initialized yet, exitting (race condition)\n");
+		threadMutexUnlock();
+		return NULL;
+	}
+	threadMessages = threadHash_get(threadArray, queue);
+	if(NULL == threadMessages)
+	{
+		dprintf_thread("message queue '%s' not found in hashtable, exitting\n", queue);
+		threadMutexUnlock();
+		return NULL;
+	}
+	messageItem = listPop(threadMessages);
+	if(messageItem)
+	{
+		message = (const char*)messageItem->data;
+		delete(messageItem);
+		dprintf_threadvv("try to recieve message from queue: %s\n", queue);
+		if(message)
+		{
+			dprintf_threadv("recieved message from queue: %s\n", queue);
+			dprintf_threadvv("message contents: %s\n", message);
+		}
+	}
+	else
+	{
+		dprintf_threadv("message queue '%s' empty, exitting\n", queue);
+	}
+	threadMutexUnlock();
+	return message;
 }

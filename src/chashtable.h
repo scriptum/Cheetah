@@ -30,10 +30,15 @@ IN THE SOFTWARE.
 
 /* #define HASH_DEBUG */
 
-#ifdef HASH_DEBUG
+#ifdef HASH_DEBUGV
 	#define dprintf_chash(...) printf(__VA_ARGS__)
+	#define dprintf_chashv(...) printf(__VA_ARGS__)
+#elif defined HASH_DEBUG
+	#define dprintf_chash(...) printf(__VA_ARGS__)
+	#define dprintf_chashv(...)
 #else
 	#define dprintf_chash(...)
+	#define dprintf_chashv(...)
 #endif
 
 #ifndef HASH_START_SIZE
@@ -79,23 +84,24 @@ typedef struct hashName##Node {                                                \
 typedef struct {                                                               \
     unsigned          size;                                                    \
     unsigned          items;                                                   \
-    hashName##Node *nodes;                                                     \
+    hashName##Node   *nodes;                                                   \
 } hashName;                                                                    \
                                                                                \
 void hashName##_destroy(hashName *hash) {                                      \
-    if(hash->nodes)    free(hash->nodes);                                      \
-    if(hash)           free(hash);                                             \
+    if(hash && hash->nodes)    free(hash->nodes);                              \
+    if(hash)                   free(hash);                                     \
 }                                                                              \
                                                                                \
 hashName *hashName##_new_size(unsigned size) {                                 \
     hashName *hash = calloc(1, sizeof(hashName));                              \
-    if(NULL == hash) goto error;                                               \
+    if(NULL == hash)                                                           \
+        goto error;                                                            \
     hash->size     = size - 1;                                                 \
     hash->nodes    = calloc(hash->size + 1, sizeof(hashName##Node));           \
-    dprintf_chash("Hash %s created of size %u\n", #hashName, size);            \
+    dprintf_chash("%s: created new of size %u\n", #hashName, size);            \
     return hash;                                                               \
 error:                                                                         \
-    dprintf_chash("Hash %s error: cannot allocate memory\n", #hashName);       \
+    dprintf_chash("%s: error: cannot allocate memory\n", #hashName);           \
     hashName##_destroy(hash);                                                  \
     return NULL;                                                               \
 }                                                                              \
@@ -108,8 +114,9 @@ static inline bool hashName##_set(hashName *hash, keyType key, valType value); \
                                                                                \
 bool hashName##_rehash(hashName *hash) {                                       \
     hashName *newhash = hashName##_new_size((hash->size + 1) * 2);             \
-    if(NULL == newhash) return FALSE;                                          \
-    HASH_EACH(hash, hashName##_set(newhash,hashnode->key,hashnode->value);)    \
+    if(NULL == newhash)                                                        \
+        return FALSE;                                                          \
+    HASH_EACH(hash, hashName##_set(newhash, hashnode->key, hashnode->value);)  \
     free(hash->nodes);                                                         \
     hash->nodes = newhash->nodes;                                              \
     hash->size = newhash->size;                                                \
@@ -118,29 +125,33 @@ bool hashName##_rehash(hashName *hash) {                                       \
 }                                                                              \
                                                                                \
 static inline valType hashName##_get(hashName *hash, keyType key) {            \
-    _HASH_INDEX(hashFunc, _HASH_NODE.exists && !cmpFunc(_HASH_NODE.key,key))   \
+    _HASH_INDEX(hashFunc, _HASH_NODE.exists && !cmpFunc(_HASH_NODE.key, key))  \
     return _HASH_NODE.value;                                                   \
 }                                                                              \
                                                                                \
 static inline valType *hashName##_getptr(hashName *hash, keyType key) {        \
-    _HASH_INDEX(hashFunc, _HASH_NODE.exists && !cmpFunc(_HASH_NODE.key,key))   \
+    _HASH_INDEX(hashFunc, _HASH_NODE.exists && !cmpFunc(_HASH_NODE.key, key))  \
     return _HASH_NODE.exists ? &(_HASH_NODE.value) : NULL;                     \
 }                                                                              \
                                                                                \
 static inline bool hashName##_set(hashName *hash, keyType key, valType value) {\
     _HASH_INDEX(hashFunc, _HASH_NODE.exists)                                   \
     _HASH_NODE.key   = key;                                                    \
-    dprintf_chash("%s: insert key %5u using %4d probes\n",                     \
-                  #hashName, key, probes);                                     \
+    dprintf_chashv("%s: insert key using %4d probes\n",                        \
+                  #hashName, probes);                                          \
     _HASH_NODE.value = value;                                                  \
     _HASH_NODE.exists  = TRUE;                                                 \
     hash->items++;                                                             \
     /* rehash if space is limited */                                           \
-    if(hash->items > hash->size * HASH_REHASH_RATIO)                           \
+    if(hash->items > hash->size * HASH_REHASH_RATIO) {                         \
+        dprintf_chash("%s: free space is limited, needs rehash\n", #hashName); \
         return hashName##_rehash(hash);                                        \
+    }                                                                          \
     /* rehash if too much collisions */                                        \
-    if(probes > (hash->size >> 4) && hash->items > (hash->size / 3))           \
+    if(probes > (hash->size >> 4) && hash->items > (hash->size / 3)) {         \
+        dprintf_chash("%s: too much collisions, needs rehash\n", #hashName);   \
         return hashName##_rehash(hash);                                        \
+    }                                                                          \
     return TRUE;                                                               \
 }                                                                              \
                                                                                \

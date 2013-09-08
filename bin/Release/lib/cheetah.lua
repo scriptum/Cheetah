@@ -74,10 +74,10 @@ C.loadDLL = function(filename)
 		if C.fileExists(header) then
 			ffi.cdef(C.getFile(header))
 		end
-		print('Successfully loaded module: '..filename)
+		-- print('Successfully loaded module: '..filename)
 		return res
 	else
-		print('Error: cannot load module '..filename)
+		-- print('Error: cannot load module '..filename)
 		return nil
 	end
 end
@@ -126,6 +126,7 @@ C.mainLoop = function()
 			C.FPS = tostring(math.floor(FPS))
 		end
 	end
+	while C.poll() do end
 end
 
 C.quit = function()
@@ -138,13 +139,13 @@ end
 	--~ return C.newImage(name, opt)
 --~ end
 
---~ C.setColor = function(r,g,b,a)
-	--~ if type(r) == 'table' then
-		--~ libcheetah.color(r[1] or 255, r[2] or 255, r[3] or 255, r[4] or 255)
-	--~ else
-		--~ libcheetah.color(r or 255, g or 255, b or 255, a or 255)
-	--~ end
---~ end
+C.setColor = function(r,g,b,a)
+	if type(r) == 'table' then
+		libcheetah.color(r[1] or 255, r[2] or 255, r[3] or 255, r[4] or 255)
+	else
+		libcheetah.color(r or 255, g or 255, b or 255, a or 255)
+	end
+end
 
 C.getWindowSize = function()
 	return libcheetah.getWindowWidth(), libcheetah.getWindowHeight()
@@ -154,7 +155,7 @@ C.poll = function()
 	local e = lua_events[libcheetah.getEventType()]
 	local a, b, c
 	if e == 'q' then
-		done = true
+		C.quit()
 	elseif e == 'kp' or e == 'kr' then
 		a = libcheetah.getEventKey()
 		a, b = lua_keys[a] or 'key_' .. a, libcheetah.getEventKeyUnicode()
@@ -495,6 +496,7 @@ ffi.metatype('Font', {
 		getInterval = libcheetah.fontGetInterval,
 		getScale = libcheetah.fontGetScale,
 		getHeight = libcheetah.fontHeight,
+		getLineHeight = libcheetah.fontLineHeight,
 		getStringWidth = libcheetah.fontWidth,
 		enableKerning = function(font) font._kerning = true end,
 		disableKerning = function(font) font._kerning = false end,
@@ -712,6 +714,23 @@ ffi.metatype('ParticleSystem', {
 	},
 	__gc = libcheetah.deleteParticleSystem
 })
+
+--------------------------------------------------------------------------------
+--                                   THREADS                                  --
+--------------------------------------------------------------------------------
+
+C.threadSend = function(message, queue)
+	libcheetah.threadSendStr(message, queue or "main")
+end
+
+C.threadRecv = function(queue)
+	local mess = libcheetah.threadRecvStr(queue or "main")
+	if(tonumber(ffi.cast('intptr_t', (ffi.cast('void *', mess)))) ~= 0) then
+		return ffi.string(mess)
+	else
+		return nil
+	end
+end
 
 --------------------------------------------------------------------------------
 --                                  SHADERS                                   --

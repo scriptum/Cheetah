@@ -1,7 +1,7 @@
 TARGET := libcheetah.so
 CFLAGS += -pipe -fPIC
 
-EXTRA_WARNINGS = -Wall -Wextra -Wno-unused-parameter -Wmissing-include-dirs -Wuninitialized -Wstrict-overflow -Wshadow -Wbad-function-cast -Wcast-qual -Wconversion
+EXTRA_WARNINGS = -Wall -Wextra -Wno-unused-parameter -Wmissing-include-dirs -Wuninitialized -Wstrict-overflow -Wshadow -Wbad-function-cast -Wconversion
 
 LDFLAGS += -shared -L"../lib" -lSDL -lGL
 INCLUDES := -I"../inc"

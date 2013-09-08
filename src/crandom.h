@@ -27,6 +27,7 @@ IN THE SOFTWARE.
 #include <stdint.h>
 #include <string.h>
 
+#include "chashfunc.h"
 /**
  * Set of some xorshift RNG's. They are all fast as hell, period differs only.
  * http://en.wikipedia.org/wiki/Xorshift
@@ -42,17 +43,6 @@ typedef struct xor_state {
 } xor_state;
 
 static xor_state _xor_ = {123456789, 362436069, 521288629, 88675123, 5783321, 6615241};
-
-static inline uint32_t hash_uint32(uint32_t hash)
-{
-	hash += ~(hash << 15);
-	hash ^=   hash >> 10;
-	hash +=   hash << 3;
-	hash ^=   hash >> 6;
-	hash += ~(hash << 11);
-	hash ^=   hash >> 16;
-	return hash;
-}
 
 static inline xor_state *random_get_state()
 {

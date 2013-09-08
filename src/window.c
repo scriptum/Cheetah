@@ -134,11 +134,11 @@ bool cheetahInit(const char *appName, const char *options) {
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_TEXTURE_2D);
 		//~ glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-		resLoaderInit(resloader);
-		if(TRUE == resloader)
-		{
-			SDL_CreateThread(resLoaderThread, (void *)NULL);
-		}
+		// if(TRUE == resloader)
+		// {
+			// resLoaderInit(resloader);
+			// SDL_CreateThread(resLoaderThread, (void *)NULL);
+		// }
 		glGenTextures(1, &null_texture);
 		glBindTexture(GL_TEXTURE_2D, null_texture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, "\0\0\0\0");

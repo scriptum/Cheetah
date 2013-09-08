@@ -35,10 +35,10 @@ IN THE SOFTWARE.
 typedef unsigned char bool;
 
 // #include "../src/cheetah.h"
-#include "../src/macros.h"
+#include "../src/cmacros.h"
 // #include "render.h"
 // #include "vertex.h"
-#include "../src/chash.h"
+#include "../src/chashtable.h"
 // #include "test.h"
 #ifndef TRUE
 #define TRUE	(bool) 1
@@ -159,26 +159,26 @@ static inline unsigned kerningCmpFunc(KerningPair a, KerningPair b)
 HASH_TEMPLATE(KernHash, KerningPair, float, kerningHashFunc, kerningCmpFunc)
 
 #ifndef TEST_NOUNICODE
-	#define UNICODE_TO_INT(a, i)                                                   \
-	if((a[i] & 0b10000000) == 0) {                                                 \
-	    c  =  a[i++];                                                              \
-	}                                                                              \
-	else if ((a[i]   & 0b11100000) == 0b11000000) {                                \
-	    c =  (a[i++] & 0b00011111) << 6;                                           \
-	    c |=  a[i++] & 0b00111111;                                                 \
-	}                                                                              \
-	else if ((a[i]   & 0b11110000) == 0b11100000) {                                \
-	    c =  (a[i++] & 0b00001111) << 12;                                          \
-	    c |= (a[i++] & 0b00111111) << 6;                                           \
-	    c |=  a[i++] & 0b00111111;                                                 \
-	}                                                                              \
-	else if ((a[i]   & 0b11111000) == 0b11110000) {                                \
-	    c =  (a[i++] & 0b00000111) << 18;                                          \
-	    c |= (a[i++] & 0b00111111) << 12;                                          \
-	    c |= (a[i++] & 0b00111111) << 6;                                           \
-	    c |=  a[i++] & 0b00111111;                                                 \
-	} else {                                                                       \
-	    c = 0;                                                                     \
+	#define UNICODE_TO_INT(a, i)                                           \
+	if((a[i] & 0b10000000) == 0) {                                         \
+	    c  =  a[i++];                                                      \
+	}                                                                      \
+	else if ((a[i]   & 0b11100000) == 0b11000000) {                        \
+	    c =  (a[i++] & 0b00011111) << 6;                                   \
+	    c |=  a[i++] & 0b00111111;                                         \
+	}                                                                      \
+	else if ((a[i]   & 0b11110000) == 0b11100000) {                        \
+	    c =  (a[i++] & 0b00001111) << 12;                                  \
+	    c |= (a[i++] & 0b00111111) << 6;                                   \
+	    c |=  a[i++] & 0b00111111;                                         \
+	}                                                                      \
+	else if ((a[i]   & 0b11111000) == 0b11110000) {                        \
+	    c =  (a[i++] & 0b00000111) << 18;                                  \
+	    c |= (a[i++] & 0b00111111) << 12;                                  \
+	    c |= (a[i++] & 0b00111111) << 6;                                   \
+	    c |=  a[i++] & 0b00111111;                                         \
+	} else {                                                               \
+	    c = 0;                                                             \
 	}
 #else
 	#define UNICODE_TO_INT(a, i) c=a[i]; i++;
@@ -226,7 +226,7 @@ HASH_TEMPLATE(KernHash, KerningPair, float, kerningHashFunc, kerningCmpFunc)
 	while(0)
 #endif
 
-#define KERNING_CONDITION if(NULL != currentFont->kerningHash && fontPrevChar && fontPrevChar->kerning)
+#define KERNING_CONDITION if(unlikely(NULL != currentFont->kerningHash && fontPrevChar && fontPrevChar->kerning))
 // #define KERNING_CONDITION if(TRUE == currentFont->_kerning)
 
 void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align) {
@@ -269,31 +269,33 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 		{
 			j = i;
 			UNICODE_TO_INT(str, i)
-			switch(c)
+			if(unlikely(c == '\0'))
 			{
-				case ' ':
-					last_space = j;
-					lastw = width;
-					spaces++;
-					width += spacew;
-					break;
-				case '\t':
-					width += spacew * 8;
-					last_space = j;
-					lastw = width;
-					break;
-				case '\0':
-					end = TRUE;
-					break;
-				default:
-					#ifndef TEST_NOHASHPTR
-					ch = FontHash_get(hash, c);
-					#else
-					ch = FontHash_getptr(hash, c);
-					#endif
-					if(NULL == ch)
-						continue;
-					width += ch->w;
+				end = TRUE;
+			}
+			else if(unlikely(c == '\t'))
+			{
+				width += spacew * 8;
+				last_space = j;
+				lastw = width;
+			}
+			else if(unlikely(c == ' '))
+			{
+				last_space = j;
+				lastw = width;
+				spaces++;
+				width += spacew;
+			}
+			else
+			{
+				#ifndef TEST_NOHASHPTR
+				ch = FontHash_get(hash, c);
+				#else
+				ch = FontHash_getptr(hash, c);
+				#endif
+				if(unlikely(NULL == ch))
+					continue;
+				width += ch->w;
 			}
 			/* drop invisible lines - great performance improvement for long texts */
 			yOutScreen = (y + oldy + fontHeight) * currentFont->_scale >= 0.0f;
@@ -306,11 +308,11 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 				}
 			prevChar = c;
 			fontPrevChar = ch;
-			if(width > maxw || '\n' == c || TRUE == end)
+			if(unlikely(width > maxw || '\n' == c || TRUE == end))
 			{
 				prevChar = 0;
 				fontPrevChar = NULL;
-				if(0 == last_space || '\n' == c || TRUE == end)
+				if(unlikely(0 == last_space || '\n' == c || TRUE == end))
 				{
 					last_space = j;
 					lastw = width;
@@ -318,7 +320,7 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 				if(buf == last_space)
 					last_space++;
 				/* dropping invisible lines from top */
-				if(yOutScreen)
+				if(unlikely(yOutScreen))
 				{
 					switch(align)
 					{
@@ -351,24 +353,25 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 								kerningAccumulator -= kerning;
 						}
 						ch = NULL;
-						switch(c)
+						if(unlikely(c == '\t'))
 						{
-							case ' ':
-								x += justifyWidth + kerningAccumulator;
-								kerningAccumulator = 0.0;
-								break;
-							case '\t':
-								x += spacew * 8;
-								break;
-							default:
-								#ifndef TEST_NOHASHPTR
-								ch = FontHash_get(hash, c);
-								#else
-								ch = FontHash_getptr(hash, c);
-								#endif
-								if(NULL == ch)
-									continue;
-								DRAW_CHAR;
+							x += spacew * 8;
+						}
+						else if(unlikely(c == ' '))
+						{
+							x += justifyWidth + kerningAccumulator;
+							kerningAccumulator = 0.0;
+						}
+						else
+						{
+							#ifndef TEST_NOHASHPTR
+							ch = FontHash_get(hash, c);
+							#else
+							ch = FontHash_getptr(hash, c);
+							#endif
+							if(NULL == ch)
+								continue;
+							DRAW_CHAR;
 						}
 						prevChar = c;
 						fontPrevChar = ch;
@@ -376,20 +379,18 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 				}
 				else
 					buf = last_space;
-				if(TRUE == end)
+				if(unlikely(TRUE == end))
 					break;
 				y += fontHeight;
 
 				h = FONT_CEIL(currentFont, y);
-				switch(str[buf])
+				if(unlikely(str[buf] == '\n' || str[buf] == '\t' || str[buf] == ' '))
 				{
-					case ' ':
-					case '\t':
-					case '\n':
-						i = buf = last_space + 1;
-						break;
-					default:
-						i = buf = last_space;
+					i = buf = last_space + 1;
+				}
+				else
+				{
+					i = buf = last_space;
 				}
 				last_space = 0;
 				width = 0;
@@ -397,7 +398,6 @@ void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, f
 				prevChar = 0;
 				fontPrevChar = NULL;
 			}
-
 		}
 	}
 	else
