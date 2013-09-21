@@ -262,6 +262,14 @@ void colord(double r, double g, double b, double a) {
 	COLOR_BODY
 }
 
+void colorC(Color C) {
+	unsigned char r = C.r;
+	unsigned char g = C.g;
+	unsigned char b = C.b;
+	unsigned char a = C.a;
+	COLOR_BODY
+}
+
 void clearColor(float r, float g, float b, float a) {
 	glClearColor(r,g,b,a);
 }
