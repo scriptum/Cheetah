@@ -28,6 +28,10 @@ $(THIRDPARTY_TARGETS): %.o: %.c $(HEADERS)
 	@echo "Building $<";\
 	$(CC) $(CFLAGS) $(EXTRA_WARNINGS) $(INCLUDES) -o "$@" -c "$<"
 
+check:
+	@echo "Checking project...";\
+	cppcheck -q $(SOURCES) $(THIRDPARTY_SOURCES)
+
 clean :
 	@echo "Cleaning...";\
 	rm -f $(OBJECTS) $(THIRDPARTY_TARGETS)
