@@ -126,7 +126,7 @@ C.mainLoop = function()
 			C.FPS = tostring(math.floor(FPS))
 		end
 	end
-	while C.poll() do end
+	--while C.poll() do end
 end
 
 C.quit = function()
