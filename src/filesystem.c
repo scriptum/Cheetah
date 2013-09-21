@@ -50,7 +50,8 @@ bool isPointer(void * ptr) {
 unsigned char *loadfile(const char *filename, long *length) {
 	unsigned char *result = NULL;
 	long size = 0;
-	FILE *file = fopen(filename, "rb");
+	FILE *file = NULL;
+	file = fopen(filename, "rb");
 	ERROR_IF_NULL(file);
 	fseek(file, 0, SEEK_END);
 	size = ftell(file);
@@ -64,6 +65,7 @@ unsigned char *loadfile(const char *filename, long *length) {
 	fclose(file);
 	return result;
 error:
+	if(file) fclose(file);
 	delete(result);
 	myError("can't load file %s", filename);
 	return NULL;
