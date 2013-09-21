@@ -178,7 +178,7 @@ bool cheetahInit(const char *appName, const char *options) {
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		#ifdef COLOR_ARRAYS
-		new(colorArray, unsigned char, 64 * VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
+		new(colorArray, unsigned char, 2 * VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
 		glEnableClientState(GL_COLOR_ARRAY);
 		#endif
 		/* fix vertex pointers to main memory area */
