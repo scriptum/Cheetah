@@ -574,7 +574,7 @@ void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, 
 void deleteImage(Image * ptr) {
 	//~ printf("%d\n", same_type_p(typeof(ptr)) == INTEGER_TYPE);
 	#ifdef MEMORY_TEST
-		printf("Freeing Image %d\n", ptr->id);
+		printf("Freeing Image %d\n", ptr ? ptr->id : 0);
 	#endif
 	if(ptr && ptr->id > 1)
 		glDeleteTextures(1, &ptr->id);
