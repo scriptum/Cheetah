@@ -21,8 +21,8 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-#ifndef __DEBUG_H__
-#define __DEBUG_H__
+#ifndef DEBUG_H_
+#define DEBUG_H_
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -125,4 +125,4 @@ IN THE SOFTWARE.
 #define varf(v) printf(DEBUG_MSG_FORMAT " %s = %f\n", LOCATION, #v, v);
 
 
-#endif /*__DEBUG_H__*/
+#endif /* DEBUG_H_ */

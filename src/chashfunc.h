@@ -21,11 +21,15 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-#include <stdint.h>
 
 /*
  * Hash functions collection
  * */
+
+#ifndef HASHFUNC_H_
+#define HASHFUNC_H_
+
+#include <stdint.h>
 
 static inline uint32_t jenkins_one_at_a_time_hash(const char *key)
 {
@@ -54,3 +58,5 @@ static inline uint32_t hash_uint32(uint32_t hash)
 	hash ^=   hash >> 16;
 	return hash;
 }
+
+#endif /* HASHFUNC_H_ */

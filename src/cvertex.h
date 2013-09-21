@@ -21,8 +21,8 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-#ifndef __VERTEX_H__
-#define __VERTEX_H__
+#ifndef VERTEX_H_
+#define VERTEX_H_
 
 #include <math.h>
 #include <SDL_opengl.h>
@@ -36,15 +36,15 @@ extern float *vertexCoord;
 
 #ifdef COLOR_ARRAYS
 extern unsigned char *colorArray;
-extern unsigned colorArrayBuf[4];
+extern unsigned colorArrayBuf[VERTICLES_PER_SPRITE];
 
-#define _DO_COLOR memcpy(colorArray + 2*vertexCounter, colorArrayBuf, 4*4);
+#define _DO_COLOR memcpy(colorArray + 2*vertexCounter, colorArrayBuf, VERTICLES_PER_SPRITE * 2);
 
-// #define _DO_COLOR                                                              \
-// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 0))) = colorArrayBuf[0];    \
-// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 1))) = colorArrayBuf[1];    \
-// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 2))) = colorArrayBuf[2];    \
-// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 3))) = colorArrayBuf[3];
+/* #define _DO_COLOR                                                              \
+ *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 0))) = colorArrayBuf[0];    \
+ *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 1))) = colorArrayBuf[1];    \
+ *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 2))) = colorArrayBuf[2];    \
+ *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 3))) = colorArrayBuf[3];*/
 
 #else
 #define _DO_COLOR
@@ -92,7 +92,6 @@ extern unsigned colorArrayBuf[4];
 
 #ifdef GL_QUADS
 /******************************DRAW USING QUADS********************************/
-#define VERTICLES_PER_SPRITE 4 * 2
 
 /**
  * Flushing buffer accumulator. It doesn't send glFlush() or glFinish, it just
@@ -152,8 +151,8 @@ static inline void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, f
 }
 
 #else
+
 /****************************DRAW USING TRIANGLES******************************/
-#define VERTICLES_PER_SPRITE 6 * 2
 
 #define FLUSH_BUFFER() do {                                                    \
     if(likely(vertexCounter)) {                                                \
@@ -213,5 +212,5 @@ static inline void PUSH_QUAD(float vx, float vy, float vw, float vh, float a, fl
 	PUSH_QUAD_TEXTURE(vx, vy, vw, vh, a, ox, oy, DEFAULT_QUAD_TEX);
 }
 
-#endif
+#endif /* VERTEX_H_ */
 

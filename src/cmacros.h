@@ -21,10 +21,12 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-#ifndef __MACROS_H__
-#define __MACROS_H__
+#ifndef MACROS_H_
+#define MACROS_H_
 
 #include <stdlib.h>
+#include <string.h>
+#include "cheetah.h"
 #include "cdebug.h"
 
 /********************************OPTIMIZATIONS*********************************/
@@ -59,7 +61,7 @@ IN THE SOFTWARE.
 } while(0)
 
 #define new1(var, type) do {                                                   \
-	new(var, type, 1);                                                     \
+    new(var, type, 1);                                                         \
 } while(0)
 
 #define renew(var, type, size) do {                                            \
@@ -75,8 +77,8 @@ IN THE SOFTWARE.
 
 #define delete(var) do {                                                       \
     if(likely(NULL != var)) {                                                  \
-        free(var);                                                             \
         dprintf_mem("Removed: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var);\
+        free(var);                                                             \
         var = NULL;                                                            \
     }                                                                          \
 } while(0)
@@ -116,20 +118,19 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);                  \
 
 /********************************OPTIONS CHECKER*******************************/
 
-#define CHECK_OPTION(options, o)                                               \
-bool o = 0;                                                                    \
-do {                                                                           \
-    typeof(options) _o_ = strstr(options, #o);                                 \
-    size_t _l_ = (size_t)strlen(#o);                                           \
-    /* check bounds */                                                         \
-    if(NULL != _o_ &&                                                          \
-      (' '== *(_o_ + _l_) || '\0' == *(_o_ + _l_)) &&                          \
-      (' '== *(_o_ -  1 ) || '\0' == *(_o_ -  1 )))                            \
-    {                                                                          \
-        /* this is not mistype! */                                             \
-        o = 1;                                                                 \
-    }                                                                          \
-} while(0)
+static inline bool check_option_helper(const char *options, const char *o)
+{
+	char *name = strstr(options, o);
+	size_t l = strlen(o);
+	/* check bounds */
+	if(NULL != name &&
+	  (' '== *(name + l) || '\0' == *(name + l)) &&
+	  (' '== *(name - 1) || '\0' == *(name - 1)))
+		return TRUE;
+	return FALSE;
+}
+
+#define CHECK_OPTION(options, o) bool o = check_option_helper(options, #o)
 
 /********************************ERROR CHECKING********************************/
 
@@ -153,4 +154,4 @@ bool isInit();
     }                                                                          \
 } while(0)
 
-#endif /*__MACROS_H__*/
+#endif /*MACROS_H_*/

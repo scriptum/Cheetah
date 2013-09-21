@@ -21,8 +21,8 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-#ifndef __RANDOM_H__
-#define __RANDOM_H__
+#ifndef RANDOM_H_
+#define RANDOM_H_
 
 #include <stdint.h>
 #include <string.h>
@@ -184,4 +184,4 @@ static inline float randf2(uint32_t random_integer)
 	return u.f - 3.f;
 }
 
-#endif /*__RANDOM_H__*/
+#endif /* RANDOM_H_ */

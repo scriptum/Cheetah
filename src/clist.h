@@ -21,6 +21,9 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
+#ifndef LIST_H_
+#define LIST_H_
+
 typedef struct listSingle {
 	void *data;
 	struct listSingle *next;
@@ -67,3 +70,5 @@ static inline listDouble *listPop(listDouble *head)
 	head->prev = head->prev->prev;
 	return ret;
 }
+
+#endif /* LIST_H_ */

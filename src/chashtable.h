@@ -25,8 +25,8 @@ IN THE SOFTWARE.
  * Hash arrays for C.
  * */
 
-#ifndef __CHASH_H__
-#define __CHASH_H__
+#ifndef HASHTABLE_H_
+#define HASHTABLE_H_
 
 /* #define HASH_DEBUG */
 
@@ -163,4 +163,4 @@ static inline unsigned hashName##_size(hashName *hash) {                       \
     return hash->size + 1;                                                     \
 }
 
-#endif /*__CHASH_H__*/
+#endif /* HASHTABLE_H_ */

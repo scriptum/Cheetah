@@ -23,5 +23,16 @@ IN THE SOFTWARE.
 
 /* Some Cheetah's tuning values */
 
+#ifndef CONFIG_H_
+#define CONFIG_H_
+
 /* Limit to virtual vertex buffer, after this limit engine flushes verticles */
 #define VERTEX_BUFFER_LIMIT 4096 /* 4096 verticles (=256 Kb) */
+
+#ifdef GL_QUADS
+/******************************DRAW USING QUADS********************************/
+#define VERTICLES_PER_SPRITE 4 * 2
+#else
+#define VERTICLES_PER_SPRITE 6 * 2
+#endif
+#endif /* CONFIG_H_ */

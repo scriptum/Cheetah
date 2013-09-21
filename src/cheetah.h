@@ -21,8 +21,8 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-#ifndef __CHEETAH_H__
-#define __CHEETAH_H__
+#ifndef CHEETAH_H_
+#define CHEETAH_H_
 
 #define COLOR_ARRAYS
 
@@ -319,4 +319,4 @@ struct {
 #define FALSE	(bool) 0
 #endif
 
-#endif /*__CHEETAH_H__*/
+#endif /* CHEETAH_H_ */
