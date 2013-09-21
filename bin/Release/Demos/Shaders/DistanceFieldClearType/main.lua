@@ -11,7 +11,7 @@ C.clearColor(1,1,1,1)
 local textarea = E:new(screen)
 :set({
 	fontScale = 0.5, --50% font scale (21/2=10pt)
-	gamma = 0.4,     --gamma for Distance Field
+	gamma = 0.5,     --gamma for Distance Field
 	sharpness = 0.15 --sharpness of DF antialiasing
 }):size(C.getWindowWidth(),C.getWindowHeight())
 :draw(function(s)
