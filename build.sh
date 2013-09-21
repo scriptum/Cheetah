@@ -59,8 +59,7 @@ fi
 
 if [ "$2" == "release" -o "$2" == "final" ]
 then
-	#add extra flags for gcc
-	FLAGS="$FLAGS_OPTIMIZE -Winline -Wdisabled-optimization"
+	FLAGS="$FLAGS_OPTIMIZE"
 else
 	if [ "$2" == "debug" ]
 	then
