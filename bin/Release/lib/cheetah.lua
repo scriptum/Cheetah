@@ -108,13 +108,18 @@ C.printFPS = false
 time = 0
 systemTime = 0
 local lastFpsTime = 0
+
+
 C.mainLoop = function()
 	assert(libcheetah.isInit(), 'You forgot about cheetah.init')
 	while done == false do
 		time = libcheetah.getGameTime()
 		systemTime = libcheetah.getTime()
 		libcheetah.prepare()
-		if C.render then C.render() end
+		if C.render then
+			local ret, err = xpcall(C.render, debug.traceback)
+			if err then io.stderr:write(err ,"\n") end
+		end
 		libcheetah.swapBuffers()
 		FPS = (FPS + 1) / (1 + (libcheetah.getTime() - systemTime));
 		if systemTime - lastFpsTime > 0.5 then
