@@ -46,7 +46,12 @@ bool isPointer(void * ptr) {
 	return ptr != NULL;
 }
 
-
+/**
+ * Loads whole file into C-string.
+ * @param filename file to read
+ * @param length resulting string length
+ * @return newly allocated string, caller should free
+ * */
 unsigned char *loadfile(const char *filename, long *length) {
 	unsigned char *result = NULL;
 	long size = 0;
@@ -54,14 +59,19 @@ unsigned char *loadfile(const char *filename, long *length) {
 	file = fopen(filename, "rb");
 	ERROR_IF_NULL(file);
 	fseek(file, 0, SEEK_END);
+	if(fseek(file, 0, SEEK_END) != 0)
+		goto error;
 	size = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	new(result, unsigned char, size);
+	if(size < 0)
+		goto error;
+	rewind(file);
+	new(result, unsigned char, size + 1);
 	if (size != (long)fread(result, sizeof(unsigned char), (size_t)size, file)) {
 		goto error;
 	}
 	if (length)
 		*length = size;
+	result[size] = '\0';
 	fclose(file);
 	return result;
 error:
@@ -97,7 +107,7 @@ filetime(m)
 filetime(a)
 filetime(c)
 
-#ifdef false
+#if 0
 long int fileatime(const char * filename) {
 long int filemtime(const char * filename) {
 long int filectime(const char * filename) {
