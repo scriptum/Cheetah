@@ -36,15 +36,20 @@ extern float *vertexCoord;
 
 #ifdef COLOR_ARRAYS
 extern unsigned char *colorArray;
-extern unsigned colorArrayBuf[VERTICLES_PER_SPRITE / 2];
+extern unsigned colorArrayBuf[4];
 
-#define _DO_COLOR memcpy(colorArray + 2*vertexCounter, colorArrayBuf, VERTICLES_PER_SPRITE * 2);
+#ifdef GL_QUADS
+	#define _DO_COLOR memcpy(colorArray + 2*vertexCounter, colorArrayBuf, VERTICLES_PER_SPRITE * 2);
+#else
+	#define _DO_COLOR                                                      \
+ *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 5))) =                     \
+ *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 0))) = colorArrayBuf[0];   \
+ *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 1))) = colorArrayBuf[1];   \
+ *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 6))) =                     \
+ *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 2))) = colorArrayBuf[2];   \
+ *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 3))) = colorArrayBuf[3];
 
-/* #define _DO_COLOR                                                              \
- *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 0))) = colorArrayBuf[0];    \
- *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 1))) = colorArrayBuf[1];    \
- *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 2))) = colorArrayBuf[2];    \
- *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 3))) = colorArrayBuf[3];*/
+#endif
 
 #else
 #define _DO_COLOR

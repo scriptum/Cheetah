@@ -29,6 +29,8 @@ IN THE SOFTWARE.
 /* Limit to virtual vertex buffer, after this limit engine flushes verticles */
 #define VERTEX_BUFFER_LIMIT 4096 /* 4096 verticles (=256 Kb) */
 
+// #undef GL_QUADS
+
 #ifdef GL_QUADS
 /******************************DRAW USING QUADS********************************/
 #define VERTICLES_PER_SPRITE 4 * 2
