@@ -36,7 +36,7 @@ extern float *vertexCoord;
 
 #ifdef COLOR_ARRAYS
 extern unsigned char *colorArray;
-extern unsigned colorArrayBuf[VERTICLES_PER_SPRITE];
+extern unsigned colorArrayBuf[VERTICLES_PER_SPRITE / 2];
 
 #define _DO_COLOR memcpy(colorArray + 2*vertexCounter, colorArrayBuf, VERTICLES_PER_SPRITE * 2);
 
