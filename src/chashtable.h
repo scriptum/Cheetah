@@ -88,8 +88,8 @@ typedef struct {                                                               \
 } hashName;                                                                    \
                                                                                \
 void hashName##_destroy(hashName *hash) {                                      \
-    if(hash && hash->nodes)    free(hash->nodes);                              \
-    if(hash)                   free(hash);                                     \
+    if(hash) free(hash->nodes);                                                \
+    free(hash);                                                                \
 }                                                                              \
                                                                                \
 hashName *hashName##_new_size(unsigned size) {                                 \
@@ -106,13 +106,15 @@ error:                                                                         \
     return NULL;                                                               \
 }                                                                              \
                                                                                \
-hashName *hashName##_new() {                                                   \
+hashName *hashName##_new(void) {                                               \
     return hashName##_new_size(HASH_START_SIZE);                               \
 }                                                                              \
                                                                                \
 static inline bool hashName##_set(hashName *hash, keyType key, valType value); \
                                                                                \
 bool hashName##_rehash(hashName *hash) {                                       \
+    if(NULL == hash)                                                           \
+        return FALSE;                                                          \
     hashName *newhash = hashName##_new_size((hash->size + 1) * 2);             \
     if(NULL == newhash)                                                        \
         return FALSE;                                                          \
@@ -156,10 +158,14 @@ static inline bool hashName##_set(hashName *hash, keyType key, valType value) {\
 }                                                                              \
                                                                                \
 static inline unsigned hashName##_length(hashName *hash) {                     \
+    if(NULL == hash)                                                           \
+        return 0;                                                              \
     return hash->items;                                                        \
 }                                                                              \
                                                                                \
 static inline unsigned hashName##_size(hashName *hash) {                       \
+    if(NULL == hash)                                                           \
+        return 0;                                                              \
     return hash->size + 1;                                                     \
 }
 

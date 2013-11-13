@@ -35,17 +35,17 @@ IN THE SOFTWARE.
 #include "chashtable.h"
 
 /* Get the number of milliseconds past from the execution time. Equivalent to SDL_GetTicks(); */
-unsigned int getTicks() {
+unsigned int getTicks(void) {
 	return SDL_GetTicks();
 }
 
 /* Get the time in seconds past from the execution time. This time may change its speed! */
-double getGameTime() {
+double getGameTime(void) {
 	return globalTimers.gameTimed;
 }
 
 /* Get the time in seconds past from the execution time. Returns system's (without game speed). */
-double getTime() {
+double getTime(void) {
 	return globalTimers.timed;
 }
 
@@ -130,12 +130,12 @@ bool newThread(const char *file) {
 	return TRUE;
 }
 
-void threadMutexLock() {
+void threadMutexLock(void) {
 	dprintf_threadvv("lock mutex\n");
 	SDL_mutexP(threadMutex);
 }
 
-void threadMutexUnlock() {
+void threadMutexUnlock(void) {
 	dprintf_threadvv("unlock mutex\n");
 	SDL_mutexV(threadMutex);
 }
@@ -172,7 +172,7 @@ void threadSendStr(const char *message, const char *queue) {
 	threadMutexUnlock();
 }
 
-// const char *threadRecv() {
+// const char *threadRecv(void) {
 	// const char *message = NULL;
 	// listDouble *messageItem;
 	// if(NULL == threadMessages)

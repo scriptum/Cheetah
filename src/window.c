@@ -42,9 +42,9 @@ SDL_Surface *screen = NULL;
 bool clearScreenFlag = 1;
 
 int resLoaderThread(void *unused);
-void initRenderer();
+void initRenderer(void);
 void resLoaderInit(bool resloader);
-extern void resLoaderMainThread();
+extern void resLoaderMainThread(void);
 
 void resetView(int w, int h)
 {
@@ -56,12 +56,14 @@ void resetView(int w, int h)
 	glLoadIdentity();
 }
 
-void resetViewDefault()
+void resetViewDefault(void)
 {
+	RETURN_IF_NULL(screen);
 	resetView(screen->w, screen->h);
 }
 
 void setWindowSize(int w, int h) {
+	RETURN_IF_NULL(screen);
 	screen->w = w;
 	screen->h = h;
 }
@@ -71,7 +73,7 @@ bool cheetahInit(const char *appName, const char *options) {
 	unsigned flags = SDL_OPENGL | SDL_DOUBLEBUF;
 	bool firstrun = FALSE;
 	int width = 800, height = 600;
-	int count = sscanf(options, "%dx%d", &width, &height);
+	int count = sscanf(options, "%11dx%11d", &width, &height);
 	if(1 == count) height = width;
 	if(width <= 0)
 		width = 800;
@@ -199,7 +201,7 @@ bool cheetahInit(const char *appName, const char *options) {
  * @group graphics/window
  * @return true if screen was initialized
  * */
-bool isInit() {
+bool isInit(void) {
 	return screen != NULL;
 }
 
@@ -209,7 +211,8 @@ bool isInit() {
  * @return width of the window
  * @see getWindowHeight
  * */
-int getWindowWidth() {
+int getWindowWidth(void) {
+	RETURN_VALUE_IF_NULL(screen, 0);
 	return screen->w;
 }
 
@@ -219,7 +222,8 @@ int getWindowWidth() {
  * @return height of the window
  * @see getWindowWidth
  * */
-int getWindowHeight() {
+int getWindowHeight(void) {
+	RETURN_VALUE_IF_NULL(screen, 0);
 	return screen->h;
 }
 
@@ -228,7 +232,7 @@ int getWindowHeight() {
  * @group graphics/window
  * @advanced
  * */
-void swapBuffers() {
+void swapBuffers(void) {
 	FLUSH_BUFFER();
 	SDL_GL_SwapBuffers();
 }
@@ -249,7 +253,7 @@ void setTitle(const char * text) {
  * @return array of pointers to SDL_Rect structure.
  * @advanced
  * */
-SDL_Rect **getModesSDL() {
+SDL_Rect **getModesSDL(void) {
 	NEEDED_INIT;
 	SDL_Rect **modes = SDL_ListModes(0, SDL_OPENGL | SDL_FULLSCREEN);
 	if(modes == (SDL_Rect **)0 || modes == (SDL_Rect **)-1)
@@ -276,7 +280,7 @@ void autoScale(bool enableAutoScale) {
 	screenScale.autoScale = enableAutoScale;
 }
 
-static void doAutoScale()
+static void doAutoScale(void)
 {
 	if(screenScale.autoScale)
 	{
@@ -286,7 +290,7 @@ static void doAutoScale()
 	}
 }
 
-void prepare() {
+void prepare(void) {
 	unsigned int delta = globalTimers.time;
 	globalTimers.time = SDL_GetTicks();
 	delta = globalTimers.time - delta;

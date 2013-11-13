@@ -39,8 +39,8 @@ void main()\
 	TexCoord = gl_MultiTexCoord0.xy;\
 }";
 
-Shader * initShader() {
-	Shader * ptr = NULL;
+Shader * initShader(void) {
+	Shader *ptr = NULL;
 	new(ptr, Shader, 1);
 	return ptr;
 }

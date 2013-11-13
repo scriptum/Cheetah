@@ -40,7 +40,7 @@ static inline void bindFramebuffer(unsigned id)
 	glBindFramebuffer_(GL_FRAMEBUFFER_EXT, id);
 }
 
-static bool checkFramebufferStatus()
+static bool checkFramebufferStatus(void)
 {
 	GLenum status;
 	status = (GLenum)glCheckFramebufferStatus_(GL_FRAMEBUFFER_EXT);

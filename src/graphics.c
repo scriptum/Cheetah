@@ -31,8 +31,8 @@ IN THE SOFTWARE.
 
 #include "SDL_byteorder.h"
 
-extern void resLoaderMainThread();
-int getWindowHeight();
+extern void resLoaderMainThread(void);
+int getWindowHeight(void);
 
 unsigned prevColor = 0xffffffff;
 
@@ -57,47 +57,47 @@ unsigned char *colorArray;
 unsigned colorArrayBuf[4] = {0xffffffff,0xffffffff,0xffffffff,0xffffffff};
 #endif
 
-static void flushBuffer()
+static void flushBuffer(void)
 {
 	FLUSH_BUFFER();
 }
 
-void enableDepthTest() {
+void enableDepthTest(void) {
 	flushBuffer();
 	glEnable(GL_DEPTH_TEST);
 }
 
-void disableDepthTest() {
+void disableDepthTest(void) {
 	flushBuffer();
 	glDisable(GL_DEPTH_TEST);
 }
 
-void enableStencilTest() {
+void enableStencilTest(void) {
 	flushBuffer();
 	glEnable(GL_STENCIL_TEST);
 }
 
-void disableStencilTest() {
+void disableStencilTest(void) {
 	flushBuffer();
 	glDisable(GL_STENCIL_TEST);
 }
 
-void enableScissorTest() {
+void enableScissorTest(void) {
 	flushBuffer();
 	glEnable(GL_SCISSOR_TEST);
 }
 
-void disableScissorTest() {
+void disableScissorTest(void) {
 	flushBuffer();
 	glDisable(GL_SCISSOR_TEST);
 }
 
-void enableAlphaTest() {
+void enableAlphaTest(void) {
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.5f);
 }
 
-void disableAlphaTest() {
+void disableAlphaTest(void) {
 	glDisable(GL_ALPHA_TEST);
 }
 
@@ -106,7 +106,7 @@ void setScissor(int x, int y, int w, int h) {
 	glScissor(x, getWindowHeight() - y - h, w, h);
 }
 
-void flush() {
+void flush(void) {
 	flushBuffer();
 	glFinish();
 }
@@ -140,31 +140,31 @@ void blend(bool blendEnabled) {
 	else glDisable(GL_BLEND);
 }
 
-void enableBlend() {
+void enableBlend(void) {
 	FLUSH_BUFFER();
 	glEnable(GL_BLEND);
 }
 
-void disableBlend() {
+void disableBlend(void) {
 	FLUSH_BUFFER();
 	glDisable(GL_BLEND);
 }
 
-void push() {
+void push(void) {
 	FLUSH_BUFFER();
 	glPushMatrix();
 	if (glGetError() == GL_STACK_OVERFLOW)
 		myError("No more free slots to save the view.");
 }
 
-void pop() {
+void pop(void) {
 	FLUSH_BUFFER();
 	glPopMatrix();
 	if (glGetError() == GL_STACK_UNDERFLOW)
 		myError("No saved view was found.");
 }
 
-void reset() {
+void reset(void) {
 	FLUSH_BUFFER();
 	glLoadIdentity();
 }
@@ -224,30 +224,30 @@ void reset() {
 //~ }
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-	#define COLOR_UINT                                                     \
-	unsigned low = (unsigned)g << 8 | ((unsigned)r & 0xff);                \
-	unsigned high = (unsigned)a << 8 | (unsigned)b;                        \
-	unsigned c = (low & 0xffff) | (high << 16);
+    #define COLOR_UINT                                                         \
+    unsigned low = (unsigned)g << 8 | ((unsigned)r & 0xff);                    \
+    unsigned high = (unsigned)a << 8 | (unsigned)b;                            \
+    unsigned c = (low & 0xffff) | (high << 16);
 #else
-	#define COLOR_UINT                                                     \
-	unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);                \
-	unsigned high = (unsigned)r << 8 | (unsigned)g;                        \
-	unsigned c = (low & 0xffff) | (high << 16);
+    #define COLOR_UINT                                                         \
+    unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);                    \
+    unsigned high = (unsigned)r << 8 | (unsigned)g;                            \
+    unsigned c = (low & 0xffff) | (high << 16);
 #endif
 
 #ifdef COLOR_ARRAYS
-	#define COLOR_BODY                                                     \
-	COLOR_UINT                                                             \
-	colorArrayBuf[0] = colorArrayBuf[1] = colorArrayBuf[2] = colorArrayBuf[3] = c;
+    #define COLOR_BODY                                                         \
+    COLOR_UINT                                                                 \
+    colorArrayBuf[0] = colorArrayBuf[1] = colorArrayBuf[2] = colorArrayBuf[3] = c;
 #else
-	#define COLOR_BODY                                                     \
-	COLOR_UINT                                                             \
-	if(unlikely(c != prevColor))                                           \
-	{                                                                      \
-		FLUSH_BUFFER();                                                \
-		glColor4ubv((const GLubyte*)c);                                \
-		prevColor = c;                                                 \
-	}
+    #define COLOR_BODY                                                         \
+    COLOR_UINT                                                                 \
+    if(unlikely(c != prevColor))                                               \
+    {                                                                          \
+        FLUSH_BUFFER();                                                        \
+        glColor4ubv((const GLubyte*)c);                                        \
+        prevColor = c;                                                         \
+    }
 #endif
 
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
@@ -315,7 +315,7 @@ void blendFunc(unsigned sourcefactor, unsigned destinationfactor) {
 	glBlendFunc(sourcefactor, destinationfactor);
 }
 
-void clear() {
+void clear(void) {
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
@@ -324,7 +324,7 @@ void clear() {
  * @group graphics/drawing
  * @see clear clearColorStencil clearDepth clearStencil
  * */
-void clearColorDepth() {
+void clearColorDepth(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -333,7 +333,7 @@ void clearColorDepth() {
  * @group graphics/drawing
  * @see clear clearColorDepth clearDepth clearStencil
  * */
-void clearColorStencil() {
+void clearColorStencil(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
@@ -342,7 +342,7 @@ void clearColorStencil() {
  * @group graphics/drawing
  * @see clear clearColorDepth clearColorStencil clearStencil
  * */
-void clearDepth() {
+void clearDepth(void) {
 	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
@@ -351,7 +351,7 @@ void clearDepth() {
  * @group graphics/drawing
  * @see clear clearColorDepth clearColorStencil clearDepth
  * */
-void clearStencil() {
+void clearStencil(void) {
 	glClear(GL_STENCIL_BUFFER_BIT);
 }
 
@@ -363,12 +363,12 @@ void stencilOp(unsigned fail, unsigned zfail, unsigned zpass) {
 	glStencilOp(fail, zfail, zpass);
 }
 
-void drawToStencil() {
+void drawToStencil(void) {
 	glStencilFunc (GL_ALWAYS, 0x0, 0x1);
 	glStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
 }
 
-void drawUsingStencil() {
+void drawUsingStencil(void) {
 	glStencilFunc (GL_EQUAL, 0x1, 0x1);
 	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 }

@@ -38,11 +38,11 @@ void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
 /* RNG push/pop functions to avoid internal state corruption */
 static xor_state rng_state;
-static inline void rng_push()
+static inline void rng_push(void)
 {
 	memcpy(&rng_state, random_get_state(), sizeof(xor_state));
 }
-static inline void rng_pop()
+static inline void rng_pop(void)
 {
 	random_set_state(&rng_state);
 }

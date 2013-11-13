@@ -44,7 +44,7 @@ typedef struct xor_state {
 
 static xor_state _xor_ = {123456789, 362436069, 521288629, 88675123, 5783321, 6615241};
 
-static inline xor_state *random_get_state()
+static inline xor_state *random_get_state(void)
 {
 	return &_xor_;
 }
@@ -100,7 +100,7 @@ static inline void random_hash_seed192(uint32_t x, uint32_t y, uint32_t z, uint3
 	_xor_.d = hash_uint32(d);
 }
 
-static inline uint32_t random_get_seed()
+static inline uint32_t random_get_seed(void)
 {
 	return _xor_.x;
 }
@@ -108,7 +108,7 @@ static inline uint32_t random_get_seed()
 /**
  * Period: 2^128-1. Fastest: 646M rn/sec @ Intel Pentium 4 3.0 GHz
  **/
-static inline uint32_t rand128()
+static inline uint32_t rand128(void)
 {
 	uint32_t t;
 	t = _xor_.x ^ (_xor_.x << 11);
@@ -121,7 +121,7 @@ static inline uint32_t rand128()
 /**
  * Period: 2^192-2^32. Fast enough: 555M rn/sec @ Intel Pentium 4 3.0 GHz
  **/
-static inline uint32_t rand192()
+static inline uint32_t rand192(void)
 {
 	uint32_t t;
 	t = (_xor_.x ^ (_xor_.x >> 2));
@@ -136,7 +136,7 @@ static inline uint32_t rand192()
 /**
  * Period: 2^88. Known as tauss generator. ~2 times slower than xorshift.
  **/
-static inline uint32_t rand_t88()
+static inline uint32_t rand_t88(void)
 {
 	uint32_t s1 = _xor_.x, s2 = _xor_.y, s3 = _xor_.z;
 	s1 = (uint32_t)(((int32_t)s1 &  -2) << 12) ^ (((s1 << 13) ^  s1) >> 19);
@@ -150,7 +150,7 @@ static inline uint32_t rand_t88()
  * Small period, needs 64bit integer... Without seed!
  * It does not pass all tests, it slow, so I kept it just as example.
  **/
-static inline uint32_t rand32()
+static inline uint32_t rand32(void)
 {
 	static uint64_t y = 123456789;
 	y ^= (y << 13);

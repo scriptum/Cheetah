@@ -83,7 +83,7 @@ static unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 	return tex_id;
 }
 
-static unsigned char * loadImageMask(const unsigned char * img, const char *mask_name, int width, int height, int channels)
+static unsigned char * loadImageMask(const unsigned char *img, const char *mask_name, int width, int height, int channels)
 {
 	unsigned char *mask_img;
 	unsigned char *new_img;
@@ -91,6 +91,8 @@ static unsigned char * loadImageMask(const unsigned char * img, const char *mask
 	int mask_w, mask_h, mask_channels;
 	int mask_step, img_step;
 	int x, y, j, i;
+	RETURN_VALUE_IF_NULL(mask_name, NULL);
+	RETURN_VALUE_IF_NULL(img, NULL);
 	if(unlikely(FALSE == fileExists(mask_name)))
 		return NULL;
 	
@@ -140,15 +142,16 @@ static unsigned char * loadImageData(const char *name, int *width, int *height, 
 	unsigned char *img;
 	unsigned char *myBuf;
 	NEEDED_INIT;
-	printf("%d\n", SDL_GetTicks());
+	// printf("%d\n", SDL_GetTicks());
+	RETURN_IF_NULL(name);
 	myBuf = loadfile(name, &file_size);
 	ERROR_IF_NULL(myBuf);
-	printf("%d\n", SDL_GetTicks());
+	// printf("%d\n", SDL_GetTicks());
 	img = SOIL_load_image_from_memory(
 				myBuf, (int)sizeof(unsigned char) * (int)file_size,
 				width, height, channels,
 				0 );
-	printf("%d\n", SDL_GetTicks());
+	// printf("%d\n", SDL_GetTicks());
 	if(img != myBuf)
 		delete(myBuf);
 	if(FALSE == mask && NULL != img) /* avoid loading mask of mask */
@@ -187,7 +190,7 @@ error:
 	return NULL;
 }
 
-queue newQueue()
+queue newQueue(void)
 {
 	node q = malloc(sizeof(node_t));
 	q->next = q->prev = 0;
@@ -246,7 +249,8 @@ int resLoaderThread(void *unused)
 	unsigned char *img;
 	//~ unsigned char *myBuf;
 	//~ bool empty;
-	int width, height;
+	int width = 0
+	int height = 0;
 	while(1)
 	{
 		//~ empty = QEMPTY(resLoaderQueue)
@@ -258,11 +262,13 @@ int resLoaderThread(void *unused)
 			//~ SDL_mutexP(resQueueMutex);
 			dequeue(resLoaderQueue, &r);
 			img = loadImageData(r.image->name, &width, &height, &r.image->channels, FALSE);
-			r.image->w = (float)width;
-			r.image->h = (float)height;
-			r.data = img;
-			//~ printf("%s\n", r.image->name);
-			resShared = &r;
+			if(img)
+			{
+				r.image->w = (float)width;
+				r.image->h = (float)height;
+				r.data = img;
+				resShared = &r;
+			}
 			//~ SDL_Delay(5);
 			//~ new(e, SDL_Event, 1);
 			//~ e.type = SDL_USEREVENT;
@@ -277,7 +283,7 @@ int resLoaderThread(void *unused)
 /**
  * Runt in the mainthread to just copy image to GPU
  * */
-void resLoaderMainThread()
+void resLoaderMainThread(void)
 {
 	Resource * r;
 	if(resShared)
@@ -290,8 +296,9 @@ void resLoaderMainThread()
 	}
 }
 
-static void imageCheckResLoader(Image * image)
+static void imageCheckResLoader(Image *image)
 {
+	RETURN_IF_NULL(image);
 	if(resLoaderQueue) 
 		if(unlikely(image->id == null_texture && !image->queued))
 		{
@@ -305,9 +312,9 @@ static void imageCheckResLoader(Image * image)
 
 static void multitextureBind(Multitexture * multitexture)
 {
-	Image * image;
-	if(unlikely(NULL == multitexture || NULL == multitexture->images))
-		return;
+	Image *image;
+	RETURN_IF_NULL(multitexture);
+	RETURN_IF_NULL(multitexture->images);
 	FLUSH_BUFFER();
 	int i;
 	for(i = 0; i < multitexture->size; i++)
@@ -330,6 +337,7 @@ PUBLIC FUNCTIOS
 
 /* Load image from disk */
 void newImageOpt(Image *ptr, const char *name, const char *options) {
+	RETURN_IF_NULL(ptr);
 	int width, height, channels;
 	unsigned int tex_id;
 	unsigned char *img;
@@ -415,9 +423,7 @@ void newImageRaw(Image *ptr, int width, int height, const char *data, const char
  * @var Image object
  * @advanced
  * */
-void imageBind(Image * image) {
-	if(unlikely(NULL == image))
-		return;
+void imageBind(Image *image) {
 	imageCheckResLoader(image);
 	TEXTURE_BIND(image->id);
 }
@@ -427,7 +433,7 @@ void imageBind(Image * image) {
  * @group image
  * @advanced
  * */
-void enableTexture() {
+void enableTexture(void) {
 	glEnable(GL_TEXTURE_2D);
 }
 
@@ -436,26 +442,30 @@ void enableTexture() {
  * @group image
  * @advanced
  * */
-void disableTexture() {
+void disableTexture(void) {
 	glDisable(GL_TEXTURE_2D);
 }
 
-void imageDrawxy(Image * image, float x, float y, float w, float h) {
+void imageDrawxy(Image *image, float x, float y, float w, float h) {
+	RETURN_IF_NULL(image);
 	imageBind(image);
 	PUSH_QUAD(x,y,w,h,0,0,0);
 }
 
-void imageDrawt(Image * image, float x, float y, float w, float h, float a, float ox, float oy) {
+void imageDrawt(Image *image, float x, float y, float w, float h, float a, float ox, float oy) {
+	RETURN_IF_NULL(image);
 	imageBind(image);
 	PUSH_QUAD(x,y,w,h,a,ox,oy);
 }
 
-void imageDrawqxy(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
+void imageDrawqxy(Image *image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
+	RETURN_IF_NULL(image);
 	imageBind(image);
 	PUSH_QUADT(x,y,w,h,0,0,0,qx, qy, qw, qh, image->w, image->h);
 }
 
-void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
+void imageDrawqt(Image *image, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
+	RETURN_IF_NULL(image);
 	imageBind(image);
 	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, image->w, image->h);
 }
@@ -487,37 +497,45 @@ void imageDrawqt(Image * image, float x, float y, float w, float h, float qx, fl
 } while(0)
 
 void borderImageDrawt(BorderImage * borderImage, float x, float y, float w, float h, float a, float ox, float oy) {
+	RETURN_IF_NULL(borderImage);
 	borderImageDrawInternal(borderImage, x, y, w, h, a, ox, oy);
 }
 
 void borderImageDrawxy(BorderImage * borderImage, float x, float y, float w, float h) {
+	RETURN_IF_NULL(borderImage);
 	borderImageDrawInternal(borderImage, x, y, w, h, 0, 0, 0);
 }
 
 void initMultitexture(Multitexture * multitexture) {
+	RETURN_IF_NULL(multitexture);
 	new(multitexture->images, Image*, multitexture->size);
 }
 
 void deleteMultitexture(Multitexture * multitexture) {
+	RETURN_IF_NULL(multitexture);
 	delete(multitexture->images);
 }
 
 void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, float h) {
+	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
 	PUSH_QUAD(x,y,w,h,0,0,0);
 }
 
 void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy) {
+	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
 	PUSH_QUAD(x,y,w,h,a,ox,oy);
 }
 
 void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
+	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
 	PUSH_QUADT(x,y,w,h,0,0,0,qx, qy, qw, qh, multitexture->w, multitexture->h);
 }
 
 void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
+	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
 	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, multitexture->w, multitexture->h);
 }
@@ -572,11 +590,12 @@ void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, 
  * @advanced
  * */
 void deleteImage(Image * ptr) {
+	RETURN_IF_NULL(ptr);
 	//~ printf("%d\n", same_type_p(typeof(ptr)) == INTEGER_TYPE);
 	#ifdef MEMORY_TEST
-		printf("Freeing Image %d\n", ptr ? ptr->id : 0);
+		printf("Freeing Image %d\n", ptr);
 	#endif
-	if(ptr && ptr->id > 1)
+	if(ptr->id > 1)
 		glDeleteTextures(1, &ptr->id);
 
 	//~ else MYERROR("Trying to free a null-image. Maybe, you did it manually?");

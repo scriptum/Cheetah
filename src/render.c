@@ -93,7 +93,7 @@ PFNGLBLITFRAMEBUFFEREXTPROC         glBlitFramebuffer_         = NULL;
 
 #define getProcAddr SDL_GL_GetProcAddress
 
-void initRenderer()
+void initRenderer(void)
 {
 	const char *vendor	= (const char *)glGetString(GL_VENDOR);
 	const char *exts	= (const char *)glGetString(GL_EXTENSIONS);

@@ -31,8 +31,13 @@ IN THE SOFTWARE.
 
 /********************************OPTIMIZATIONS*********************************/
 
-#define likely(x)   __builtin_expect((x),1)
-#define unlikely(x) __builtin_expect((x),0)
+#if defined(__GNUC__) && (__GNUC__ > 2)
+#define likely(x)    (__builtin_expect(!!(x), 1))
+#define unlikely(x)  (__builtin_expect(!!(x), 0))
+#else
+#define likely(x)    (x)
+#define unlikely(x)  (x)
+#endif
 
 /**********************************MEMOTY OPS**********************************/
 
@@ -116,25 +121,14 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);                  \
 } while(0)
 
 
-/********************************OPTIONS CHECKER*******************************/
-
-static inline bool check_option_helper(const char *options, const char *o)
-{
-	char *name = strstr(options, o);
-	size_t l = strlen(o);
-	/* check bounds */
-	if(NULL != name &&
-	  (' '== *(name + l) || '\0' == *(name + l)) &&
-	  (' '== *(name - 1) || '\0' == *(name - 1)))
-		return TRUE;
-	return FALSE;
-}
-
-#define CHECK_OPTION(options, o) bool o = check_option_helper(options, #o)
-
 /********************************ERROR CHECKING********************************/
 
-#define ERROR_IF_NULL(name) if(NULL == name) goto error
+#define ERROR_IF_NULL(name) if(unlikely(NULL == (name))) goto error
+#define ERROR_IF_FAIL(name) if(unlikely(!(name))) goto error
+#define RETURN_IF_NULL(name) if(unlikely(NULL == (name))) return
+#define RETURN_VALUE_IF_NULL(name, value) if(unlikely(NULL == (name))) return (value)
+#define RETURN_IF_FAIL(name) if(unlikely(!(name))) return
+#define RETURN_VALUE_FAIL(name, value) if(unlikely(!(name))) return (value)
 
 bool isInit();
 
@@ -153,5 +147,24 @@ bool isInit();
         return;                                                                \
     }                                                                          \
 } while(0)
+
+/********************************OPTIONS CHECKER*******************************/
+
+static inline bool check_option_helper(const char *options, const char *o)
+{
+	RETURN_VALUE_IF_NULL(options, FALSE);
+	RETURN_VALUE_IF_NULL(o, FALSE);
+	char *name = strstr(options, o);
+	size_t l = strlen(o);
+	/* check bounds */
+	if(NULL != name &&
+	  (' ' == *(name + l) || '\0' == *(name + l)) &&
+	  (' ' == *(name - 1) || '\0' == *(name - 1)))
+		return TRUE;
+	return FALSE;
+}
+
+#define CHECK_OPTION(options, o) bool o = check_option_helper(options, #o)
+
 
 #endif /*MACROS_H_*/

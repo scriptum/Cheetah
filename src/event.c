@@ -34,7 +34,7 @@ SDL_Event event;
 void recomputeScreenScale(float w, float h);
 void setWindowSize(unsigned w, unsigned h);
 
-unsigned int getEventType() {
+unsigned int getEventType(void) {
 	/* skip unneeded events */
 	while(SDL_PollEvent(&event)) {
 		switch(event.type) {
@@ -82,35 +82,35 @@ unsigned int getEventType() {
 	return 0;
 }
 
-unsigned int getEventKey() {
+unsigned int getEventKey(void) {
 	return event.key.keysym.sym;
 }
 
-unsigned int getEventKeyUnicode() {
+unsigned int getEventKeyUnicode(void) {
 	return event.key.keysym.unicode;
 }
 
-int getEventMouseX() {
+int getEventMouseX(void) {
 	if(screenScale.autoScale)
 		return (int)(((float)event.button.x - screenScale.offsetX) / screenScale.scaleX);
 	return event.button.x;
 }
 
-int getEventMouseY() {
+int getEventMouseY(void) {
 	if(screenScale.autoScale)
 		return (int)(((float)event.button.y - screenScale.offsetY) / screenScale.scaleY);
 	return event.button.y;
 }
 
-unsigned int getEventMouseButton() {
+unsigned int getEventMouseButton(void) {
 	return event.button.button;
 }
 
-int getEventResizeW() {
+int getEventResizeW(void) {
 	return event.resize.w;
 }
 
-int getEventResizeH() {
+int getEventResizeH(void) {
 	return event.resize.h;
 }
 
@@ -118,7 +118,7 @@ void setResizeDelay(unsigned delay) {
 	globalTimers.resizeDelay = delay;
 }
 
-int getMouseX() {
+int getMouseX(void) {
 	int x;
 	SDL_GetMouseState(&x, NULL);
 	if(screenScale.autoScale)
@@ -126,7 +126,7 @@ int getMouseX() {
 	return x;
 }
 
-int getMouseY() {
+int getMouseY(void) {
 	int y;
 	SDL_GetMouseState(NULL, &y);
 	if(screenScale.autoScale)
@@ -134,7 +134,7 @@ int getMouseY() {
 	return y;
 }
 
-unsigned char *getKeyState() {
+unsigned char *getKeyState(void) {
 	return SDL_GetKeyState(NULL);
 }
 
