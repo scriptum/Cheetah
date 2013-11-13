@@ -530,7 +530,6 @@ void
 	rgb_888_from_565( enc_c0, &c0[0], &c0[1], &c0[2] );
 	rgb_888_from_565( enc_c1, &c1[0], &c1[1], &c1[2] );
 	/*	the new vector	*/
-	vec_len2 = 0.0f;
 	for( i = 0; i < 3; ++i )
 	{
 		color_line[i] = (float)(c1[i] - c0[i]);
