@@ -48,14 +48,11 @@ then
 fi
 
 GCC_VERSION=$($COMPILER -v |& tail -1 | awk '{print $3}' | sed s/\\.//g)
-FLAGS_OPTIMIZE_GENERAL="-fomit-frame-pointer -funroll-loops -mmmx -msse -mtune=generic"
+FLAGS_OPTIMIZE_GENERAL="-fomit-frame-pointer -mtune=generic"
 
-if [ $GCC_VERSION -ge 460 ]
-then
-	FLAGS_OPTIMIZE="-Ofast $FLAGS_OPTIMIZE_GENERAL"
-else
-	FLAGS_OPTIMIZE="-O3 -ffast-math $FLAGS_OPTIMIZE_GENERAL"
-fi
+# FLAGS_OPTIMIZE_GENERAL="$FLAGS_OPTIMIZE_GENERAL -ftree-vectorize"
+
+FLAGS_OPTIMIZE="-O2 $FLAGS_OPTIMIZE_GENERAL"
 
 if [ "$2" == "release" -o "$2" == "final" ]
 then
