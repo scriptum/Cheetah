@@ -76,7 +76,7 @@ void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
 	ptr->id = 0;
 	if(!supported.GLSL)
 	{
-		dprintf_shader("Trying to create shader, but system doesn't support shaders.");
+		dbg("Trying to create shader, but system doesn't support shaders");
 		return;
 	}
 	v = glCreateShaderObject_(GL_VERTEX_SHADER);
@@ -100,7 +100,7 @@ void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
 	glDeleteObject_(f);
 	if (0 == linked)
 	{
-		dprintf_shader("Error while linking shader\n");
+		dbg("Error while linking shader");
 		return;
 	}
 	ptr->id = p;
@@ -121,7 +121,7 @@ void deleteShader(Shader * ptr) {
 	}
 	else
 	{
-		dprintf_shader("Trying to free a null-shader. Maybe, you did it manually?");
+		dbg("Trying to free a null-shader. Maybe, you did it manually?");
 	}
 }
 

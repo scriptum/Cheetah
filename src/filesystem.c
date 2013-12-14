@@ -47,7 +47,7 @@ bool isPointer(void * ptr) {
 }
 
 /**
- * Loads whole file into C-string.
+ * Loads whole file into C-string. Note that returned value  null-terminated.
  * @param filename file to read
  * @param length resulting string length
  * @return newly allocated string, caller should free
@@ -55,27 +55,28 @@ bool isPointer(void * ptr) {
 unsigned char *loadfile(const char *filename, long *length) {
 	unsigned char *result = NULL;
 	long size = 0;
-	FILE *file = NULL;
-	file = fopen(filename, "rb");
-	ERROR_IF_NULL(file);
-	fseek(file, 0, SEEK_END);
-	if(fseek(file, 0, SEEK_END) != 0)
+	FILE *f = NULL;
+	f = fopen(filename, "rb");
+	ERROR_IF_NULL(f);
+	fseek(f, 0, SEEK_END);
+	if(fseek(f, 0, SEEK_END) != 0)
 		goto error;
-	size = ftell(file);
+	size = ftell(f);
 	if(size < 0)
 		goto error;
-	rewind(file);
-	new(result, unsigned char, size + 1);
-	if (size != (long)fread(result, sizeof(unsigned char), (size_t)size, file)) {
+	if(fseek(f, 0, SEEK_SET) != 0)
 		goto error;
-	}
-	if (length)
+	new(result, unsigned char, size + 1);
+	if(size != (long)fread(result, sizeof(char), (size_t)size, f))
+		goto error;
+	if(length)
 		*length = size;
 	result[size] = '\0';
-	fclose(file);
+	fclose(f);
 	return result;
 error:
-	if(file) fclose(file);
+	if(f)
+		fclose(f);
 	delete(result);
 	myError("can't load file %s", filename);
 	return NULL;
@@ -144,7 +145,7 @@ bool mkDir(const char * path) {
 	return FALSE;
 }
 
-char *getDirentName(struct dirent * de) {
+const char *getDirentName(struct dirent * de) {
 	return de->d_name;
 }
 

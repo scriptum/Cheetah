@@ -44,40 +44,33 @@ static bool checkFramebufferStatus(void)
 {
 	GLenum status;
 	status = (GLenum)glCheckFramebufferStatus_(GL_FRAMEBUFFER_EXT);
-	#if DEBUG_FRAMEBUFFER
-	const char *error;
 	switch(status) {
 		case GL_FRAMEBUFFER_COMPLETE_EXT:
 			return TRUE;
 		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-			error = "FBO: incomplete attachment\n";
+			dbg("FBO: incomplete attachment");
 			break;
 		case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-			error = "Unsupported FBO format\n";
+			dbg("Unsupported FBO format");
 			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-			error = "FBO: missing attachment\n";
+			dbg("FBO: missing attachment");
 			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-			error = "FBO: attached images must have same dimensions\n";
+			dbg("FBO: attached images must have same dimensions");
 			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-			error = "FBO: attached images must have same format\n";
+			dbg("FBO: attached images must have same format");
 			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-			error = "FBO: missing draw buffer\n";
+			dbg("FBO: missing draw buffer");
 			break;
 		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-			error = "FBO: missing read buffer\n";
+			dbg("FBO: missing read buffer");
 			break;
 		default:
-			error = "FBO: unknown error\n";
+			dbg("FBO: unknown error");
 	}
-	dprintf_fbo(error);
-	#else
-	if(status == GL_FRAMEBUFFER_COMPLETE_EXT)
-		return TRUE;
-	#endif
 	return FALSE;
 }
 
@@ -94,7 +87,7 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 	NEEDED_INIT_VOID;
 
 	if(!supported.FBO) {
-		dprintf_fbo("Framebuffers are not supported on this machine. You'd better to check it in script (try \"if cheetah.supported.FBO\")");
+		dbg("Framebuffers are not supported on this machine. You'd better to check it in script (try \"if cheetah.supported.FBO\")");
 		return;
 	}
 
@@ -222,6 +215,6 @@ void deleteFramebuffer(Framebuffer *ptr) {
 	}
 	else
 	{
-		dprintf_fbo("Trying to free a null-framebuffer. Maybe, you did it manually?");
+		dbg("Trying to free a null-framebuffer. Maybe, you did it manually?");
 	}
 }

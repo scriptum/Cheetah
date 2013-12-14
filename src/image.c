@@ -136,14 +136,14 @@ error:
  * */
 
 /* Load image in separate thread (if specified) */
-static unsigned char * loadImageData(const char *name, int *width, int *height, int *channels, bool mask)
+static unsigned char *loadImageData(const char *name, int *width, int *height, int *channels, bool mask)
 {
 	long int file_size;
 	unsigned char *img;
 	unsigned char *myBuf;
 	NEEDED_INIT;
 	// printf("%d\n", SDL_GetTicks());
-	RETURN_IF_NULL(name);
+	RETURN_VALUE_IF_NULL(name, NULL);
 	myBuf = loadfile(name, &file_size);
 	ERROR_IF_NULL(myBuf);
 	// printf("%d\n", SDL_GetTicks());
@@ -167,18 +167,18 @@ static unsigned char * loadImageData(const char *name, int *width, int *height, 
 			{
 				strncpy(mask_name, name, (size_t)(pch - name));
 				strcpy(mask_name + (pch - name), ".mask");
-				dprintf_graphics("Trying to load mask with name %s...\n", mask_name);
+				dbg("Trying to load mask with name %s...", mask_name);
 				img_mask = loadImageMask(img, mask_name, *width, *height, *channels);
 				if(likely(NULL != img_mask))
 				{
 					*channels = 4;
 					free(img);
 					img = img_mask;
-					dprintf_graphics("Success\n");
+					dbg("Success");
 				}
 				else
 				{
-					dprintf_graphics("Fail\n");
+					dbg("Fail");
 				}
 			}
 			delete(mask_name);
@@ -249,7 +249,7 @@ int resLoaderThread(void *unused)
 	unsigned char *img;
 	//~ unsigned char *myBuf;
 	//~ bool empty;
-	int width = 0
+	int width = 0;
 	int height = 0;
 	while(1)
 	{

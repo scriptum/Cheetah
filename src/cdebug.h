@@ -27,98 +27,38 @@ IN THE SOFTWARE.
 #include <stdlib.h>
 #include <stdio.h>
 
-/*
- * Usage: compile engine with flag -DDEBUG_<class>[V[V]] or uncomment one of examples.
- * class - one of:
- * - MEMORY_ERRORS
- * - MEMORY
- * - FRAMEBUFFER
- * - SHADERS
- * - EVENTS
- * - GRAPHICS
- * Add V to get more messages. Add VV to get HUGE amount of messages 
- * (tells about anything happened in engine).
- * e.g.: -DDEBUG_THREADV (verbose output about thread)
- * */
-
 /*******************************DEBUGGING OPTIONS******************************/
 
-/* Debug memory operations */
-// #define DEBUG_MEMORY_ERRORS
-// #define DEBUG_MEMORY
-// 
-// #define DEBUG_FRAMEBUFFER
-// #define DEBUG_SHADERS
-// #define DEBUG_EVENTS
-// #define DEBUG_GRAPHICS
-
-// #define DEBUG_THREAD
-// #define DEBUG_THREADV
-// #define DEBUG_THREADVV
+#define DEBUG
+// #define DEBUGV
+// #define DEBUGVV
 
 /**********************************DEBUG STUFF*********************************/
 
-#define __DBG_PRINT(class, ...) printf(#class ": "); printf(__VA_ARGS__)
-
-#ifdef DEBUG_MEMORY
-	#define dprintf_mem(...) printf("Memory: ");printf(__VA_ARGS__)
-#else
-	#define dprintf_mem(...)
-#endif
-
-#ifdef DEBUG_MEMORY_ERRORS
-	#define dprintf_memerr(...) myError(__VA_ARGS__)
-#else
-	#define dprintf_memerr(...)
-#endif
-
-#ifdef DEBUG_FRAMEBUFFER
-	#define dprintf_fbo(...) printf("Framebuffer: ");printf(__VA_ARGS__)
-#else
-	#define dprintf_fbo(...)
-#endif
-
-#ifdef DEBUG_SHADERS
-	#define dprintf_shader(...) printf("Shaders: ");printf(__VA_ARGS__)
-#else
-	#define dprintf_shader(...)
-#endif
-
-#ifdef DEBUG_EVENTS
-	#define dprintf_event(...) printf("Event: ");printf(__VA_ARGS__)
-#else
-	#define dprintf_event(...)
-#endif
-
-#ifdef DEBUG_GRAPHICS
-	#define dprintf_graphics(...) printf("Graphics: ");printf(__VA_ARGS__)
-#else
-	#define dprintf_graphics(...)
-#endif
-
-#ifdef DEBUG_THREADVV
-	#define dprintf_thread(...) __DBG_PRINT(Thread, __VA_ARGS__)
-	#define dprintf_threadv(...) __DBG_PRINT(ThreadV, __VA_ARGS__)
-	#define dprintf_threadvv(...) __DBG_PRINT(ThreadVV, __VA_ARGS__)
-#elif defined DEBUG_THREADV
-	#define dprintf_thread(...) __DBG_PRINT(Thread, __VA_ARGS__)
-	#define dprintf_threadv(...) __DBG_PRINT(ThreadV, __VA_ARGS__)
-	#define dprintf_threadvv(...)
-#elif defined DEBUG_THREAD
-	#define dprintf_thread(...) __DBG_PRINT(Thread, __VA_ARGS__)
-	#define dprintf_threadv(...)
-	#define dprintf_threadvv(...)
-#else
-	#define dprintf_thread(...)
-	#define dprintf_threadv(...)
-	#define dprintf_threadvv(...)
-#endif
-
-/******************************************************************************/
-
-#define DEBUG_MSG_FORMAT "%s (%d) - %s: "
+#define DEBUG_MSG_FORMAT "%s:%d(%s): "
 
 #define LOCATION __FILE__, __LINE__, __FUNCTION__
+
+#define DBG_PRINT(format, args...) printf(DEBUG_MSG_FORMAT format "\n", LOCATION, ## args)
+
+#ifdef DEBUGVV
+	#define dbg(format, args...) DBG_PRINT(format, ## args)
+	#define dbgv(format, args...) DBG_PRINT(format, ## args)
+	#define dbgvv(format, args...) DBG_PRINT(format, ## args)
+#elif defined DEBUGV
+	#define dbg(format, args...) DBG_PRINT(format, ## args)
+	#define dbgv(format, args...) DBG_PRINT(format, ## args)
+	#define dbgvv(...)
+#elif defined DEBUG
+	#define dbg(format, args...) DBG_PRINT(format, ## args)
+	#define dbgv(...)
+	#define dbgvv(...)
+#else
+	#define dbg(...)
+	#define dbgv(...)
+	#define dbgvv(...)
+#endif
+
 
 #define vard(v) printf(DEBUG_MSG_FORMAT " %s = %d\n", LOCATION, #v, v);
 #define vars(v) printf(DEBUG_MSG_FORMAT " %s = %s\n", LOCATION, #v, v);

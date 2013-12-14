@@ -43,8 +43,8 @@ IN THE SOFTWARE.
 
 #define new(var, type, size) do {                                              \
     if(unlikely(NULL != (var))) {                                              \
-        dprintf_memerr("variable %s already contains data: %x."                \
-                       " Delete it before allocating", #var, var);             \
+        dbg("variable %s already stores pointer: %p."                          \
+            " Delete it before allocating", #var, var);                        \
         exit(1);                                                               \
     }                                                                          \
     var = (type*)malloc((size_t)sizeof(type) * (size_t)(size));                \
@@ -52,12 +52,12 @@ IN THE SOFTWARE.
     if((size) == 1)                                                            \
         memset(var, 0, (size_t)sizeof(type));                                  \
     if(unlikely(NULL == var)) {                                                \
-        dprintf_memerr("cannot allocate %zd bytes for %s",                     \
-                       (size_t)sizeof(type) * (size_t)(size), #var);           \
+        dbg("cannot allocate %zd bytes for %s",                                \
+            (size_t)sizeof(type) * (size_t)(size), #var);                      \
         exit(1);                                                               \
     }                                                                          \
-    dprintf_mem("Added: %s %d %s (%x) %zd bytes\n",                            \
-           __FILE__, __LINE__, #var, var, (size_t)sizeof(type)*(size_t)(size));\
+    dbg("Added: %s(%p) %zd bytes",                                             \
+        #var, var, (size_t)sizeof(type)*(size_t)(size));                       \
 } while(0)
 
 #define new0(var, type, size) do {                                             \
@@ -72,17 +72,17 @@ IN THE SOFTWARE.
 #define renew(var, type, size) do {                                            \
     var = (type*)realloc(var, (size_t)sizeof(type)*(size_t)(size));            \
     if(unlikely(NULL == var)) {                                                \
-        dprintf_memerr("cannot re-allocate %zd bytes for %s",                  \
-                       (size_t)sizeof(type) * (size_t)(size), #var);           \
+        dbg("cannot re-allocate %zd bytes for %s",                             \
+             (size_t)sizeof(type) * (size_t)(size), #var);                     \
         exit(1);                                                               \
     }                                                                          \
-    dprintf_mem("Reallocated: %s %d %s (%x) %zd bytes\n",                      \
-         __FILE__, __LINE__, #var, var, (size_t)sizeof(type) * (size_t)(size));\
+    dbg("Reallocated: %s(%p) %zd bytes",                                       \
+         #var, var, (size_t)sizeof(type) * (size_t)(size));                    \
 } while(0)
 
 #define delete(var) do {                                                       \
     if(likely(NULL != var)) {                                                  \
-        dprintf_mem("Removed: %s %d %s (%x)\n", __FILE__, __LINE__, #var, var);\
+        dbg("Removed: %s(%p)", #var, var);                                     \
         free(var);                                                             \
         var = NULL;                                                            \
     }                                                                          \
@@ -159,7 +159,7 @@ static inline bool check_option_helper(const char *options, const char *o)
 	/* check bounds */
 	if(NULL != name &&
 	  (' ' == *(name + l) || '\0' == *(name + l)) &&
-	  (' ' == *(name - 1) || '\0' == *(name - 1)))
+	  (name == options || ' ' == *(name - 1) || '\0' == *(name - 1)))
 		return TRUE;
 	return FALSE;
 }
