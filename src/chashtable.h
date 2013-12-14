@@ -28,18 +28,7 @@ IN THE SOFTWARE.
 #ifndef HASHTABLE_H_
 #define HASHTABLE_H_
 
-/* #define HASH_DEBUG */
-
-#ifdef HASH_DEBUGV
-	#define dprintf_chash(...) printf(__VA_ARGS__)
-	#define dprintf_chashv(...) printf(__VA_ARGS__)
-#elif defined HASH_DEBUG
-	#define dprintf_chash(...) printf(__VA_ARGS__)
-	#define dprintf_chashv(...)
-#else
-	#define dprintf_chash(...)
-	#define dprintf_chashv(...)
-#endif
+#include "cdebug.h"
 
 #ifndef HASH_START_SIZE
 #define HASH_START_SIZE 128
@@ -63,62 +52,52 @@ IN THE SOFTWARE.
     }                                                                          \
 }
 
-#define _HASH_NODE hash->nodes[index]
-
-#define _HASH_INDEX(hashFunc, condition)                                       \
-unsigned index = hashFunc(key) & hash->size;                                   \
-unsigned probes = 0;                                                           \
-while (condition) {                                                            \
-    probes++;                                                                  \
-    index = (HASH_PROBING) & hash->size;                                       \
-}
-
-#define HASH_TEMPLATE(hashName, keyType, valType, hashFunc, cmpFunc)           \
+#define HASH_TEMPLATE(hName, keyType, valType, hashFunc, cmpFunc)              \
                                                                                \
-typedef struct hashName##Node {                                                \
+typedef struct __attribute__((packed)) hName##Node {                           \
     keyType         key;                                                       \
     valType         value;                                                     \
     bool            exists;                                                    \
-} hashName##Node;                                                              \
+} hName##Node;                                                                 \
                                                                                \
 typedef struct {                                                               \
-    unsigned          size;                                                    \
-    unsigned          items;                                                   \
-    hashName##Node   *nodes;                                                   \
-} hashName;                                                                    \
+    hName##Node   *nodes;                                                      \
+    unsigned       size;                                                       \
+    unsigned       items;                                                      \
+} hName;                                                                       \
                                                                                \
-void hashName##_destroy(hashName *hash) {                                      \
+void hName##_destroy(hName *hash) {                                            \
     if(hash) free(hash->nodes);                                                \
     free(hash);                                                                \
 }                                                                              \
                                                                                \
-hashName *hashName##_new_size(unsigned size) {                                 \
-    hashName *hash = calloc(1, sizeof(hashName));                              \
+hName *hName##_new_size(unsigned size) {                                       \
+    hName *hash = (hName*)calloc(1, sizeof(hName));                            \
     if(NULL == hash)                                                           \
         goto error;                                                            \
-    hash->size     = size - 1;                                                 \
-    hash->nodes    = calloc(hash->size + 1, sizeof(hashName##Node));           \
-    dprintf_chash("%s: created new of size %u\n", #hashName, size);            \
+    hash->size  = size - 1;                                                    \
+    hash->nodes = (hName##Node*)calloc(hash->size + 1, sizeof(hName##Node));   \
+    dbg("%s: created new of size %u", #hName, size);                           \
     return hash;                                                               \
 error:                                                                         \
-    dprintf_chash("%s: error: cannot allocate memory\n", #hashName);           \
-    hashName##_destroy(hash);                                                  \
+    dbg("%s: error: cannot allocate memory", #hName);                          \
+    hName##_destroy(hash);                                                     \
     return NULL;                                                               \
 }                                                                              \
                                                                                \
-hashName *hashName##_new(void) {                                               \
-    return hashName##_new_size(HASH_START_SIZE);                               \
+hName *hName##_new(void) {                                                     \
+    return hName##_new_size(HASH_START_SIZE);                                  \
 }                                                                              \
                                                                                \
-static inline bool hashName##_set(hashName *hash, keyType key, valType value); \
+static inline bool hName##_set(hName *hash, keyType key, valType value);       \
                                                                                \
-bool hashName##_rehash(hashName *hash) {                                       \
+bool hName##_rehash(hName *hash) {                                             \
     if(NULL == hash)                                                           \
         return FALSE;                                                          \
-    hashName *newhash = hashName##_new_size((hash->size + 1) * 2);             \
+    hName *newhash = hName##_new_size((hash->size + 1) * 2);                   \
     if(NULL == newhash)                                                        \
         return FALSE;                                                          \
-    HASH_EACH(hash, hashName##_set(newhash, hashnode->key, hashnode->value);)  \
+    HASH_EACH(hash, hName##_set(newhash, hashnode->key, hashnode->value);)     \
     free(hash->nodes);                                                         \
     hash->nodes = newhash->nodes;                                              \
     hash->size = newhash->size;                                                \
@@ -126,47 +105,51 @@ bool hashName##_rehash(hashName *hash) {                                       \
     return TRUE;                                                               \
 }                                                                              \
                                                                                \
-static inline valType hashName##_get(hashName *hash, keyType key) {            \
-    _HASH_INDEX(hashFunc, _HASH_NODE.exists && !cmpFunc(_HASH_NODE.key, key))  \
-    return _HASH_NODE.value;                                                   \
+static inline hName##Node *hName##_getnode(hName *hash, keyType key) {         \
+    unsigned index = hashFunc(key) & hash->size;                               \
+    unsigned probes = 0;                                                       \
+    while(hash->nodes[index].exists && !cmpFunc(hash->nodes[index].key, key)) {\
+        probes++;                                                              \
+        index = (HASH_PROBING) & hash->size;                                   \
+    }                                                                          \
+    return &hash->nodes[index];                                                \
 }                                                                              \
                                                                                \
-static inline valType *hashName##_getptr(hashName *hash, keyType key) {        \
-    _HASH_INDEX(hashFunc, _HASH_NODE.exists && !cmpFunc(_HASH_NODE.key, key))  \
-    return _HASH_NODE.exists ? &(_HASH_NODE.value) : NULL;                     \
+static inline valType hName##_get(hName *hash, keyType key) {                  \
+    hName##Node *n = hName##_getnode(hash, key);                               \
+    return n->value;                                                           \
 }                                                                              \
                                                                                \
-static inline bool hashName##_set(hashName *hash, keyType key, valType value) {\
-    _HASH_INDEX(hashFunc, _HASH_NODE.exists)                                   \
-    _HASH_NODE.key   = key;                                                    \
-    dprintf_chashv("%s: insert key using %4d probes\n",                        \
-                  #hashName, probes);                                          \
-    _HASH_NODE.value = value;                                                  \
-    _HASH_NODE.exists  = TRUE;                                                 \
+static inline bool hName##_set(hName *hash, keyType key, valType value) {      \
+    hName##Node *n = hName##_getnode(hash, key);                               \
+    n->key   = key;                                                            \
+    n->value = value;                                                          \
+    n->exists  = TRUE;                                                         \
     hash->items++;                                                             \
     /* rehash if space is limited */                                           \
     if(hash->items > hash->size * HASH_REHASH_RATIO) {                         \
-        dprintf_chash("%s: free space is limited, needs rehash\n", #hashName); \
-        return hashName##_rehash(hash);                                        \
+        dbg("%s: free space is limited, needs rehash", #hName);                \
+        return hName##_rehash(hash);                                           \
     }                                                                          \
     /* rehash if too much collisions */                                        \
-    if(probes > (hash->size >> 4) && hash->items > (hash->size / 3)) {         \
-        dprintf_chash("%s: too much collisions, needs rehash\n", #hashName);   \
-        return hashName##_rehash(hash);                                        \
-    }                                                                          \
+    /*if(probes > (hash->size >> 4) && hash->items > (hash->size / 3)) {       \
+        dbg("%s: too much collisions, needs rehash", #hName);                  \
+        return hName##_rehash(hash);                                           \
+    }*/                                                                        \
     return TRUE;                                                               \
 }                                                                              \
                                                                                \
-static inline unsigned hashName##_length(hashName *hash) {                     \
+static inline unsigned hName##_length(hName *hash) {                           \
     if(NULL == hash)                                                           \
         return 0;                                                              \
     return hash->items;                                                        \
 }                                                                              \
                                                                                \
-static inline unsigned hashName##_size(hashName *hash) {                       \
+static inline unsigned hName##_size(hName *hash) {                             \
     if(NULL == hash)                                                           \
         return 0;                                                              \
     return hash->size + 1;                                                     \
 }
+
 
 #endif /* HASHTABLE_H_ */
