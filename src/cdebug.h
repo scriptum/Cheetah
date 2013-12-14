@@ -29,7 +29,7 @@ IN THE SOFTWARE.
 
 /*******************************DEBUGGING OPTIONS******************************/
 
-#define DEBUG
+// #define DEBUG
 // #define DEBUGV
 // #define DEBUGVV
 
