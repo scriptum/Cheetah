@@ -12,7 +12,7 @@ for i=1,10000 do
 	:image(img)
 	:move(400,300)
 	--~ :move(math.random(0,800-img.w),math.random(0,600-img.h))
-	:animate({x=math.random(0,800-img.w),y=math.random(0,600-img.h)}, 10)
+	:animate({x=math.random(0,800-img.w),y=math.random(0,600-img.h)}, 1)
 	:mouseover(function(s)
 		s:animate({x=math.random(0,800-img.w),y=math.random(0,600-img.h)})
 	end)

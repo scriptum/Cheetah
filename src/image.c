@@ -53,12 +53,12 @@ queue resLoaderQueue;
 Resource *resShared;
 SDL_mutex *resQueueMutex;
 
-bool fileExists(const char * filename);
+bool fileExists(const char *filename);
 
 /*******************************************************************************
 PRIVATE FUNCTIOS
 *******************************************************************************/
-static unsigned char * loadImageData(const char *name, int *width, int *height, int *channels, bool mask);
+static unsigned char *loadImageData(const char *name, int *width, int *height, int *channels, bool mask);
 
 static unsigned int loadImageTex(const char *options, unsigned char *img, int width, int height, int channels)
 {
@@ -83,7 +83,7 @@ static unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 	return tex_id;
 }
 
-static unsigned char * loadImageMask(const unsigned char *img, const char *mask_name, int width, int height, int channels)
+static unsigned char *loadImageMask(const unsigned char *img, const char *mask_name, int width, int height, int channels)
 {
 	unsigned char *mask_img;
 	unsigned char *new_img;
@@ -285,7 +285,7 @@ int resLoaderThread(void *unused)
  * */
 void resLoaderMainThread(void)
 {
-	Resource * r;
+	Resource *r;
 	if(resShared)
 	{
 		r = resShared;
@@ -310,7 +310,7 @@ static void imageCheckResLoader(Image *image)
 		}
 }
 
-static void multitextureBind(Multitexture * multitexture)
+static void multitextureBind(Multitexture *multitexture)
 {
 	Image *image;
 	RETURN_IF_NULL(multitexture);
@@ -341,8 +341,6 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 	int width, height, channels;
 	unsigned int tex_id;
 	unsigned char *img;
-	
-	
 	NEEDED_INIT_VOID;
 	if(unlikely(NULL == name))
 	{
@@ -449,95 +447,95 @@ void disableTexture(void) {
 void imageDrawxy(Image *image, float x, float y, float w, float h) {
 	RETURN_IF_NULL(image);
 	imageBind(image);
-	PUSH_QUAD(x,y,w,h,0,0,0);
+	PUSH_QUAD(x, y, w, h, 0, 0, 0);
 }
 
 void imageDrawt(Image *image, float x, float y, float w, float h, float a, float ox, float oy) {
 	RETURN_IF_NULL(image);
 	imageBind(image);
-	PUSH_QUAD(x,y,w,h,a,ox,oy);
+	PUSH_QUAD(x, y, w, h, a, ox, oy);
 }
 
 void imageDrawqxy(Image *image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
 	RETURN_IF_NULL(image);
 	imageBind(image);
-	PUSH_QUADT(x,y,w,h,0,0,0,qx, qy, qw, qh, image->w, image->h);
+	PUSH_QUADT(x, y, w, h, 0, 0, 0, qx, qy, qw, qh, image->w, image->h);
 }
 
 void imageDrawqt(Image *image, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
 	RETURN_IF_NULL(image);
 	imageBind(image);
-	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, image->w, image->h);
+	PUSH_QUADT(x, y, w, h, a, ox, oy, qx, qy, qw, qh, image->w, image->h);
 }
 
-#define borderImageDrawInternal(borderImage, x, y, w, h, a, ox, oy) do {\
-	imageBind(borderImage->image);\
-	float ow = borderImage->image->w;\
-	float oh = borderImage->image->h;\
-	float t  = borderImage->top;\
-	float r  = borderImage->right;\
-	float b  = borderImage->bottom;\
-	float l  = borderImage->left;\
-	if(t > 0.0f)\
-	{\
-		PUSH_QUADT(x,  y,  l,          t,          a, ox,         oy,          0,       0,       l,            t,          ow, oh);\
-		PUSH_QUADT(x,  y,  w - l - r,  t,          a, ox - l,     oy,          l,       0,       ow - l - r,   t,          ow, oh);\
-		PUSH_QUADT(x,  y,  r,          t,          a, ox - w + r, oy,          ow - r,  0,       r,            t,          ow, oh);\
-	}\
-	PUSH_QUADT(x,    y,      l,      h - t - b,  a, ox,         oy - t,      0,       t,        l,           oh - t - b, ow, oh);\
-	if(FALSE == borderImage->borderOnly)\
-		PUSH_QUADT(x,  y,  w - l - r,  h - t - b,  a, ox - l,     oy - t,      l,       t,        ow - l - r,  oh - t - b, ow, oh);\
-	PUSH_QUADT(x,    y,  r,          h - t - b,  a, ox - w + r, oy - t,      ow - r,  t,        r,           oh - t - b, ow, oh);\
-	if(b > 0.0f)\
-	{\
-		PUSH_QUADT(x,  y,  l,          b,          a, ox,         oy - h + b,  0,       oh - b,   l,           b,          ow, oh);\
-		PUSH_QUADT(x,  y,  w - l - r,  b,          a, ox - l,     oy - h + b,  l,       oh - b,   ow - l - r,  b,          ow, oh);\
-		PUSH_QUADT(x,  y,  r,          b,          a, ox - w + r, oy - h + b,  ow - r,  oh - b,   r,           b,          ow, oh);\
-	}\
-} while(0)
+static void borderImageDrawInternal(BorderImage *borderImage, float x, float y, float w, float h, float a, float ox, float oy) {
+	imageBind(borderImage->image);
+	float ow = borderImage->image->w;
+	float oh = borderImage->image->h;
+	float t  = borderImage->top;
+	float r  = borderImage->right;
+	float b  = borderImage->bottom;
+	float l  = borderImage->left;
+	if(t > 0.0f)
+	{
+		PUSH_QUADT(x,  y,  l,          t,          a, ox,         oy,          0,       0,       l,            t,          ow, oh);
+		PUSH_QUADT(x,  y,  w - l - r,  t,          a, ox - l,     oy,          l,       0,       ow - l - r,   t,          ow, oh);
+		PUSH_QUADT(x,  y,  r,          t,          a, ox - w + r, oy,          ow - r,  0,       r,            t,          ow, oh);
+	}
+	PUSH_QUADT(x,    y,      l,      h - t - b,  a, ox,         oy - t,      0,       t,        l,           oh - t - b, ow, oh);
+	if(FALSE == borderImage->borderOnly)
+		PUSH_QUADT(x,  y,  w - l - r,  h - t - b,  a, ox - l,     oy - t,      l,       t,        ow - l - r,  oh - t - b, ow, oh);
+	PUSH_QUADT(x,    y,  r,          h - t - b,  a, ox - w + r, oy - t,      ow - r,  t,        r,           oh - t - b, ow, oh);
+	if(b > 0.0f)
+	{
+		PUSH_QUADT(x,  y,  l,          b,          a, ox,         oy - h + b,  0,       oh - b,   l,           b,          ow, oh);
+		PUSH_QUADT(x,  y,  w - l - r,  b,          a, ox - l,     oy - h + b,  l,       oh - b,   ow - l - r,  b,          ow, oh);
+		PUSH_QUADT(x,  y,  r,          b,          a, ox - w + r, oy - h + b,  ow - r,  oh - b,   r,           b,          ow, oh);
+	}
+}
 
-void borderImageDrawt(BorderImage * borderImage, float x, float y, float w, float h, float a, float ox, float oy) {
+void borderImageDrawt(BorderImage *borderImage, float x, float y, float w, float h, float a, float ox, float oy) {
 	RETURN_IF_NULL(borderImage);
 	borderImageDrawInternal(borderImage, x, y, w, h, a, ox, oy);
 }
 
-void borderImageDrawxy(BorderImage * borderImage, float x, float y, float w, float h) {
+void borderImageDrawxy(BorderImage *borderImage, float x, float y, float w, float h) {
 	RETURN_IF_NULL(borderImage);
 	borderImageDrawInternal(borderImage, x, y, w, h, 0, 0, 0);
 }
 
-void initMultitexture(Multitexture * multitexture) {
+void initMultitexture(Multitexture *multitexture) {
 	RETURN_IF_NULL(multitexture);
 	new(multitexture->images, Image*, multitexture->size);
 }
 
-void deleteMultitexture(Multitexture * multitexture) {
+void deleteMultitexture(Multitexture *multitexture) {
 	RETURN_IF_NULL(multitexture);
 	delete(multitexture->images);
 }
 
-void multitextureDrawxy(Multitexture * multitexture, float x, float y, float w, float h) {
+void multitextureDrawxy(Multitexture *multitexture, float x, float y, float w, float h) {
 	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
 	PUSH_QUAD(x,y,w,h,0,0,0);
 }
 
-void multitextureDrawt(Multitexture * multitexture, float x, float y, float w, float h, float a, float ox, float oy) {
+void multitextureDrawt(Multitexture *multitexture, float x, float y, float w, float h, float a, float ox, float oy) {
 	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
 	PUSH_QUAD(x,y,w,h,a,ox,oy);
 }
 
-void multitextureDrawqxy(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
+void multitextureDrawqxy(Multitexture *multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
 	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
-	PUSH_QUADT(x,y,w,h,0,0,0,qx, qy, qw, qh, multitexture->w, multitexture->h);
+	PUSH_QUADT(x, y, w, h, 0, 0, 0, qx, qy, qw, qh, multitexture->w, multitexture->h);
 }
 
-void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
+void multitextureDrawqt(Multitexture *multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
 	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
-	PUSH_QUADT(x,y,w,h,a,ox,oy,qx, qy, qw, qh, multitexture->w, multitexture->h);
+	PUSH_QUADT(x, y, w, h, a, ox, oy, qx, qy, qw, qh, multitexture->w, multitexture->h);
 }
 
 //~ /**
@@ -589,7 +587,7 @@ void multitextureDrawqt(Multitexture * multitexture, float x, float y, float w, 
  * @var Image object
  * @advanced
  * */
-void deleteImage(Image * ptr) {
+void deleteImage(Image *ptr) {
 	RETURN_IF_NULL(ptr);
 	//~ printf("%d\n", same_type_p(typeof(ptr)) == INTEGER_TYPE);
 	#ifdef MEMORY_TEST

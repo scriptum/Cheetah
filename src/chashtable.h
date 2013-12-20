@@ -39,18 +39,14 @@ IN THE SOFTWARE.
 #endif
 
 #ifndef HASH_PROBING
-#define HASH_PROBING (unsigned)(index + (probes))
+#define HASH_PROBING (unsigned)(i + (probes))
 #endif
 
-#define HASH_EACH(hash, CODE) {                                                \
-    unsigned __i;                                                              \
-    typeof(hash->nodes) hashnode;                                              \
-    for(__i = 0; __i <= hash->size; __i++)                                     \
-    {                                                                          \
-        hashnode = &(hash->nodes[__i]);                                        \
-        if(hashnode->exists) { CODE }                                          \
-    }                                                                          \
-}
+#define HASH_FOREACH(i, h, n)                                                  \
+    unsigned i;                                                                \
+    typeof((h)->nodes) n;                                                      \
+    for(i = 0; n = &((h)->nodes[i]), i <= (h)->size; i++)                      \
+        if(n->exists)
 
 #define HASH_TEMPLATE(hName, keyType, valType, hashFunc, cmpFunc)              \
                                                                                \
@@ -97,7 +93,8 @@ bool hName##_rehash(hName *hash) {                                             \
     hName *newhash = hName##_new_size((hash->size + 1) * 2);                   \
     if(NULL == newhash)                                                        \
         return FALSE;                                                          \
-    HASH_EACH(hash, hName##_set(newhash, hashnode->key, hashnode->value);)     \
+    HASH_FOREACH(i, (hName*)hash, n)                                           \
+        hName##_set(newhash, n->key, n->value);                                \
     free(hash->nodes);                                                         \
     hash->nodes = newhash->nodes;                                              \
     hash->size = newhash->size;                                                \
@@ -106,13 +103,13 @@ bool hName##_rehash(hName *hash) {                                             \
 }                                                                              \
                                                                                \
 static inline hName##Node *hName##_getnode(hName *hash, keyType key) {         \
-    unsigned index = hashFunc(key) & hash->size;                               \
+    unsigned i = hashFunc(key) & hash->size;                                   \
     unsigned probes = 0;                                                       \
-    while(hash->nodes[index].exists && !cmpFunc(hash->nodes[index].key, key)) {\
+    while(hash->nodes[i].exists && !cmpFunc(hash->nodes[i].key, key)) {        \
         probes++;                                                              \
-        index = (HASH_PROBING) & hash->size;                                   \
+        i = (HASH_PROBING) & hash->size;                                       \
     }                                                                          \
-    return &hash->nodes[index];                                                \
+    return &hash->nodes[i];                                                    \
 }                                                                              \
                                                                                \
 static inline valType hName##_get(hName *hash, keyType key) {                  \

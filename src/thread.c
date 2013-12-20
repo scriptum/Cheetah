@@ -65,17 +65,13 @@ typedef struct Thread {
 	lua_State  *L;
 } Thread;
 
-static inline bool threadCmpFunc(const char *a, const char *b)
-{
-	return strcmp(a, b) == 0;
-}
 // 
 // typedef struct threadMessage {
 	// const char *message;
 	// lua_State  *L; 
 // } threadMessage;
 
-HASH_TEMPLATE(threadHash, const char *, listDouble *, jenkins_one_at_a_time_hash, threadCmpFunc)
+HASH_TEMPLATE(threadHash, const char*, listDouble*, hash_string, cmp_string)
 
 threadHash *threadArray = NULL;
 SDL_mutex *threadMutex = NULL;

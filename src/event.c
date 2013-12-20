@@ -42,38 +42,40 @@ unsigned int getEventType(void) {
 				dbg("Quit");
 				return EVENT_QUIT;
 			case SDL_KEYDOWN:
-				dbg("Key down");
+				dbgv("Key down");
 				return EVENT_KEYDOWN;
 			case SDL_KEYUP:
-				dbg("Key up");
+				dbgv("Key up");
 				return EVENT_KEYUP;
 			case SDL_MOUSEBUTTONDOWN:
-				dbg("Mouse down");
+				dbgv("Mouse down");
 				return EVENT_MOUSEBUTTONDOWN;
 			case SDL_MOUSEBUTTONUP:
-				dbg("Mouse up");
+				dbgv("Mouse up");
 				return EVENT_MOUSEBUTTONUP;
 			case SDL_VIDEORESIZE:
-				dbg("Resize");
-				if(event.resize.w < 1) event.resize.w = 1;
-				if(event.resize.h < 1) event.resize.h = 1;
+				dbgv("Resize");
+				if(event.resize.w < 1)
+					event.resize.w = 1;
+				if(event.resize.h < 1)
+					event.resize.h = 1;
 				recomputeScreenScale((float)event.resize.w, (float)event.resize.h);
 				globalTimers.rescaleTime = globalTimers.time + globalTimers.resizeDelay;
 				setWindowSize((unsigned)event.resize.w, (unsigned)event.resize.h);
 				return EVENT_RESIZE;
 			/* TODO to do something here */
 			case SDL_VIDEOEXPOSE:
-				dbg("Expose");
+				dbgv("Expose");
 				return EVENT_EXPOSE;
 			case SDL_ACTIVEEVENT:
-				dbg("Active");
+				dbgv("Active");
 				return EVENT_ACTIVE;
 			case SDL_JOYAXISMOTION:
 			case SDL_JOYBALLMOTION:
 			case SDL_JOYHATMOTION:
 			case SDL_JOYBUTTONDOWN:
 			case SDL_JOYBUTTONUP:
-				dbg("Joystick");
+				dbgv("Joystick");
 				return EVENT_JOY;
 			default:
 				dbgv("Some event #%d", event.type);

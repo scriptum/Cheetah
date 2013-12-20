@@ -279,7 +279,8 @@ while(0)
 
 // #define KERNING_CONDITION (TRUE == currentFont->_kerning && NULL != currentFont->kerningHash && prevChar > 0 && fontPrevChar && fontPrevChar->kerning)
 #define KERNING_CONDITION (NULL != currentFont->kerningHash && fontPrevChar && fontPrevChar->kerning)
-void fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align) {
+
+void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align) {
 	FontChar *ch           = NULL;
 	unsigned  i            = 0;
 	unsigned  j            = 0;
@@ -631,8 +632,12 @@ void deleteFont(Font * ptr) {
 	{
 		if(NULL != ptr->hash)
 		{
-			HASH_EACH(((FontHash*)ptr->hash), delete(hashnode->value);)
-			FontHash_destroy((FontHash*)ptr->hash);
+			FontHash* h = (FontHash*)ptr->hash;
+			HASH_FOREACH(i, h, n)
+			{
+				delete(n->value);
+			}
+			FontHash_destroy(h);
 		}
 		if(NULL != ptr->kerningHash)
 		{

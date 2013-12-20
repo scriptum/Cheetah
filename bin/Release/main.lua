@@ -5,7 +5,6 @@ require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
 C.init('Welcome to Cheetah 2D Engine!', '800x600 vsync')
-
 Entity:new(screen)
 :image('Cheetahs.jpg')
 :move(-800,0)

@@ -118,7 +118,7 @@ static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,0};
 /**
  * Genegal vertex operations: push vertex coordinates to buffer.
  * */
-static inline void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, float a, float ox, float oy) {
+static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, float a, float ox, float oy) {
 	vertexCoord[vertexCounter + 0] = vx + VERTEX_ROT_X(0,  0,  a, ox, oy);
 	vertexCoord[vertexCounter + 1] = vy + VERTEX_ROT_Y(0,  0,  a, ox, oy);
 	vertexCoord[vertexCounter + 2] = vx + VERTEX_ROT_X(0,  vh, a, ox, oy);
@@ -134,7 +134,7 @@ static inline void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, 
  * Pushing full quad with all transformaions: size, rotation (a - angle),
  * texture offsets and origin position (ox, oy).
  * */
-static inline void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h) {
+static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h) {
 	FLUSH_BUFFER_IF_OVERFLOW
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
 	texCoord[vertexCounter + 2] =
@@ -183,7 +183,7 @@ static inline void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, 
 	vertexCoord[vertexCounter + 9]  = (vy) + VERTEX_ROT_Y(vw, 0,  a, ox, oy);
 }
 
-static inline void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h) {
+static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h) {
 	FLUSH_BUFFER_IF_OVERFLOW
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
 	texCoord[vertexCounter + 10] =
@@ -206,14 +206,14 @@ static inline void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, f
 
 #endif /* #ifdef GL_QUADS */
 
-static inline void PUSH_QUAD_TEXTURE(float vx, float vy, float vw, float vh, float a, float ox, float oy, const float *texture) {
+static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_TEXTURE(float vx, float vy, float vw, float vh, float a, float ox, float oy, const float *texture) {
 	FLUSH_BUFFER_IF_OVERFLOW
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
 	memcpy(texCoord + vertexCounter, texture, sizeof(float) * VERTICLES_PER_SPRITE);
 	vertexCounter += VERTICLES_PER_SPRITE;
 }
 
-static inline void PUSH_QUAD(float vx, float vy, float vw, float vh, float a, float ox, float oy) {
+static inline void __attribute__((optimize("-O3"))) PUSH_QUAD(float vx, float vy, float vw, float vh, float a, float ox, float oy) {
 	PUSH_QUAD_TEXTURE(vx, vy, vw, vh, a, ox, oy, DEFAULT_QUAD_TEX);
 }
 
