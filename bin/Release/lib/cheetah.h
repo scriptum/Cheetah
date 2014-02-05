@@ -390,3 +390,4 @@ void autoScale(bool enableAutoScale);
 void prepare(void);
 int (*showCursor)(int mode);
 int (*grabCursor)(int mode);
+void (*sdlquit)(void);

@@ -94,9 +94,8 @@ bool cheetahInit(const char *appName, const char *options) {
 	if(TRUE == noframe)
 		flags |= SDL_NOFRAME;
 	if(NULL == screen) {
-		if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) != 0)
+		if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 			return FALSE;
-		atexit(SDL_Quit);
 		SDL_EnableUNICODE(1);
 		//~ SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
@@ -191,7 +190,7 @@ bool cheetahInit(const char *appName, const char *options) {
 		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
 
 		/* init random generator */
-		random_hash_seed((unsigned)time(0));
+		random_hash_seed((uint32_t)time(NULL));
 	}
 	return TRUE;
 }
@@ -332,3 +331,4 @@ void recomputeScreenScale(float w, float h)
 
 int (*showCursor)(int mode) = &SDL_ShowCursor;
 int (*grabCursor)(int mode) = &SDL_WM_GrabInput;
+void (*sdlquit)(void) = &SDL_Quit;

@@ -131,6 +131,8 @@ C.mainLoop = function()
 			C.FPS = tostring(math.floor(FPS))
 		end
 	end
+	--fix exit halt bug
+	C.sdlquit()
 	--while C.poll() do end
 end
 
