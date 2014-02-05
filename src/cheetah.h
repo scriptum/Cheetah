@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-Copyright (c) 2012-2013 Pavel Roschin (aka RPG) <rpg89@post.ru>
+Copyright (c) 2012-2014 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to
@@ -275,10 +275,10 @@ enum {
 
 enum {
 	EVENT_QUIT = 1,
-	EVENT_KEYDOWN,
 	EVENT_KEYUP,
-	EVENT_MOUSEBUTTONDOWN,
-	EVENT_MOUSEBUTTONUP,
+	EVENT_KEYDOWN,
+	EVENT_MOUSEUP,
+	EVENT_MOUSEDOWN,
 	EVENT_RESIZE,
 	EVENT_EXPOSE,
 	EVENT_ACTIVE,

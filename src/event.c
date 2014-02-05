@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-Copyright (c) 2012-2013 Pavel Roschin (aka RPG) <rpg89@post.ru>
+Copyright (c) 2012-2014 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to
@@ -36,23 +36,25 @@ void setWindowSize(unsigned w, unsigned h);
 
 unsigned int getEventType(void) {
 	/* skip unneeded events */
-	while(SDL_PollEvent(&event)) {
-		switch(event.type) {
+	while(SDL_PollEvent(&event))
+	{
+		switch(event.type)
+		{
 			case SDL_QUIT:
 				dbg("Quit");
 				return EVENT_QUIT;
-			case SDL_KEYDOWN:
-				dbgv("Key down");
-				return EVENT_KEYDOWN;
 			case SDL_KEYUP:
 				dbgv("Key up");
 				return EVENT_KEYUP;
-			case SDL_MOUSEBUTTONDOWN:
-				dbgv("Mouse down");
-				return EVENT_MOUSEBUTTONDOWN;
+			case SDL_KEYDOWN:
+				dbgv("Key down");
+				return EVENT_KEYDOWN;
 			case SDL_MOUSEBUTTONUP:
 				dbgv("Mouse up");
-				return EVENT_MOUSEBUTTONUP;
+				return EVENT_MOUSEUP;
+			case SDL_MOUSEBUTTONDOWN:
+				dbgv("Mouse down");
+				return EVENT_MOUSEDOWN;
 			case SDL_VIDEORESIZE:
 				dbgv("Resize");
 				if(event.resize.w < 1)
@@ -93,15 +95,15 @@ unsigned int getEventKeyUnicode(void) {
 }
 
 int getEventMouseX(void) {
-	if(screenScale.autoScale)
-		return (int)(((float)event.button.x - screenScale.offsetX) / screenScale.scaleX);
-	return event.button.x;
+	if(!screenScale.autoScale)
+		return event.button.x;
+	return (int)(((float)event.button.x - screenScale.offsetX) / screenScale.scaleX);
 }
 
 int getEventMouseY(void) {
-	if(screenScale.autoScale)
-		return (int)(((float)event.button.y - screenScale.offsetY) / screenScale.scaleY);
-	return event.button.y;
+	if(!screenScale.autoScale)
+		return event.button.y;
+	return (int)(((float)event.button.y - screenScale.offsetY) / screenScale.scaleY);
 }
 
 unsigned int getEventMouseButton(void) {
@@ -123,17 +125,17 @@ void setResizeDelay(unsigned delay) {
 int getMouseX(void) {
 	int x;
 	SDL_GetMouseState(&x, NULL);
-	if(screenScale.autoScale)
-		return (int)(((float)x - screenScale.offsetX) / screenScale.scaleX);
-	return x;
+	if(!screenScale.autoScale)
+		return x;
+	return (int)(((float)x - screenScale.offsetX) / screenScale.scaleX);
 }
 
 int getMouseY(void) {
 	int y;
 	SDL_GetMouseState(NULL, &y);
-	if(screenScale.autoScale)
-		return (int)(((float)y - screenScale.offsetY) / screenScale.scaleY);
-	return y;
+	if(!screenScale.autoScale)
+		return y;
+	return (int)(((float)y - screenScale.offsetY) / screenScale.scaleY);
 }
 
 unsigned char *getKeyState(void) {

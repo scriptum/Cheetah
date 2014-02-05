@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-Copyright (c) 2012-2013 Pavel Roschin (aka RPG) <rpg89@post.ru>
+Copyright (c) 2012-2014 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to
@@ -311,21 +311,20 @@ void prepare(void) {
 
 void recomputeScreenScale(float w, float h)
 {
-	if(screenScale.autoScale)
+	if(!screenScale.autoScale)
+		return;
+	screenScale.aspect = w / h;
+	if(screenScale.aspect > screenScale.origWidth/screenScale.origHeight)
 	{
-		screenScale.aspect = w / h;
-		if(screenScale.aspect > screenScale.origWidth/screenScale.origHeight)
-		{
-			screenScale.scaleX = screenScale.scaleY = h/screenScale.origHeight;
-			screenScale.offsetX = floorf((w - screenScale.origWidth * screenScale.scaleX) * 0.5f);
-			screenScale.offsetY = 0;
-		}
-		else
-		{
-			screenScale.scaleX = screenScale.scaleY = w/screenScale.origWidth;
-			screenScale.offsetY = floorf((h - screenScale.origHeight * screenScale.scaleY) * 0.5f);
-			screenScale.offsetX = 0;
-		}
+		screenScale.scaleX = screenScale.scaleY = h/screenScale.origHeight;
+		screenScale.offsetX = floorf((w - screenScale.origWidth * screenScale.scaleX) * 0.5f);
+		screenScale.offsetY = 0;
+	}
+	else
+	{
+		screenScale.scaleX = screenScale.scaleY = w/screenScale.origWidth;
+		screenScale.offsetY = floorf((h - screenScale.origHeight * screenScale.scaleY) * 0.5f);
+		screenScale.offsetX = 0;
 	}
 }
 

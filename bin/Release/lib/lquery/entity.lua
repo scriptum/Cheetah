@@ -1,6 +1,6 @@
 --[[****************************************************************************
 
-Copyright (c) 2012 Pavel Roschin (aka RPG) <rpg89@post.ru>
+Copyright (c) 2012-2014 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to
@@ -608,6 +608,7 @@ end
 
 --some events
 local function events(v)
+	--screen can receive all key events
 	if v == screen or v._focus or _lQuery._globalFocus == false then
 		if _lQuery.KeyPressed == true then
 			if v._keypress then
@@ -699,12 +700,12 @@ local function process_entities(s)
 	end
 end
 
-_lQuery.event = function(e, a, b, c)
-	if e == "mp" then
+_lQuery.event = function(eid, a, b, c)
+	if eid == C.EVENT_MOUSEDOWN then
 		_lQuery.MousePressed = true
 		_lQuery.MouseButton = c
 		mPressOwn = true
-	elseif e == "mr" then
+	elseif eid == C.EVENT_MOUSEUP then
 		_lQuery.MousePressed = false
 		_lQuery.MouseButton = c
 		--click handler
@@ -728,15 +729,15 @@ _lQuery.event = function(e, a, b, c)
 			end
 		end
 		_lQuery.MousePressedOwner = nil
-	elseif e == "kp" then
+	elseif eid == C.EVENT_KEYDOWN then
 		_lQuery.KeyPressed = true
 		_lQuery.KeyPressedKey = a
 		_lQuery.KeyPressedUni = b
-	elseif e == "kr" then
+	elseif eid == C.EVENT_KEYUP then
 		_lQuery.KeyReleased = true
 		_lQuery.KeyReleasedKey = a
 		_lQuery.KeyReleasedUni = b
-	elseif e == "rz" then
+	elseif eid == C.EVENT_RESIZE then
 		screen_width = a
 		screen_height = b
 		if _lQuery._onresize[1] then
@@ -744,7 +745,7 @@ _lQuery.event = function(e, a, b, c)
 				_lQuery._onresize[i](a, b)
 			end
 		end
-	elseif e == "q" then
+	elseif eid == C.EVENT_QUIT then
 		if atexit then atexit() end
 	end
 end

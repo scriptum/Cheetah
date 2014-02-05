@@ -1,6 +1,6 @@
 --[[****************************************************************************
 
-Copyright (c) 2012 Pavel Roschin (aka RPG) <rpg89@post.ru>
+Copyright (c) 2012-2014 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to
@@ -89,17 +89,12 @@ int sscanf ( const char * str, const char * format, ...);
 int (*grabCursor)(int mode);
 ]]
 
-
-
 local libcheetah = C.loadDLL 'cheetah'
 assert(libcheetah, 'Cannot load cheetah library!')
 
---~ require "lib.gl"
-
 local lua_keys = require 'lib.keys'
 local keys_reverse = require 'lib.keys_reverse'
-local button_names = {"l","m","r","wu","wd"}
-local lua_events = {"q","kp","kr","mp","mr","rz"}
+local button_names = {"l", "m", "r", "wu", "wd"}
 
 local done = false
 local FPS = 60
@@ -112,11 +107,12 @@ local lastFpsTime = 0
 
 C.mainLoop = function()
 	assert(libcheetah.isInit(), 'You forgot about cheetah.init')
-	while done == false do
+	while not done do
 		time = libcheetah.getGameTime()
 		systemTime = libcheetah.getTime()
 		libcheetah.prepare()
 		if C.render then
+			--do not crash after a bug in user script
 			local ret, err = xpcall(C.render, debug.traceback)
 			if err then io.stderr:write(err ,"\n") end
 		end
@@ -125,8 +121,9 @@ C.mainLoop = function()
 		if systemTime - lastFpsTime > 0.5 then
 			lastFpsTime = systemTime
 			if C.printFPS then
-				print(C.FPS..' '..gcinfo())
-				C.setTitle(C.FPS..' '..gcinfo())
+				local s = C.FPS..' '..gcinfo()
+				print(s)
+				C.setTitle(s)
 			end
 			C.FPS = tostring(math.floor(FPS))
 		end
@@ -150,16 +147,25 @@ end
 
 local _blend_modes = {
 	additive = libcheetah.blend_additive,
+	add = libcheetah.blend_additive,
+	default = libcheetah.blend_alpha,
 	alpha = libcheetah.blend_alpha,
+	mul = libcheetah.blend_multiplicative,
 	multiplicative = libcheetah.blend_multiplicative,
 	screen = libcheetah.blend_screen,
 	detail = libcheetah.blend_detail,
+	sub = libcheetah.blend_substractive,
 	substractive = libcheetah.blend_substractive,
+	diff = libcheetah.blend_difference,
 	difference = libcheetah.blend_difference,
 	mask = libcheetah.blend_mask,
 }
 
 C.setBlendMode = function(mode)
+	if not mode then
+		libcheetah.blendMode(libcheetah.blend_alpha)
+		return
+	end
 	if type(r) == 'string' then
 		libcheetah.blendMode(_blend_modes[mode])
 	else
@@ -172,22 +178,22 @@ C.getWindowSize = function()
 end
 
 C.poll = function()
-	local e = lua_events[libcheetah.getEventType()]
+	local eid = libcheetah.getEventType()
 	local a, b, c
-	if e == 'q' then
+	if eid == C.EVENT_QUIT then
 		C.quit()
-	elseif e == 'kp' or e == 'kr' then
+	elseif eid == C.EVENT_KEYDOWN or eid == C.EVENT_KEYUP then
 		a = libcheetah.getEventKey()
 		a, b = lua_keys[a] or 'key_' .. a, libcheetah.getEventKeyUnicode()
-	elseif e == 'mp' or e == 'mr' then
+	elseif eid == C.EVENT_MOUSEUP or eid == C.EVENT_MOUSEDOWN then
 		c = libcheetah.getEventMouseButton()
 		a, b, c = libcheetah.getEventMouseX(), libcheetah.getEventMouseY(), button_names[c] or 'm_' .. c
-	elseif e == 'rz' then
+	elseif eid == C.EVENT_RESIZE then
 		a, b = libcheetah.getEventResizeW(), libcheetah.getEventResizeH()
 	else
 		return nil
 	end
-	return e, a, b, c
+	return eid, a, b, c
 end
 
 C.getMousePos = function()
@@ -774,18 +780,17 @@ C.newShader = function(fragment, vertex)
 		str = fragment
 	end
 	local location, float
-	if shader:check() then
-		uniforms[shader.id] = {}
-		for a, b in string.gmatch(str, "uniform[ \t]+([^ ]+)[ \t]+([^ ;]+);") do
-			location = libcheetah.GetUniformLocation(shader.id, b)
-			if location then
-				if a == 'float' or a == 'vec2' or a == 'vec3' or a == 'vec4' then
-					float = true
-				else
-					float = false
-				end
-				uniforms[shader.id][b] = {location, float}
+	if not shader:check() then return nil end
+	uniforms[shader.id] = {}
+	for a, b in string.gmatch(str, "uniform[ \t]+([^ ]+)[ \t]+([^ ;]+);") do
+		location = libcheetah.GetUniformLocation(shader.id, b)
+		if location then
+			if a == 'float' or a == 'vec2' or a == 'vec3' or a == 'vec4' then
+				float = true
+			else
+				float = false
 			end
+			uniforms[shader.id][b] = {location, float}
 		end
 	end
 	return shader
@@ -800,19 +805,17 @@ ffi.metatype('Shader', {
 		--type of uniform is detecting in C.newShader
 		set = function(shader, name, a, b, c, d)
 			local buf = uniforms[shader.id]
-			if buf then
-				buf = buf[name]
-				if buf and buf[1] >= 0 then
-					if d then
-						libcheetah.Uniform4f(buf[1], a, b, c, d)
-					elseif c then
-						libcheetah.Uniform3f(buf[1], a, b, c)
-					elseif b then
-						libcheetah.Uniform2f(buf[1], a, b)
-					elseif a then
-						if buf[2] then libcheetah.Uniform1f(buf[1], a) else libcheetah.Uniform1i(buf[1], a) end
-					end
-				end
+			if not buf then return end
+			buf = buf[name]
+			if not (buf and buf[1] >= 0) then return end
+			if d then
+				libcheetah.Uniform4f(buf[1], a, b, c, d)
+			elseif c then
+				libcheetah.Uniform3f(buf[1], a, b, c)
+			elseif b then
+				libcheetah.Uniform2f(buf[1], a, b)
+			elseif a then
+				if buf[2] then libcheetah.Uniform1f(buf[1], a) else libcheetah.Uniform1i(buf[1], a) end
 			end
 		end
 	},
