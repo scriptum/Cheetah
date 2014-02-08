@@ -152,9 +152,10 @@ bool isInit();
 
 static inline bool check_option_helper(const char *options, const char *o)
 {
+	char *name;
 	RETURN_VALUE_IF_NULL(options, FALSE);
 	RETURN_VALUE_IF_NULL(o, FALSE);
-	char *name = strstr(options, o);
+	name = strstr(options, o);
 	size_t l = strlen(o);
 	/* check bounds */
 	if(NULL != name &&

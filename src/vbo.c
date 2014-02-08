@@ -21,8 +21,8 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-//~ #include "cheetah.h"
-//~ #include "render.h"
+/* #include "cheetah.h"
+#include "render.h" */
 
 /*
 Vbo * newVbo(Point * data, Point * tex, unsigned int count) {

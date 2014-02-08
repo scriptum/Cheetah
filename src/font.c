@@ -21,7 +21,7 @@ IN THE SOFTWARE.
 
 *******************************************************************************/
 
-//TODO: rich text
+/* TODO: rich text */
 
 #include <stdio.h>
 #include <stdlib.h>
