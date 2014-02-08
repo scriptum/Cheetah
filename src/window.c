@@ -88,7 +88,7 @@ bool cheetahInit(const char *appName, const char *options) {
 	CHECK_OPTION(options, noframe);
 	const int bpp = 32;
 	if(TRUE == fullscreen)
-		flags |= SDL_FULLSCREEN;
+		flags |= SDL_NOFRAME;
 	else if(TRUE == resizable)
 		flags |= SDL_RESIZABLE;
 	if(TRUE == noframe)
@@ -96,6 +96,12 @@ bool cheetahInit(const char *appName, const char *options) {
 	if(NULL == screen) {
 		if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 			return FALSE;
+		if(TRUE == fullscreen)
+		{
+			const SDL_VideoInfo* info = SDL_GetVideoInfo();
+			width = info->current_w;
+			height = info->current_h;
+		}
 		SDL_EnableUNICODE(1);
 		//~ SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);

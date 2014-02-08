@@ -159,11 +159,11 @@ typedef struct Shader {
 	unsigned	id;
 } Shader;
 typedef struct _Tilemap {
-	int		w, h;            // size in tiles
-	int		tw, th;          // single tile size
-	float		**index;         // texture coords index
-	unsigned char	**map;           // tile indexes map
-	int		scalable;        // should tilemap be scaled to screen size or drawed per-pixel
+	int		w, h;            /* size in tiles */
+	int		tw, th;          /* single tile size */
+	float		**index;         /* texture coords index */
+	unsigned char	**map;           /* tile indexes map */
+	int		scalable;        /* should tilemap be scaled to screen size or drawed per-pixel */
 	Image		*img;
 } Tilemap;
 typedef struct Vbo {
@@ -186,7 +186,7 @@ enum {
 	blendDetail,
 	blendSubstractive,
 	blendDifference,
-	blendMask,
+	blendMask
 };
 enum {
 	alignLeft = 1,
