@@ -167,5 +167,4 @@ static inline bool check_option_helper(const char *options, const char *o)
 
 #define CHECK_OPTION(options, o) bool o = check_option_helper(options, #o)
 
-
 #endif /*MACROS_H_*/

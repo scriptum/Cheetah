@@ -31,7 +31,8 @@ IN THE SOFTWARE.
 
 void imageBind(Image * image);
 
-void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox, float oy) {
+CHEETAH_EXPORT void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox, float oy)
+{
 	float scalex = w/p->w;
 	float scaley = h/p->h;
 	imageBind(p->image);
@@ -41,7 +42,8 @@ void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox,
 		PUSH_QUAD_TEXTURE(x, y, p->aw * scalex, p->ah * scaley, a, ox - p->x * scalex, oy - p->y * scaley, p->tex);
 }
 
-void atlasDrawxy(Atlas *p, float x, float y, float w, float h) {
+CHEETAH_EXPORT void atlasDrawxy(Atlas *p, float x, float y, float w, float h)
+{
 	float scalex = w / p->w;
 	float scaley = h / p->h;
 	imageBind(p->image);

@@ -38,7 +38,9 @@ IN THE SOFTWARE.
 
 #include "test.h"
 
-SDL_Surface *screen = NULL;
+SDL_Window *screen = NULL;
+SDL_GLContext glcontext;
+
 bool clearScreenFlag = 1;
 
 int resLoaderThread(void *unused);
@@ -58,19 +60,22 @@ void resetView(int w, int h)
 
 void resetViewDefault(void)
 {
+	int w, h;
 	RETURN_IF_NULL(screen);
-	resetView(screen->w, screen->h);
+	SDL_GetWindowSize(screen, &w, &h);
+	resetView(w, h);
 }
 
-void setWindowSize(int w, int h) {
+CHEETAH_EXPORT void setWindowSize(int w, int h)
+{
 	RETURN_IF_NULL(screen);
-	screen->w = w;
-	screen->h = h;
+	SDL_SetWindowSize(screen, w, h);
 }
 
 /* Create window and initialize all OpenGL's stuff. */
-bool cheetahInit(const char *appName, const char *options) {
-	unsigned flags = SDL_OPENGL | SDL_DOUBLEBUF;
+CHEETAH_EXPORT bool cheetahInit(const char *appName, const char *options)
+{
+	unsigned flags = SDL_WINDOW_OPENGL;
 	bool firstrun = FALSE;
 	int width = 800, height = 600;
 	int count = sscanf(options, "%11dx%11d", &width, &height);
@@ -88,23 +93,26 @@ bool cheetahInit(const char *appName, const char *options) {
 	CHECK_OPTION(options, noframe);
 	const int bpp = 32;
 	if(TRUE == fullscreen)
-		flags |= SDL_NOFRAME;
+		flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 	else if(TRUE == resizable)
-		flags |= SDL_RESIZABLE;
+		flags |= SDL_WINDOW_RESIZABLE;
 	if(TRUE == noframe)
-		flags |= SDL_NOFRAME;
+		flags |= SDL_WINDOW_BORDERLESS;
 	if(NULL == screen) {
 		if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 			return FALSE;
-		if(TRUE == fullscreen)
+		screen = SDL_CreateWindow(appName ? appName : "Cheetah Engine",
+			SDL_WINDOWPOS_CENTERED,
+			SDL_WINDOWPOS_CENTERED,
+			width, height, flags);
+		if(NULL == screen)
 		{
-			const SDL_VideoInfo* info = SDL_GetVideoInfo();
-			width = info->current_w;
-			height = info->current_h;
+			myError("couldn't set %dx%dx%d video mode: %s",
+				width, height, bpp, SDL_GetError());
+			return FALSE;
 		}
-		SDL_EnableUNICODE(1);
-		//~ SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
+		glcontext = SDL_GL_CreateContext(screen);
+		SDL_GL_SetSwapInterval(vsync);
 		if(TRUE == depth)
 			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 		if(TRUE == stencil)
@@ -121,12 +129,6 @@ bool cheetahInit(const char *appName, const char *options) {
 		screenScale.offsetY = 0.0f;
 		screenScale.aspect = screenScale.origWidth / screenScale.origHeight;
 	}
-	if(NULL != appName)
-		SDL_WM_SetCaption(appName, appName);
-	screen = SDL_SetVideoMode(width, height, bpp, flags);
-	if (NULL == screen)
-		myError("couldn't set %dx%dx%d video mode: %s",
-			width, height, bpp, SDL_GetError());
 
 	if(TRUE == firstrun)
 	{
@@ -144,7 +146,7 @@ bool cheetahInit(const char *appName, const char *options) {
 		if(TRUE == resloader)
 		{
 			resLoaderInit(resloader);
-			SDL_CreateThread(resLoaderThread, (void *)NULL);
+			SDL_CreateThread(resLoaderThread, NULL, NULL);
 		}
 		glGenTextures(1, &null_texture);
 		glBindTexture(GL_TEXTURE_2D, null_texture);
@@ -187,9 +189,6 @@ bool cheetahInit(const char *appName, const char *options) {
 		#ifdef COLOR_ARRAYS
 		new(colorArray, unsigned char, 2 * VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
 		glEnableClientState(GL_COLOR_ARRAY);
-		#endif
-		/* fix vertex pointers to main memory area */
-		#ifdef COLOR_ARRAYS
 		glColorPointer(4, GL_UNSIGNED_BYTE, 0, colorArray);
 		#endif
 		glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
@@ -198,6 +197,7 @@ bool cheetahInit(const char *appName, const char *options) {
 		/* init random generator */
 		random_hash_seed((uint32_t)time(NULL));
 	}
+	
 	return TRUE;
 }
 
@@ -206,30 +206,23 @@ bool cheetahInit(const char *appName, const char *options) {
  * @group graphics/window
  * @return true if screen was initialized
  * */
-bool isInit(void) {
+CHEETAH_EXPORT bool isInit(void)
+{
 	return screen != NULL;
 }
 
 /**
  * @descr Get window's width.
  * @group graphics/window
- * @return width of the window
- * @see getWindowHeight
  * */
-int getWindowWidth(void) {
-	RETURN_VALUE_IF_NULL(screen, 0);
-	return screen->w;
-}
-
-/**
- * @descr Get window's height.
- * @group graphics/window
- * @return height of the window
- * @see getWindowWidth
- * */
-int getWindowHeight(void) {
-	RETURN_VALUE_IF_NULL(screen, 0);
-	return screen->h;
+CHEETAH_EXPORT void getWindowSize(int *w, int *h)
+{
+	if(NULL == screen)
+	{
+		*w = *h = 0;
+		return;
+	}
+	SDL_GetWindowSize(screen, w, h);
 }
 
 /**
@@ -237,9 +230,10 @@ int getWindowHeight(void) {
  * @group graphics/window
  * @advanced
  * */
-void swapBuffers(void) {
+CHEETAH_EXPORT void swapBuffers(void)
+{
 	FLUSH_BUFFER();
-	SDL_GL_SwapBuffers();
+	SDL_GL_SwapWindow(screen);
 }
 
 /**
@@ -248,8 +242,9 @@ void swapBuffers(void) {
  * @var text to replace the caption
  * @see init
  * */
-void setTitle(const char * text) {
-	SDL_WM_SetCaption(text, text);
+CHEETAH_EXPORT void setTitle(const char * text)
+{
+	SDL_SetWindowTitle(screen, text);
 }
 
 /**
@@ -258,13 +253,13 @@ void setTitle(const char * text) {
  * @return array of pointers to SDL_Rect structure.
  * @advanced
  * */
-SDL_Rect **getModesSDL(void) {
+/*SDL_Rect **getModesSDL(void) {
 	NEEDED_INIT;
 	SDL_Rect **modes = SDL_ListModes(0, SDL_OPENGL | SDL_FULLSCREEN);
 	if(modes == (SDL_Rect **)0 || modes == (SDL_Rect **)-1)
 		return NULL;
 	return modes;
-}
+}*/
 
 /**
  * @descr Toggle auto-clear screen. Disable auto-clear if you want to do it manually or you have fullscreen background.
@@ -272,7 +267,8 @@ SDL_Rect **getModesSDL(void) {
  * @var enable or disable
  * @see clear
  * */
-void clearScreen(bool enabled) {
+CHEETAH_EXPORT void clearScreen(bool enabled)
+{
 	clearScreenFlag = enabled;
 }
 
@@ -281,7 +277,8 @@ void clearScreen(bool enabled) {
  * @group graphics/drawing
  * @var enable or disable autoscale
  * */
-void autoScale(bool enableAutoScale) {
+CHEETAH_EXPORT void autoScale(bool enableAutoScale)
+{
 	screenScale.autoScale = enableAutoScale;
 }
 
@@ -295,19 +292,23 @@ static void doAutoScale(void)
 	}
 }
 
-void prepare(void) {
+CHEETAH_EXPORT void prepare(void)
+{
 	unsigned int delta = globalTimers.time;
 	globalTimers.time = SDL_GetTicks();
 	delta = globalTimers.time - delta;
 	globalTimers.timeOffsetd += (1.0 - globalTimers.gameSpeed) * delta / 1000.0;
 	globalTimers.timed = globalTimers.time / 1000.0;
 	globalTimers.gameTimed = globalTimers.timed - globalTimers.timeOffsetd;
+	dbgvv("time: %f\ngame time: %f\noffset: %f", globalTimers.timed, globalTimers.gameTimed, globalTimers.timeOffsetd);
 	doAutoScale();
 	resLoaderMainThread();
 	if(globalTimers.rescaleTime && globalTimers.time > globalTimers.rescaleTime)
 	{
-		SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
-		resetView((int)screen->w, (int)screen->h);
+		int w, h;
+		SDL_GetWindowSize(screen, &w, &h);
+		// SDL_SetVideoMode(screen->w, screen->h, 32, screen->flags);
+		resetView(w, h);
 		doAutoScale();
 		globalTimers.rescaleTime = 0;
 	}
@@ -334,6 +335,12 @@ void recomputeScreenScale(float w, float h)
 	}
 }
 
-int (*showCursor)(int mode) = &SDL_ShowCursor;
-int (*grabCursor)(int mode) = &SDL_WM_GrabInput;
-void (*sdlquit)(void) = &SDL_Quit;
+CHEETAH_EXPORT void sdlquit()
+{
+	if(screen)
+	{
+		SDL_DestroyWindow(screen);
+		SDL_GL_DeleteContext(glcontext);  
+	}
+	SDL_Quit();
+}

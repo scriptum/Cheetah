@@ -38,7 +38,8 @@ Vbo * newVbo(Point * data, Point * tex, unsigned int count) {
 	return ptr;
 }
 
-void vboDraw(Vbo * ptr) {
+CHEETAH_EXPORT void vboDraw(Vbo * ptr)
+{
 	//~ glEnable(GL_TEXTURE_2D);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -85,7 +86,8 @@ Vbo * newVboPoints(Point * data, unsigned int count) {
 
 	return ptr;
 }
-void vboDrawSprites(Vbo * ptr, Image * img, float size) {
+CHEETAH_EXPORT void vboDrawSprites(Vbo * ptr, Image * img, float size)
+{
 	int i;
 	//~ glEnable(GL_TEXTURE_2D);
 	imageBind(img);
@@ -130,7 +132,8 @@ Vbo * newVboPoints3(Point3 * data, unsigned int count) {
 	glBufferData_(GL_ARRAY_BUFFER_ARB, sizeof(Point3)*count, (void*)data, GL_STATIC_DRAW_ARB);
 	return ptr;
 }
-void vboDrawSprites3(Vbo * ptr, Image * img, float size) {
+CHEETAH_EXPORT void vboDrawSprites3(Vbo * ptr, Image * img, float size)
+{
 	//~ glEnable(GL_TEXTURE_2D);
 	imageBind(img);
 	glPointSize(size);
@@ -145,7 +148,8 @@ void vboDrawSprites3(Vbo * ptr, Image * img, float size) {
 	//~ glDisable(GL_TEXTURE_2D);
 }
 
-void deleteVbo(Vbo * ptr) {
+CHEETAH_EXPORT void deleteVbo(Vbo * ptr)
+{
 	if(ptr) {
 		glDeleteBuffers_(1, &ptr->id);
 	}

@@ -1,1 +1,1 @@
-Put your binaries and luajit here.
+Put your binaries and cheetah engine here.

@@ -35,27 +35,32 @@ IN THE SOFTWARE.
 #include "chashtable.h"
 
 /* Get the number of milliseconds past from the execution time. Equivalent to SDL_GetTicks(); */
-unsigned int getTicks(void) {
+CHEETAH_EXPORT unsigned int getTicks(void)
+{
 	return SDL_GetTicks();
 }
 
 /* Get the time in seconds past from the execution time. This time may change its speed! */
-double getGameTime(void) {
+CHEETAH_EXPORT double getGameTime(void)
+{
 	return globalTimers.gameTimed;
 }
 
 /* Get the time in seconds past from the execution time. Returns system's (without game speed). */
-double getTime(void) {
+CHEETAH_EXPORT double getTime(void)
+{
 	return globalTimers.timed;
 }
 
 /* Do nothing some time. */
-void delay(unsigned int ms) {
+CHEETAH_EXPORT void delay(unsigned int ms)
+{
 	SDL_Delay(ms);
 }
 
 /* Do nothing some time. */
-void sleep(double sec) {
+CHEETAH_EXPORT void sleep(double sec)
+{
 	SDL_Delay((unsigned)(sec * 1000.));
 }
 
@@ -98,7 +103,8 @@ int Lua_Thread_create(void *data)
 	return 0;
 }
 
-bool newThread(const char *file) {
+CHEETAH_EXPORT bool newThread(const char *file)
+{
 	// Thread t;
 	// t.file = file;
 	SDL_Thread *t;
@@ -117,7 +123,7 @@ bool newThread(const char *file) {
 			dbg("created new thread mutex");
 		}
 	}
-	t = SDL_CreateThread(Lua_Thread_create, (void*)file);
+	t = SDL_CreateThread(Lua_Thread_create, NULL, (void*)file);
 	if(unlikely(NULL == t))
 	{
 		dbg("failed created new thread!");
@@ -126,12 +132,14 @@ bool newThread(const char *file) {
 	return TRUE;
 }
 
-void threadMutexLock(void) {
+CHEETAH_EXPORT void threadMutexLock(void)
+{
 	dbgvv("lock mutex");
 	SDL_mutexP(threadMutex);
 }
 
-void threadMutexUnlock(void) {
+CHEETAH_EXPORT void threadMutexUnlock(void)
+{
 	dbgvv("unlock mutex");
 	SDL_mutexV(threadMutex);
 }
@@ -142,7 +150,8 @@ void threadMutexUnlock(void) {
 	// threadMutexUnlock();
 // }
 
-void threadSendStr(const char *message, const char *queue) {
+CHEETAH_EXPORT void threadSendStr(const char *message, const char *queue)
+{
 	listDouble *messageItem = NULL;
 	listDouble *threadMessages = NULL;
 	if(unlikely(NULL == message || NULL == queue))
@@ -185,7 +194,8 @@ void threadSendStr(const char *message, const char *queue) {
 	// return message;
 // }
 
-const char *threadRecvStr(const char *queue) {
+CHEETAH_EXPORT const char *threadRecvStr(const char *queue)
+{
 	const char *message = NULL;
 	listDouble *messageItem;
 	listDouble *threadMessages = NULL;

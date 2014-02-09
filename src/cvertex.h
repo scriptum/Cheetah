@@ -62,6 +62,7 @@ extern unsigned colorArrayBuf[4];
 #define TEXTURE_BIND(tex) do {                                                 \
     if(unlikely(prevImageId != (tex))) {                                       \
         FLUSH_BUFFER();                                                        \
+        dbgvv("bind texture %d", tex);                                         \
         glBindTexture(GL_TEXTURE_2D, tex);                                     \
         prevImageId = tex;                                                     \
     }                                                                          \
@@ -105,6 +106,7 @@ static inline float VERTEX_ROT_Y(float x,float y,float a,float ox,float oy)
  * */
 #define FLUSH_BUFFER() do {                                                    \
     if(likely(vertexCounter!= 0)) {                                            \
+        dbgvv("buffer of size %d flushed", vertexCounter);                     \
         glDrawArrays(GL_QUADS, 0, vertexCounter / 2);                          \
         vertexCounter = 0;                                                     \
     }                                                                          \

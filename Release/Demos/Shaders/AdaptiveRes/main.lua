@@ -1,19 +1,22 @@
 require 'lib.cheetah'
 require 'lib.lquery.init'
 local C = cheetah
-C.init('Ajustable shader', '800x600 resizable')
+local w, h = 1024, 768
+C.init('Ajustable shader', w..'x'..h..' resizable')
 C.printFPS = true
 
 local shader = C.newShader("fire.glsl")
 local dummy = C.generate('noise', 256, 256)
-local fbo = C.newFramebuffer(800,600)
+
+local fbo = C.newFramebuffer(w,h)
 local s = 0
+local targetFPS = 30
 E:new(screen):draw(function()
-	local delta = math.abs(C.getFps() - 60) / 1000
-	if C.getFps() < 60 then s = s + delta
+	local delta = math.abs(C.getFps() - targetFPS) / 1000
+	if C.getFps() < targetFPS then s = s + delta
 	else s = s - delta end
 	if s < 0 then s = 0 end
-	local rx, ry = 800 - s*800, 600 - s*600
+	local rx, ry = w - s*w, h - s*h
 	if rx < 32 then rx = 32 end
 	if ry < 32 then ry = 32 end
 	shader:bind()
@@ -25,7 +28,7 @@ E:new(screen):draw(function()
 	dummy:drawq(0, 0, rx, ry)
 	fbo:unbind()
 	shader:unbind()
-	fbo:drawq(0, 0, 800, 600, 0, 0, rx, ry)
+	fbo:drawq(0, 0, w, h, 0, 0, rx, ry)
 	--print(C.FPS, rx)
 end)
 C.mainLoop()

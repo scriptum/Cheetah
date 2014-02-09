@@ -5,7 +5,7 @@ CORES=`nproc`
 THREADS=`expr $CORES \* 2`
 MAKE="/usr/bin/make -j$THREADS"
 CLEAN="/usr/bin/make clean"
-DIR=./bin/Release
+DIR=./Release
 MACHINE_NAME=`uname -m`
 case ${MACHINE_NAME} in
 i486|i586|i686)
@@ -20,8 +20,7 @@ x86_64)
 esac
 
 OS=linux
-LIB=libcheetah.so
-EXE=luajit
+EXE=cheetah
 COMPILER=gcc
 FLAGS_THIRDPARTY=""
 
@@ -91,29 +90,29 @@ then
 fi
 
 LIBPATH="$DIR/bin/$OS$MACHINE_NAME/$LIB"
-EXEPATH="./bin/$OS$MACHINE_NAME/$EXE"
+EXEPATH="$DIR/bin/$OS$MACHINE_NAME/$EXE"
 
-if [ ! -f "$DIR/bin/$OS$MACHINE_NAME/$EXE" ]
-then
-	echo "Building luajit..."
-	(
-		cd thirdparty/LuaJIT
-		make clean
-		if [ "$1" == "win" -o "$1" == "windows" ]
-		then
-			make HOST_CC="gcc -m32" CROSS=${MINGWGCC%-gcc} TARGET_SYS=Windows
-			cp src/luajit.dll "../../$DIR/bin/$OS$MACHINE_NAME/"
-		else
-			if [ "$1" == "linux32" ]
-			then
-				make CC="gcc -m32"
-			else
-				make
-			fi
-			cp src/$EXE "../../$DIR/bin/$OS$MACHINE_NAME/"
-		fi
-	)
-fi
+# if [ ! -f "$DIR/bin/$OS$MACHINE_NAME/$EXE" ]
+# then
+	# echo "Building luajit..."
+	# (
+		# cd thirdparty/LuaJIT
+		# make clean
+		# if [ "$1" == "win" -o "$1" == "windows" ]
+		# then
+			# make HOST_CC="gcc -m32" CROSS=${MINGWGCC%-gcc} TARGET_SYS=Windows
+			# cp src/luajit.dll "../../$DIR/bin/$OS$MACHINE_NAME/"
+		# else
+			# if [ "$1" == "linux32" ]
+			# then
+				# make CC="gcc -m32"
+			# else
+				# make
+			# fi
+			# cp src/$EXE "../../$DIR/bin/$OS$MACHINE_NAME/"
+		# fi
+	# )
+# fi
 
 if [ "$CFLAGS" ]
 then FLAGS="$FLAGS $CFLAGS"
@@ -133,7 +132,7 @@ then
 		FLAGS="$FLAGS -flto"
 	fi
 	(cd src; $CLEAN)
-	CFLAGS="$FLAGS -fprofile-generate" $MAKE && mv libcheetah.so $LIBPATH
+	CFLAGS="$FLAGS -fprofile-generate" $MAKE && mv $EXE ../$EXEPATH
 	pushd .
 	cd $DIR
 	pushd .
@@ -148,18 +147,18 @@ then
 	(
 		cd src
 		$CLEAN
-		CFLAGS="$FLAGS -fprofile-use" $MAKE && mv libcheetah.so ../$LIBPATH
+		CFLAGS="$FLAGS -fprofile-use" $MAKE && $EXE ../$EXEPATH
 	)
 else
 	(
 		cd src
-		CFLAGS="$FLAGS" $MAKE && mv libcheetah.so ../$LIBPATH
+		CFLAGS="$FLAGS" $MAKE && mv $EXE ../$EXEPATH
 	)
 fi
 
 if [ "$2" != "debug" ]
 then
-	strip -s $LIBPATH
+	strip -s $EXEPATH
 fi
 
 sh genheader.sh

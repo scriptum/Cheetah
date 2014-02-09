@@ -27,14 +27,16 @@ IN THE SOFTWARE.
 #define CONFIG_H_
 
 /* Limit to virtual vertex buffer, after this limit engine flushes verticles */
-#define VERTEX_BUFFER_LIMIT 4096 /* 4096 verticles (=256 Kb) */
+#define VERTEX_BUFFER_LIMIT 4096 /* 4096 verticles (~256 Kb) */
 
-/* #undef GL_QUADS */
-
-#ifdef GL_QUADS
 /******************************DRAW USING QUADS********************************/
+/* #undef GL_QUADS */
+#ifdef GL_QUADS
 #define VERTICLES_PER_SPRITE 4 * 2
 #else
 #define VERTICLES_PER_SPRITE 6 * 2
 #endif
 #endif /* CONFIG_H_ */
+
+/******************************USE COLOR ARRAYS********************************/
+#define COLOR_ARRAYS

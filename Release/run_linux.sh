@@ -58,8 +58,8 @@ fi
 
 DIRNAME=`dirname "$SCRIPT"`
 BASENAME=`basename "$SCRIPT"`
-LUAJIT=${DIR}/bin/${SYSTEM_NAME}${MACHINE_NAME}/luajit
-if [ -x $LUAJIT ]
+EXE=${DIR}/bin/${SYSTEM_NAME}${MACHINE_NAME}/cheetah
+if [ -x $EXE ]
 then
 	if [ "$DIRNAME" ]
 	then
@@ -73,8 +73,8 @@ then
 		fi
 		cd "$DIRNAME"
 	fi
-	$LUAJIT "$BASENAME" "$@"
-	# $LUAJIT "$BASENAME" "$@" 2> /tmp/cheetah-engine-errors
+	$EXE "$BASENAME" "$@"
+	# $EXE "$BASENAME" "$@" 2> /tmp/cheetah-engine-errors
 	# if [ $? != "0" ]
 	# then
 		# $MSG "Cannot run engine!\n`cat /tmp/cheetah-engine-errors`"

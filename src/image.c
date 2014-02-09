@@ -71,11 +71,14 @@ static unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 		flags = 0;
 	tex_id = SOIL_direct_load_DDS_from_memory(img, 0, flags, 0);
 	if(0 == tex_id)
+	{
 		tex_id = SOIL_internal_create_OGL_texture(
 			img, width, height, channels,
 			0, flags,
 			GL_TEXTURE_2D, GL_TEXTURE_2D,
 			GL_MAX_TEXTURE_SIZE);
+		dbgv("image got texture id %d", tex_id);
+	}
 	if(TRUE == nearest)
 		TEX_NEAREST;
 	SOIL_free_image_data(img);
@@ -264,6 +267,7 @@ int resLoaderThread(void *unused)
 			img = loadImageData(r.image->name, &width, &height, &r.image->channels, FALSE);
 			if(img)
 			{
+				dbgv("added to queue image %s %dx%d", r.image->name, width, height);
 				r.image->w = (float)width;
 				r.image->h = (float)height;
 				r.data = img;
@@ -336,7 +340,8 @@ PUBLIC FUNCTIOS
 *******************************************************************************/
 
 /* Load image from disk */
-void newImageOpt(Image *ptr, const char *name, const char *options) {
+CHEETAH_EXPORT void newImageOpt(Image *ptr, const char *name, const char *options)
+{
 	RETURN_IF_NULL(ptr);
 	int width, height, channels;
 	unsigned int tex_id;
@@ -357,6 +362,7 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
 			myError("can't load image %s", name);
 			return;
 		}
+		dbgv("load image %s %dx%d without queue, data: %x%x%x", name, width, height, *(uint32_t*)img, *(uint32_t*)(img + 4), *(uint32_t*)(img + 8));
 		tex_id = loadImageTex(options, img, width, height, channels);
 		ptr->id = tex_id;
 		ptr->w = (float)width;
@@ -387,7 +393,8 @@ void newImageOpt(Image *ptr, const char *name, const char *options) {
  * @return Image object
  * @advanced
  * */
-void newImageRaw(Image *ptr, int width, int height, const char *data, const char *options) {
+CHEETAH_EXPORT void newImageRaw(Image *ptr, int width, int height, const char *data, const char *options)
+{
 	unsigned int tex_id;
 	GLenum format = GL_RGB;
 	const GLint level = 0;
@@ -421,7 +428,8 @@ void newImageRaw(Image *ptr, int width, int height, const char *data, const char
  * @var Image object
  * @advanced
  * */
-void imageBind(Image *image) {
+CHEETAH_EXPORT void imageBind(Image *image)
+{
 	imageCheckResLoader(image);
 	TEXTURE_BIND(image->id);
 }
@@ -431,7 +439,8 @@ void imageBind(Image *image) {
  * @group image
  * @advanced
  * */
-void enableTexture(void) {
+CHEETAH_EXPORT void enableTexture(void)
+{
 	glEnable(GL_TEXTURE_2D);
 }
 
@@ -440,35 +449,41 @@ void enableTexture(void) {
  * @group image
  * @advanced
  * */
-void disableTexture(void) {
+CHEETAH_EXPORT void disableTexture(void)
+{
 	glDisable(GL_TEXTURE_2D);
 }
 
-void imageDrawxy(Image *image, float x, float y, float w, float h) {
+CHEETAH_EXPORT void imageDrawxy(Image *image, float x, float y, float w, float h)
+{
 	RETURN_IF_NULL(image);
 	imageBind(image);
 	PUSH_QUAD(x, y, w, h, 0, 0, 0);
 }
 
-void imageDrawt(Image *image, float x, float y, float w, float h, float a, float ox, float oy) {
+CHEETAH_EXPORT void imageDrawt(Image *image, float x, float y, float w, float h, float a, float ox, float oy)
+{
 	RETURN_IF_NULL(image);
 	imageBind(image);
 	PUSH_QUAD(x, y, w, h, a, ox, oy);
 }
 
-void imageDrawqxy(Image *image, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
+CHEETAH_EXPORT void imageDrawqxy(Image *image, float x, float y, float w, float h, float qx, float qy, float qw, float qh)
+{
 	RETURN_IF_NULL(image);
 	imageBind(image);
 	PUSH_QUADT(x, y, w, h, 0, 0, 0, qx, qy, qw, qh, image->w, image->h);
 }
 
-void imageDrawqt(Image *image, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
+CHEETAH_EXPORT void imageDrawqt(Image *image, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy)
+{
 	RETURN_IF_NULL(image);
 	imageBind(image);
 	PUSH_QUADT(x, y, w, h, a, ox, oy, qx, qy, qw, qh, image->w, image->h);
 }
 
-static void borderImageDrawInternal(BorderImage *borderImage, float x, float y, float w, float h, float a, float ox, float oy) {
+CHEETAH_EXPORT static void borderImageDrawInternal(BorderImage *borderImage, float x, float y, float w, float h, float a, float ox, float oy)
+{
 	imageBind(borderImage->image);
 	float ow = borderImage->image->w;
 	float oh = borderImage->image->h;
@@ -494,45 +509,53 @@ static void borderImageDrawInternal(BorderImage *borderImage, float x, float y, 
 	}
 }
 
-void borderImageDrawt(BorderImage *borderImage, float x, float y, float w, float h, float a, float ox, float oy) {
+CHEETAH_EXPORT void borderImageDrawt(BorderImage *borderImage, float x, float y, float w, float h, float a, float ox, float oy)
+{
 	RETURN_IF_NULL(borderImage);
 	borderImageDrawInternal(borderImage, x, y, w, h, a, ox, oy);
 }
 
-void borderImageDrawxy(BorderImage *borderImage, float x, float y, float w, float h) {
+CHEETAH_EXPORT void borderImageDrawxy(BorderImage *borderImage, float x, float y, float w, float h)
+{
 	RETURN_IF_NULL(borderImage);
 	borderImageDrawInternal(borderImage, x, y, w, h, 0, 0, 0);
 }
 
-void initMultitexture(Multitexture *multitexture) {
+CHEETAH_EXPORT void initMultitexture(Multitexture *multitexture)
+{
 	RETURN_IF_NULL(multitexture);
 	new(multitexture->images, Image*, multitexture->size);
 }
 
-void deleteMultitexture(Multitexture *multitexture) {
+CHEETAH_EXPORT void deleteMultitexture(Multitexture *multitexture)
+{
 	RETURN_IF_NULL(multitexture);
 	delete(multitexture->images);
 }
 
-void multitextureDrawxy(Multitexture *multitexture, float x, float y, float w, float h) {
+CHEETAH_EXPORT void multitextureDrawxy(Multitexture *multitexture, float x, float y, float w, float h)
+{
 	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
 	PUSH_QUAD(x,y,w,h,0,0,0);
 }
 
-void multitextureDrawt(Multitexture *multitexture, float x, float y, float w, float h, float a, float ox, float oy) {
+CHEETAH_EXPORT void multitextureDrawt(Multitexture *multitexture, float x, float y, float w, float h, float a, float ox, float oy)
+{
 	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
 	PUSH_QUAD(x,y,w,h,a,ox,oy);
 }
 
-void multitextureDrawqxy(Multitexture *multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh) {
+CHEETAH_EXPORT void multitextureDrawqxy(Multitexture *multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh)
+{
 	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
 	PUSH_QUADT(x, y, w, h, 0, 0, 0, qx, qy, qw, qh, multitexture->w, multitexture->h);
 }
 
-void multitextureDrawqt(Multitexture *multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy) {
+CHEETAH_EXPORT void multitextureDrawqt(Multitexture *multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh, float a, float ox, float oy)
+{
 	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
 	PUSH_QUADT(x, y, w, h, a, ox, oy, qx, qy, qw, qh, multitexture->w, multitexture->h);
@@ -587,7 +610,8 @@ void multitextureDrawqt(Multitexture *multitexture, float x, float y, float w, f
  * @var Image object
  * @advanced
  * */
-void deleteImage(Image *ptr) {
+CHEETAH_EXPORT void deleteImage(Image *ptr)
+{
 	RETURN_IF_NULL(ptr);
 	//~ printf("%d\n", same_type_p(typeof(ptr)) == INTEGER_TYPE);
 	#ifdef MEMORY_TEST

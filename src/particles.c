@@ -52,7 +52,8 @@ static void particleSystemApplyForces(ParticleSystem *ptr, Particle *particle)
 
 }
 
-void newParticleSystem(ParticleSystem *ptr, Image *image, unsigned maxParticles, const char *options) {
+CHEETAH_EXPORT void newParticleSystem(ParticleSystem *ptr, Image *image, unsigned maxParticles, const char *options)
+{
 	NEEDED_INIT_VOID;
 	new0(ptr->particles, Particle, maxParticles);
 	ptr->maxParticles = maxParticles;
@@ -67,7 +68,8 @@ void newParticleSystem(ParticleSystem *ptr, Image *image, unsigned maxParticles,
 	//~ memset(&ptr->colorVariation, 255, sizeof(Color));
 }
 
-static void particleSystemUpdate(ParticleSystem *pSystem) {
+CHEETAH_EXPORT static void particleSystemUpdate(ParticleSystem *pSystem)
+{
 	unsigned	i;
 	Particle	*particle = pSystem->particles;
 	if(globalTimers.timed - pSystem->_lasttime < 1.0/100.0)
@@ -118,7 +120,8 @@ static void particleSystemUpdate(ParticleSystem *pSystem) {
 	}
 }
 
-void particleSystemDraw(ParticleSystem *ptr, float x, float y) {
+CHEETAH_EXPORT void particleSystemDraw(ParticleSystem *ptr, float x, float y)
+{
 	unsigned	i;
 	Particle	*particle = ptr->particles;
 	particleSystemUpdate(ptr);
@@ -162,7 +165,8 @@ void particleSystemDraw(ParticleSystem *ptr, float x, float y) {
 }
 
 
-void deleteParticleSystem(ParticleSystem *ptr) {
+CHEETAH_EXPORT void deleteParticleSystem(ParticleSystem *ptr)
+{
 	if(ptr)
 		delete(ptr->particles);
 }

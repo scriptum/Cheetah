@@ -75,7 +75,8 @@ static bool checkFramebufferStatus(void)
 }
 
 /* Create framebuffer object. Note, that not all video drivers support this. It's recommend to check returning value using cheetah.inPointer and check framebuffer support using cheetah.supported.FBO. */
-void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int height, const char * options) {
+CHEETAH_EXPORT void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int height, const char * options)
+{
 	Image *ptr = NULL;
 	GLint current_fbo;
 	GLint internal;
@@ -163,13 +164,15 @@ void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int hei
 }
 
 /* Check, if framebuffer created without errors. */
-bool framebufferCheck(Framebuffer *ptr) {
+CHEETAH_EXPORT bool framebufferCheck(Framebuffer *ptr)
+{
 	return (bool)ptr->id;
 }
 
 /* Bind framebuffer object. Means, that now all graphics will be rendered to
  * this framebuffer. */
-void framebufferBind(Framebuffer *ptr) {
+CHEETAH_EXPORT void framebufferBind(Framebuffer *ptr)
+{
 	if(ptr->id)
 	{
 		FLUSH_BUFFER();
@@ -185,14 +188,16 @@ void framebufferBind(Framebuffer *ptr) {
 
 /* Unbind framebuffer object. Means, that now all graphics will be rendered to
  * default screen. This function unbinds the current framebuffer object. */
-void framebufferUnbind(Framebuffer *ptr) {
+CHEETAH_EXPORT void framebufferUnbind(Framebuffer *ptr)
+{
 	FLUSH_BUFFER();
 	bindFramebuffer(0);
 	resetViewDefault();
 }
 
 /* Save image from framebuffer to BMP format */
-void framebufferSaveBMP(Framebuffer *ptr, const char *name) {
+CHEETAH_EXPORT void framebufferSaveBMP(Framebuffer *ptr, const char *name)
+{
 	unsigned char *img = NULL;
 	GLsizei w = (GLsizei)ptr->image->w; 
 	GLsizei h = (GLsizei)ptr->image->h;
@@ -206,7 +211,8 @@ void framebufferSaveBMP(Framebuffer *ptr, const char *name) {
 }
 
 /* Delete framebuffer and free memory. */
-void deleteFramebuffer(Framebuffer *ptr) {
+CHEETAH_EXPORT void deleteFramebuffer(Framebuffer *ptr)
+{
 	if(ptr)
 	{
 		glDeleteTextures(1, &ptr->image->id);

@@ -24,7 +24,7 @@ IN THE SOFTWARE.
 #ifndef CHEETAH_H_
 #define CHEETAH_H_
 
-#define COLOR_ARRAYS
+#define CHEETAH_EXPORT __attribute__((__visibility__("default")))
 
 typedef unsigned char bool;
 unsigned char * loadfile(const char * filename, long * length);
@@ -279,8 +279,19 @@ enum {
 	EVENT_KEYDOWN,
 	EVENT_MOUSEUP,
 	EVENT_MOUSEDOWN,
-	EVENT_RESIZE,
-	EVENT_EXPOSE,
+	EVENT_RESIZED,
+	EVENT_EXPOSED,
+	EVENT_SHOWN,
+	EVENT_HIDDEN,
+	EVENT_MOVED,
+	EVENT_MINIMIZED,
+	EVENT_MAXIMIZED,
+	EVENT_RESTORED,
+	EVENT_ENTER,
+	EVENT_LEAVE,
+	EVENT_FOCUS_GAINED,
+	EVENT_FOCUS_LOST,
+	EVENT_CLOSE,
 	EVENT_ACTIVE,
 	EVENT_JOY
 };

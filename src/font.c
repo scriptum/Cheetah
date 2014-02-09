@@ -116,16 +116,19 @@ else if (((unsigned)a[i]   & 0b11111000) == 0b11110000) {                      \
     c = 0;                                                                     \
 }
 
-void fontEnableDistanceField(Font *f) {
+CHEETAH_EXPORT void fontEnableDistanceField(Font *f)
+{
 	f->distanceField = TRUE;
 }
 
-void fontDisableDistanceField(Font *f) {
+CHEETAH_EXPORT void fontDisableDistanceField(Font *f)
+{
 	f->distanceField = FALSE;
 }
 
 /* Calculate width of text block */
-float fontWidth(Font *f, const char *str) {
+CHEETAH_EXPORT float fontWidth(Font *f, const char *str)
+{
 	float		width = 0;
 	float		maxwidth = 0;
 	unsigned	c = 0;
@@ -167,7 +170,8 @@ float fontWidth(Font *f, const char *str) {
 }
 
 /* Calculate height of text block */
-float fontHeight(Font *currentFont, const char *str, float maxw) {
+CHEETAH_EXPORT float fontHeight(Font *currentFont, const char *str, float maxw)
+{
 	FontChar *ch           = NULL;
 	unsigned  i            = 0;
 	unsigned  j            = 0;
@@ -254,7 +258,8 @@ out:
 }
 
 /* Get font one line height */
-float fontLineHeight(Font *currentFont) {
+CHEETAH_EXPORT float fontLineHeight(Font *currentFont)
+{
 	return currentFont->height * currentFont->_interval * currentFont->_scale;
 }
 
@@ -280,7 +285,8 @@ while(0)
 // #define KERNING_CONDITION (TRUE == currentFont->_kerning && NULL != currentFont->kerningHash && prevChar > 0 && fontPrevChar && fontPrevChar->kerning)
 #define KERNING_CONDITION (NULL != currentFont->kerningHash && fontPrevChar && fontPrevChar->kerning)
 
-void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align) {
+CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align)
+{
 	FontChar *ch           = NULL;
 	unsigned  i            = 0;
 	unsigned  j            = 0;
@@ -535,24 +541,29 @@ void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFont, const unsign
 	}
 }
 
-void fontScale(Font *font, float scale) {
+CHEETAH_EXPORT void fontScale(Font *font, float scale)
+{
 	font->scalable = TRUE;
 	font->_scale = scale;
 }
 
-void fontInterval(Font *font, float interval) {
+CHEETAH_EXPORT void fontInterval(Font *font, float interval)
+{
 	font->_interval = interval;
 }
 
-float fontGetScale(Font *font) {
+CHEETAH_EXPORT float fontGetScale(Font *font)
+{
 	return font->_scale;
 }
 
-float fontGetInterval(Font *font) {
+CHEETAH_EXPORT float fontGetInterval(Font *font)
+{
 	return font->_interval;
 }
 
-void fontSetGlyph(Font *ptr, const char *line) {
+CHEETAH_EXPORT void fontSetGlyph(Font *ptr, const char *line)
+{
 	float cx2 = 0.0;
 	float cy2 = 0.0;
 	float x1  = 0.0;
@@ -606,7 +617,8 @@ void fontSetGlyph(Font *ptr, const char *line) {
 	ptr->height = h;
 }
 
-void fontSetKerning(Font *ptr, const char *line) {
+CHEETAH_EXPORT void fontSetKerning(Font *ptr, const char *line)
+{
 	unsigned	first;
 	unsigned	second;
 	float		kerning;
@@ -627,7 +639,8 @@ void fontSetKerning(Font *ptr, const char *line) {
 		fch->kerning = TRUE;
 }
 
-void deleteFont(Font * ptr) {
+CHEETAH_EXPORT void deleteFont(Font * ptr)
+{
 	if(ptr)
 	{
 		if(NULL != ptr->hash)

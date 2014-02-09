@@ -33,7 +33,8 @@ IN THE SOFTWARE.
 #include "cmacros.h"
 #include "test.h"
 
-void myError(const char *fmt, ...) {
+CHEETAH_EXPORT void myError(const char *fmt, ...)
+{
 	va_list args;
 	va_start(args, fmt);
 	fputs("error: ", stderr);
@@ -42,7 +43,8 @@ void myError(const char *fmt, ...) {
 	va_end(args);
 }
 
-bool isPointer(void * ptr) {
+CHEETAH_EXPORT bool isPointer(void * ptr)
+{
 	return ptr != NULL;
 }
 
@@ -52,7 +54,8 @@ bool isPointer(void * ptr) {
  * @param length resulting string length
  * @return newly allocated string, caller should free
  * */
-unsigned char *loadfile(const char *filename, long *length) {
+CHEETAH_EXPORT unsigned char *loadfile(const char *filename, long *length)
+{
 	unsigned char *result = NULL;
 	long size = 0;
 	FILE *f = NULL;
@@ -82,7 +85,8 @@ error:
 	return NULL;
 }
 
-bool fileExists(const char * filename) {
+CHEETAH_EXPORT bool fileExists(const char * filename)
+{
 	FILE *file = fopen(filename, "rb");
 	if(NULL == file)
 		return FALSE;
@@ -109,24 +113,30 @@ filetime(a)
 filetime(c)
 
 #if 0
-long int fileatime(const char * filename) {
-long int filemtime(const char * filename) {
-long int filectime(const char * filename) {
+CHEETAH_EXPORT long int fileatime(const char * filename)
+{
+CHEETAH_EXPORT long int filemtime(const char * filename)
+{
+CHEETAH_EXPORT long int filectime(const char * filename)
+{
 #endif
 
 DIR *openDir(const char *name) {
 	return opendir(name);
 }
 
-struct dirent *readDir(DIR *dirp) {
+CHEETAH_EXPORT struct dirent *readDir(DIR *dirp)
+{
 	return readdir(dirp);
 }
 
-int closeDir(DIR *dirp) {
+CHEETAH_EXPORT int closeDir(DIR *dirp)
+{
 	return closedir(dirp);
 }
 
-bool isDir(const char *name) {
+CHEETAH_EXPORT bool isDir(const char *name)
+{
 	DIR *dir = opendir(name);
 	if(dir)
 	{
@@ -136,7 +146,8 @@ bool isDir(const char *name) {
 	return FALSE;
 }
 
-bool mkDir(const char * path) {
+CHEETAH_EXPORT bool mkDir(const char * path)
+{
 #ifdef _WIN32
 	if(mkdir(path) == 0) return TRUE;
 #else
@@ -145,7 +156,8 @@ bool mkDir(const char * path) {
 	return FALSE;
 }
 
-const char *getDirentName(struct dirent * de) {
+CHEETAH_EXPORT const char *getDirentName(struct dirent * de)
+{
 	return de->d_name;
 }
 

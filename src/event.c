@@ -34,95 +34,143 @@ SDL_Event event;
 void recomputeScreenScale(float w, float h);
 void setWindowSize(unsigned w, unsigned h);
 
-unsigned int getEventType(void) {
+CHEETAH_EXPORT unsigned int getEventType(void)
+{
 	/* skip unneeded events */
 	while(SDL_PollEvent(&event))
 	{
 		switch(event.type)
 		{
-			case SDL_QUIT:
-				dbg("Quit");
-				return EVENT_QUIT;
-			case SDL_KEYUP:
-				dbgv("Key up");
-				return EVENT_KEYUP;
-			case SDL_KEYDOWN:
-				dbgv("Key down");
-				return EVENT_KEYDOWN;
-			case SDL_MOUSEBUTTONUP:
-				dbgv("Mouse up");
-				return EVENT_MOUSEUP;
-			case SDL_MOUSEBUTTONDOWN:
-				dbgv("Mouse down");
-				return EVENT_MOUSEDOWN;
-			case SDL_VIDEORESIZE:
+		case SDL_QUIT:
+			dbg("Quit");
+			return EVENT_QUIT;
+		case SDL_KEYUP:
+			dbgv("Key up");
+			return EVENT_KEYUP;
+		case SDL_KEYDOWN:
+			dbgv("Key down");
+			return EVENT_KEYDOWN;
+		case SDL_MOUSEBUTTONUP:
+			dbgv("Mouse up");
+			return EVENT_MOUSEUP;
+		case SDL_MOUSEBUTTONDOWN:
+			dbgv("Mouse down");
+			return EVENT_MOUSEDOWN;
+		case SDL_JOYAXISMOTION:
+		case SDL_JOYBALLMOTION:
+		case SDL_JOYHATMOTION:
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+			dbgv("Joystick");
+			return EVENT_JOY;
+		case SDL_WINDOWEVENT:
+			switch (event.window.event)
+			{
+				int w, h;
+			case SDL_WINDOWEVENT_RESIZED:
 				dbgv("Resize");
-				if(event.resize.w < 1)
-					event.resize.w = 1;
-				if(event.resize.h < 1)
-					event.resize.h = 1;
-				recomputeScreenScale((float)event.resize.w, (float)event.resize.h);
+				w = event.window.data1;
+				h = event.window.data2;
+				if(w < 1)
+					w = 1;
+				if(h < 1)
+					h = 1;
+				recomputeScreenScale((float)w, (float)h);
 				globalTimers.rescaleTime = globalTimers.time + globalTimers.resizeDelay;
-				setWindowSize((unsigned)event.resize.w, (unsigned)event.resize.h);
-				return EVENT_RESIZE;
-			/* TODO to do something here */
-			case SDL_VIDEOEXPOSE:
-				dbgv("Expose");
-				return EVENT_EXPOSE;
-			case SDL_ACTIVEEVENT:
-				dbgv("Active");
-				return EVENT_ACTIVE;
-			case SDL_JOYAXISMOTION:
-			case SDL_JOYBALLMOTION:
-			case SDL_JOYHATMOTION:
-			case SDL_JOYBUTTONDOWN:
-			case SDL_JOYBUTTONUP:
-				dbgv("Joystick");
-				return EVENT_JOY;
-			default:
-				dbgv("Some event #%d", event.type);
+				setWindowSize(w, h);
+				return EVENT_RESIZED;
+			case SDL_WINDOWEVENT_EXPOSED:
+				dbgv("Window expose");
+				return EVENT_EXPOSED;
+			case SDL_WINDOWEVENT_SHOWN:
+				dbgv("Window shown");
+				return EVENT_SHOWN;
+			case SDL_WINDOWEVENT_HIDDEN:
+				dbgv("Window hidden");
+				return EVENT_HIDDEN;
+			case SDL_WINDOWEVENT_MOVED:
+				dbgv("Window moved");
+				return EVENT_MOVED;
+			case SDL_WINDOWEVENT_MINIMIZED:
+				dbgv("Window minimized");
+				return EVENT_MINIMIZED;
+			case SDL_WINDOWEVENT_MAXIMIZED:
+				dbgv("Window maximized");
+				return EVENT_MAXIMIZED;
+			case SDL_WINDOWEVENT_RESTORED:
+				dbgv("Window restored");
+				return EVENT_RESTORED;
+			case SDL_WINDOWEVENT_ENTER:
+				dbgv("Window enter");
+				return EVENT_ENTER;
+			case SDL_WINDOWEVENT_LEAVE:
+				dbgv("Window leave");
+				return EVENT_LEAVE;
+			case SDL_WINDOWEVENT_FOCUS_GAINED:
+				dbgv("Window focus gained");
+				return EVENT_FOCUS_GAINED;
+			case SDL_WINDOWEVENT_FOCUS_LOST:
+				dbgv("Window focus lost");
+				return EVENT_FOCUS_LOST;
+			case SDL_WINDOWEVENT_CLOSE:
+				dbgv("Window closed");
+				return EVENT_CLOSE;
+			}
+			break;
+		default:
+			dbgv("Some event #%d", event.type);
 		}
 	}
 	return 0;
 }
 
-unsigned int getEventKey(void) {
-	return event.key.keysym.sym;
+CHEETAH_EXPORT unsigned int getEventKey(void)
+{
+	return event.key.keysym.scancode;
 }
 
-unsigned int getEventKeyUnicode(void) {
+/*
+CHEETAH_EXPORT unsigned int getEventKeyUnicode(void)
+{
 	return event.key.keysym.unicode;
 }
-
-int getEventMouseX(void) {
+*/
+CHEETAH_EXPORT int getEventMouseX(void)
+{
 	if(!screenScale.autoScale)
 		return event.button.x;
 	return (int)(((float)event.button.x - screenScale.offsetX) / screenScale.scaleX);
 }
 
-int getEventMouseY(void) {
+CHEETAH_EXPORT int getEventMouseY(void)
+{
 	if(!screenScale.autoScale)
 		return event.button.y;
 	return (int)(((float)event.button.y - screenScale.offsetY) / screenScale.scaleY);
 }
 
-unsigned int getEventMouseButton(void) {
+CHEETAH_EXPORT unsigned int getEventMouseButton(void)
+{
 	return event.button.button;
 }
 
-int getEventResizeW(void) {
-	return event.resize.w;
+CHEETAH_EXPORT int getEventResizeW(void)
+{
+	return event.window.data1;
 }
 
-int getEventResizeH(void) {
-	return event.resize.h;
+CHEETAH_EXPORT int getEventResizeH(void)
+{
+	return event.window.data2;
 }
 
-void setResizeDelay(unsigned delay) {
+CHEETAH_EXPORT void setResizeDelay(unsigned delay)
+{
 	globalTimers.resizeDelay = delay;
 }
 
-int getMouseX(void) {
+CHEETAH_EXPORT int getMouseX(void)
+{
 	int x;
 	SDL_GetMouseState(&x, NULL);
 	if(!screenScale.autoScale)
@@ -130,7 +178,8 @@ int getMouseX(void) {
 	return (int)(((float)x - screenScale.offsetX) / screenScale.scaleX);
 }
 
-int getMouseY(void) {
+CHEETAH_EXPORT int getMouseY(void)
+{
 	int y;
 	SDL_GetMouseState(NULL, &y);
 	if(!screenScale.autoScale)
@@ -138,10 +187,12 @@ int getMouseY(void) {
 	return (int)(((float)y - screenScale.offsetY) / screenScale.scaleY);
 }
 
-unsigned char *getKeyState(void) {
-	return SDL_GetKeyState(NULL);
+CHEETAH_EXPORT const unsigned char *getKeyState(void)
+{
+	return SDL_GetKeyboardState(NULL);
 }
 
-void gameSpeed(double speed) {
+CHEETAH_EXPORT void gameSpeed(double speed)
+{
 	globalTimers.gameSpeed = speed;
 }

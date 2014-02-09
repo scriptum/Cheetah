@@ -51,7 +51,7 @@ static inline uint32_t hash_string(const char *c) {
 	//c = (const char*)__builtin_assume_aligned(c, 32);
 	uint32_t h = (uint32_t)*c;
 	while (c && *c)
-		h = ((h << 5) + h) + (uint32_t)*c++;
+		h = ((h << 5) + h) + (uint32_t)(*c++);
 	return h;
 }
 

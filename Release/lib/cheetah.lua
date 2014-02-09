@@ -26,6 +26,13 @@ local ffi = require 'ffi'
 require 'lib.table'
 require 'lib.string'
 
+--debugging
+-- debug.sethook(function (event, line)
+	-- local s = debug.getinfo(2).short_src
+	-- print(s .. ":" .. line .. ' ' .. event)
+-- end, "l")
+
+
 cheetah = {}
 
 local C = cheetah
@@ -89,8 +96,10 @@ int sscanf ( const char * str, const char * format, ...);
 int (*grabCursor)(int mode);
 ]]
 
-local libcheetah = C.loadDLL 'cheetah'
-assert(libcheetah, 'Cannot load cheetah library!')
+ffi.cdef(C.getFile('lib/cheetah.h'))
+
+local libcheetah = ffi.C
+-- assert(libcheetah, 'Cannot load cheetah library!')
 
 local lua_keys = require 'lib.keys'
 local keys_reverse = require 'lib.keys_reverse'
@@ -184,11 +193,11 @@ C.poll = function()
 		C.quit()
 	elseif eid == C.EVENT_KEYDOWN or eid == C.EVENT_KEYUP then
 		a = libcheetah.getEventKey()
-		a, b = lua_keys[a] or 'key_' .. a, libcheetah.getEventKeyUnicode()
+		a = lua_keys[a] or 'key_' .. a
 	elseif eid == C.EVENT_MOUSEUP or eid == C.EVENT_MOUSEDOWN then
 		c = libcheetah.getEventMouseButton()
 		a, b, c = libcheetah.getEventMouseX(), libcheetah.getEventMouseY(), button_names[c] or 'm_' .. c
-	elseif eid == C.EVENT_RESIZE then
+	elseif eid == C.EVENT_RESIZED then
 		a, b = libcheetah.getEventResizeW(), libcheetah.getEventResizeH()
 	else
 		return nil

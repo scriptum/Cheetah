@@ -69,7 +69,8 @@ static inline float distance(int i, int j, int w, int h)
 		((float)j - (float)h / 2 + 0.5f) * ((float)j - (float)h / 2 + 0.5f) / (float)(h * h));
 }
 
-static void generateImageData(ImageData *ptr, int w, int h, const char *imageType, bool alpha) {
+CHEETAH_EXPORT static void generateImageData(ImageData *ptr, int w, int h, const char *imageType, bool alpha)
+{
 	int i, j, channels;
 	int32_t c;
 	float buff;
@@ -149,7 +150,8 @@ static void generateImageData(ImageData *ptr, int w, int h, const char *imageTyp
 	ptr->data = buf;
 }
 
-void generateImage(Image *ptr, int w, int h, const char *imageType, const char *options) {
+CHEETAH_EXPORT void generateImage(Image *ptr, int w, int h, const char *imageType, const char *options)
+{
 	static ImageData imageData;
 	ptr->id = 0;
 	NEEDED_INIT_VOID;

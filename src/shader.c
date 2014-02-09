@@ -68,7 +68,8 @@ static bool compile(GLuint shader, const char* name)
 	return TRUE;
 }
 
-void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
+CHEETAH_EXPORT void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver)
+{
 	GLuint v, f, p;
 	GLint linked;
 	const GLsizei count = 1;
@@ -106,15 +107,18 @@ void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver) {
 	ptr->id = p;
 }
 
-void newFragmentShader(Shader * ptr, const char * frag) {
+CHEETAH_EXPORT void newFragmentShader(Shader * ptr, const char * frag)
+{
 	newFragmentVertexShader(ptr, frag, std_vertex_shader);
 }
 
-bool shaderCheck(Shader * ptr) {
+CHEETAH_EXPORT bool shaderCheck(Shader * ptr)
+{
 	return (bool)ptr->id;
 }
 
-void deleteShader(Shader * ptr) {
+CHEETAH_EXPORT void deleteShader(Shader * ptr)
+{
 	if(ptr) {
 		if(supported.GLSL && ptr->id)
 			glDeleteObject_(ptr->id);
@@ -125,7 +129,8 @@ void deleteShader(Shader * ptr) {
 	}
 }
 
-void shaderBind(Shader * ptr) {
+CHEETAH_EXPORT void shaderBind(Shader * ptr)
+{
 	if(supported.GLSL && ptr->id)
 	{
 		FLUSH_BUFFER();
@@ -133,7 +138,8 @@ void shaderBind(Shader * ptr) {
 	}
 }
 
-void shaderUnbind(Shader * ptr) {
+CHEETAH_EXPORT void shaderUnbind(Shader * ptr)
+{
 	if(supported.GLSL)
 	{
 		FLUSH_BUFFER();
@@ -141,21 +147,27 @@ void shaderUnbind(Shader * ptr) {
 	}
 }
 
-int GetUniformLocation(unsigned program, const char * name) {
+CHEETAH_EXPORT int GetUniformLocation(unsigned program, const char * name)
+{
 	return glGetUniformLocation_(program, name);
 }
-void Uniform1i(int location, int var) {
+CHEETAH_EXPORT void Uniform1i(int location, int var)
+{
 	glUniform1i_(location, var);
 }
-void Uniform1f(int location, float var) {
+CHEETAH_EXPORT void Uniform1f(int location, float var)
+{
 	glUniform1f_(location, var);
 }
-void Uniform2f(int location, float var, float var1) {
+CHEETAH_EXPORT void Uniform2f(int location, float var, float var1)
+{
 	glUniform2f_(location, var, var1);
 }
-void Uniform3f(int location, float var, float var1, float var2) {
+CHEETAH_EXPORT void Uniform3f(int location, float var, float var1, float var2)
+{
 	glUniform3f_(location, var, var1, var2);
 }
-void Uniform4f(int location, float var, float var1, float var2, float var3) {
+CHEETAH_EXPORT void Uniform4f(int location, float var, float var1, float var2, float var3)
+{
 	glUniform4f_(location, var, var1, var2, var3);
 }

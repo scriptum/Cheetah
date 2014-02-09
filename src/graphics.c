@@ -29,14 +29,16 @@ IN THE SOFTWARE.
 #include "cvertex.h"
 #include "test.h"
 
-#include "SDL_byteorder.h"
+#include "SDL_endian.h"
+
 
 extern void resLoaderMainThread(void);
-int getWindowHeight(void);
+void getWindowSize(int *w, int *h);
 
 unsigned prevColor = 0xffffffff;
 
-void colorMask(bool r, bool g, bool b, bool a) {
+CHEETAH_EXPORT void colorMask(bool r, bool g, bool b, bool a)
+{
 	FLUSH_BUFFER();
 	glColorMask(r,g,b,a);
 }
@@ -62,71 +64,87 @@ static void flushBuffer(void)
 	FLUSH_BUFFER();
 }
 
-void enableDepthTest(void) {
+CHEETAH_EXPORT void enableDepthTest(void)
+{
 	flushBuffer();
 	glEnable(GL_DEPTH_TEST);
 }
 
-void disableDepthTest(void) {
+CHEETAH_EXPORT void disableDepthTest(void)
+{
 	flushBuffer();
 	glDisable(GL_DEPTH_TEST);
 }
 
-void enableStencilTest(void) {
+CHEETAH_EXPORT void enableStencilTest(void)
+{
 	flushBuffer();
 	glEnable(GL_STENCIL_TEST);
 }
 
-void disableStencilTest(void) {
+CHEETAH_EXPORT void disableStencilTest(void)
+{
 	flushBuffer();
 	glDisable(GL_STENCIL_TEST);
 }
 
-void enableScissorTest(void) {
+CHEETAH_EXPORT void enableScissorTest(void)
+{
 	flushBuffer();
 	glEnable(GL_SCISSOR_TEST);
 }
 
-void disableScissorTest(void) {
+CHEETAH_EXPORT void disableScissorTest(void)
+{
 	flushBuffer();
 	glDisable(GL_SCISSOR_TEST);
 }
 
-void enableAlphaTest(void) {
+CHEETAH_EXPORT void enableAlphaTest(void)
+{
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.5f);
 }
 
-void disableAlphaTest(void) {
+CHEETAH_EXPORT void disableAlphaTest(void)
+{
 	glDisable(GL_ALPHA_TEST);
 }
 
-void setScissor(int x, int y, int w, int h) {
+CHEETAH_EXPORT void setScissor(int x, int y, int w, int h)
+{
+	int ww, wh;
 	flushBuffer();
-	glScissor(x, getWindowHeight() - y - h, w, h);
+	getWindowSize(&ww, &wh);
+	glScissor(x, wh - y - h, w, h);
 }
 
-void flush(void) {
+CHEETAH_EXPORT void flush(void)
+{
 	flushBuffer();
 	glFinish();
 }
 
-void move(double translateX, double translateY) {
+CHEETAH_EXPORT void move(double translateX, double translateY)
+{
 	FLUSH_BUFFER();
 	glTranslated(translateX, translateY, 0);
 }
 
-void scale(double scaleX, double scaleY) {
+CHEETAH_EXPORT void scale(double scaleX, double scaleY)
+{
 	FLUSH_BUFFER();
 	glScaled(scaleX, scaleY, 1);
 }
 
-void rotate(double angle) {
+CHEETAH_EXPORT void rotate(double angle)
+{
 	FLUSH_BUFFER();
 	glRotated(angle, 0, 0, 1);
 }
 
-void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y) {
+CHEETAH_EXPORT void translateObject(double x, double y, double angle, double width, double height, double origin_x, double origin_y)
+{
 	flushBuffer();
 	if(x || y) glTranslated(x, y, 0);
 	if(angle) glRotated(angle, 0, 0, 1);
@@ -134,37 +152,43 @@ void translateObject(double x, double y, double angle, double width, double heig
 	if(origin_x || origin_y) glTranslated(-origin_x/width, -origin_y/height, 0);
 }
 
-void blend(bool blendEnabled) {
+CHEETAH_EXPORT void blend(bool blendEnabled)
+{
 	FLUSH_BUFFER();
 	if(blendEnabled) glEnable(GL_BLEND);
 	else glDisable(GL_BLEND);
 }
 
-void enableBlend(void) {
+CHEETAH_EXPORT void enableBlend(void)
+{
 	FLUSH_BUFFER();
 	glEnable(GL_BLEND);
 }
 
-void disableBlend(void) {
+CHEETAH_EXPORT void disableBlend(void)
+{
 	FLUSH_BUFFER();
 	glDisable(GL_BLEND);
 }
 
-void push(void) {
+CHEETAH_EXPORT void push(void)
+{
 	FLUSH_BUFFER();
 	glPushMatrix();
 	if (glGetError() == GL_STACK_OVERFLOW)
 		myError("No more free slots to save the view.");
 }
 
-void pop(void) {
+CHEETAH_EXPORT void pop(void)
+{
 	FLUSH_BUFFER();
 	glPopMatrix();
 	if (glGetError() == GL_STACK_UNDERFLOW)
 		myError("No saved view was found.");
 }
 
-void reset(void) {
+CHEETAH_EXPORT void reset(void)
+{
 	FLUSH_BUFFER();
 	glLoadIdentity();
 }
@@ -250,19 +274,23 @@ void reset(void) {
     }
 #endif
 
-void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+CHEETAH_EXPORT void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
 	COLOR_BODY
 }
 
-void colorf(float r, float g, float b, float a) {
+CHEETAH_EXPORT void colorf(float r, float g, float b, float a)
+{
 	COLOR_BODY
 }
 
-void colord(double r, double g, double b, double a) {
+CHEETAH_EXPORT void colord(double r, double g, double b, double a)
+{
 	COLOR_BODY
 }
 
-void colorC(Color C) {
+CHEETAH_EXPORT void colorC(Color C)
+{
 	unsigned char r = C.r;
 	unsigned char g = C.g;
 	unsigned char b = C.b;
@@ -270,15 +298,18 @@ void colorC(Color C) {
 	COLOR_BODY
 }
 
-void clearColor(float r, float g, float b, float a) {
+CHEETAH_EXPORT void clearColor(float r, float g, float b, float a)
+{
 	glClearColor(r,g,b,a);
 }
 
-void setClearColor(float r, float g, float b, float a) {
+CHEETAH_EXPORT void setClearColor(float r, float g, float b, float a)
+{
 	glClearColor(r / 255.f, g / 255.f, b / 255.f, a / 255.f);
 }
 
-void blendMode(int mode) {
+CHEETAH_EXPORT void blendMode(int mode)
+{
 	FLUSH_BUFFER();
 	switch(mode) {
 		case blend_alpha:
@@ -305,17 +336,20 @@ void blendMode(int mode) {
 	}
 }
 
-void blendEquation(unsigned mode) {
+CHEETAH_EXPORT void blendEquation(unsigned mode)
+{
 	FLUSH_BUFFER();
 	glBlendEquation_(mode);
 }
 
-void blendFunc(unsigned sourcefactor, unsigned destinationfactor) {
+CHEETAH_EXPORT void blendFunc(unsigned sourcefactor, unsigned destinationfactor)
+{
 	FLUSH_BUFFER();
 	glBlendFunc(sourcefactor, destinationfactor);
 }
 
-void clear(void) {
+CHEETAH_EXPORT void clear(void)
+{
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
@@ -324,7 +358,8 @@ void clear(void) {
  * @group graphics/drawing
  * @see clear clearColorStencil clearDepth clearStencil
  * */
-void clearColorDepth(void) {
+CHEETAH_EXPORT void clearColorDepth(void)
+{
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -333,7 +368,8 @@ void clearColorDepth(void) {
  * @group graphics/drawing
  * @see clear clearColorDepth clearDepth clearStencil
  * */
-void clearColorStencil(void) {
+CHEETAH_EXPORT void clearColorStencil(void)
+{
 	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
@@ -342,7 +378,8 @@ void clearColorStencil(void) {
  * @group graphics/drawing
  * @see clear clearColorDepth clearColorStencil clearStencil
  * */
-void clearDepth(void) {
+CHEETAH_EXPORT void clearDepth(void)
+{
 	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
@@ -351,24 +388,29 @@ void clearDepth(void) {
  * @group graphics/drawing
  * @see clear clearColorDepth clearColorStencil clearDepth
  * */
-void clearStencil(void) {
+CHEETAH_EXPORT void clearStencil(void)
+{
 	glClear(GL_STENCIL_BUFFER_BIT);
 }
 
-void stencilFunc(unsigned func, int ref, unsigned mask) {
+CHEETAH_EXPORT void stencilFunc(unsigned func, int ref, unsigned mask)
+{
 	glStencilFunc(func, ref, mask);
 }
 
-void stencilOp(unsigned fail, unsigned zfail, unsigned zpass) {
-	glStencilOp(fail, zfail, zpass);
+CHEETAH_EXPORT void stencilOp(unsigned fail, unsigned zfail, unsigned zpass)
+{
+	// glStencilOp(fail, zfail, zpass);
 }
 
-void drawToStencil(void) {
+CHEETAH_EXPORT void drawToStencil(void)
+{
 	glStencilFunc (GL_ALWAYS, 0x0, 0x1);
-	glStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
+	// glStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
 }
 
-void drawUsingStencil(void) {
+CHEETAH_EXPORT void drawUsingStencil(void)
+{
 	glStencilFunc (GL_EQUAL, 0x1, 0x1);
-	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
+	// glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 }

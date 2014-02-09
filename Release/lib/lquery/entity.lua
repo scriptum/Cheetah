@@ -231,7 +231,7 @@ function Entity:color(r, g, b, a)
 		if colors[r] then
 			r = colors[r]
 		elseif not r:match('^[a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9]$') then
-			print('Cannot recognise color: '..r)
+			io.stderr:write('Cannot recognise color: '..r)
 			return self
 		end
 		self.r = tonumber(r:sub(1,2), 16)
@@ -737,7 +737,7 @@ _lQuery.event = function(eid, a, b, c)
 		_lQuery.KeyReleased = true
 		_lQuery.KeyReleasedKey = a
 		_lQuery.KeyReleasedUni = b
-	elseif eid == C.EVENT_RESIZE then
+	elseif eid == C.EVENT_RESIZED then
 		screen_width = a
 		screen_height = b
 		if _lQuery._onresize[1] then

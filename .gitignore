@@ -14,5 +14,6 @@ tests/bin/
 thirdparty
 *.tar.*
 papers/
-bin/Release/Demos/Tests/
+Release/Demos/Tests/
 screenshots/
+Release/bin/*/cheetah

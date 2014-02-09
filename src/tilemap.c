@@ -14,7 +14,8 @@ typedef struct _Tilemap {
 } Tilemap;
 */
 #define INDEX_COUNT ((int)(t->img->w / t->tw) * (int)(t->img->h / t->th))
-void newTilmapInternal(Tilemap *t, const char *name) {
+CHEETAH_EXPORT void newTilmapInternal(Tilemap *t, const char *name)
+{
 	//~ int iw, ih, i = 0;  // just indexes for loops
 	//~
 	//~ if(!t->img->id)
@@ -94,7 +95,8 @@ void newTilmapInternal(Tilemap *t, const char *name) {
 }
 
 //void tilemapDraw(Tilemap *t, float x, float y, float r, float z) {
-void tilemapDraw(Tilemap *t, double x, double y, double r, double z, double ox, double oy) {
+CHEETAH_EXPORT void tilemapDraw(Tilemap *t, double x, double y, double r, double z, double ox, double oy)
+{
 	//~ int i, j, k = 0;
 	//~ int x1, y1, x2, y2; // coords of visible part of tilemap (in tiles)
 	//~
@@ -147,7 +149,8 @@ void tilemapDraw(Tilemap *t, double x, double y, double r, double z, double ox, 
 	//~ glPopMatrix();
 }
 
-void deleteTilemap(Tilemap *t) {
+CHEETAH_EXPORT void deleteTilemap(Tilemap *t)
+{
 	//~ int i;
 	//~ for (i = 0; i < INDEX_COUNT; i++) delete(t->index[i]);
 	//~ delete(t->index);
