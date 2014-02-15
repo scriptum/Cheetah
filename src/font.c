@@ -286,7 +286,7 @@ CHEETAH_EXPORT float fontLineHeight(Font *currentFont)
 #define FONT_CEIL(font, x) (font->scalable || font->distanceField) ? x : ceilf(x)
 
 #define DRAW_CHAR do {                                                         \
-    FLUSH_BUFFER_IF_OVERFLOW                                                   \
+    FLUSH_BUFFER_IF_OVERFLOW();                                                \
     texCoord[vertexCounter]   = texCoord[vertexCounter+2] = ch->t[0];          \
     texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];          \
     texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];          \

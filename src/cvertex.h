@@ -41,7 +41,7 @@ extern unsigned colorArrayBuf[4];
 #ifdef GL_QUADS
 #define _DO_COLOR memcpy(colorArray + 2*vertexCounter, colorArrayBuf, VERTICLES_PER_SPRITE * 2);
 #else
-#define _DO_COLOR                                                      \
+#define _DO_COLOR                                                              \
  *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 5))) =                     \
  *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 0))) = colorArrayBuf[0];   \
  *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 1))) = colorArrayBuf[1];   \
@@ -59,21 +59,45 @@ extern unsigned colorArrayBuf[4];
 
 /**********************************VERTEX OPS**********************************/
 
-#define TEXTURE_BIND(tex) do {                                                 \
-    if(unlikely(prevImageId != (tex))) {                                       \
-        FLUSH_BUFFER();                                                        \
-        dbgvv("bind texture %d", tex);                                         \
-        glBindTexture(GL_TEXTURE_2D, tex);                                     \
-        prevImageId = tex;                                                     \
-    }                                                                          \
-} while(0)
+/**
+ * Flushing buffer accumulator. It doesn't send glFlush() or glFinish, it just
+ * calls glDrawArrays to draw quads from buffer. Some functions as color, move,
+ * bindShader need to flush buffer to avoid visual appearance corruption.
+ * */
+static inline void FLUSH_BUFFER()
+{
+	if(likely(vertexCounter))
+	{
+#ifdef GL_QUADS
+		glDrawArrays(GL_QUADS, 0, vertexCounter / 2);
+#else
+		glDrawArrays(GL_TRIANGLES, 0, vertexCounter / 2);
+#endif
+		vertexCounter = 0;
+	}
+}
+
+static inline void TEXTURE_BIND(GLuint tex)
+{
+	if(unlikely(prevImageId != (tex)))
+	{
+		FLUSH_BUFFER();
+		dbgvv("bind texture %d", tex);
+		glBindTexture(GL_TEXTURE_2D, tex);
+		prevImageId = tex;
+	}
+}
 
 /**
- * Just checking if buffer grows over his size and flushing it.
+ * Just check if buffer grows over his size and flush it
  * */
-#define FLUSH_BUFFER_IF_OVERFLOW                                               \
-    if(unlikely(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE))  \
+static inline void FLUSH_BUFFER_IF_OVERFLOW()
+{
+	if(unlikely(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE))
+	{
 		FLUSH_BUFFER();
+	}
+}
 
 /**
  * Rotation of verticles. We are hoping that compiler will optimize sin(0) and
@@ -98,19 +122,6 @@ static inline float VERTEX_ROT_Y(float x,float y,float a,float ox,float oy)
 
 #ifdef GL_QUADS
 /******************************DRAW USING QUADS********************************/
-
-/**
- * Flushing buffer accumulator. It doesn't send glFlush() or glFinish, it just
- * calls glDrawArrays to draw quads from buffer. Some functions as color, move,
- * bindShader need to flush buffer to avoid visual appearance corruption.
- * */
-#define FLUSH_BUFFER() do {                                                    \
-    if(likely(vertexCounter!= 0)) {                                            \
-        dbgvv("buffer of size %d flushed", vertexCounter);                     \
-        glDrawArrays(GL_QUADS, 0, vertexCounter / 2);                          \
-        vertexCounter = 0;                                                     \
-    }                                                                          \
-} while(0)
 
 /**
  * Default texture coordinates.
@@ -139,18 +150,18 @@ static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_VERTEX_OPS(float v
  * */
 static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h)
 {
-	FLUSH_BUFFER_IF_OVERFLOW
+	FLUSH_BUFFER_IF_OVERFLOW();
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
 	texCoord[vertexCounter + 2] =
-	        texCoord[vertexCounter + 0] = tx / w;
+	texCoord[vertexCounter + 0] = tx / w;
 	texCoord[vertexCounter + 7] =
-	        texCoord[vertexCounter + 1] = ty / h;
+	texCoord[vertexCounter + 1] = ty / h;
 	texCoord[vertexCounter + 5] =
-	        texCoord[vertexCounter + 3] =
-	                texCoord[vertexCounter + 1] + th / h;
+	texCoord[vertexCounter + 3] =
+	texCoord[vertexCounter + 1] + th / h;
 	texCoord[vertexCounter + 6] =
-	        texCoord[vertexCounter + 4] =
-	                texCoord[vertexCounter + 0] + tw / w;
+	texCoord[vertexCounter + 4] =
+	texCoord[vertexCounter + 0] + tw / w;
 	// memcpy(colorArray + 2*vertexCounter, colorArrayBuf, 4*4);
 	// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 0))) = colorArrayBuf[0];
 	// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 1))) = colorArrayBuf[1];
@@ -162,13 +173,6 @@ static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float v
 #else
 
 /****************************DRAW USING TRIANGLES******************************/
-
-#define FLUSH_BUFFER() do {                                                    \
-    if(likely(vertexCounter)) {                                                \
-        glDrawArrays(GL_TRIANGLES, 0, vertexCounter / 2);                      \
-        vertexCounter = 0;                                                     \
-    }                                                                          \
-} while(0)
 
 static const float DEFAULT_QUAD_TEX[] = {0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0};
 
@@ -190,22 +194,22 @@ static inline void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, 
 
 static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h)
 {
-	FLUSH_BUFFER_IF_OVERFLOW
+	FLUSH_BUFFER_IF_OVERFLOW();
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
 	texCoord[vertexCounter + 10] =
-	        texCoord[vertexCounter + 2] =
-	                texCoord[vertexCounter + 0] = (tx) / (w);
+	texCoord[vertexCounter + 2] =
+	texCoord[vertexCounter + 0] = (tx) / (w);
 	texCoord[vertexCounter + 11] =
-	        texCoord[vertexCounter + 9] =
-	                texCoord[vertexCounter + 1] = (ty) / (h);
+	texCoord[vertexCounter + 9] =
+	texCoord[vertexCounter + 1] = (ty) / (h);
 	texCoord[vertexCounter + 7] =
-	        texCoord[vertexCounter + 5] =
-	                texCoord[vertexCounter + 3] =
-	                        texCoord[vertexCounter + 1] + (th) / (h);
+	texCoord[vertexCounter + 5] =
+	texCoord[vertexCounter + 3] =
+	texCoord[vertexCounter + 1] + (th) / (h);
 	texCoord[vertexCounter + 8] =
-	        texCoord[vertexCounter + 6] =
-	                texCoord[vertexCounter + 4] =
-	                        texCoord[vertexCounter + 0] + (tw) / (w);
+	texCoord[vertexCounter + 6] =
+	texCoord[vertexCounter + 4] =
+	texCoord[vertexCounter + 0] + (tw) / (w);
 	memcpy(colorArray, colorArrayBuf, 4 * 6);
 	vertexCounter += VERTICLES_PER_SPRITE;
 }
@@ -214,7 +218,7 @@ static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float v
 
 static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_TEXTURE(float vx, float vy, float vw, float vh, float a, float ox, float oy, const float *texture)
 {
-	FLUSH_BUFFER_IF_OVERFLOW
+	FLUSH_BUFFER_IF_OVERFLOW();
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
 	memcpy(texCoord + vertexCounter, texture, sizeof(float) * VERTICLES_PER_SPRITE);
 	vertexCounter += VERTICLES_PER_SPRITE;
