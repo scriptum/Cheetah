@@ -106,6 +106,7 @@ CHEETAH_EXPORT void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, u
 		format = GL_FLOAT;
 	}
 	else
+	{
 		if(TRUE == percision16)
 		{
 			internal = alpha ? GL_RGBA16F_ARB : GL_RGB16F_ARB;
@@ -116,6 +117,7 @@ CHEETAH_EXPORT void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, u
 			internal = alpha ? GL_RGBA : GL_RGB;
 			format = GL_UNSIGNED_BYTE;
 		}
+	}
 
 	/* save current fbo */
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING_EXT, &current_fbo);
@@ -224,14 +226,12 @@ CHEETAH_EXPORT void framebufferSaveBMP(Framebuffer *ptr, const char *name)
 /* Delete framebuffer and free memory. */
 CHEETAH_EXPORT void deleteFramebuffer(Framebuffer *ptr)
 {
-	if(ptr)
-	{
-		glDeleteTextures(1, &ptr->image->id);
-		glDeleteFramebuffers_(1, &ptr->id);
-		delete(ptr->image);
-	}
-	else
+	if(NULL == ptr)
 	{
 		dbg("Trying to free a null-framebuffer. Maybe, you did it manually?");
+		return;
 	}
+	glDeleteTextures(1, &ptr->image->id);
+	glDeleteFramebuffers_(1, &ptr->id);
+	delete(ptr->image);
 }

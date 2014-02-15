@@ -116,6 +116,7 @@ CHEETAH_EXPORT bool cheetahInit(const char *appName, const char *options)
 	{
 		if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 		{
+			myError("couldn't init SDL: %s", SDL_GetError());
 			return FALSE;
 		}
 		screen = SDL_CreateWindow(appName ? appName : "Cheetah Engine",

@@ -150,22 +150,7 @@ bool isInit();
 
 /********************************OPTIONS CHECKER*******************************/
 
-static inline bool check_option_helper(const char *options, const char *o)
-{
-	char *name;
-	RETURN_VALUE_IF_NULL(options, FALSE);
-	RETURN_VALUE_IF_NULL(o, FALSE);
-	name = strstr(options, o);
-	size_t l = strlen(o);
-	/* check bounds */
-	if(NULL != name &&
-	                (' ' == *(name + l) || '\0' == *(name + l)) &&
-	                (name == options || ' ' == *(name - 1) || '\0' == *(name - 1)))
-	{
-		return TRUE;
-	}
-	return FALSE;
-}
+bool check_option_helper(const char *options, const char *o);
 
 #define CHECK_OPTION(options, o) bool o = check_option_helper(options, #o)
 

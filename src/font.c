@@ -214,27 +214,25 @@ CHEETAH_EXPORT float fontHeight(Font *currentFont, const char *str, float maxw)
 				y += height;
 				goto out;
 			}
+			else if(unlikely(c == '\t'))
+			{
+				width += spacew * 8;
+				last_space = j;
+			}
+			else if(unlikely(c == ' '))
+			{
+				last_space = j;
+				width += spacew;
+			}
 			else
-				if(unlikely(c == '\t'))
+			{
+				ch = FontHash_get(hash, c);
+				if(unlikely(NULL == ch))
 				{
-					width += spacew * 8;
-					last_space = j;
+					continue;
 				}
-				else
-					if(unlikely(c == ' '))
-					{
-						last_space = j;
-						width += spacew;
-					}
-					else
-					{
-						ch = FontHash_get(hash, c);
-						if(unlikely(NULL == ch))
-						{
-							continue;
-						}
-						width += ch->w;
-					}
+				width += ch->w;
+			}
 
 			if(unlikely(width > maxw || '\n' == c))
 			{
@@ -395,30 +393,28 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 			{
 				end = TRUE;
 			}
+			else if(unlikely(c == '\t'))
+			{
+				width += spacew * 8;
+				last_space = j;
+				lastw = width;
+			}
+			else if(unlikely(c == ' '))
+			{
+				last_space = j;
+				lastw = width;
+				spaces++;
+				width += spacew;
+			}
 			else
-				if(unlikely(c == '\t'))
+			{
+				ch = FontHash_get(hash, c);
+				if(unlikely(NULL == ch))
 				{
-					width += spacew * 8;
-					last_space = j;
-					lastw = width;
+					continue;
 				}
-				else
-					if(unlikely(c == ' '))
-					{
-						last_space = j;
-						lastw = width;
-						spaces++;
-						width += spacew;
-					}
-					else
-					{
-						ch = FontHash_get(hash, c);
-						if(unlikely(NULL == ch))
-						{
-							continue;
-						}
-						width += ch->w;
-					}
+				width += ch->w;
+			}
 			/* drop invisible lines - great performance improvement for long texts */
 			yOutScreen = (y + oldy + height) * currentFont->_scale > 0.0f;
 			/* drop kerning computation for invisible lines - speed +15% */
@@ -702,24 +698,22 @@ CHEETAH_EXPORT void fontSetKerning(Font *ptr, const char *line)
 
 CHEETAH_EXPORT void deleteFont(Font *ptr)
 {
-	if(ptr)
+	if(NULL == ptr)
 	{
-		if(NULL != ptr->hash)
-		{
-			FontHash *h = (FontHash *)ptr->hash;
-			HASH_FOREACH(i, h, n)
-			{
-				delete(n->value);
-			}
-			FontHash_destroy(h);
-		}
-		if(NULL != ptr->kerningHash)
-		{
-			KernHash_destroy((KernHash *)ptr->kerningHash);
-		}
+		dbg("Trying to free a null-font. Maybe, you did it manually?");
+		return;
 	}
-	else
+	if(NULL != ptr->hash)
 	{
-		myError("Trying to free a null-font. Maybe, you did it manually?");
+		FontHash *h = (FontHash *)ptr->hash;
+		HASH_FOREACH(i, h, n)
+		{
+			delete(n->value);
+		}
+		FontHash_destroy(h);
+	}
+	if(NULL != ptr->kerningHash)
+	{
+		KernHash_destroy((KernHash *)ptr->kerningHash);
 	}
 }
