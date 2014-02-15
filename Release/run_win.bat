@@ -1,5 +1,5 @@
 if X%1==X (
-	.\bin\win32\luajit.exe main.lua
+	.\bin\win32\cheetah.exe main.lua
 ) else (
-	.\bin\win32\luajit.exe %1
+	.\bin\win32\cheetah.exe %1
 )
