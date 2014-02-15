@@ -32,7 +32,7 @@ IN THE SOFTWARE.
 #include "crandom.h"
 #include "test.h"
 
-void imageBind(Image * image);
+void imageBind(Image *image);
 void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
 
@@ -72,8 +72,10 @@ CHEETAH_EXPORT static void particleSystemUpdate(ParticleSystem *pSystem)
 {
 	unsigned	i;
 	Particle	*particle = pSystem->particles;
-	if(globalTimers.timed - pSystem->_lasttime < 1.0/100.0)
+	if(globalTimers.timed - pSystem->_lasttime < 1.0 / 100.0)
+	{
 		return;
+	}
 	float deltaTime = (float)(globalTimers.gameTimed - (double)pSystem->_lasttime);
 	pSystem->_lasttime = globalTimers.gameTimed;
 	pSystem->_particlesNeeded += pSystem->emissionRate * deltaTime;
@@ -101,7 +103,10 @@ CHEETAH_EXPORT static void particleSystemUpdate(ParticleSystem *pSystem)
 		particle = &(pSystem->particles[pSystem->_aliveParticles]);
 		for(i = 0; i < particlesNeeded; i++)
 		{
-			if(pSystem->_aliveParticles >= pSystem->maxParticles) break;
+			if(pSystem->_aliveParticles >= pSystem->maxParticles)
+			{
+				break;
+			}
 			memset(particle, 0, sizeof(Particle));
 			float angle = pSystem->direction + randf2(rand128()) * pSystem->directionVariation;
 			particle->speed.x = cosf(angle);
@@ -109,9 +114,11 @@ CHEETAH_EXPORT static void particleSystemUpdate(ParticleSystem *pSystem)
 			float startSpeed = pSystem->startSpeed + randf2(rand128()) * pSystem->startSpeedVariation;
 			particle->speed.x *= startSpeed;
 			particle->speed.y *= startSpeed;
-			#define RNDC(T) particle->color.T = (unsigned char)((int)pSystem->color.T + (((int)(rand128() & 255) - 128) * (int)pSystem->colorVariation.T) / 256);
+#define RNDC(T) particle->color.T =                                            \
+(unsigned char)((int)pSystem->color.T +                                        \
+(((int)(rand128() & 255) - 128) * (int)pSystem->colorVariation.T) / 256);
 			RNDC(r) RNDC(g) RNDC(b) RNDC(a)
-			#undef RNDC
+#undef RNDC
 			particle->age = pSystem->particleLife + randf2(rand128()) * pSystem->particleLifeVariation;
 			particle->scale = pSystem->scale + randf2(rand128()) * pSystem->scaleVariation;
 			particle++;
@@ -136,8 +143,8 @@ CHEETAH_EXPORT void particleSystemDraw(ParticleSystem *ptr, float x, float y)
 	// Particle	*particle = ptr->particles;
 	// Color particleColor;
 	// union {
-		// Color particleColor;
-		// uint32_t colorUint;
+	// Color particleColor;
+	// uint32_t colorUint;
 	// } colorUnion;
 	// particleSystemUpdate(ptr);
 	// rng_push();
@@ -146,20 +153,20 @@ CHEETAH_EXPORT void particleSystemDraw(ParticleSystem *ptr, float x, float y)
 	// colorUnion.particleColor = ptr->colorVariation;
 	// for(i = 0; i < ptr->_aliveParticles; i++)
 	// {
-		// if(colorUnion.colorUint) /* if have randomized color */
-		// {
-			// crandom.hash_seed128((uint32_t)particle, 362436069, 521288629, 88675123);
-			// #define RNDC(T) int T = (int)particleColor.T + (((int)(rand128() & 255) - 128) * (int)colorUnion.particleColor.T) / 256;
-			// RNDC(r) RNDC(g) RNDC(b) RNDC(a)
-			// #undef RNDC
-			// color(r, g, b, a);
-		// }
-		// else
-		// {
-			// color(particleColor.r, particleColor.g, particleColor.b, particleColor.a);
-		// }
-		// PUSH_QUAD(particle->position.x + x, particle->position.y + y, ptr->image->w, ptr->image->h, 0, ptr->image->w * 0.5f, ptr->image->h * 0.5f);
-		// particle++;
+	// if(colorUnion.colorUint) /* if have randomized color */
+	// {
+	// crandom.hash_seed128((uint32_t)particle, 362436069, 521288629, 88675123);
+	// #define RNDC(T) int T = (int)particleColor.T + (((int)(rand128() & 255) - 128) * (int)colorUnion.particleColor.T) / 256;
+	// RNDC(r) RNDC(g) RNDC(b) RNDC(a)
+	// #undef RNDC
+	// color(r, g, b, a);
+	// }
+	// else
+	// {
+	// color(particleColor.r, particleColor.g, particleColor.b, particleColor.a);
+	// }
+	// PUSH_QUAD(particle->position.x + x, particle->position.y + y, ptr->image->w, ptr->image->h, 0, ptr->image->w * 0.5f, ptr->image->h * 0.5f);
+	// particle++;
 	// }
 	// rng_pop();
 }
@@ -168,5 +175,7 @@ CHEETAH_EXPORT void particleSystemDraw(ParticleSystem *ptr, float x, float y)
 CHEETAH_EXPORT void deleteParticleSystem(ParticleSystem *ptr)
 {
 	if(ptr)
+	{
 		delete(ptr->particles);
+	}
 }

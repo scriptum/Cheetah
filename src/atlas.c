@@ -29,17 +29,21 @@ IN THE SOFTWARE.
 #include "cvertex.h"
 #include "test.h"
 
-void imageBind(Image * image);
+void imageBind(Image *image);
 
 CHEETAH_EXPORT void atlasDrawt(Atlas *p, float x, float y, float w, float h, float a, float ox, float oy)
 {
-	float scalex = w/p->w;
-	float scaley = h/p->h;
+	float scalex = w / p->w;
+	float scaley = h / p->h;
 	imageBind(p->image);
 	if(.0f == a)
+	{
 		PUSH_QUAD_TEXTURE(x, y, p->aw * scalex, p->ah * scaley, 0.0, ox - p->x * scalex, oy - p->y * scaley, p->tex);
+	}
 	else
+	{
 		PUSH_QUAD_TEXTURE(x, y, p->aw * scalex, p->ah * scaley, a, ox - p->x * scalex, oy - p->y * scaley, p->tex);
+	}
 }
 
 CHEETAH_EXPORT void atlasDrawxy(Atlas *p, float x, float y, float w, float h)

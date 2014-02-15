@@ -31,21 +31,22 @@ IN THE SOFTWARE.
 #include "cvertex.h"
 #include "test.h"
 
-const char * std_vertex_shader = "varying vec2 TexCoord;"
-"void main()"
-"{"
-	"gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
-	"gl_FrontColor = gl_Color;"
-	"TexCoord = gl_MultiTexCoord0.xy;"
-"}";
+const char *std_vertex_shader = "varying vec2 TexCoord;"
+                                "void main()"
+                                "{"
+                                "gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
+                                "gl_FrontColor = gl_Color;"
+                                "TexCoord = gl_MultiTexCoord0.xy;"
+                                "}";
 
-Shader * initShader(void) {
+Shader *initShader(void)
+{
 	Shader *ptr = NULL;
 	new(ptr, Shader, 1);
 	return ptr;
 }
 
-static bool compile(GLuint shader, const char* name)
+static bool compile(GLuint shader, const char *name)
 {
 	GLint compiled;
 	GLint blen = 0;
@@ -53,10 +54,10 @@ static bool compile(GLuint shader, const char* name)
 	GLchar *compiler_log = NULL;
 	glCompileShader_(shader);
 	glGetShaderiv_(shader, GL_COMPILE_STATUS, &compiled);
-	if (!compiled)
+	if(!compiled)
 	{
 		glGetShaderiv_(shader, GL_INFO_LOG_LENGTH , &blen);
-		if (blen > 1)
+		if(blen > 1)
 		{
 			new(compiler_log, GLchar, blen);
 			glGetInfoLog_(shader, blen, &slen, compiler_log);
@@ -68,7 +69,7 @@ static bool compile(GLuint shader, const char* name)
 	return TRUE;
 }
 
-CHEETAH_EXPORT void newFragmentVertexShader(Shader * ptr, const char * pix, const char * ver)
+CHEETAH_EXPORT void newFragmentVertexShader(Shader *ptr, const char *pix, const char *ver)
 {
 	GLuint v, f, p;
 	GLint linked;
@@ -85,21 +86,23 @@ CHEETAH_EXPORT void newFragmentVertexShader(Shader * ptr, const char * pix, cons
 	glShaderSource_(v, count, &ver, NULL);
 	glShaderSource_(f, count, &pix, NULL);
 	if(FALSE == compile(v, "string_shader"))
+	{
 		return;
+	}
 	if(FALSE == compile(f, "string_shader"))
 	{
 		glDeleteObject_(v);
 		return;
 	}
 	p = glCreateProgramObject_();
-	glAttachObject_(p,v);
-	glAttachObject_(p,f);
+	glAttachObject_(p, v);
+	glAttachObject_(p, f);
 	glLinkProgram_(p);
 
 	glGetProgramiv_(p, GL_LINK_STATUS, &linked);
 	glDeleteObject_(v);
 	glDeleteObject_(f);
-	if (0 == linked)
+	if(0 == linked)
 	{
 		dbg("Error while linking shader");
 		return;
@@ -107,21 +110,24 @@ CHEETAH_EXPORT void newFragmentVertexShader(Shader * ptr, const char * pix, cons
 	ptr->id = p;
 }
 
-CHEETAH_EXPORT void newFragmentShader(Shader * ptr, const char * frag)
+CHEETAH_EXPORT void newFragmentShader(Shader *ptr, const char *frag)
 {
 	newFragmentVertexShader(ptr, frag, std_vertex_shader);
 }
 
-CHEETAH_EXPORT bool shaderCheck(Shader * ptr)
+CHEETAH_EXPORT bool shaderCheck(Shader *ptr)
 {
 	return (bool)ptr->id;
 }
 
-CHEETAH_EXPORT void deleteShader(Shader * ptr)
+CHEETAH_EXPORT void deleteShader(Shader *ptr)
 {
-	if(ptr) {
+	if(ptr)
+	{
 		if(supported.GLSL && ptr->id)
+		{
 			glDeleteObject_(ptr->id);
+		}
 	}
 	else
 	{
@@ -129,7 +135,7 @@ CHEETAH_EXPORT void deleteShader(Shader * ptr)
 	}
 }
 
-CHEETAH_EXPORT void shaderBind(Shader * ptr)
+CHEETAH_EXPORT void shaderBind(Shader *ptr)
 {
 	if(supported.GLSL && ptr->id)
 	{
@@ -138,7 +144,7 @@ CHEETAH_EXPORT void shaderBind(Shader * ptr)
 	}
 }
 
-CHEETAH_EXPORT void shaderUnbind(Shader * ptr)
+CHEETAH_EXPORT void shaderUnbind(Shader *ptr)
 {
 	if(supported.GLSL)
 	{
@@ -147,7 +153,7 @@ CHEETAH_EXPORT void shaderUnbind(Shader * ptr)
 	}
 }
 
-CHEETAH_EXPORT int GetUniformLocation(unsigned program, const char * name)
+CHEETAH_EXPORT int GetUniformLocation(unsigned program, const char *name)
 {
 	return glGetUniformLocation_(program, name);
 }

@@ -79,11 +79,18 @@ CHEETAH_EXPORT bool cheetahInit(const char *appName, const char *options)
 	bool firstrun = FALSE;
 	int width = 800, height = 600;
 	int count = sscanf(options, "%11dx%11d", &width, &height);
-	if(1 == count) height = width;
+	if(1 == count)
+	{
+		height = width;
+	}
 	if(width <= 0)
+	{
 		width = 800;
+	}
 	if(height <= 0)
+	{
 		height = 600;
+	}
 	CHECK_OPTION(options, fullscreen);
 	CHECK_OPTION(options, resizable);
 	CHECK_OPTION(options, vsync);
@@ -93,30 +100,44 @@ CHEETAH_EXPORT bool cheetahInit(const char *appName, const char *options)
 	CHECK_OPTION(options, noframe);
 	const int bpp = 32;
 	if(TRUE == fullscreen)
+	{
 		flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-	else if(TRUE == resizable)
-		flags |= SDL_WINDOW_RESIZABLE;
+	}
+	else
+		if(TRUE == resizable)
+		{
+			flags |= SDL_WINDOW_RESIZABLE;
+		}
 	if(TRUE == noframe)
+	{
 		flags |= SDL_WINDOW_BORDERLESS;
-	if(NULL == screen) {
+	}
+	if(NULL == screen)
+	{
 		if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
+		{
 			return FALSE;
+		}
 		screen = SDL_CreateWindow(appName ? appName : "Cheetah Engine",
-			SDL_WINDOWPOS_CENTERED,
-			SDL_WINDOWPOS_CENTERED,
-			width, height, flags);
+		                          SDL_WINDOWPOS_CENTERED,
+		                          SDL_WINDOWPOS_CENTERED,
+		                          width, height, flags);
 		if(NULL == screen)
 		{
 			myError("couldn't set %dx%dx%d video mode: %s",
-				width, height, bpp, SDL_GetError());
+			        width, height, bpp, SDL_GetError());
 			return FALSE;
 		}
 		glcontext = SDL_GL_CreateContext(screen);
 		SDL_GL_SetSwapInterval(vsync);
 		if(TRUE == depth)
+		{
 			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+		}
 		if(TRUE == stencil)
+		{
 			SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+		}
 		firstrun = TRUE;
 		/*Set screen auto-scale properties*/
 		screenScale.origWidth = (float)width;
@@ -175,10 +196,10 @@ CHEETAH_EXPORT bool cheetahInit(const char *appName, const char *options)
 		TEX_CLAMP;
 		TEX_LINEAR;
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4, 4, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-		"\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0\377"
-		"\377\377\377\377\377\377\377\377\377\377\0\377\377\377\0\377\377\377\377"
-		"\377\377\377\377\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0"
-		"\377\377\377\0");
+		             "\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0\377"
+		             "\377\377\377\377\377\377\377\377\377\377\0\377\377\377\0\377\377\377\377"
+		             "\377\377\377\377\377\377\377\0\377\377\377\0\377\377\377\0\377\377\377\0"
+		             "\377\377\377\0");
 
 		/* create two main vertex buffers */
 		vertexCounter = 0;
@@ -186,18 +207,18 @@ CHEETAH_EXPORT bool cheetahInit(const char *appName, const char *options)
 		new(vertexCoord, float, VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		#ifdef COLOR_ARRAYS
+#ifdef COLOR_ARRAYS
 		new(colorArray, unsigned char, 2 * VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE);
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(4, GL_UNSIGNED_BYTE, 0, colorArray);
-		#endif
+#endif
 		glVertexPointer(2, GL_FLOAT, 0, vertexCoord);
 		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
 
 		/* init random generator */
 		random_hash_seed((uint32_t)time(NULL));
 	}
-	
+
 	return TRUE;
 }
 
@@ -242,7 +263,7 @@ CHEETAH_EXPORT void swapBuffers(void)
  * @var text to replace the caption
  * @see init
  * */
-CHEETAH_EXPORT void setTitle(const char * text)
+CHEETAH_EXPORT void setTitle(const char *text)
 {
 	SDL_SetWindowTitle(screen, text);
 }
@@ -313,23 +334,27 @@ CHEETAH_EXPORT void prepare(void)
 		globalTimers.rescaleTime = 0;
 	}
 	if(clearScreenFlag)
+	{
 		glClear(GL_COLOR_BUFFER_BIT);
+	}
 }
 
 void recomputeScreenScale(float w, float h)
 {
 	if(!screenScale.autoScale)
-		return;
-	screenScale.aspect = w / h;
-	if(screenScale.aspect > screenScale.origWidth/screenScale.origHeight)
 	{
-		screenScale.scaleX = screenScale.scaleY = h/screenScale.origHeight;
+		return;
+	}
+	screenScale.aspect = w / h;
+	if(screenScale.aspect > screenScale.origWidth / screenScale.origHeight)
+	{
+		screenScale.scaleX = screenScale.scaleY = h / screenScale.origHeight;
 		screenScale.offsetX = floorf((w - screenScale.origWidth * screenScale.scaleX) * 0.5f);
 		screenScale.offsetY = 0;
 	}
 	else
 	{
-		screenScale.scaleX = screenScale.scaleY = w/screenScale.origWidth;
+		screenScale.scaleX = screenScale.scaleY = w / screenScale.origWidth;
 		screenScale.offsetY = floorf((h - screenScale.origHeight * screenScale.scaleY) * 0.5f);
 		screenScale.offsetX = 0;
 	}
@@ -340,7 +365,7 @@ CHEETAH_EXPORT void sdlquit()
 	if(screen)
 	{
 		SDL_DestroyWindow(screen);
-		SDL_GL_DeleteContext(glcontext);  
+		SDL_GL_DeleteContext(glcontext);
 	}
 	SDL_Quit();
 }

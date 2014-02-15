@@ -39,9 +39,9 @@ extern unsigned char *colorArray;
 extern unsigned colorArrayBuf[4];
 
 #ifdef GL_QUADS
-	#define _DO_COLOR memcpy(colorArray + 2*vertexCounter, colorArrayBuf, VERTICLES_PER_SPRITE * 2);
+#define _DO_COLOR memcpy(colorArray + 2*vertexCounter, colorArrayBuf, VERTICLES_PER_SPRITE * 2);
 #else
-	#define _DO_COLOR                                                      \
+#define _DO_COLOR                                                      \
  *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 5))) =                     \
  *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 0))) = colorArrayBuf[0];   \
  *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 1))) = colorArrayBuf[1];   \
@@ -115,12 +115,13 @@ static inline float VERTEX_ROT_Y(float x,float y,float a,float ox,float oy)
 /**
  * Default texture coordinates.
  * */
-static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,0};
+static const float DEFAULT_QUAD_TEX[] = {0, 0, 0, 1, 1, 1, 1, 0};
 
 /**
  * Genegal vertex operations: push vertex coordinates to buffer.
  * */
-static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, float a, float ox, float oy) {
+static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, float a, float ox, float oy)
+{
 	vertexCoord[vertexCounter + 0] = vx + VERTEX_ROT_X(0,  0,  a, ox, oy);
 	vertexCoord[vertexCounter + 1] = vy + VERTEX_ROT_Y(0,  0,  a, ox, oy);
 	vertexCoord[vertexCounter + 2] = vx + VERTEX_ROT_X(0,  vh, a, ox, oy);
@@ -136,19 +137,20 @@ static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_VERTEX_OPS(float v
  * Pushing full quad with all transformaions: size, rotation (a - angle),
  * texture offsets and origin position (ox, oy).
  * */
-static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h) {
+static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h)
+{
 	FLUSH_BUFFER_IF_OVERFLOW
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
 	texCoord[vertexCounter + 2] =
-	texCoord[vertexCounter + 0] = tx / w;
+	        texCoord[vertexCounter + 0] = tx / w;
 	texCoord[vertexCounter + 7] =
-	texCoord[vertexCounter + 1] = ty / h;
+	        texCoord[vertexCounter + 1] = ty / h;
 	texCoord[vertexCounter + 5] =
-	texCoord[vertexCounter + 3] =
-	texCoord[vertexCounter + 1] + th / h;
+	        texCoord[vertexCounter + 3] =
+	                texCoord[vertexCounter + 1] + th / h;
 	texCoord[vertexCounter + 6] =
-	texCoord[vertexCounter + 4] =
-	texCoord[vertexCounter + 0] + tw / w;
+	        texCoord[vertexCounter + 4] =
+	                texCoord[vertexCounter + 0] + tw / w;
 	// memcpy(colorArray + 2*vertexCounter, colorArrayBuf, 4*4);
 	// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 0))) = colorArrayBuf[0];
 	// *((unsigned *)(colorArray + 4 * (vertexCounter/2 + 1))) = colorArrayBuf[1];
@@ -168,54 +170,58 @@ static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float v
     }                                                                          \
 } while(0)
 
-static const float DEFAULT_QUAD_TEX[] = {0,0,0,1,1,1,1,1,1,0,0,0};
+static const float DEFAULT_QUAD_TEX[] = {0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0};
 
-static inline void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, float a, float ox, float oy) {
+static inline void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, float a, float ox, float oy)
+{
 	vertexCoord[vertexCounter + 10] =
-	vertexCoord[vertexCounter + 0]  = (vx) + VERTEX_ROT_X(0,  0,  a, ox, oy);
+	        vertexCoord[vertexCounter + 0]  = (vx) + VERTEX_ROT_X(0,  0,  a, ox, oy);
 	vertexCoord[vertexCounter + 11] =
-	vertexCoord[vertexCounter + 1]  = (vy) + VERTEX_ROT_Y(0,  0,  a, ox, oy);
+	        vertexCoord[vertexCounter + 1]  = (vy) + VERTEX_ROT_Y(0,  0,  a, ox, oy);
 	vertexCoord[vertexCounter + 2]  = (vx) + VERTEX_ROT_X(0,  vh, a, ox, oy);
 	vertexCoord[vertexCounter + 3]  = (vy) + VERTEX_ROT_Y(0,  vh, a, ox, oy);
 	vertexCoord[vertexCounter + 6]  =
-	vertexCoord[vertexCounter + 4]  = (vx) + VERTEX_ROT_X(vw, vh, a, ox, oy);
+	        vertexCoord[vertexCounter + 4]  = (vx) + VERTEX_ROT_X(vw, vh, a, ox, oy);
 	vertexCoord[vertexCounter + 7]  =
-	vertexCoord[vertexCounter + 5]  = (vy) + VERTEX_ROT_Y(vw, vh, a, ox, oy);
+	        vertexCoord[vertexCounter + 5]  = (vy) + VERTEX_ROT_Y(vw, vh, a, ox, oy);
 	vertexCoord[vertexCounter + 8]  = (vx) + VERTEX_ROT_X(vw, 0,  a, ox, oy);
 	vertexCoord[vertexCounter + 9]  = (vy) + VERTEX_ROT_Y(vw, 0,  a, ox, oy);
 }
 
-static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h) {
+static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h)
+{
 	FLUSH_BUFFER_IF_OVERFLOW
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
 	texCoord[vertexCounter + 10] =
-	texCoord[vertexCounter + 2] =
-	texCoord[vertexCounter + 0] = (tx) / (w);
+	        texCoord[vertexCounter + 2] =
+	                texCoord[vertexCounter + 0] = (tx) / (w);
 	texCoord[vertexCounter + 11] =
-	texCoord[vertexCounter + 9] =
-	texCoord[vertexCounter + 1] = (ty) / (h);
+	        texCoord[vertexCounter + 9] =
+	                texCoord[vertexCounter + 1] = (ty) / (h);
 	texCoord[vertexCounter + 7] =
-	texCoord[vertexCounter + 5] =
-	texCoord[vertexCounter + 3] =
-	texCoord[vertexCounter + 1] + (th) / (h);
+	        texCoord[vertexCounter + 5] =
+	                texCoord[vertexCounter + 3] =
+	                        texCoord[vertexCounter + 1] + (th) / (h);
 	texCoord[vertexCounter + 8] =
-	texCoord[vertexCounter + 6] =
-	texCoord[vertexCounter + 4] =
-	texCoord[vertexCounter + 0] + (tw) / (w);
+	        texCoord[vertexCounter + 6] =
+	                texCoord[vertexCounter + 4] =
+	                        texCoord[vertexCounter + 0] + (tw) / (w);
 	memcpy(colorArray, colorArrayBuf, 4 * 6);
 	vertexCounter += VERTICLES_PER_SPRITE;
 }
 
 #endif /* #ifdef GL_QUADS */
 
-static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_TEXTURE(float vx, float vy, float vw, float vh, float a, float ox, float oy, const float *texture) {
+static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_TEXTURE(float vx, float vy, float vw, float vh, float a, float ox, float oy, const float *texture)
+{
 	FLUSH_BUFFER_IF_OVERFLOW
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
 	memcpy(texCoord + vertexCounter, texture, sizeof(float) * VERTICLES_PER_SPRITE);
 	vertexCounter += VERTICLES_PER_SPRITE;
 }
 
-static inline void __attribute__((optimize("-O3"))) PUSH_QUAD(float vx, float vy, float vw, float vh, float a, float ox, float oy) {
+static inline void __attribute__((optimize("-O3"))) PUSH_QUAD(float vx, float vy, float vw, float vh, float a, float ox, float oy)
+{
 	PUSH_QUAD_TEXTURE(vx, vy, vw, vh, a, ox, oy, DEFAULT_QUAD_TEX);
 }
 

@@ -108,35 +108,37 @@ void initRenderer(void)
 	//проверка поддержки шейдров
 	if(strstr(exts, "GL_ARB_shading_language_100") && strstr(exts, "GL_ARB_shader_objects") && strstr(exts, "GL_ARB_vertex_shader") && strstr(exts, "GL_ARB_fragment_shader"))
 	{
-		glCreateProgramObject_ =        (PFNGLCREATEPROGRAMOBJECTARBPROC)     getProcAddr("glCreateProgramObjectARB");
-		glDeleteObject_ =               (PFNGLDELETEOBJECTARBPROC)            getProcAddr("glDeleteObjectARB");
-		glUseProgramObject_ =           (PFNGLUSEPROGRAMOBJECTARBPROC)        getProcAddr("glUseProgramObjectARB");
-		glCreateShaderObject_ =         (PFNGLCREATESHADEROBJECTARBPROC)      getProcAddr("glCreateShaderObjectARB");
-		glShaderSource_ =               (PFNGLSHADERSOURCEARBPROC)            getProcAddr("glShaderSourceARB");
-		glCompileShader_ =              (PFNGLCOMPILESHADERARBPROC)           getProcAddr("glCompileShaderARB");
-		glGetObjectParameteriv_ =       (PFNGLGETOBJECTPARAMETERIVARBPROC)    getProcAddr("glGetObjectParameterivARB");
-		glAttachObject_ =               (PFNGLATTACHOBJECTARBPROC)            getProcAddr("glAttachObjectARB");
-		glGetInfoLog_ =                 (PFNGLGETINFOLOGARBPROC)              getProcAddr("glGetInfoLogARB");
-		glLinkProgram_ =                (PFNGLLINKPROGRAMARBPROC)             getProcAddr("glLinkProgramARB");
-		glGetUniformLocation_ =         (PFNGLGETUNIFORMLOCATIONARBPROC)      getProcAddr("glGetUniformLocationARB");
-		glUniform1f_ =                  (PFNGLUNIFORM1FARBPROC)               getProcAddr("glUniform1fARB");
-		glUniform2f_ =                  (PFNGLUNIFORM2FARBPROC)               getProcAddr("glUniform2fARB");
-		glUniform3f_ =                  (PFNGLUNIFORM3FARBPROC)               getProcAddr("glUniform3fARB");
-		glUniform4f_ =                  (PFNGLUNIFORM4FARBPROC)               getProcAddr("glUniform4fARB");
-		glUniform1fv_ =                 (PFNGLUNIFORM1FVARBPROC)              getProcAddr("glUniform1fvARB");
-		glUniform2fv_ =                 (PFNGLUNIFORM2FVARBPROC)              getProcAddr("glUniform2fvARB");
-		glUniform3fv_ =                 (PFNGLUNIFORM3FVARBPROC)              getProcAddr("glUniform3fvARB");
-		glUniform4fv_ =                 (PFNGLUNIFORM4FVARBPROC)              getProcAddr("glUniform4fvARB");
-		glUniform1i_ =                  (PFNGLUNIFORM1IARBPROC)               getProcAddr("glUniform1iARB");
-		glBindAttribLocation_ =         (PFNGLBINDATTRIBLOCATIONARBPROC)      getProcAddr("glBindAttribLocationARB");
-		glGetActiveUniform_ =           (PFNGLGETACTIVEUNIFORMARBPROC)        getProcAddr("glGetActiveUniformARB");
-		glGetShaderiv_ =                (PFNGLGETSHADERIVPROC)                getProcAddr("glGetShaderiv");
-		glGetProgramiv_ =               (PFNGLGETPROGRAMIVPROC)               getProcAddr("glGetProgramiv");
+		glCreateProgramObject_ = (PFNGLCREATEPROGRAMOBJECTARBPROC)     getProcAddr("glCreateProgramObjectARB");
+		glDeleteObject_ = (PFNGLDELETEOBJECTARBPROC)            getProcAddr("glDeleteObjectARB");
+		glUseProgramObject_ = (PFNGLUSEPROGRAMOBJECTARBPROC)        getProcAddr("glUseProgramObjectARB");
+		glCreateShaderObject_ = (PFNGLCREATESHADEROBJECTARBPROC)      getProcAddr("glCreateShaderObjectARB");
+		glShaderSource_ = (PFNGLSHADERSOURCEARBPROC)            getProcAddr("glShaderSourceARB");
+		glCompileShader_ = (PFNGLCOMPILESHADERARBPROC)           getProcAddr("glCompileShaderARB");
+		glGetObjectParameteriv_ = (PFNGLGETOBJECTPARAMETERIVARBPROC)    getProcAddr("glGetObjectParameterivARB");
+		glAttachObject_ = (PFNGLATTACHOBJECTARBPROC)            getProcAddr("glAttachObjectARB");
+		glGetInfoLog_ = (PFNGLGETINFOLOGARBPROC)              getProcAddr("glGetInfoLogARB");
+		glLinkProgram_ = (PFNGLLINKPROGRAMARBPROC)             getProcAddr("glLinkProgramARB");
+		glGetUniformLocation_ = (PFNGLGETUNIFORMLOCATIONARBPROC)      getProcAddr("glGetUniformLocationARB");
+		glUniform1f_ = (PFNGLUNIFORM1FARBPROC)               getProcAddr("glUniform1fARB");
+		glUniform2f_ = (PFNGLUNIFORM2FARBPROC)               getProcAddr("glUniform2fARB");
+		glUniform3f_ = (PFNGLUNIFORM3FARBPROC)               getProcAddr("glUniform3fARB");
+		glUniform4f_ = (PFNGLUNIFORM4FARBPROC)               getProcAddr("glUniform4fARB");
+		glUniform1fv_ = (PFNGLUNIFORM1FVARBPROC)              getProcAddr("glUniform1fvARB");
+		glUniform2fv_ = (PFNGLUNIFORM2FVARBPROC)              getProcAddr("glUniform2fvARB");
+		glUniform3fv_ = (PFNGLUNIFORM3FVARBPROC)              getProcAddr("glUniform3fvARB");
+		glUniform4fv_ = (PFNGLUNIFORM4FVARBPROC)              getProcAddr("glUniform4fvARB");
+		glUniform1i_ = (PFNGLUNIFORM1IARBPROC)               getProcAddr("glUniform1iARB");
+		glBindAttribLocation_ = (PFNGLBINDATTRIBLOCATIONARBPROC)      getProcAddr("glBindAttribLocationARB");
+		glGetActiveUniform_ = (PFNGLGETACTIVEUNIFORMARBPROC)        getProcAddr("glGetActiveUniformARB");
+		glGetShaderiv_ = (PFNGLGETSHADERIVPROC)                getProcAddr("glGetShaderiv");
+		glGetProgramiv_ = (PFNGLGETPROGRAMIVPROC)               getProcAddr("glGetProgramiv");
 		supported.GLSL = TRUE;
 		puts("yes");
 	}
 	else
+	{
 		puts("no");
+	}
 
 	printf("Minmax blend:\t");
 	supported.BE = FALSE;
@@ -149,7 +151,9 @@ void initRenderer(void)
 		puts("yes");
 	}
 	else
+	{
 		puts("no");
+	}
 
 	printf("Framebuffer:\t");
 	supported.FBO = 0;
@@ -170,7 +174,9 @@ void initRenderer(void)
 		puts("yes");
 	}
 	else
+	{
 		puts("no");
+	}
 
 	printf("Multitexture:\t");
 	supported.MT = FALSE;
@@ -185,7 +191,9 @@ void initRenderer(void)
 		puts("yes");
 	}
 	else
+	{
 		puts("no");
+	}
 
 	printf("Vertex Buffer:\t");
 	supported.VBO = FALSE;
@@ -203,7 +211,9 @@ void initRenderer(void)
 		puts("yes");
 	}
 	else
+	{
 		puts("no");
+	}
 
 	printf("Point Sprite:\t");
 	supported.PS = FALSE;
@@ -213,5 +223,7 @@ void initRenderer(void)
 		puts("yes");
 	}
 	else
+	{
 		puts("no");
+	}
 }

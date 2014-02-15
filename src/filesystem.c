@@ -43,7 +43,7 @@ CHEETAH_EXPORT void myError(const char *fmt, ...)
 	va_end(args);
 }
 
-CHEETAH_EXPORT bool isPointer(void * ptr)
+CHEETAH_EXPORT bool isPointer(void *ptr)
 {
 	return ptr != NULL;
 }
@@ -63,33 +63,47 @@ CHEETAH_EXPORT unsigned char *loadfile(const char *filename, long *length)
 	ERROR_IF_NULL(f);
 	fseek(f, 0, SEEK_END);
 	if(fseek(f, 0, SEEK_END) != 0)
+	{
 		goto error;
+	}
 	size = ftell(f);
 	if(size < 0)
+	{
 		goto error;
+	}
 	if(fseek(f, 0, SEEK_SET) != 0)
+	{
 		goto error;
+	}
 	new(result, unsigned char, size + 1);
 	if(size != (long)fread(result, sizeof(char), (size_t)size, f))
+	{
 		goto error;
+	}
 	if(length)
+	{
 		*length = size;
+	}
 	result[size] = '\0';
 	fclose(f);
 	return result;
 error:
 	if(f)
+	{
 		fclose(f);
+	}
 	delete(result);
 	myError("can't load file %s", filename);
 	return NULL;
 }
 
-CHEETAH_EXPORT bool fileExists(const char * filename)
+CHEETAH_EXPORT bool fileExists(const char *filename)
 {
 	FILE *file = fopen(filename, "rb");
 	if(NULL == file)
+	{
 		return FALSE;
+	}
 	else
 	{
 		fclose(file);
@@ -113,66 +127,73 @@ filetime(a)
 filetime(c)
 
 #if 0
-CHEETAH_EXPORT long int fileatime(const char * filename)
+CHEETAH_EXPORT long int fileatime(const char *filename)
 {
-CHEETAH_EXPORT long int filemtime(const char * filename)
-{
-CHEETAH_EXPORT long int filectime(const char * filename)
-{
-#endif
-
-DIR *openDir(const char *name) {
-	return opendir(name);
-}
-
-CHEETAH_EXPORT struct dirent *readDir(DIR *dirp)
-{
-	return readdir(dirp);
-}
-
-CHEETAH_EXPORT int closeDir(DIR *dirp)
-{
-	return closedir(dirp);
-}
-
-CHEETAH_EXPORT bool isDir(const char *name)
-{
-	DIR *dir = opendir(name);
-	if(dir)
+	CHEETAH_EXPORT long int filemtime(const char * filename)
 	{
-		closedir(dir);
-		return TRUE;
-	}
-	return FALSE;
-}
-
-CHEETAH_EXPORT bool mkDir(const char * path)
-{
-#ifdef _WIN32
-	if(mkdir(path) == 0) return TRUE;
-#else
-	if(mkdir(path, 0755) == 0) return TRUE;
+		CHEETAH_EXPORT long int filectime(const char * filename)
+		{
 #endif
-	return FALSE;
-}
 
-CHEETAH_EXPORT const char *getDirentName(struct dirent * de)
-{
-	return de->d_name;
-}
+			DIR *openDir(const char * name)
+			{
+				return opendir(name);
+			}
+
+			CHEETAH_EXPORT struct dirent *readDir(DIR * dirp)
+			{
+				return readdir(dirp);
+			}
+
+			CHEETAH_EXPORT int closeDir(DIR * dirp)
+			{
+				return closedir(dirp);
+			}
+
+			CHEETAH_EXPORT bool isDir(const char * name)
+			{
+				DIR *dir = opendir(name);
+				if(dir)
+				{
+					closedir(dir);
+					return TRUE;
+				}
+				return FALSE;
+			}
+
+			CHEETAH_EXPORT bool mkDir(const char * path)
+			{
+#ifdef _WIN32
+				if(mkdir(path) == 0)
+				{
+					return TRUE;
+				}
+#else
+				if(mkdir(path, 0755) == 0)
+				{
+					return TRUE;
+				}
+#endif
+				return FALSE;
+			}
+
+			CHEETAH_EXPORT const char *getDirentName(struct dirent * de)
+			{
+				return de->d_name;
+			}
 
 //~ const char * fileExt(const char * name) {
-	//~ int i, pos = 0;
-	//~ char ch;
-	//~ for (i = 0; ; i++)
-	//~ {
-		//~ ch = name[i];
-		//~ if(ch)
-		//~ {
+			//~ int i, pos = 0;
+			//~ char ch;
+			//~ for (i = 0; ; i++)
+			//~ {
+			//~ ch = name[i];
+			//~ if(ch)
+			//~ {
 			//~ if(ch == '.') pos = i;
-		//~ }
-		//~ else
+			//~ }
+			//~ else
 			//~ break;
-	//~ }
-	//~ return (name + pos + 1);
+			//~ }
+			//~ return (name + pos + 1);
 //~ }

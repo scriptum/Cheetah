@@ -42,21 +42,21 @@ IN THE SOFTWARE.
 #define DBG_PRINT(format, args...) printf(DEBUG_MSG_FORMAT format "\n", LOCATION, ## args)
 
 #ifdef DEBUGVV
-	#define dbg(format, args...) DBG_PRINT(format, ## args)
-	#define dbgv(format, args...) DBG_PRINT(format, ## args)
-	#define dbgvv(format, args...) DBG_PRINT(format, ## args)
+#define dbg(format, args...) DBG_PRINT(format, ## args)
+#define dbgv(format, args...) DBG_PRINT(format, ## args)
+#define dbgvv(format, args...) DBG_PRINT(format, ## args)
 #elif defined DEBUGV
-	#define dbg(format, args...) DBG_PRINT(format, ## args)
-	#define dbgv(format, args...) DBG_PRINT(format, ## args)
-	#define dbgvv(...)
+#define dbg(format, args...) DBG_PRINT(format, ## args)
+#define dbgv(format, args...) DBG_PRINT(format, ## args)
+#define dbgvv(...)
 #elif defined DEBUG
-	#define dbg(format, args...) DBG_PRINT(format, ## args)
-	#define dbgv(...)
-	#define dbgvv(...)
+#define dbg(format, args...) DBG_PRINT(format, ## args)
+#define dbgv(...)
+#define dbgvv(...)
 #else
-	#define dbg(...)
-	#define dbgv(...)
-	#define dbgvv(...)
+#define dbg(...)
+#define dbgv(...)
+#define dbgvv(...)
 #endif
 
 

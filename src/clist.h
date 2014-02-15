@@ -24,18 +24,21 @@ IN THE SOFTWARE.
 #ifndef LIST_H_
 #define LIST_H_
 
-typedef struct listSingle {
+typedef struct listSingle
+{
 	void *data;
 	struct listSingle *next;
 } listSingle;
 
-typedef struct listDouble {
+typedef struct listDouble
+{
 	void *data;
 	struct listDouble *next;
 	struct listDouble *prev;
 } listDouble;
 
-typedef struct listSingleHead {
+typedef struct listSingleHead
+{
 	void *data;
 	struct listSingle *next;
 	struct listSingle *prev;
@@ -44,9 +47,13 @@ typedef struct listSingleHead {
 static inline void listPush(listDouble *head, listDouble *item)
 {
 	if(NULL == head)
+	{
 		return;
+	}
 	if(NULL == item)
+	{
 		return;
+	}
 	if(NULL == head->next)
 	{
 		head->next = item;
@@ -64,7 +71,9 @@ static inline void listPush(listDouble *head, listDouble *item)
 static inline listDouble *listPop(listDouble *head)
 {
 	if(NULL == head || NULL == head->next)
+	{
 		return NULL;
+	}
 	listDouble *ret = head->prev;
 	ret->prev->next = NULL;
 	head->prev = head->prev->prev;

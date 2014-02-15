@@ -20,27 +20,27 @@ CHEETAH_EXPORT void newTilmapInternal(Tilemap *t, const char *name)
 	//~
 	//~ if(!t->img->id)
 	//~ {
-		//~ MYERROR("Cannot get image for tile map");
-		//~ return;
+	//~ MYERROR("Cannot get image for tile map");
+	//~ return;
 	//~ }
 	//~
 	//~ if(name == NULL)
 	//~ {
-		//~ MYERROR("Can't load tilemap without name");
-		//~ return;
+	//~ MYERROR("Can't load tilemap without name");
+	//~ return;
 	//~ }
 	//~
 	//~ if(t == NULL)
 	//~ {
-		//~ MYERROR("Map %s not initialised", name);
-		//~ return;
+	//~ MYERROR("Map %s not initialised", name);
+	//~ return;
 	//~ }
 	//~
 	//~ FILE *f = fopen(name, "r");
 	//~ if(f == NULL)
 	//~ {
-		//~ MYERROR("Can't open tilemap %s", name);
-		//~ return;
+	//~ MYERROR("Can't open tilemap %s", name);
+	//~ return;
 	//~ }
 	//~
 	//~ //easy way to skip line
@@ -50,45 +50,45 @@ CHEETAH_EXPORT void newTilmapInternal(Tilemap *t, const char *name)
 	//~ t->index = NULL;
 	//~ new(t->index, float *, INDEX_COUNT);
 	//~ for (i = 0; i < INDEX_COUNT; i++) {
-		//~ t->index[i] = NULL;
-		//~ new(t->index[i], float, 8);
+	//~ t->index[i] = NULL;
+	//~ new(t->index[i], float, 8);
 	//~ }
 	//~
 	//~ // calculate indexes' texture coords
 	//~ i = 0;
 	//~ for (iw  = 0; iw < t->img->w / t->tw; iw++) {
-		//~ for (ih = 0; ih < t->img->h / t->th; ih++) {
-			//~ t->index[i][0] = (iw * t->tw) / t->img->w;
-			//~ t->index[i][1] = (ih * t->th) / t->img->h;
-			//~ t->index[i][2] = t->index[i][0];
-			//~ t->index[i][3] = t->index[i][1] + t->th / t->img->h;
-			//~ t->index[i][4] = t->index[i][0] + t->tw / t->img->w;
-			//~ t->index[i][5] = t->index[i][3];
-			//~ t->index[i][6] = t->index[i][4];
-			//~ t->index[i][7] = t->index[i][1];
-			//~
-			//~ i++;
-		//~ }
+	//~ for (ih = 0; ih < t->img->h / t->th; ih++) {
+	//~ t->index[i][0] = (iw * t->tw) / t->img->w;
+	//~ t->index[i][1] = (ih * t->th) / t->img->h;
+	//~ t->index[i][2] = t->index[i][0];
+	//~ t->index[i][3] = t->index[i][1] + t->th / t->img->h;
+	//~ t->index[i][4] = t->index[i][0] + t->tw / t->img->w;
+	//~ t->index[i][5] = t->index[i][3];
+	//~ t->index[i][6] = t->index[i][4];
+	//~ t->index[i][7] = t->index[i][1];
+	//~
+	//~ i++;
+	//~ }
 	//~ }
 	//~
 	//~ // get memory
 	//~ t->map = NULL;
 	//~ new(t->map, unsigned char *, t->w);
 	//~ for (i = 0; i < t->w; i++) {
-		//~ t->map[i] = NULL;
-		//~ new(t->map[i], unsigned char, t->h);
+	//~ t->map[i] = NULL;
+	//~ new(t->map[i], unsigned char, t->h);
 	//~ }
 	//~
 	//~ // read index map
 	//~ for (iw = 0; iw < t->w; iw++) {
-		//~ for (ih = 0; ih < t->h; ih++) {
-			//~ if (fscanf(f, "%d", &i) != 1)
-			//~ {
-				//~ MYERROR("Can't read tilemap from %s", name);
-				//~ return;
-			//~ }
-			//~ t->map[iw][ih] = (unsigned char)i;
-		//~ }
+	//~ for (ih = 0; ih < t->h; ih++) {
+	//~ if (fscanf(f, "%d", &i) != 1)
+	//~ {
+	//~ MYERROR("Can't read tilemap from %s", name);
+	//~ return;
+	//~ }
+	//~ t->map[iw][ih] = (unsigned char)i;
+	//~ }
 	//~ }
 	//~
 	//~ fclose(f);
@@ -137,12 +137,12 @@ CHEETAH_EXPORT void tilemapDraw(Tilemap *t, double x, double y, double r, double
 	//~
 	//~ // draw bottom tiles
 	//~ for (i = x1; i < x2; i++) {
-		//~ for (j = y1; j < y2; j++) {
-			//~ ACCUM_VERTEX(i * t->tw, j * t->th, t->tw, t->th);
-			//~ ACCUM_TEXTURE_ARRAY(t->index[t->map[i][j]]);
-			//~ ACCUM_ADD();
-			//~ k += 4;
-		//~ }
+	//~ for (j = y1; j < y2; j++) {
+	//~ ACCUM_VERTEX(i * t->tw, j * t->th, t->tw, t->th);
+	//~ ACCUM_TEXTURE_ARRAY(t->index[t->map[i][j]]);
+	//~ ACCUM_ADD();
+	//~ k += 4;
+	//~ }
 	//~ }
 	//~ imageBind(t->img);
 	//~ ACCUM_DRAW();

@@ -27,20 +27,22 @@ IN THE SOFTWARE.
 #define CHEETAH_EXPORT __attribute__((__visibility__("default")))
 
 typedef unsigned char bool;
-unsigned char * loadfile(const char * filename, long * length);
+unsigned char *loadfile(const char *filename, long *length);
 
 
 void myError(const char *fmt, ...);
 
 
 #if 0
-typedef struct SDL_Rect {
+typedef struct SDL_Rect
+{
 	short		x, y;
 	unsigned short	w, h;
 } SDL_Rect;
 
 
-struct {
+struct
+{
 	unsigned int	flags;
 	void		*format;
 	int		w, h;
@@ -56,12 +58,14 @@ struct {
 	int		refcount;
 } screen;
 
-typedef struct __dirstream {
+typedef struct __dirstream
+{
 } DIR;
 
 #endif
 
-struct {
+struct
+{
 	bool		GLSL;
 	bool		BE;
 	bool		FBO;
@@ -70,25 +74,30 @@ struct {
 	bool		PS;
 } supported;
 
-typedef struct Color {
+typedef struct Color
+{
 	unsigned char	r, g, b, a;
 } Color;
 
 /*=================================points=====================================*/
-typedef struct Point {
+typedef struct Point
+{
 	float x, y;
 } Point;
 
-typedef struct Size {
+typedef struct Size
+{
 	short w, h;
 } Size;
 
-typedef struct Point3 {
+typedef struct Point3
+{
 	float x, y, z;
 } Point3;
 
 /*=================================images=====================================*/
-typedef struct Image {
+typedef struct Image
+{
 	char		*name;
 	char		*options;
 	/* OpenGL texture id */
@@ -101,12 +110,14 @@ typedef struct Image {
 
 typedef Image *pImage;
 
-typedef struct ImageData {
+typedef struct ImageData
+{
 	int		w, h, channels;
 	char		*data;
 } ImageData;
 
-typedef struct BorderImage {
+typedef struct BorderImage
+{
 	Image		*image;
 	/* image borders */
 	float		top;
@@ -117,21 +128,24 @@ typedef struct BorderImage {
 	bool		borderOnly;
 } BorderImage;
 
-typedef struct Multitexture {
+typedef struct Multitexture
+{
 	float		w, h;
 	int		size;
 	Image 		**images;
 } Multitexture;
 
 /*================================particles===================================*/
-typedef struct ParticleForce {
+typedef struct ParticleForce
+{
 	float		particeStartTime;
 	float		particleDuration;
 	float		systemStartTime;
 	float		systemDuration;
-	void		(*function)(void *);
+	void	(*function)(void *);
 	struct ParticleForce	*next;
-	union {
+	union
+	{
 		void    *ptrData;
 		int      intData;
 		long     longData;
@@ -143,7 +157,8 @@ typedef struct ParticleForce {
 	} data;
 } ParticleForce;
 
-typedef struct Particle {
+typedef struct Particle
+{
 	Point		position;
 	Point		speed;
 	float		scale;
@@ -152,7 +167,8 @@ typedef struct Particle {
 	Color		color;
 } Particle;
 
-typedef struct ParticleSystem {
+typedef struct ParticleSystem
+{
 	ParticleForce	*forces;
 	Particle	*particles;
 	Image		*image;
@@ -177,7 +193,8 @@ typedef struct ParticleSystem {
 } ParticleSystem;
 
 /*=================================atlas======================================*/
-typedef struct Atlas {
+typedef struct Atlas
+{
 	Image		*image;
 	/* original width and height */
 	float		w, h;
@@ -190,7 +207,8 @@ typedef struct Atlas {
 } Atlas;
 
 /*==============================framebuffers==================================*/
-typedef struct Framebuffer {
+typedef struct Framebuffer
+{
 	unsigned	id;
 	Image		*image;
 } Framebuffer;
@@ -205,7 +223,8 @@ typedef struct FontChar
 	bool kerning;
 } FontChar;
 
-typedef struct Font {
+typedef struct Font
+{
 	Image		*image;
 	void		*hash;
 	void		*kerningHash;
@@ -222,12 +241,14 @@ typedef struct Font {
 } Font;
 
 /*================================shaders=====================================*/
-typedef struct Shader {
+typedef struct Shader
+{
 	unsigned	id;
 } Shader;
 
 /*================================tilemap=====================================*/
-typedef struct _Tilemap {
+typedef struct _Tilemap
+{
 	int		w, h;            /* size in tiles */
 	int		tw, th;          /* single tile size */
 	float		**index;         /* texture coords index */
@@ -238,65 +259,70 @@ typedef struct _Tilemap {
 
 /*==================================VBO=======================================*/
 
-typedef struct Vbo {
+typedef struct Vbo
+{
 	unsigned	id, count, tex;
 	Point		*data;
 } Vbo;
 
-enum {
-	blend_alpha,
-	blend_additive,
-	blend_multiplicative,
-	blend_screen,
-	blend_detail,
-	blend_substractive,
-	blend_difference,
-	blend_mask,
-	blendAlpha = 0,
-	blendAdditive,
-	blendMultiplicative,
-	blendScreen,
-	blendDetail,
-	blendSubstractive,
-	blendDifference,
-	blendMask
+enum
+{
+        blend_alpha,
+        blend_additive,
+        blend_multiplicative,
+        blend_screen,
+        blend_detail,
+        blend_substractive,
+        blend_difference,
+        blend_mask,
+        blendAlpha = 0,
+        blendAdditive,
+        blendMultiplicative,
+        blendScreen,
+        blendDetail,
+        blendSubstractive,
+        blendDifference,
+        blendMask
 };
 
-enum {
-	alignLeft = 1,
-	alignCenter,
-	alignRight,
-	alignJustify,
-	align_left = 1,
-	align_center,
-	align_right,
-	align_justify
+enum
+{
+        alignLeft = 1,
+        alignCenter,
+        alignRight,
+        alignJustify,
+        align_left = 1,
+        align_center,
+        align_right,
+        align_justify
 };
 
-enum {
-	EVENT_QUIT = 1,
-	EVENT_KEYUP,
-	EVENT_KEYDOWN,
-	EVENT_MOUSEUP,
-	EVENT_MOUSEDOWN,
-	EVENT_RESIZED,
-	EVENT_EXPOSED,
-	EVENT_SHOWN,
-	EVENT_HIDDEN,
-	EVENT_MOVED,
-	EVENT_MINIMIZED,
-	EVENT_MAXIMIZED,
-	EVENT_RESTORED,
-	EVENT_ENTER,
-	EVENT_LEAVE,
-	EVENT_FOCUS_GAINED,
-	EVENT_FOCUS_LOST,
-	EVENT_CLOSE,
-	EVENT_ACTIVE,
-	EVENT_JOY
+enum
+{
+        EVENT_QUIT = 1,
+        EVENT_KEYUP,
+        EVENT_KEYDOWN,
+        EVENT_MOUSEUP,
+        EVENT_MOUSEDOWN,
+        EVENT_RESIZED,
+        EVENT_EXPOSED,
+        EVENT_SHOWN,
+        EVENT_HIDDEN,
+        EVENT_MOVED,
+        EVENT_MINIMIZED,
+        EVENT_MAXIMIZED,
+        EVENT_RESTORED,
+        EVENT_ENTER,
+        EVENT_LEAVE,
+        EVENT_FOCUS_GAINED,
+        EVENT_FOCUS_LOST,
+        EVENT_CLOSE,
+        EVENT_ACTIVE,
+        EVENT_JOY
 };
 
-struct {
+struct
+{
 	float		scaleX;
 	float		scaleY;
 	float		offsetX;
@@ -309,7 +335,8 @@ struct {
 	bool		autoScaleFont;
 } screenScale;
 
-struct {
+struct
+{
 	/* Used to check window resizing */
 	unsigned	rescaleTime;
 	/* System timers: usigned (milliseconds) and double (seconds) */

@@ -34,7 +34,8 @@ IN THE SOFTWARE.
 #include "SOIL/SOIL.h"
 #include "test.h"
 
-typedef struct Resource {
+typedef struct Resource
+{
 	Image *image;
 	unsigned char *data;
 	char *name;
@@ -42,8 +43,12 @@ typedef struct Resource {
 } Resource;
 
 #define QDATA Resource
-	typedef struct node_t node_t, *node, *queue;
-	struct node_t {QDATA val; node prev, next;};
+typedef struct node_t node_t, *node, *queue;
+struct node_t
+{
+	QDATA val;
+	node prev, next;
+};
 #define QHEAD(q) q->prev
 #define QTAIL(q) q->next
 #define QEMPTY(q) !QHEAD(q)
@@ -68,19 +73,23 @@ static unsigned int loadImageTex(const char *options, unsigned char *img, int wi
 	CHECK_OPTION(options, nearest);
 	CHECK_OPTION(options, clamp);
 	if(TRUE == clamp)
+	{
 		flags = 0;
+	}
 	tex_id = SOIL_direct_load_DDS_from_memory(img, 0, flags, 0);
 	if(0 == tex_id)
 	{
 		tex_id = SOIL_internal_create_OGL_texture(
-			img, width, height, channels,
-			0, flags,
-			GL_TEXTURE_2D, GL_TEXTURE_2D,
-			GL_MAX_TEXTURE_SIZE);
+		                 img, width, height, channels,
+		                 0, flags,
+		                 GL_TEXTURE_2D, GL_TEXTURE_2D,
+		                 GL_MAX_TEXTURE_SIZE);
 		dbgv("image got texture id %d", tex_id);
 	}
 	if(TRUE == nearest)
+	{
 		TEX_NEAREST;
+	}
 	SOIL_free_image_data(img);
 	prevImageId = 0;
 	return tex_id;
@@ -97,8 +106,10 @@ static unsigned char *loadImageMask(const unsigned char *img, const char *mask_n
 	RETURN_VALUE_IF_NULL(mask_name, NULL);
 	RETURN_VALUE_IF_NULL(img, NULL);
 	if(unlikely(FALSE == fileExists(mask_name)))
+	{
 		return NULL;
-	
+	}
+
 	/* try to load mask */
 	mask_img = loadImageData(mask_name, &mask_w, &mask_h, &mask_channels, TRUE);
 	if(unlikely(NULL != mask_img))
@@ -111,18 +122,24 @@ static unsigned char *loadImageMask(const unsigned char *img, const char *mask_n
 			new_img[j++] = img[img_step++];
 			new_img[j++] = img[img_step++];
 			if(unlikely(channels == 4))
+			{
 				img_step++;
+			}
 			new_img[j++] = (unsigned char)(0xff - mask_img[(y * mask_h + x) * mask_channels]);
 			x++;
 			if(unlikely(x >= mask_h))
+			{
 				x = 0;
+			}
 			mask_step++;
 			if(unlikely(mask_step >= width))
 			{
 				x = mask_step = 0;
 				y++;
 				if(y >= mask_h)
+				{
 					y = 0;
+				}
 			}
 		}
 		free(mask_img);
@@ -151,12 +168,14 @@ static unsigned char *loadImageData(const char *name, int *width, int *height, i
 	ERROR_IF_NULL(myBuf);
 	// printf("%d\n", SDL_GetTicks());
 	img = SOIL_load_image_from_memory(
-				myBuf, (int)sizeof(unsigned char) * (int)file_size,
-				width, height, channels,
-				0 );
+	              myBuf, (int)sizeof(unsigned char) * (int)file_size,
+	              width, height, channels,
+	              0);
 	// printf("%d\n", SDL_GetTicks());
 	if(img != myBuf)
+	{
 		delete(myBuf);
+	}
 	if(FALSE == mask && NULL != img) /* avoid loading mask of mask */
 	{
 		/* gen mask name */
@@ -206,9 +225,15 @@ static void enqueue(queue q, QDATA n)
 	SDL_mutexP(resQueueMutex);
 	node nd = malloc(sizeof(node_t));
 	nd->val = n;
-	if (!QHEAD(q)) QHEAD(q) = nd;
+	if(!QHEAD(q))
+	{
+		QHEAD(q) = nd;
+	}
 	nd->prev = QTAIL(q);
-	if (nd->prev) nd->prev->next = nd;
+	if(nd->prev)
+	{
+		nd->prev->next = nd;
+	}
 	QTAIL(q) = nd;
 	nd->next = 0;
 	//~ printf("%d\n", QEMPTY(resLoaderQueue));
@@ -219,12 +244,16 @@ static int dequeue(queue q, QDATA *val)
 {
 	SDL_mutexP(resQueueMutex);
 	node tmp = QHEAD(q);
-	if (unlikely(NULL == tmp))
+	if(unlikely(NULL == tmp))
+	{
 		return 0;
+	}
 	*val = tmp->val;
 	QHEAD(q) = tmp->next;
 	if(QTAIL(q) == tmp)
+	{
 		QTAIL(q) = 0;
+	}
 	free(tmp);
 	SDL_mutexV(resQueueMutex);
 	return 1;
@@ -303,7 +332,7 @@ void resLoaderMainThread(void)
 static void imageCheckResLoader(Image *image)
 {
 	RETURN_IF_NULL(image);
-	if(resLoaderQueue) 
+	if(resLoaderQueue)
 		if(unlikely(image->id == null_texture && !image->queued))
 		{
 			Resource r;
@@ -326,10 +355,14 @@ static void multitextureBind(Multitexture *multitexture)
 		image = multitexture->images[i];
 		glActiveTexture_((GLenum)(GL_TEXTURE0 + i));
 		if(unlikely(NULL == image))
+		{
 			continue;
+		}
 		imageCheckResLoader(image);
 		if(likely(0 != image->id))
+		{
 			glBindTexture(GL_TEXTURE_2D, image->id);
+		}
 	}
 	prevImageId = 0;
 	glActiveTexture_(GL_TEXTURE0);
@@ -362,7 +395,7 @@ CHEETAH_EXPORT void newImageOpt(Image *ptr, const char *name, const char *option
 			myError("can't load image %s", name);
 			return;
 		}
-		dbgv("load image %s %dx%d without queue, data: %x%x%x", name, width, height, *(uint32_t*)img, *(uint32_t*)(img + 4), *(uint32_t*)(img + 8));
+		dbgv("load image %s %dx%d without queue, data: %x%x%x", name, width, height, *(uint32_t *)img, *(uint32_t *)(img + 4), *(uint32_t *)(img + 8));
 		tex_id = loadImageTex(options, img, width, height, channels);
 		ptr->id = tex_id;
 		ptr->w = (float)width;
@@ -370,10 +403,10 @@ CHEETAH_EXPORT void newImageOpt(Image *ptr, const char *name, const char *option
 	}
 	else
 	{
-		new(ptr->name, char, strlen(name)+1);
-		new(ptr->options, char, strlen(options)+1);
-		memcpy(ptr->name, name, strlen(name)+1);
-		memcpy(ptr->options, options, strlen(options)+1);
+		new(ptr->name, char, strlen(name) + 1);
+		new(ptr->options, char, strlen(options) + 1);
+		memcpy(ptr->name, name, strlen(name) + 1);
+		memcpy(ptr->options, options, strlen(options) + 1);
 		ptr->id = null_texture;
 		ptr->w = 1;
 		ptr->h = 1;
@@ -404,19 +437,29 @@ CHEETAH_EXPORT void newImageRaw(Image *ptr, int width, int height, const char *d
 	CHECK_OPTION(options, alpha);
 	CHECK_OPTION(options, clamp);
 	if(TRUE == alpha)
+	{
 		format = GL_RGBA;
+	}
 	glGenTextures(1, &tex_id);
 	TEXTURE_BIND(tex_id);
 	if(unlikely(TRUE == nearest))
+	{
 		TEX_NEAREST;
+	}
 	else
+	{
 		TEX_LINEAR;
+	}
 	if(unlikely(TRUE == clamp))
+	{
 		TEX_CLAMP;
+	}
 	else
+	{
 		TEX_REPEAT;
-	glTexImage2D(GL_TEXTURE_2D, level, (GLint)format, (GLsizei)width, (GLsizei)height, 
-		border, format, GL_UNSIGNED_BYTE, (const GLvoid *)data);
+	}
+	glTexImage2D(GL_TEXTURE_2D, level, (GLint)format, (GLsizei)width, (GLsizei)height,
+	             border, format, GL_UNSIGNED_BYTE, (const GLvoid *)data);
 	ptr->w = (float)width;
 	ptr->h = (float)height;
 	ptr->id = tex_id;
@@ -499,7 +542,9 @@ CHEETAH_EXPORT static void borderImageDrawInternal(BorderImage *borderImage, flo
 	}
 	PUSH_QUADT(x,    y,      l,      h - t - b,  a, ox,         oy - t,      0,       t,        l,           oh - t - b, ow, oh);
 	if(FALSE == borderImage->borderOnly)
+	{
 		PUSH_QUADT(x,  y,  w - l - r,  h - t - b,  a, ox - l,     oy - t,      l,       t,        ow - l - r,  oh - t - b, ow, oh);
+	}
 	PUSH_QUADT(x,    y,  r,          h - t - b,  a, ox - w + r, oy - t,      ow - r,  t,        r,           oh - t - b, ow, oh);
 	if(b > 0.0f)
 	{
@@ -524,7 +569,7 @@ CHEETAH_EXPORT void borderImageDrawxy(BorderImage *borderImage, float x, float y
 CHEETAH_EXPORT void initMultitexture(Multitexture *multitexture)
 {
 	RETURN_IF_NULL(multitexture);
-	new(multitexture->images, Image*, multitexture->size);
+	new(multitexture->images, Image *, multitexture->size);
 }
 
 CHEETAH_EXPORT void deleteMultitexture(Multitexture *multitexture)
@@ -537,14 +582,14 @@ CHEETAH_EXPORT void multitextureDrawxy(Multitexture *multitexture, float x, floa
 {
 	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
-	PUSH_QUAD(x,y,w,h,0,0,0);
+	PUSH_QUAD(x, y, w, h, 0, 0, 0);
 }
 
 CHEETAH_EXPORT void multitextureDrawt(Multitexture *multitexture, float x, float y, float w, float h, float a, float ox, float oy)
 {
 	RETURN_IF_NULL(multitexture);
 	multitextureBind(multitexture);
-	PUSH_QUAD(x,y,w,h,a,ox,oy);
+	PUSH_QUAD(x, y, w, h, a, ox, oy);
 }
 
 CHEETAH_EXPORT void multitextureDrawqxy(Multitexture *multitexture, float x, float y, float w, float h, float qx, float qy, float qw, float qh)
@@ -562,45 +607,45 @@ CHEETAH_EXPORT void multitextureDrawqt(Multitexture *multitexture, float x, floa
 }
 
 //~ /**
- //~ * @descr Set the current active texture for multitexturenig. Equivalent to glActiveTexture(GL_TEXTURE0 + i).
- //~ * @group image
- //~ * @var number of texture slot (min 0, max 7)
- //~ * */
+//~ * @descr Set the current active texture for multitexturenig. Equivalent to glActiveTexture(GL_TEXTURE0 + i).
+//~ * @group image
+//~ * @var number of texture slot (min 0, max 7)
+//~ * */
 //~ void activeTexture(int i) {
-	//~ glActiveTexture_(GL_TEXTURE0 + i);
+//~ glActiveTexture_(GL_TEXTURE0 + i);
 //~ }
 
 //~ /**
- //~ * @descr Enable/disable smooth interpolation for image. Disabled filtering useful, if you want to fit image to pixel matrix. If this image will be scaled and/or rotated you must enable filtering (default). Must be called before texture loading.
- //~ * @group image
- //~ * @var Image object
- //~ * @var true means that filtering is enabled, false means that filtering is disabled
- //~ * */
+//~ * @descr Enable/disable smooth interpolation for image. Disabled filtering useful, if you want to fit image to pixel matrix. If this image will be scaled and/or rotated you must enable filtering (default). Must be called before texture loading.
+//~ * @group image
+//~ * @var Image object
+//~ * @var true means that filtering is enabled, false means that filtering is disabled
+//~ * */
 //~ void imageFiltering(Image * img, bool enabled) {
-	//~ glBindTexture(GL_TEXTURE_2D, img->id);
-	//~ if(!enabled)
-		//~ TEX_NEAREST;
-	//~ else
-		//~ TEX_LINEAR;
+//~ glBindTexture(GL_TEXTURE_2D, img->id);
+//~ if(!enabled)
+//~ TEX_NEAREST;
+//~ else
+//~ TEX_LINEAR;
 //~ }
 
 //~ void _newImageFromData(Image * ptr, ImageData * imgdata, const char *options) {
-	//~ unsigned int tex_id;
-	//~ if(!imgdata || !imgdata->data) MYERROR("invalid data");
-	//~ ptr->w = (float)imgdata->w;
-	//~ ptr->h = (float)imgdata->h;
-	//~ ptr->channels = imgdata->channels;
-	//~ tex_id = SOIL_internal_create_OGL_texture(
-			//~ (unsigned char*)imgdata->data, ptr->w, ptr->h, ptr->channels,
-			//~ 0, SOIL_FLAG_TEXTURE_REPEATS,
-			//~ GL_TEXTURE_2D, GL_TEXTURE_2D,
-			//~ GL_MAX_TEXTURE_SIZE);
-	//~ ptr->id = tex_id;
-	//~ while(*options)
-	//~ {
-		//~ if(*options == 'n') TEX_NEAREST;
-		//~ options++;
-	//~ }
+//~ unsigned int tex_id;
+//~ if(!imgdata || !imgdata->data) MYERROR("invalid data");
+//~ ptr->w = (float)imgdata->w;
+//~ ptr->h = (float)imgdata->h;
+//~ ptr->channels = imgdata->channels;
+//~ tex_id = SOIL_internal_create_OGL_texture(
+//~ (unsigned char*)imgdata->data, ptr->w, ptr->h, ptr->channels,
+//~ 0, SOIL_FLAG_TEXTURE_REPEATS,
+//~ GL_TEXTURE_2D, GL_TEXTURE_2D,
+//~ GL_MAX_TEXTURE_SIZE);
+//~ ptr->id = tex_id;
+//~ while(*options)
+//~ {
+//~ if(*options == 'n') TEX_NEAREST;
+//~ options++;
+//~ }
 //~ }
 
 
@@ -614,11 +659,13 @@ CHEETAH_EXPORT void deleteImage(Image *ptr)
 {
 	RETURN_IF_NULL(ptr);
 	//~ printf("%d\n", same_type_p(typeof(ptr)) == INTEGER_TYPE);
-	#ifdef MEMORY_TEST
-		printf("Freeing Image %d\n", ptr);
-	#endif
+#ifdef MEMORY_TEST
+	printf("Freeing Image %d\n", ptr);
+#endif
 	if(ptr->id > 1)
+	{
 		glDeleteTextures(1, &ptr->id);
+	}
 
 	//~ else MYERROR("Trying to free a null-image. Maybe, you did it manually?");
 }

@@ -47,11 +47,14 @@ static inline uint32_t hash_string_jenkins(const char *key)
 	return hash;
 }
 
-static inline uint32_t hash_string(const char *c) {
+static inline uint32_t hash_string(const char *c)
+{
 	//c = (const char*)__builtin_assume_aligned(c, 32);
-	uint32_t h = (uint32_t)*c;
-	while (c && *c)
+	uint32_t h = (uint32_t) * c;
+	while(c && *c)
+	{
 		h = ((h << 5) + h) + (uint32_t)(*c++);
+	}
 	return h;
 }
 
@@ -68,8 +71,10 @@ static inline uint32_t hash_uint32(uint32_t hash)
 
 static inline bool cmp_string(const char *a, const char *b)
 {
-	if((*(unsigned short*)a != *(unsigned short*)b))
+	if((*(unsigned short *)a != *(unsigned short *)b))
+	{
 		return FALSE;
+	}
 	return strcmp(a, b) == 0;
 }
 

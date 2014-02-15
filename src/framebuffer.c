@@ -44,50 +44,52 @@ static bool checkFramebufferStatus(void)
 {
 	GLenum status;
 	status = (GLenum)glCheckFramebufferStatus_(GL_FRAMEBUFFER_EXT);
-	switch(status) {
-		case GL_FRAMEBUFFER_COMPLETE_EXT:
-			return TRUE;
-		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-			dbg("FBO: incomplete attachment");
-			break;
-		case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-			dbg("Unsupported FBO format");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-			dbg("FBO: missing attachment");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-			dbg("FBO: attached images must have same dimensions");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-			dbg("FBO: attached images must have same format");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-			dbg("FBO: missing draw buffer");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-			dbg("FBO: missing read buffer");
-			break;
-		default:
-			dbg("FBO: unknown error");
+	switch(status)
+	{
+	case GL_FRAMEBUFFER_COMPLETE_EXT:
+		return TRUE;
+	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+		dbg("FBO: incomplete attachment");
+		break;
+	case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
+		dbg("Unsupported FBO format");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+		dbg("FBO: missing attachment");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+		dbg("FBO: attached images must have same dimensions");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+		dbg("FBO: attached images must have same format");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
+		dbg("FBO: missing draw buffer");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
+		dbg("FBO: missing read buffer");
+		break;
+	default:
+		dbg("FBO: unknown error");
 	}
 	return FALSE;
 }
 
 /* Create framebuffer object. Note, that not all video drivers support this. It's recommend to check returning value using cheetah.inPointer and check framebuffer support using cheetah.supported.FBO. */
-CHEETAH_EXPORT void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int height, const char * options)
+CHEETAH_EXPORT void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, unsigned int height, const char *options)
 {
 	Image *ptr = NULL;
-	GLint current_fbo;
-	GLint internal;
+	GLint  current_fbo;
+	GLint  internal;
 	GLenum format;
-	bool status;
+	bool   status;
 
 	fboptr->id = 0;
 
 	NEEDED_INIT_VOID;
 
-	if(!supported.FBO) {
+	if(!supported.FBO)
+	{
 		dbg("Framebuffers are not supported on this machine. You'd better to check it in script (try \"if cheetah.supported.FBO\")");
 		return;
 	}
@@ -103,16 +105,17 @@ CHEETAH_EXPORT void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, u
 		internal = alpha ? GL_RGBA32F_ARB : GL_RGB32F_ARB;
 		format = GL_FLOAT;
 	}
-	else if(TRUE == percision16)
-	{
-		internal = alpha ? GL_RGBA16F_ARB : GL_RGB16F_ARB;
-		format = GL_HALF_FLOAT_ARB;
-	}
 	else
-	{
-		internal = alpha ? GL_RGBA : GL_RGB;
-		format = GL_UNSIGNED_BYTE;
-	}
+		if(TRUE == percision16)
+		{
+			internal = alpha ? GL_RGBA16F_ARB : GL_RGB16F_ARB;
+			format = GL_HALF_FLOAT_ARB;
+		}
+		else
+		{
+			internal = alpha ? GL_RGBA : GL_RGB;
+			format = GL_UNSIGNED_BYTE;
+		}
 
 	/* save current fbo */
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING_EXT, &current_fbo);
@@ -126,14 +129,22 @@ CHEETAH_EXPORT void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, u
 	TEXTURE_BIND(ptr->id);
 
 	if(TRUE == nearest)
+	{
 		TEX_NEAREST;
+	}
 	else
+	{
 		TEX_LINEAR;
+	}
 
 	if(TRUE == clamp)
+	{
 		TEX_CLAMP;
+	}
 	else
+	{
 		TEX_REPEAT;
+	}
 
 	glTexImage2D(GL_TEXTURE_2D, 0, internal, (GLsizei)width, (GLsizei)height, 0, GL_RGBA, format, 0);
 	//~ glBindTexture(GL_TEXTURE_2D, 0);
@@ -142,7 +153,7 @@ CHEETAH_EXPORT void newFramebufferOpt(Framebuffer *fboptr, unsigned int width, u
 	glGenFramebuffers_(1, &fboptr->id);
 	bindFramebuffer(fboptr->id);
 	glFramebufferTexture2D_(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, ptr->id, 0);
+	                        GL_TEXTURE_2D, ptr->id, 0);
 	status = checkFramebufferStatus();
 
 	/* unbind framebuffer */
@@ -199,7 +210,7 @@ CHEETAH_EXPORT void framebufferUnbind(Framebuffer *ptr)
 CHEETAH_EXPORT void framebufferSaveBMP(Framebuffer *ptr, const char *name)
 {
 	unsigned char *img = NULL;
-	GLsizei w = (GLsizei)ptr->image->w; 
+	GLsizei w = (GLsizei)ptr->image->w;
 	GLsizei h = (GLsizei)ptr->image->h;
 	new(img, unsigned char, (size_t)(3 * w * h));
 	bindFramebuffer(ptr->id);

@@ -37,8 +37,8 @@ IN THE SOFTWARE.
 #include "test.h"
 
 bool fontShaderFailed = FALSE;
-Shader * df_shader = NULL;
-const char * fontShaderNormalSource = "#version 120\n\
+Shader *df_shader = NULL;
+const char *fontShaderNormalSource = "#version 120\n\
 uniform sampler2D texture;\n\
 uniform float sharpness;\n\
 uniform float gamma;\n\
@@ -48,7 +48,7 @@ void main() {\n\
 	gl_FragColor = vec4(gl_Color.rgb, gl_Color.a * smoothstep(gamma - sharpness, gamma + sharpness, color));\n\
 }";
 
-const char * fontShaderFastSource = "#version 120\n\
+const char *fontShaderFastSource = "#version 120\n\
 uniform sampler2D texture;\n\
 uniform float sharpness;\n\
 uniform float gamma;\n\
@@ -58,9 +58,9 @@ void main() {\n\
 	gl_FragColor = vec4(gl_Color.rgb, gl_Color.a * clamp((color - 0.5) * sharpness + 0.5, 0., 1.));\n\
 }";
 
-bool shaderCheck(Shader * ptr);
-Shader * initShader();
-void newFragmentShader(Shader * ptr, const char * frag);
+bool shaderCheck(Shader *ptr);
+Shader *initShader();
+void newFragmentShader(Shader *ptr, const char *frag);
 
 static inline unsigned fontHashFunc(unsigned key)
 {
@@ -72,9 +72,10 @@ static inline unsigned fontCmpFunc(unsigned a, unsigned b)
 	return a == b;
 }
 
-HASH_TEMPLATE(FontHash, unsigned, FontChar*, fontHashFunc, fontCmpFunc)
+HASH_TEMPLATE(FontHash, unsigned, FontChar *, fontHashFunc, fontCmpFunc)
 
-typedef struct KerningPair {
+typedef struct KerningPair
+{
 	unsigned first;
 	unsigned second;
 } KerningPair;
@@ -91,7 +92,7 @@ static inline unsigned kerningCmpFunc(KerningPair a, KerningPair b)
 
 HASH_TEMPLATE(KernHash, KerningPair, float, kerningHashFunc, kerningCmpFunc)
 
-void imageBind(Image * image);
+void imageBind(Image *image);
 extern SDL_Surface *screen;
 
 #define UNICODE_TO_INT(a, i)                                                   \
@@ -140,23 +141,29 @@ CHEETAH_EXPORT float fontWidth(Font *f, const char *str)
 		UNICODE_TO_INT(str, i)
 		switch(c)
 		{
-			case ' ':
-				width += f->_spacewidth;
-				continue;
-			case '\n':
-				if(width > maxwidth)
-					maxwidth = width;
-				width = 0;
-				continue;
-			case '\t':
-				width += f->_spacewidth * 8;
-				continue;
+		case ' ':
+			width += f->_spacewidth;
+			continue;
+		case '\n':
+			if(width > maxwidth)
+			{
+				maxwidth = width;
+			}
+			width = 0;
+			continue;
+		case '\t':
+			width += f->_spacewidth * 8;
+			continue;
 		}
 		if(unlikely(c == 0))
+		{
 			continue;
+		}
 		fch = FontHash_get(f->hash, c);
 		if(fch)
+		{
 			width += fch->w;
+		}
 		if(NULL != f->kerningHash && prevChar > 0)
 		{
 			KerningPair kp = {prevChar, c};
@@ -165,7 +172,9 @@ CHEETAH_EXPORT float fontWidth(Font *f, const char *str)
 		}
 	}
 	if(width > maxwidth)
+	{
 		maxwidth = width;
+	}
 	return maxwidth * f->_scale;
 }
 
@@ -181,9 +190,11 @@ CHEETAH_EXPORT float fontHeight(Font *currentFont, const char *str, float maxw)
 	float     spacew       = currentFont->_spacewidth;
 	float     height       = currentFont->height * currentFont->_interval * currentFont->_scale;
 	float     y;
-	FontHash *hash         = (FontHash*)currentFont->hash;
+	FontHash *hash         = (FontHash *)currentFont->hash;
 	if(NULL == hash)
+	{
 		return 0.f;
+	}
 	maxw /= currentFont->_scale;
 	if(FALSE == currentFont->scalable)
 	{
@@ -203,24 +214,28 @@ CHEETAH_EXPORT float fontHeight(Font *currentFont, const char *str, float maxw)
 				y += height;
 				goto out;
 			}
-			else if(unlikely(c == '\t'))
-			{
-				width += spacew * 8;
-				last_space = j;
-			}
-			else if(unlikely(c == ' '))
-			{
-				last_space = j;
-				width += spacew;
-			}
 			else
-			{
-				ch = FontHash_get(hash, c);
-				if(unlikely(NULL == ch))
-					continue;
-				width += ch->w;
-			}
-			
+				if(unlikely(c == '\t'))
+				{
+					width += spacew * 8;
+					last_space = j;
+				}
+				else
+					if(unlikely(c == ' '))
+					{
+						last_space = j;
+						width += spacew;
+					}
+					else
+					{
+						ch = FontHash_get(hash, c);
+						if(unlikely(NULL == ch))
+						{
+							continue;
+						}
+						width += ch->w;
+					}
+
 			if(unlikely(width > maxw || '\n' == c))
 			{
 				if(0 == last_space || '\n' == c)
@@ -248,9 +263,14 @@ CHEETAH_EXPORT float fontHeight(Font *currentFont, const char *str, float maxw)
 		{
 			UNICODE_TO_INT(str, i)
 			if(unlikely(c == '\0'))
+			{
 				goto out;
-			else if(unlikely(c == '\n'))
-				y += height;
+			}
+			else
+				if(unlikely(c == '\n'))
+				{
+					y += height;
+				}
 		}
 	}
 out:
@@ -303,11 +323,13 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 	float     oldy         = y / currentFont->_scale;
 	bool      end          = FALSE;
 	bool      yOutScreen   = FALSE;
-	FontHash *hash         = (FontHash*)currentFont->hash;
+	FontHash *hash         = (FontHash *)currentFont->hash;
 	unsigned  prevChar     = 0;
 	FontChar *fontPrevChar = NULL;
 	if(unlikely(NULL == hash))
+	{
 		return;
+	}
 	// if(maxw > 0.0f)
 	{
 		maxw /= currentFont->_scale;
@@ -320,13 +342,17 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 		if(unlikely(NULL == df_shader && FALSE == fontShaderFailed))
 		{
 			if(FALSE == supported.GLSL)
+			{
 				fontShaderFailed = TRUE;
+			}
 			else
 			{
 				df_shader = initShader();
 				newFragmentShader(df_shader, fontShaderFastSource);
 				if(FALSE == shaderCheck(df_shader))
+				{
 					fontShaderFailed = TRUE;
+				}
 			}
 		}
 		if(unlikely(TRUE == fontShaderFailed))
@@ -343,17 +369,18 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 		glScalef(currentFont->_scale, currentFont->_scale, 1);
 		glTranslatef(x / currentFont->_scale, y / currentFont->_scale, 0);
 	}
-	else if(FALSE == currentFont->scalable)
-	{
-		glScalef(currentFont->_scale / screenScale.scaleX, currentFont->_scale / screenScale.scaleY, 1);
-		glTranslatef(floorf(x * screenScale.scaleX), floorf(y * screenScale.scaleY), 0);
-		maxw = maxw * screenScale.scaleX;
-	}
 	else
-	{
-		glTranslatef(x, y, 0);
-		glScalef(currentFont->_scale, currentFont->_scale, 1);
-	}
+		if(FALSE == currentFont->scalable)
+		{
+			glScalef(currentFont->_scale / screenScale.scaleX, currentFont->_scale / screenScale.scaleY, 1);
+			glTranslatef(floorf(x * screenScale.scaleX), floorf(y * screenScale.scaleY), 0);
+			maxw = maxw * screenScale.scaleX;
+		}
+		else
+		{
+			glTranslatef(x, y, 0);
+			glScalef(currentFont->_scale, currentFont->_scale, 1);
+		}
 
 	x = h = y = 0.0;
 
@@ -368,26 +395,30 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 			{
 				end = TRUE;
 			}
-			else if(unlikely(c == '\t'))
-			{
-				width += spacew * 8;
-				last_space = j;
-				lastw = width;
-			}
-			else if(unlikely(c == ' '))
-			{
-				last_space = j;
-				lastw = width;
-				spaces++;
-				width += spacew;
-			}
 			else
-			{
-				ch = FontHash_get(hash, c);
-				if(unlikely(NULL == ch))
-					continue;
-				width += ch->w;
-			}
+				if(unlikely(c == '\t'))
+				{
+					width += spacew * 8;
+					last_space = j;
+					lastw = width;
+				}
+				else
+					if(unlikely(c == ' '))
+					{
+						last_space = j;
+						lastw = width;
+						spaces++;
+						width += spacew;
+					}
+					else
+					{
+						ch = FontHash_get(hash, c);
+						if(unlikely(NULL == ch))
+						{
+							continue;
+						}
+						width += ch->w;
+					}
 			/* drop invisible lines - great performance improvement for long texts */
 			yOutScreen = (y + oldy + height) * currentFont->_scale > 0.0f;
 			/* drop kerning computation for invisible lines - speed +15% */
@@ -409,26 +440,33 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 					lastw = width;
 				}
 				if(buf == last_space)
+				{
 					last_space++;
+				}
 				/* dropping invisible lines from top */
 				if(unlikely(yOutScreen))
 				{
 					switch(align)
 					{
-						case alignCenter:
-							x = (maxw - lastw) * 0.5f;
-							break;
-						case alignRight:
-							x = maxw - lastw;
-							break;
-						case alignJustify:
-							if(unlikely('\n' == c || TRUE == end))
-								justifyWidth = spacew;
-							else
-								justifyWidth = (maxw + spacew * ((float)spaces) - lastw) / (float)(spaces);
-							x = 0;
-							break;
-						default: x = 0;
+					case alignCenter:
+						x = (maxw - lastw) * 0.5f;
+						break;
+					case alignRight:
+						x = maxw - lastw;
+						break;
+					case alignJustify:
+						if(unlikely('\n' == c || TRUE == end))
+						{
+							justifyWidth = spacew;
+						}
+						else
+						{
+							justifyWidth = (maxw + spacew * ((float)spaces) - lastw) / (float)(spaces);
+						}
+						x = 0;
+						break;
+					default:
+						x = 0;
 					}
 					float kerningAccumulator = 0.0;
 					while(buf < last_space)
@@ -440,37 +478,48 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 							float kerning = KernHash_get(currentFont->kerningHash, kp);
 							x += kerning;
 							if(align == alignJustify)
+							{
 								kerningAccumulator -= kerning;
+							}
 						}
 						ch = NULL;
 						if(unlikely(c == '\t'))
 						{
 							x += spacew * 8;
 						}
-						else if (unlikely(c == ' '))
-						{
-							x += justifyWidth + kerningAccumulator;
-							kerningAccumulator = 0.0;
-						}
 						else
-						{
-							ch = FontHash_get(hash, c);
-							if(unlikely(NULL == ch))
-								continue;
-							DRAW_CHAR;
-						}
+							if(unlikely(c == ' '))
+							{
+								x += justifyWidth + kerningAccumulator;
+								kerningAccumulator = 0.0;
+							}
+							else
+							{
+								ch = FontHash_get(hash, c);
+								if(unlikely(NULL == ch))
+								{
+									continue;
+								}
+								DRAW_CHAR;
+							}
 						prevChar = c;
 						fontPrevChar = ch;
 					}
 				}
 				else
+				{
 					buf = last_space;
+				}
 				if(unlikely(TRUE == end))
+				{
 					break;
+				}
 				y += height;
 				/* dropping invisible lines from buttom */
 				if(unlikely((y + oldy) * currentFont->_scale > screen->h))
+				{
 					break;
+				}
 				h = FONT_CEIL(currentFont, y);
 				if(unlikely(str[buf] == '\n' || str[buf] == '\t' || str[buf] == ' '))
 				{
@@ -497,30 +546,34 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 			ch = NULL;
 			switch(c)
 			{
-				case ' ':
-					x += spacew;
+			case ' ':
+				x += spacew;
+				break;
+			case '\n':
+				x = 0;
+				y += height;
+				if((y + oldy) * currentFont->_scale > screen->h)
+				{
 					break;
-				case '\n':
-					x = 0;
-					y += height;
-					if((y + oldy) * currentFont->_scale > screen->h)
-						break;
-					h = FONT_CEIL(currentFont, y);
-					break;
-				case '\t':
-					x += spacew * 8;
-					break;
-				default:
-					ch = FontHash_get(hash, c);
-					if(unlikely(NULL == ch))
-						continue;
-					if(unlikely(KERNING_CONDITION))
-					{
-						KerningPair kp = {prevChar, c};
-						float kerning = KernHash_get(currentFont->kerningHash, kp);
-						x += kerning;
-					}
-					DRAW_CHAR;
+				}
+				h = FONT_CEIL(currentFont, y);
+				break;
+			case '\t':
+				x += spacew * 8;
+				break;
+			default:
+				ch = FontHash_get(hash, c);
+				if(unlikely(NULL == ch))
+				{
+					continue;
+				}
+				if(unlikely(KERNING_CONDITION))
+				{
+					KerningPair kp = {prevChar, c};
+					float kerning = KernHash_get(currentFont->kerningHash, kp);
+					x += kerning;
+				}
+				DRAW_CHAR;
 			}
 			prevChar = c;
 			fontPrevChar = ch;
@@ -577,19 +630,21 @@ CHEETAH_EXPORT void fontSetGlyph(Font *ptr, const char *line)
 	unsigned ch = 0;
 	FontChar *fch = NULL;
 	if(sscanf(line, "%11u %10f %10f %10f %10f %10f %10f %10f %10f", &ch, &x1, &y1, &x2, &y2, &cx1, &cy1, &w, &h) == -1)
+	{
 		return;
+	}
 	if(NULL == ptr->hash)
 	{
 		ptr->hash = (void *)FontHash_new();
 		new0(fch, FontChar, 1);
-		FontHash_set((FontHash*)ptr->hash, '\0', fch);
+		FontHash_set((FontHash *)ptr->hash, '\0', fch);
 		fch = NULL;
 		new0(fch, FontChar, 1);
-		FontHash_set((FontHash*)ptr->hash, '\n', fch);
+		FontHash_set((FontHash *)ptr->hash, '\n', fch);
 		fch = NULL;
 		ptr->mem += (unsigned)sizeof(FontHash)
-			+ (unsigned)sizeof(Font) + (unsigned)sizeof(FontChar) * 2
-			+ FontHash_size((FontHash*)ptr->hash) * (unsigned)sizeof(FontHashNode);
+		            + (unsigned)sizeof(Font) + (unsigned)sizeof(FontChar) * 2
+		            + FontHash_size((FontHash *)ptr->hash) * (unsigned)sizeof(FontHashNode);
 	}
 	new0(fch, FontChar, 1);
 	x1 = x1 / (float)ptr->image->w;
@@ -603,7 +658,7 @@ CHEETAH_EXPORT void fontSetGlyph(Font *ptr, const char *line)
 	memcpy(fch->v, ver, sizeof(ver));
 	memcpy(fch->t, tex, sizeof(tex));
 	fch->w = w;
-	FontHash_set((FontHash*)ptr->hash, ch, fch);
+	FontHash_set((FontHash *)ptr->hash, ch, fch);
 	ptr->mem += (unsigned)sizeof(FontChar);
 	if(' ' == ch)
 	{
@@ -611,7 +666,7 @@ CHEETAH_EXPORT void fontSetGlyph(Font *ptr, const char *line)
 		fch = NULL;
 		new0(fch, FontChar, 1);
 		fch->w = w * 8;
-		FontHash_set((FontHash*)ptr->hash, '\t', fch);
+		FontHash_set((FontHash *)ptr->hash, '\t', fch);
 		ptr->mem += (unsigned)sizeof(FontChar);
 	}
 	ptr->height = h;
@@ -623,29 +678,35 @@ CHEETAH_EXPORT void fontSetKerning(Font *ptr, const char *line)
 	unsigned	second;
 	float		kerning;
 	if(sscanf(line, "%10u %10u %10f", &first, &second, &kerning) == -1)
+	{
 		return;
+	}
 	if(NULL == ptr->kerningHash)
 	{
 		ptr->kerningHash = (void *)KernHash_new_size(64);
-		ptr->mem += (unsigned)sizeof(KernHash) + KernHash_size((KernHash*)ptr->kerningHash) * (unsigned)sizeof(KernHashNode);
+		ptr->mem += (unsigned)sizeof(KernHash) + KernHash_size((KernHash *)ptr->kerningHash) * (unsigned)sizeof(KernHashNode);
 	}
 	KerningPair kp = {first, second};
 	KernHash_set(ptr->kerningHash, kp, kerning);
 	if(NULL == ptr->hash)
+	{
 		return;
+	}
 	FontChar *fch = FontHash_get(ptr->hash, first);
 	/* mark that this char has kerning (much faster kerning access) */
 	if(fch)
+	{
 		fch->kerning = TRUE;
+	}
 }
 
-CHEETAH_EXPORT void deleteFont(Font * ptr)
+CHEETAH_EXPORT void deleteFont(Font *ptr)
 {
 	if(ptr)
 	{
 		if(NULL != ptr->hash)
 		{
-			FontHash* h = (FontHash*)ptr->hash;
+			FontHash *h = (FontHash *)ptr->hash;
 			HASH_FOREACH(i, h, n)
 			{
 				delete(n->value);
@@ -654,9 +715,11 @@ CHEETAH_EXPORT void deleteFont(Font * ptr)
 		}
 		if(NULL != ptr->kerningHash)
 		{
-			KernHash_destroy((KernHash*)ptr->kerningHash);
+			KernHash_destroy((KernHash *)ptr->kerningHash);
 		}
 	}
 	else
+	{
 		myError("Trying to free a null-font. Maybe, you did it manually?");
+	}
 }

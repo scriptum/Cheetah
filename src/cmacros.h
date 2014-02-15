@@ -159,9 +159,11 @@ static inline bool check_option_helper(const char *options, const char *o)
 	size_t l = strlen(o);
 	/* check bounds */
 	if(NULL != name &&
-	  (' ' == *(name + l) || '\0' == *(name + l)) &&
-	  (name == options || ' ' == *(name - 1) || '\0' == *(name - 1)))
+	                (' ' == *(name + l) || '\0' == *(name + l)) &&
+	                (name == options || ' ' == *(name - 1) || '\0' == *(name - 1)))
+	{
 		return TRUE;
+	}
 	return FALSE;
 }
 

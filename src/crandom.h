@@ -33,7 +33,8 @@ IN THE SOFTWARE.
  * http://en.wikipedia.org/wiki/Xorshift
  **/
 
-typedef struct xor_state {
+typedef struct xor_state
+{
 	uint32_t x;
 	uint32_t y;
 	uint32_t z;
@@ -142,7 +143,9 @@ static inline uint32_t rand_t88(void)
 	s1 = (uint32_t)(((int32_t)s1 &  -2) << 12) ^ (((s1 << 13) ^  s1) >> 19);
 	s2 = (uint32_t)(((int32_t)s2 &  -8) <<  4) ^ (((s2 <<  2) ^  s2) >> 25);
 	s3 = (uint32_t)(((int32_t)s3 & -16) << 17) ^ (((s3 <<  3) ^  s3) >> 11);
-	_xor_.x = s1; _xor_.y = s2; _xor_.z = s3;
+	_xor_.x = s1;
+	_xor_.y = s2;
+	_xor_.z = s3;
 	return s1 ^ s2 ^ s3;
 }
 
@@ -164,7 +167,8 @@ static inline uint32_t rand32(void)
  **/
 static inline float randf(uint32_t random_integer)
 {
-	union {
+	union
+	{
 		uint32_t	i;
 		float		f;
 	} u;
@@ -176,7 +180,8 @@ static inline float randf(uint32_t random_integer)
  **/
 static inline float randf2(uint32_t random_integer)
 {
-	union {
+	union
+	{
 		uint32_t	i;
 		float		f;
 	} u;

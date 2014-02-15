@@ -65,41 +65,44 @@ CHEETAH_EXPORT void sleep(double sec)
 }
 
 /*================================threads=====================================*/
-typedef struct Thread {
+typedef struct Thread
+{
 	const char *file;
 	lua_State  *L;
 } Thread;
 
-// 
+//
 // typedef struct threadMessage {
-	// const char *message;
-	// lua_State  *L; 
+// const char *message;
+// lua_State  *L;
 // } threadMessage;
 
-HASH_TEMPLATE(threadHash, const char*, listDouble*, hash_string, cmp_string)
+HASH_TEMPLATE(threadHash, const char *, listDouble *, hash_string, cmp_string)
 
 threadHash *threadArray = NULL;
 SDL_mutex *threadMutex = NULL;
 
-int Lua_Thread_create(void *data) 
+int Lua_Thread_create(void *data)
 {
 	// Thread *t = (Thread*)data;
 	lua_State *L;
 	if(unlikely(NULL == data))
+	{
 		return -1;
+	}
 	L = luaL_newstate();
 	luaL_openlibs(L);
 	int n = lua_gettop(L);
-	if(unlikely(luaL_loadfile(L, (const char*)data) != 0))
+	if(unlikely(luaL_loadfile(L, (const char *)data) != 0))
 	{
-		dbg("cannot load lua file: %s", (const char*)data);
+		dbg("cannot load lua file: %s", (const char *)data);
 		return lua_error(L);
 	}
-	dbg("created thread: %s (%p)", (const char*)data, L);
+	dbg("created thread: %s (%p)", (const char *)data, L);
 	lua_call(L, 0, LUA_MULTRET);
 	lua_pop(L, lua_gettop(L) - n);
 	lua_close(L);
-	dbg("closed thread: %s (%p)", (const char*)data, L);
+	dbg("closed thread: %s (%p)", (const char *)data, L);
 	return 0;
 }
 
@@ -109,7 +112,9 @@ CHEETAH_EXPORT bool newThread(const char *file)
 	// t.file = file;
 	SDL_Thread *t;
 	if(unlikely(NULL == file))
+	{
 		return FALSE;
+	}
 	if(unlikely(NULL == threadMutex))
 	{
 		threadMutex = SDL_CreateMutex();
@@ -123,7 +128,7 @@ CHEETAH_EXPORT bool newThread(const char *file)
 			dbg("created new thread mutex");
 		}
 	}
-	t = SDL_CreateThread(Lua_Thread_create, NULL, (void*)file);
+	t = SDL_CreateThread(Lua_Thread_create, NULL, (void *)file);
 	if(unlikely(NULL == t))
 	{
 		dbg("failed created new thread!");
@@ -145,9 +150,9 @@ CHEETAH_EXPORT void threadMutexUnlock(void)
 }
 
 // void threadSend(listDouble *messageItem) {
-	// threadMutexLock();
-	// listPush(threadMessages, messageItem);
-	// threadMutexUnlock();
+// threadMutexLock();
+// listPush(threadMessages, messageItem);
+// threadMutexUnlock();
 // }
 
 CHEETAH_EXPORT void threadSendStr(const char *message, const char *queue)
@@ -155,7 +160,9 @@ CHEETAH_EXPORT void threadSendStr(const char *message, const char *queue)
 	listDouble *messageItem = NULL;
 	listDouble *threadMessages = NULL;
 	if(unlikely(NULL == message || NULL == queue))
+	{
 		return;
+	}
 	threadMutexLock();
 	if(unlikely(NULL == threadArray))
 	{
@@ -178,20 +185,20 @@ CHEETAH_EXPORT void threadSendStr(const char *message, const char *queue)
 }
 
 // const char *threadRecv(void) {
-	// const char *message = NULL;
-	// listDouble *messageItem;
-	// if(NULL == threadMessages)
-	// {
-		// return NULL;
-	// }
-	// threadMutexLock();
-	// messageItem = listPop(threadMessages);
-	// threadMutexUnlock();
-	// if(messageItem)
-	// {
-		// message = (const char*)messageItem->data;
-	// }
-	// return message;
+// const char *message = NULL;
+// listDouble *messageItem;
+// if(NULL == threadMessages)
+// {
+// return NULL;
+// }
+// threadMutexLock();
+// messageItem = listPop(threadMessages);
+// threadMutexUnlock();
+// if(messageItem)
+// {
+// message = (const char*)messageItem->data;
+// }
+// return message;
 // }
 
 CHEETAH_EXPORT const char *threadRecvStr(const char *queue)
@@ -222,7 +229,7 @@ CHEETAH_EXPORT const char *threadRecvStr(const char *queue)
 	messageItem = listPop(threadMessages);
 	if(unlikely(NULL != messageItem))
 	{
-		message = (const char*)messageItem->data;
+		message = (const char *)messageItem->data;
 		delete(messageItem);
 		dbgvv("try to recieve message from queue: %s", queue);
 		if(message)
