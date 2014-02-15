@@ -41,21 +41,26 @@ static inline void repeat(int w, int h, int channels, char *buf)
 {
 	int i, j;
 	for(j = h / 2; j < h; j++)
+	{
 		for(i = 0; i <= w / 2; i++)
-			*((int *)(buf + (j * h + i) * channels)) =
-			        *((int *)(buf + ((h - j - 1) * h + i) * channels));
+		{
+			*((int *)(buf + (j * h + i) * channels)) = *((int *)(buf + ((h - j - 1) * h + i) * channels));
+		}
+	}
 	for(j = 0; j < h; j++)
+	{
 		for(i = w / 2; i < w; i++)
+		{
 			if(channels == 3)
 			{
-				*((int *)(buf + (j * h +          i)  * channels)) |=
-				        *((int *)(buf + (j * h + (w - i - 1)) * channels)) & 0xffffff;
+				*((int *)(buf + (j * h + i)  * channels)) |= *((int *)(buf + (j * h + (w - i - 1)) * channels)) & 0xffffff;
 			}
 			else
 			{
-				*((int *)(buf + (j * h +          i)  * channels)) =
-				        *((int *)(buf + (j * h + (w - i - 1)) * channels));
+				*((int *)(buf + (j * h + i)  * channels)) = *((int *)(buf + (j * h + (w - i - 1)) * channels));
 			}
+		}
+	}
 }
 
 #define LOOP_CIRCLE(code)                                                      \
@@ -96,67 +101,63 @@ CHEETAH_EXPORT static void generateImageData(ImageData *ptr, int w, int h, const
 		NEW;
 		memset(buf, 0xff, (size_t)(w * h * channels));
 	}
-	else
-		if(strcmp(imageType, "noise") == 0)
+	else if(strcmp(imageType, "noise") == 0)
+	{
+		NEW;
+		for(i = 0; i < w * h; i++)
 		{
-			NEW;
-			for(i = 0; i < w * h; i++)
-			{
-				*((unsigned *)(buf + i * channels)) = rand128();
+			*((unsigned *)(buf + i * channels)) = rand128();
+		}
+	}
+
+#define COLOR_LIGHT                                                            \
+	if(channels == 3) {                                                    \
+		c = c | c << 8 | c << 16;                                      \
+		*((int*)(buf + (j * h + i) * channels)) |= c;                  \
+	} else {                                                               \
+		c = 0xffffff | c << 24;                                        \
+		*((int*)(buf + (j * h + i) * channels)) = c;                   \
+	}
+
+	else if(strcmp(imageType, "light") == 0)
+	{
+		NEW;
+		LOOP_CIRCLE(
+		        buff = 2.0f * 255.0f * sqrtf(distance(i, j, w, h));
+		        c = 255 - (int)buff;
+		        if(c < 0)
+		        c = 0;
+		        COLOR_LIGHT
+		)
+	}
+	else if(strcmp(imageType, "lightexp") == 0)
+	{
+		NEW;
+		LOOP_CIRCLE(
+		        buff = 255.0f * expf(-distance(i, j, w, h) * MAGICK_CONSTANT);
+		        c = (int)buff;
+		        COLOR_LIGHT
+		)
+	}
+	else if(strcmp(imageType, "circle") == 0)
+	{
+		NEW;
+		LOOP_CIRCLE(
+		        c = (i - w / 2) * (i - w / 2) + (j - h / 2) * (j - h / 2);
+		        if(c > (w * w / 4))
+		        c = 0;
+		        else
+		{
+			c = (int32_t)0xffffffff;
 			}
-		}
-
-#define COLOR_LIGHT                                                    \
-		if(channels == 3) {                                            \
-			c = c | c << 8 | c << 16;                              \
-			*((int*)(buf + (j * h + i) * channels)) |= c;          \
-		} else {                                                       \
-			c = 0xffffff | c << 24;                                \
-			*((int*)(buf + (j * h + i) * channels)) = c;           \
-		}
-
-		else
-			if(strcmp(imageType, "light") == 0)
-			{
-				NEW;
-				LOOP_CIRCLE(
-				        buff = 2.0f * 255.0f * sqrtf(distance(i, j, w, h));
-				        c = 255 - (int)buff;
-				        if(c < 0)
-				        c = 0;
-				        COLOR_LIGHT
-				)
-				}
-			else
-				if(strcmp(imageType, "lightexp") == 0)
-				{
-					NEW;
-					LOOP_CIRCLE(
-					        buff = 255.0f * expf(-distance(i, j, w, h) * MAGICK_CONSTANT);
-					        c = (int)buff;
-					        COLOR_LIGHT
-					)
-				}
-				else
-					if(strcmp(imageType, "circle") == 0)
-					{
-						NEW;
-						LOOP_CIRCLE(
-						        c = (i - w / 2) * (i - w / 2) + (j - h / 2) * (j - h / 2);
-						        if(c > (w * w / 4))
-						        c = 0;
-						        else
-						{
-							c = (int32_t)0xffffffff;
-							}
-						* ((int *)(buf + (j * h + i) * channels)) = c;
-						)
-					}
-					else
-					{
-						myError("undefined generator type: %s", imageType);
-						return;
-					}
+		* ((int *)(buf + (j * h + i) * channels)) = c;
+		)
+	}
+	else
+	{
+		myError("undefined generator type: %s", imageType);
+		return;
+	}
 	ptr->w = w;
 	ptr->h = h;
 	ptr->channels = channels;
