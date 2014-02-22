@@ -104,10 +104,12 @@ CHEETAH_EXPORT bool cheetahInit(const char *appName, const char *options)
 		flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 	}
 	else
+	{
 		if(TRUE == resizable)
 		{
 			flags |= SDL_WINDOW_RESIZABLE;
 		}
+	}
 	if(TRUE == noframe)
 	{
 		flags |= SDL_WINDOW_BORDERLESS;

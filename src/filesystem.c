@@ -128,72 +128,54 @@ filetime(c)
 
 #if 0
 CHEETAH_EXPORT long int fileatime(const char *filename)
+CHEETAH_EXPORT long int filemtime(const char * filename)
+CHEETAH_EXPORT long int filectime(const char * filename)
+#endif
+
+DIR *openDir(const char * name)
 {
-	CHEETAH_EXPORT long int filemtime(const char * filename)
+	return opendir(name);
+}
+
+CHEETAH_EXPORT struct dirent *readDir(DIR * dirp)
+{
+	return readdir(dirp);
+}
+
+CHEETAH_EXPORT int closeDir(DIR * dirp)
+{
+	return closedir(dirp);
+}
+
+CHEETAH_EXPORT bool isDir(const char * name)
+{
+	DIR *dir = opendir(name);
+	if(dir)
 	{
-		CHEETAH_EXPORT long int filectime(const char * filename)
-		{
-#endif
+		closedir(dir);
+		return TRUE;
+	}
+	return FALSE;
+}
 
-			DIR *openDir(const char * name)
-			{
-				return opendir(name);
-			}
-
-			CHEETAH_EXPORT struct dirent *readDir(DIR * dirp)
-			{
-				return readdir(dirp);
-			}
-
-			CHEETAH_EXPORT int closeDir(DIR * dirp)
-			{
-				return closedir(dirp);
-			}
-
-			CHEETAH_EXPORT bool isDir(const char * name)
-			{
-				DIR *dir = opendir(name);
-				if(dir)
-				{
-					closedir(dir);
-					return TRUE;
-				}
-				return FALSE;
-			}
-
-			CHEETAH_EXPORT bool mkDir(const char * path)
-			{
+CHEETAH_EXPORT bool mkDir(const char * path)
+{
 #ifdef _WIN32
-				if(mkdir(path) == 0)
-				{
-					return TRUE;
-				}
+	if(mkdir(path) == 0)
+	{
+		return TRUE;
+	}
 #else
-				if(mkdir(path, 0755) == 0)
-				{
-					return TRUE;
-				}
+	if(mkdir(path, 0755) == 0)
+	{
+		return TRUE;
+	}
 #endif
-				return FALSE;
-			}
+	return FALSE;
+}
 
-			CHEETAH_EXPORT const char *getDirentName(struct dirent * de)
-			{
-				return de->d_name;
-			}
+CHEETAH_EXPORT const char *getDirentName(struct dirent * de)
+{
+	return de->d_name;
+}
 
-//~ const char * fileExt(const char * name) {
-			//~ int i, pos = 0;
-			//~ char ch;
-			//~ for (i = 0; ; i++)
-			//~ {
-			//~ ch = name[i];
-			//~ if(ch)
-			//~ {
-			//~ if(ch == '.') pos = i;
-			//~ }
-			//~ else
-			//~ break;
-			//~ }
-			//~ return (name + pos + 1);
-//~ }
