@@ -197,11 +197,19 @@ C.poll = function()
 	elseif eid == C.EVENT_MOUSEUP or eid == C.EVENT_MOUSEDOWN then
 		c = libcheetah.getEventMouseButton()
 		a, b, c = libcheetah.getEventMouseX(), libcheetah.getEventMouseY(), button_names[c] or 'm_' .. c
+	elseif eid == C.EVENT_MOUSEWHEEL then
+		a, b = libcheetah.getEventMouseWheelX(), libcheetah.getEventMouseWheelY()
+		if b > 0 then
+			c = "wu"
+		elseif b < 0 then
+			c = "wd"
+		end
 	elseif eid == C.EVENT_RESIZED then
 		a, b = libcheetah.getEventResizeW(), libcheetah.getEventResizeH()
 	else
 		return nil
 	end
+	--print (eid, a, b, c)
 	return eid, a, b, c
 end
 

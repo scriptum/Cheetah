@@ -230,6 +230,7 @@ enum
         EVENT_KEYDOWN,
         EVENT_MOUSEUP,
         EVENT_MOUSEDOWN,
+        EVENT_MOUSEWHEEL,
         EVENT_RESIZED,
         EVENT_EXPOSED,
         EVENT_SHOWN,
@@ -279,6 +280,8 @@ unsigned int getEventKey(void);
 unsigned int getEventKeyUnicode(void);
 int getEventMouseX(void);
 int getEventMouseY(void);
+int getEventMouseWheelX(void);
+int getEventMouseWheelY(void);
 unsigned int getEventMouseButton(void);
 int getEventResizeW(void);
 int getEventResizeH(void);
@@ -292,13 +295,13 @@ bool isPointer(void *ptr);
 unsigned char *loadfile(const char *filename, long *length);
 bool fileExists(const char *filename);
 long int fileatime(const char *filename);
-	long int filemtime(const char * filename);
-		long int filectime(const char * filename);
-			struct dirent *readDir(DIR * dirp);
-			int closeDir(DIR * dirp);
-			bool isDir(const char * name);
-			bool mkDir(const char * path);
-			const char *getDirentName(struct dirent * de);
+long int filemtime(const char * filename);
+long int filectime(const char * filename);
+struct dirent *readDir(DIR * dirp);
+int closeDir(DIR * dirp);
+bool isDir(const char * name);
+bool mkDir(const char * path);
+const char *getDirentName(struct dirent * de);
 void fontEnableDistanceField(Font *f);
 void fontDisableDistanceField(Font *f);
 float fontWidth(Font *f, const char *str);

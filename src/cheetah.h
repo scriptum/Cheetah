@@ -304,6 +304,7 @@ enum
         EVENT_KEYDOWN,
         EVENT_MOUSEUP,
         EVENT_MOUSEDOWN,
+        EVENT_MOUSEWHEEL,
         EVENT_RESIZED,
         EVENT_EXPOSED,
         EVENT_SHOWN,
