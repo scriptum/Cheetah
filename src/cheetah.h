@@ -321,7 +321,7 @@ enum
         EVENT_JOY
 };
 
-struct
+CHEETAH_EXPORT struct
 {
 	float		scaleX;
 	float		scaleY;
@@ -335,7 +335,7 @@ struct
 	bool		autoScaleFont;
 } screenScale;
 
-struct
+CHEETAH_EXPORT struct
 {
 	/* Used to check window resizing */
 	unsigned	rescaleTime;
