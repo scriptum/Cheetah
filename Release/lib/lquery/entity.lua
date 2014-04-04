@@ -639,12 +639,12 @@ local function events(v)
 		if v._mousemove then
 			v._mousemove(v, mX, mY)
 		end
-		if _lQuery.MouseButton == "wu" and _lQuery.MousePressed == true then
+		if _lQuery.MouseButton == "wu"  then
 			if v._wheel then
 				v._wheel(v, mX, mY, "u")
 				_lQuery.MouseButton = nil
 			end
-		elseif _lQuery.MouseButton == "wd" and _lQuery.MousePressed == true then
+		elseif _lQuery.MouseButton == "wd"  then
 			if v._wheel then
 				v._wheel(v, mX, mY, "d")
 				_lQuery.MouseButton = nil
@@ -729,6 +729,8 @@ _lQuery.event = function(eid, a, b, c)
 			end
 		end
 		_lQuery.MousePressedOwner = nil
+	elseif eid == C.EVENT_MOUSEWHEEL then
+		_lQuery.MouseButton = c
 	elseif eid == C.EVENT_KEYDOWN then
 		_lQuery.KeyPressed = true
 		_lQuery.KeyPressedKey = a

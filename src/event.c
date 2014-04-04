@@ -56,6 +56,9 @@ CHEETAH_EXPORT unsigned int getEventType(void)
 		case SDL_MOUSEBUTTONDOWN:
 			dbgv("Mouse down");
 			return EVENT_MOUSEDOWN;
+		case SDL_MOUSEWHEEL:
+			dbgv("Mouse wheel");
+			return EVENT_MOUSEWHEEL;
 		case SDL_JOYAXISMOTION:
 		case SDL_JOYBALLMOTION:
 		case SDL_JOYHATMOTION:
@@ -155,6 +158,16 @@ CHEETAH_EXPORT int getEventMouseY(void)
 		return event.button.y;
 	}
 	return (int)(((float)event.button.y - screenScale.offsetY) / screenScale.scaleY);
+}
+
+CHEETAH_EXPORT int getEventMouseWheelX(void)
+{
+	return event.wheel.x;
+}
+
+CHEETAH_EXPORT int getEventMouseWheelY(void)
+{
+	return event.wheel.y;
 }
 
 CHEETAH_EXPORT unsigned int getEventMouseButton(void)
