@@ -77,6 +77,7 @@ CHEETAH_EXPORT bool cheetahInit(const char *appName, const char *options)
 {
 	unsigned flags = SDL_WINDOW_OPENGL;
 	bool firstrun = FALSE;
+	bool vsync;
 	int width = 800, height = 600;
 	int count = sscanf(options, "%11dx%11d", &width, &height);
 	if(1 == count)
@@ -93,7 +94,8 @@ CHEETAH_EXPORT bool cheetahInit(const char *appName, const char *options)
 	}
 	CHECK_OPTION(options, fullscreen);
 	CHECK_OPTION(options, resizable);
-	CHECK_OPTION(options, vsync);
+	CHECK_OPTION(options, novsync);
+	vsync = !novsync;
 	CHECK_OPTION(options, resloader);
 	CHECK_OPTION(options, depth);
 	CHECK_OPTION(options, stencil);
