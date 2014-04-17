@@ -132,7 +132,7 @@ CHEETAH_EXPORT long int filemtime(const char * filename)
 CHEETAH_EXPORT long int filectime(const char * filename)
 #endif
 
-DIR *openDir(const char * name)
+CHEETAH_EXPORT DIR *openDir(const char * name)
 {
 	return opendir(name);
 }
