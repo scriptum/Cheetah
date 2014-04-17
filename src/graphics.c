@@ -270,54 +270,59 @@ CHEETAH_EXPORT void reset(void)
 //~ }
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-#define COLOR_UINT                                                         \
-    unsigned low = (unsigned)g << 8 | ((unsigned)r & 0xff);                    \
-    unsigned high = (unsigned)a << 8 | (unsigned)b;                            \
-    unsigned c = (low & 0xffff) | (high << 16);
+static inline unsigned color_to_uint(unsigned r, unsigned g, unsigned b, unsigned a)
+{
+	unsigned low = g << 8 | (r & 0xff);
+	unsigned high = a << 8 | b;
+	return (low & 0xffff) | (high << 16);
+} 
 #else
-#define COLOR_UINT                                                         \
-    unsigned low = (unsigned)b << 8 | ((unsigned)a & 0xff);                    \
-    unsigned high = (unsigned)r << 8 | (unsigned)g;                            \
-    unsigned c = (low & 0xffff) | (high << 16);
+static inline unsigned color_to_uint(unsigned r, unsigned g, unsigned b, unsigned a)
+{
+	unsigned low = b << 8 | (a & 0xff);
+	unsigned high = r << 8 | g;
+	return (low & 0xffff) | (high << 16);
+}
 #endif
 
 #ifdef COLOR_ARRAYS
-#define COLOR_BODY                                                         \
-    COLOR_UINT                                                                 \
-    colorArrayBuf[0] = colorArrayBuf[1] = colorArrayBuf[2] = colorArrayBuf[3] = c;
+static inline void color_body(unsigned r, unsigned g, unsigned b, unsigned a)
+{
+	unsigned c = color_to_uint(r, g, b, a);
+	colorArrayBuf[0] = colorArrayBuf[1] = colorArrayBuf[2] = colorArrayBuf[3] = c;
+}
+
 #else
-#define COLOR_BODY                                                         \
-    COLOR_UINT                                                                 \
-    if(unlikely(c != prevColor))                                               \
-    {                                                                          \
-        FLUSH_BUFFER();                                                        \
-        glColor4ubv((const GLubyte*)c);                                        \
-        prevColor = c;                                                         \
-    }
+static inline void color_body(unsigned r, unsigned g, unsigned b, unsigned a)
+{
+	unsigned c = color_to_uint(r, g, b, a);
+	if(unlikely(c != prevColor))
+	{
+		FLUSH_BUFFER();
+		glColor4ubv((const GLubyte*)c);
+		prevColor = c;
+	}
+}
 #endif
 
 CHEETAH_EXPORT void color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
-	COLOR_BODY
+	color_body(r, g, b, a);
 }
 
 CHEETAH_EXPORT void colorf(float r, float g, float b, float a)
 {
-	COLOR_BODY
+	color_body(r, g, b, a);
 }
 
 CHEETAH_EXPORT void colord(double r, double g, double b, double a)
 {
-	COLOR_BODY
+	color_body(r, g, b, a);
 }
 
 CHEETAH_EXPORT void colorC(Color C)
 {
-	unsigned char r = C.r;
-	unsigned char g = C.g;
-	unsigned char b = C.b;
-	unsigned char a = C.a;
-	COLOR_BODY
+	color_body(C.r, C.g, C.b, C.a);
 }
 
 CHEETAH_EXPORT void clearColor(float r, float g, float b, float a)
