@@ -32,6 +32,7 @@ E:new(screen):draw(function(s)
 	img:draw(0, 0, img.w, img.h)
 end)
 :wheel(function(s, x, y, b)
+print(b)
 	if b == 'u' then
 		s:set({tw = s.tw*1.2, th = s.th*1.2})
 	else

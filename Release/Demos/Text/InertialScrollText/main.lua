@@ -6,7 +6,7 @@ C.init('Test', '1024x700 resizable')
 C.printFPS = true
 -- C.autoScale(false)
 --load font
-local f = C.newFont('MonotypeCorsiva.fnt', true)
+local f = C.newFont('myfont.fnt', true)
 f.distanceField = true
 -- local f = C.newFont('LiberationSerif.fnt', true)
 -- local f = C.newFont('DejaVuSans.fnt', true)
@@ -44,7 +44,7 @@ local textarea = E:new(screen)
 	f:setScale(s.fontScale)
 	f:print(str, s.x, s.y - s._offset, s.w, C.alignJustify)
 	-- dfshader:unbind()
-end):size(C.getWindowWidth(),C.getWindowHeight())
+end):size(1024,768)
 :mousepressed(function(s, x, y, b)
 	s.dragY = lQuery.mY + s._offset
 	s.dragging = true
