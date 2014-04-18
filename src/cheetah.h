@@ -25,6 +25,7 @@ IN THE SOFTWARE.
 #define CHEETAH_H_
 
 #define CHEETAH_EXPORT __attribute__((__visibility__("default")))
+#define CHEETAH_INLINE static inline __attribute__((always_inline optimize("-Ofast")))
 
 typedef unsigned char bool;
 unsigned char *loadfile(const char *filename, long *length);
@@ -236,7 +237,7 @@ typedef struct Font
 	float		dfSharpness;
 	unsigned	mem;
 	bool		scalable;
-	bool		distanceField;
+	bool		SDF;
 	bool		_kerning;
 } Font;
 

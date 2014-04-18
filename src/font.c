@@ -61,6 +61,8 @@ void main() {\n\
 bool shaderCheck(Shader *ptr);
 Shader *initShader();
 void newFragmentShader(Shader *ptr, const char *frag);
+void getWindowSize(int *w, int *h);
+void imageBind(Image *image);
 
 static inline unsigned fontHashFunc(unsigned key)
 {
@@ -92,39 +94,46 @@ static inline unsigned kerningCmpFunc(KerningPair a, KerningPair b)
 
 HASH_TEMPLATE(KernHash, KerningPair, float, kerningHashFunc, kerningCmpFunc)
 
-void imageBind(Image *image);
-extern SDL_Surface *screen;
-
-#define UNICODE_TO_INT(a, i)                                                   \
-if((a[i] & 0b10000000) == 0) {                                                 \
-    c  =  (unsigned)a[i++];                                                    \
-}                                                                              \
-else if (((unsigned)a[i]   & 0b11100000) == 0b11000000) {                      \
-    c =  ((unsigned)a[i++] & 0b00011111) << 6;                                 \
-    c |=  (unsigned)a[i++] & 0b00111111;                                       \
-}                                                                              \
-else if (((unsigned)a[i]   & 0b11110000) == 0b11100000) {                      \
-    c =  ((unsigned)a[i++] & 0b00001111) << 12;                                \
-    c |= ((unsigned)a[i++] & 0b00111111) << 6;                                 \
-    c |=  (unsigned)a[i++] & 0b00111111;                                       \
-}                                                                              \
-else if (((unsigned)a[i]   & 0b11111000) == 0b11110000) {                      \
-    c =  ((unsigned)a[i++] & 0b00000111) << 18;                                \
-    c |= ((unsigned)a[i++] & 0b00111111) << 12;                                \
-    c |= ((unsigned)a[i++] & 0b00111111) << 6;                                 \
-    c |=  (unsigned)a[i++] & 0b00111111;                                       \
-} else { /* Error! */                                                          \
-    c = 0;                                                                     \
+CHEETAH_INLINE unsigned fontUnicodeToUint(const char *a, unsigned *ii)
+{
+	unsigned c;
+	unsigned i = *ii;
+	if((a[i] & 0b10000000) == 0)
+	{
+		c  =  (unsigned)a[i++];
+	}
+	else if (((unsigned)a[i]   & 0b11100000) == 0b11000000)
+	{
+		c  = ((unsigned)a[i++] & 0b00011111) << 6;
+		c |=  (unsigned)a[i++] & 0b00111111;
+	}
+	else if (((unsigned)a[i]   & 0b11110000) == 0b11100000)
+	{
+		c  = ((unsigned)a[i++] & 0b00001111) << 12;
+		c |= ((unsigned)a[i++] & 0b00111111) << 6;
+		c |=  (unsigned)a[i++] & 0b00111111;
+	}
+	else if (((unsigned)a[i]   & 0b11111000) == 0b11110000)
+	{
+		c  = ((unsigned)a[i++] & 0b00000111) << 18;
+		c |= ((unsigned)a[i++] & 0b00111111) << 12;
+		c |= ((unsigned)a[i++] & 0b00111111) << 6;
+		c |=  (unsigned)a[i++] & 0b00111111;
+	} else {
+		c = 0;
+	}
+	*ii = i;
+	return c;
 }
 
 CHEETAH_EXPORT void fontEnableDistanceField(Font *f)
 {
-	f->distanceField = TRUE;
+	f->SDF = TRUE;
 }
 
 CHEETAH_EXPORT void fontDisableDistanceField(Font *f)
 {
-	f->distanceField = FALSE;
+	f->SDF = FALSE;
 }
 
 /* Calculate width of text block */
@@ -133,12 +142,12 @@ CHEETAH_EXPORT float fontWidth(Font *f, const char *str)
 	float		width = 0;
 	float		maxwidth = 0;
 	unsigned	c = 0;
-	int		i = 0;
+	unsigned	i = 0;
 	FontChar	*fch;
 	unsigned	prevChar = 0;
 	while(str[i])
 	{
-		UNICODE_TO_INT(str, i)
+		c = fontUnicodeToUint(str, &i) ;
 		switch(c)
 		{
 		case ' ':
@@ -208,7 +217,7 @@ CHEETAH_EXPORT float fontHeight(Font *currentFont, const char *str, float maxw)
 		while(TRUE)
 		{
 			j = i;
-			UNICODE_TO_INT(str, i)
+			c = fontUnicodeToUint(str, &i);
 			if(unlikely(c == '\0'))
 			{
 				y += height;
@@ -259,7 +268,7 @@ CHEETAH_EXPORT float fontHeight(Font *currentFont, const char *str, float maxw)
 	{
 		while(str[i])
 		{
-			UNICODE_TO_INT(str, i)
+			c = fontUnicodeToUint(str, &i);
 			if(unlikely(c == '\0'))
 			{
 				goto out;
@@ -280,62 +289,34 @@ CHEETAH_EXPORT float fontLineHeight(Font *currentFont)
 {
 	return currentFont->height * currentFont->_interval * currentFont->_scale;
 }
+CHEETAH_INLINE float fontCeil(Font *font, float x)
+{
+	return (font->scalable || font->SDF) ? (x) : ceilf(x);
+}
 
-#define FONT_CEIL(font, x) (font->scalable || font->distanceField) ? x : ceilf(x)
-
-#define DRAW_CHAR do {                                                         \
-    FLUSH_BUFFER_IF_OVERFLOW();                                                \
-    texCoord[vertexCounter]   = texCoord[vertexCounter+2] = ch->t[0];          \
-    texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];          \
-    texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];          \
-    texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];          \
-    width = FONT_CEIL(currentFont, x);                                         \
-    vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0]+width;\
-    vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;\
-    vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;\
-    vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6]=ch->v[2]+width;\
-    _DO_COLOR                                                                  \
-    vertexCounter += 8;                                                        \
-    x += ch->w;                                                                \
-}                                                                              \
-while(0)
+CHEETAH_INLINE void fontDrawChar(Font *currentFont, FontChar *ch, float *x, float h)
+{
+	float width = fontCeil(currentFont, *x);
+	FLUSH_BUFFER_IF_OVERFLOW();
+	texCoord[vertexCounter]   = texCoord[vertexCounter+2] = ch->t[0];
+	texCoord[vertexCounter+1] = texCoord[vertexCounter+7] = ch->t[1];
+	texCoord[vertexCounter+3] = texCoord[vertexCounter+5] = ch->t[3];
+	texCoord[vertexCounter+4] = texCoord[vertexCounter+6] = ch->t[2];
+	vertexCoord[vertexCounter] = vertexCoord[vertexCounter+2] = ch->v[0]+width;
+	vertexCoord[vertexCounter+1] = vertexCoord[vertexCounter+7] = ch->v[1] + h;
+	vertexCoord[vertexCounter+3] = vertexCoord[vertexCounter+5] = ch->v[3] + h;
+	vertexCoord[vertexCounter+4] = vertexCoord[vertexCounter+6]=ch->v[2]+width;
+	_DO_COLOR
+	vertexCounter += 8;
+	*x += ch->w;
+}
 
 // #define KERNING_CONDITION (TRUE == currentFont->_kerning && NULL != currentFont->kerningHash && prevChar > 0 && fontPrevChar && fontPrevChar->kerning)
 #define KERNING_CONDITION (NULL != currentFont->kerningHash && fontPrevChar && fontPrevChar->kerning)
 
-CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFont, const unsigned char *str, float x, float y, float maxw, int align)
+static void fontCheckSDF(Font *currentFont, float x, float y, float *maxw)
 {
-	FontChar *ch           = NULL;
-	unsigned  i            = 0;
-	unsigned  j            = 0;
-	unsigned  last_space   = 0;
-	unsigned  buf          = 0;
-	int       spaces       = -1;
-	unsigned  c            = 0;
-	float     width        = 0.0f;
-	float     h            = 0.0f;
-	float     lastw        = 0.0f;
-	float     justifyWidth = currentFont->_spacewidth;
-	float     spacew       = currentFont->_spacewidth;
-	float     height       = currentFont->height * currentFont->_interval;
-	float     oldy         = y / currentFont->_scale;
-	bool      end          = FALSE;
-	bool      yOutScreen   = FALSE;
-	FontHash *hash         = (FontHash *)currentFont->hash;
-	unsigned  prevChar     = 0;
-	FontChar *fontPrevChar = NULL;
-	if(unlikely(NULL == hash))
-	{
-		return;
-	}
-	// if(maxw > 0.0f)
-	{
-		maxw /= currentFont->_scale;
-		// if(maxw == 0.0f) maxw = 0.0001f;
-	}
-	FLUSH_BUFFER();
-	glPushMatrix();
-	if(TRUE == currentFont->distanceField)
+	if(TRUE == currentFont->SDF)
 	{
 		if(unlikely(NULL == df_shader && FALSE == fontShaderFailed))
 		{
@@ -360,35 +341,200 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 		}
 		else
 		{
+			GLuint gamma_location = glGetUniformLocation_(df_shader->id, "gamma");
 			glUseProgramObject_(df_shader->id);
-			glUniform1f_(glGetUniformLocation_(df_shader->id, "gamma"), currentFont->dfGamma);
+			glUniform1f_(gamma_location, currentFont->dfGamma);
 			glUniform1f_(glGetUniformLocation_(df_shader->id, "sharpness"), 4.18f * currentFont->dfSharpness * currentFont->_scale * screenScale.scaleY);
 		}
 		glScalef(currentFont->_scale, currentFont->_scale, 1);
 		glTranslatef(x / currentFont->_scale, y / currentFont->_scale, 0);
 	}
 	else
+	{
 		if(FALSE == currentFont->scalable)
 		{
 			glScalef(currentFont->_scale / screenScale.scaleX, currentFont->_scale / screenScale.scaleY, 1);
 			glTranslatef(floorf(x * screenScale.scaleX), floorf(y * screenScale.scaleY), 0);
-			maxw = maxw * screenScale.scaleX;
+			*maxw *= screenScale.scaleX;
 		}
 		else
 		{
 			glTranslatef(x, y, 0);
 			glScalef(currentFont->_scale, currentFont->_scale, 1);
 		}
+	}
+}
 
-	x = h = y = 0.0;
+static void fontDrawLine(Font *currentFont, const char *str, int align, float h, unsigned c, int spaces, bool end, unsigned *buf, float maxw, float lastw, unsigned  last_space)
+{
+	float     justifyWidth = currentFont->_spacewidth;
+	unsigned  prevChar     = 0;
+	float     spacew       = currentFont->_spacewidth;
+	FontChar *fontPrevChar = NULL;
+	FontChar *ch;
+	float x;
+	switch(align)
+	{
+		case alignCenter:
+			x = (maxw - lastw) * 0.5f;
+			break;
+		case alignRight:
+			x = maxw - lastw;
+			break;
+		case alignJustify:
+			if(unlikely('\n' == c || TRUE == end))
+			{
+				justifyWidth = spacew;
+			}
+			else
+			{
+				justifyWidth = (maxw + spacew * ((float)spaces) - lastw) / (float)(spaces);
+			}
+			x = 0;
+			break;
+		default:
+			x = 0;
+	}
+	float kerningAccumulator = 0.0;
+	while(*buf < last_space)
+	{
+		c = fontUnicodeToUint(str, buf);
+		if(unlikely(KERNING_CONDITION))
+		{
+			KerningPair kp = {prevChar, c};
+			float kerning = KernHash_get(currentFont->kerningHash, kp);
+			x += kerning;
+			if(align == alignJustify)
+			{
+				kerningAccumulator -= kerning;
+			}
+		}
+		ch = NULL;
+		if(unlikely(c == '\t'))
+		{
+			x += spacew * 8;
+		}
+		else
+			if(unlikely(c == ' '))
+			{
+				x += justifyWidth + kerningAccumulator;
+				kerningAccumulator = 0.0;
+			}
+			else
+			{
+				ch = FontHash_get((FontHash *)currentFont->hash, c);
+				if(unlikely(NULL == ch))
+				{
+					continue;
+				}
+				fontDrawChar(currentFont, ch, &x, h);
+			}
+		prevChar = c;
+		fontPrevChar = ch;
+	}
+}
+
+static void fontDrawTail(Font *currentFont, const char *str, float oldy)
+{
+	FontChar *fontPrevChar = NULL;
+	FontChar *ch;
+	unsigned  prevChar     = 0;
+	unsigned c;
+	unsigned i = 0;
+	float y = 0.0f;
+	float x = 0.0f;
+	float height = currentFont->height * currentFont->_interval;
+	float spacew = currentFont->_spacewidth;
+	float screenH;
+	int sw, sh;
+	getWindowSize(&sw, &sh);
+	screenH = sh;
+	while(str[i])
+	{
+		c = fontUnicodeToUint(str, &i);
+		ch = NULL;
+		switch(c)
+		{
+		case ' ':
+			x += spacew;
+			break;
+		case '\n':
+			x = 0;
+			y += height;
+			if((y + oldy) * currentFont->_scale > screenH)
+			{
+				break;
+			}
+			break;
+		case '\t':
+			x += spacew * 8;
+			break;
+		default:
+			ch = FontHash_get((FontHash *)currentFont->hash, c);
+			if(unlikely(NULL == ch))
+			{
+				continue;
+			}
+			if(unlikely(KERNING_CONDITION))
+			{
+				KerningPair kp = {prevChar, c};
+				float kerning = KernHash_get(currentFont->kerningHash, kp);
+				x += kerning;
+			}
+			fontDrawChar(currentFont, ch, &x, fontCeil(currentFont, y));
+		}
+		prevChar = c;
+		fontPrevChar = ch;
+	}
+}
+
+CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFont, const char *str, float x, float y, float maxw, int align)
+{
+	
+	float     oldy         = y / currentFont->_scale;
+	FontHash *hash         = (FontHash *)currentFont->hash;
+	
+	if(unlikely(NULL == hash))
+	{
+		return;
+	}
+	// if(maxw > 0.0f)
+	{
+		maxw /= currentFont->_scale;
+		// if(maxw == 0.0f) maxw = 0.0001f;
+	}
+	FLUSH_BUFFER();
+	glPushMatrix();
+	fontCheckSDF(currentFont, x, y, &maxw);
 
 	imageBind(currentFont->image);
 	if(likely(maxw > 0.0f))
 	{
+		float height = currentFont->height * currentFont->_interval;
+		float spacew = currentFont->_spacewidth;
+		float screenH;
+		int sw, sh;
+		float h = 0.0f;
+		unsigned i = 0;
+		unsigned j = 0;
+		bool      end          = FALSE;
+		bool      yOutScreen   = FALSE;
+		FontChar *ch           = NULL;
+		FontChar *fontPrevChar = NULL;
+		unsigned  last_space   = 0;
+		int       spaces       = -1;
+		float     lastw        = 0.0f;
+		getWindowSize(&sw, &sh);
+		unsigned  c            = 0;
+		screenH = sh;
+		float     width        = 0.0f;
+		unsigned  prevChar     = 0;
+		unsigned buf = 0;
+		y = 0.0;
 		while(TRUE)
 		{
 			j = i;
-			UNICODE_TO_INT(str, i)
+			c = fontUnicodeToUint(str, &i);
 			if(unlikely(c == '\0'))
 			{
 				end = TRUE;
@@ -442,65 +588,7 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 				/* dropping invisible lines from top */
 				if(unlikely(yOutScreen))
 				{
-					switch(align)
-					{
-					case alignCenter:
-						x = (maxw - lastw) * 0.5f;
-						break;
-					case alignRight:
-						x = maxw - lastw;
-						break;
-					case alignJustify:
-						if(unlikely('\n' == c || TRUE == end))
-						{
-							justifyWidth = spacew;
-						}
-						else
-						{
-							justifyWidth = (maxw + spacew * ((float)spaces) - lastw) / (float)(spaces);
-						}
-						x = 0;
-						break;
-					default:
-						x = 0;
-					}
-					float kerningAccumulator = 0.0;
-					while(buf < last_space)
-					{
-						UNICODE_TO_INT(str, buf)
-						if(unlikely(KERNING_CONDITION))
-						{
-							KerningPair kp = {prevChar, c};
-							float kerning = KernHash_get(currentFont->kerningHash, kp);
-							x += kerning;
-							if(align == alignJustify)
-							{
-								kerningAccumulator -= kerning;
-							}
-						}
-						ch = NULL;
-						if(unlikely(c == '\t'))
-						{
-							x += spacew * 8;
-						}
-						else
-							if(unlikely(c == ' '))
-							{
-								x += justifyWidth + kerningAccumulator;
-								kerningAccumulator = 0.0;
-							}
-							else
-							{
-								ch = FontHash_get(hash, c);
-								if(unlikely(NULL == ch))
-								{
-									continue;
-								}
-								DRAW_CHAR;
-							}
-						prevChar = c;
-						fontPrevChar = ch;
-					}
+					fontDrawLine(currentFont, str, align, h, c, spaces, end, &buf, maxw, lastw, last_space);
 				}
 				else
 				{
@@ -512,11 +600,11 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 				}
 				y += height;
 				/* dropping invisible lines from buttom */
-				if(unlikely((y + oldy) * currentFont->_scale > screen->h))
+				if(unlikely((y + oldy) * currentFont->_scale > screenH))
 				{
 					break;
 				}
-				h = FONT_CEIL(currentFont, y);
+				h = fontCeil(currentFont, y);
 				if(unlikely(str[buf] == '\n' || str[buf] == '\t' || str[buf] == ' '))
 				{
 					i = buf = last_space + 1;
@@ -528,56 +616,19 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 				last_space = 0;
 				width = 0;
 				spaces = -1;
-				prevChar = 0;
-				fontPrevChar = NULL;
+				// prevChar = 0;
+				// fontPrevChar = NULL;
 			}
 
 		}
 	}
 	else
 	{
-		while(str[i])
-		{
-			UNICODE_TO_INT(str, i)
-			ch = NULL;
-			switch(c)
-			{
-			case ' ':
-				x += spacew;
-				break;
-			case '\n':
-				x = 0;
-				y += height;
-				if((y + oldy) * currentFont->_scale > screen->h)
-				{
-					break;
-				}
-				h = FONT_CEIL(currentFont, y);
-				break;
-			case '\t':
-				x += spacew * 8;
-				break;
-			default:
-				ch = FontHash_get(hash, c);
-				if(unlikely(NULL == ch))
-				{
-					continue;
-				}
-				if(unlikely(KERNING_CONDITION))
-				{
-					KerningPair kp = {prevChar, c};
-					float kerning = KernHash_get(currentFont->kerningHash, kp);
-					x += kerning;
-				}
-				DRAW_CHAR;
-			}
-			prevChar = c;
-			fontPrevChar = ch;
-		}
+		fontDrawTail(currentFont, str, oldy);
 	}
 	FLUSH_BUFFER();
 	glPopMatrix();
-	if(TRUE == currentFont->distanceField)
+	if(TRUE == currentFont->SDF)
 	{
 		if(unlikely(TRUE == fontShaderFailed))
 		{

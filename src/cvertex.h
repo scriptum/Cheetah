@@ -64,7 +64,7 @@ extern unsigned colorArrayBuf[4];
  * calls glDrawArrays to draw quads from buffer. Some functions as color, move,
  * bindShader need to flush buffer to avoid visual appearance corruption.
  * */
-static inline void FLUSH_BUFFER()
+CHEETAH_INLINE void FLUSH_BUFFER()
 {
 	if(likely(vertexCounter))
 	{
@@ -77,7 +77,7 @@ static inline void FLUSH_BUFFER()
 	}
 }
 
-static inline void TEXTURE_BIND(GLuint tex)
+CHEETAH_INLINE void TEXTURE_BIND(GLuint tex)
 {
 	if(unlikely(prevImageId != (tex)))
 	{
@@ -91,7 +91,7 @@ static inline void TEXTURE_BIND(GLuint tex)
 /**
  * Just check if buffer grows over his size and flush it
  * */
-static inline void FLUSH_BUFFER_IF_OVERFLOW()
+CHEETAH_INLINE void FLUSH_BUFFER_IF_OVERFLOW()
 {
 	if(unlikely(vertexCounter >= VERTEX_BUFFER_LIMIT * VERTICLES_PER_SPRITE))
 	{
@@ -131,7 +131,7 @@ static const float DEFAULT_QUAD_TEX[] = {0, 0, 0, 1, 1, 1, 1, 0};
 /**
  * Genegal vertex operations: push vertex coordinates to buffer.
  * */
-static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, float a, float ox, float oy)
+CHEETAH_INLINE void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, float a, float ox, float oy)
 {
 	vertexCoord[vertexCounter + 0] = vx + VERTEX_ROT_X(0,  0,  a, ox, oy);
 	vertexCoord[vertexCounter + 1] = vy + VERTEX_ROT_Y(0,  0,  a, ox, oy);
@@ -148,7 +148,7 @@ static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_VERTEX_OPS(float v
  * Pushing full quad with all transformaions: size, rotation (a - angle),
  * texture offsets and origin position (ox, oy).
  * */
-static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h)
+CHEETAH_INLINE void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h)
 {
 	FLUSH_BUFFER_IF_OVERFLOW();
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
@@ -176,7 +176,7 @@ static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float v
 
 static const float DEFAULT_QUAD_TEX[] = {0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0};
 
-static inline void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, float a, float ox, float oy)
+CHEETAH_INLINE void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, float a, float ox, float oy)
 {
 	vertexCoord[vertexCounter + 10] =
 	        vertexCoord[vertexCounter + 0]  = (vx) + VERTEX_ROT_X(0,  0,  a, ox, oy);
@@ -192,7 +192,7 @@ static inline void PUSH_QUAD_VERTEX_OPS(float vx, float vy, float vw, float vh, 
 	vertexCoord[vertexCounter + 9]  = (vy) + VERTEX_ROT_Y(vw, 0,  a, ox, oy);
 }
 
-static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h)
+CHEETAH_INLINE void PUSH_QUADT(float vx, float vy, float vw, float vh, float a, float ox, float oy, float tx, float ty, float tw, float th, float w, float h)
 {
 	FLUSH_BUFFER_IF_OVERFLOW();
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
@@ -216,7 +216,7 @@ static inline void __attribute__((optimize("-O3"))) PUSH_QUADT(float vx, float v
 
 #endif /* #ifdef GL_QUADS */
 
-static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_TEXTURE(float vx, float vy, float vw, float vh, float a, float ox, float oy, const float *texture)
+CHEETAH_INLINE void PUSH_QUAD_TEXTURE(float vx, float vy, float vw, float vh, float a, float ox, float oy, const float *texture)
 {
 	FLUSH_BUFFER_IF_OVERFLOW();
 	PUSH_QUAD_VERTEX_OPS(vx, vy, vw, vh, a, ox, oy);
@@ -224,7 +224,7 @@ static inline void __attribute__((optimize("-O3"))) PUSH_QUAD_TEXTURE(float vx, 
 	vertexCounter += VERTICLES_PER_SPRITE;
 }
 
-static inline void __attribute__((optimize("-O3"))) PUSH_QUAD(float vx, float vy, float vw, float vh, float a, float ox, float oy)
+CHEETAH_INLINE void PUSH_QUAD(float vx, float vy, float vw, float vh, float a, float ox, float oy)
 {
 	PUSH_QUAD_TEXTURE(vx, vy, vw, vh, a, ox, oy, DEFAULT_QUAD_TEX);
 }
