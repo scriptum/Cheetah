@@ -50,11 +50,22 @@ static inline uint32_t hash_string_jenkins(const char *key)
 
 static inline uint32_t hash_string(const char *c)
 {
-	//c = (const char*)__builtin_assume_aligned(c, 32);
 	uint32_t h = (uint32_t) * c;
 	while(c && *c)
 	{
 		h = ((h << 5) + h) + (uint32_t)(*c++);
+	}
+	return h;
+}
+
+static inline uint32_t hash_string_limit(const char *c)
+{
+	int max = sizeof(uint32_t) * 8;
+	uint32_t h = (uint32_t) * c;
+	while(c && *c && max)
+	{
+		h = ((h << 5) + h) + (uint32_t)(*c++);
+		max--;
 	}
 	return h;
 }

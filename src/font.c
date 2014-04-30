@@ -76,7 +76,12 @@ static inline unsigned fontCmpFunc(unsigned a, unsigned b)
 	return a == b;
 }
 
-HASH_TEMPLATE(FontHash, unsigned, FontChar *, fontHashFunc, fontCmpFunc)
+HASH_TEMPLATE_FREE_VALUE(FontHash, unsigned, FontChar *, fontHashFunc, fontCmpFunc)
+
+static void FontHashFreeFunc(FontHashNode *node)
+{
+	free(node->value);
+}
 
 typedef struct KerningPair
 {
