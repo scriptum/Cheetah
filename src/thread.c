@@ -79,7 +79,7 @@ typedef struct Thread
 
 HASH_TEMPLATE(threadHash, const char *, listDouble *, hash_string, cmp_string)
 
-threadHash *threadArray = NULL;
+Hash *threadArray = NULL;
 SDL_mutex *threadMutex = NULL;
 
 int Lua_Thread_create(void *data)
@@ -166,14 +166,14 @@ CHEETAH_EXPORT void threadSendStr(const char *message, const char *queue)
 	threadMutexLock();
 	if(unlikely(NULL == threadArray))
 	{
-		threadArray = threadHash_new();
+		threadArray = threadHashNew();
 		dbg("created new thread hashtable");
 	}
-	threadMessages = threadHash_get(threadArray, queue);
+	threadMessages = threadHashGet(threadArray, queue);
 	if(unlikely(NULL == threadMessages))
 	{
 		new1(threadMessages, listDouble);
-		threadHash_set(threadArray, queue, threadMessages);
+		threadHashSet(threadArray, queue, threadMessages);
 		dbg("created new thread queue: %s", queue);
 	}
 	new1(messageItem, listDouble);
@@ -219,7 +219,7 @@ CHEETAH_EXPORT const char *threadRecvStr(const char *queue)
 		threadMutexUnlock();
 		return NULL;
 	}
-	threadMessages = threadHash_get(threadArray, queue);
+	threadMessages = threadHashGet(threadArray, queue);
 	if(unlikely(NULL == threadMessages))
 	{
 		dbg("message queue '%s' not found in hashtable, exitting", queue);

@@ -170,7 +170,7 @@ CHEETAH_EXPORT float fontWidth(Font *f, const char *str)
 		{
 			continue;
 		}
-		fch = FontHash_get(f->hash, c);
+		fch = FontHashGet(f->hash, c);
 		if(fch)
 		{
 			width += fch->w;
@@ -178,7 +178,7 @@ CHEETAH_EXPORT float fontWidth(Font *f, const char *str)
 		if(NULL != f->kerningHash && prevChar > 0)
 		{
 			KerningPair kp = {prevChar, c};
-			float kerning = KernHash_get(f->kerningHash, kp);
+			float kerning = KernHashGet(f->kerningHash, kp);
 			width += kerning;
 		}
 	}
@@ -201,7 +201,7 @@ CHEETAH_EXPORT float fontHeight(Font *currentFont, const char *str, float maxw)
 	float     spacew       = currentFont->_spacewidth;
 	float     height       = currentFont->height * currentFont->_interval * currentFont->_scale;
 	float     y;
-	FontHash *hash         = (FontHash *)currentFont->hash;
+	Hash     *hash         = (Hash *)currentFont->hash;
 	if(NULL == hash)
 	{
 		return 0.f;
@@ -237,7 +237,7 @@ CHEETAH_EXPORT float fontHeight(Font *currentFont, const char *str, float maxw)
 			}
 			else
 			{
-				ch = FontHash_get(hash, c);
+				ch = FontHashGet(hash, c);
 				if(unlikely(NULL == ch))
 				{
 					continue;
@@ -403,7 +403,7 @@ static void fontDrawLine(Font *currentFont, const char *str, int align, float h,
 		if(unlikely(KERNING_CONDITION))
 		{
 			KerningPair kp = {prevChar, c};
-			float kerning = KernHash_get(currentFont->kerningHash, kp);
+			float kerning = KernHashGet(currentFont->kerningHash, kp);
 			x += kerning;
 			if(align == alignJustify)
 			{
@@ -423,7 +423,7 @@ static void fontDrawLine(Font *currentFont, const char *str, int align, float h,
 			}
 			else
 			{
-				ch = FontHash_get((FontHash *)currentFont->hash, c);
+				ch = FontHashGet(currentFont->hash, c);
 				if(unlikely(NULL == ch))
 				{
 					continue;
@@ -471,7 +471,7 @@ static void fontDrawTail(Font *currentFont, const char *str, float oldy)
 			x += spacew * 8;
 			break;
 		default:
-			ch = FontHash_get((FontHash *)currentFont->hash, c);
+			ch = FontHashGet(currentFont->hash, c);
 			if(unlikely(NULL == ch))
 			{
 				continue;
@@ -479,7 +479,7 @@ static void fontDrawTail(Font *currentFont, const char *str, float oldy)
 			if(unlikely(KERNING_CONDITION))
 			{
 				KerningPair kp = {prevChar, c};
-				float kerning = KernHash_get(currentFont->kerningHash, kp);
+				float kerning = KernHashGet(currentFont->kerningHash, kp);
 				x += kerning;
 			}
 			fontDrawChar(currentFont, ch, &x, fontCeil(currentFont, y));
@@ -493,7 +493,7 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 {
 	
 	float     oldy         = y / currentFont->_scale;
-	FontHash *hash         = (FontHash *)currentFont->hash;
+	Hash     *hash         = currentFont->hash;
 	
 	if(unlikely(NULL == hash))
 	{
@@ -555,7 +555,7 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 			}
 			else
 			{
-				ch = FontHash_get(hash, c);
+				ch = FontHashGet(hash, c);
 				if(unlikely(NULL == ch))
 				{
 					continue;
@@ -569,7 +569,7 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 				if(unlikely(KERNING_CONDITION))
 				{
 					KerningPair kp = {prevChar, c};
-					width += KernHash_get(currentFont->kerningHash, kp);
+					width += KernHashGet(currentFont->kerningHash, kp);
 				}
 			prevChar = c;
 			fontPrevChar = ch;
@@ -683,16 +683,16 @@ static bool fontSetGlyph(Font *ptr, const char *line)
 	}
 	if(NULL == ptr->hash)
 	{
-		ptr->hash = (void *)FontHash_new();
+		ptr->hash = FontHashNew();
 		new0(fch, FontChar, 1);
-		FontHash_set((FontHash *)ptr->hash, '\0', fch);
+		FontHashSet(ptr->hash, '\0', fch);
 		fch = NULL;
 		new0(fch, FontChar, 1);
-		FontHash_set((FontHash *)ptr->hash, '\n', fch);
+		FontHashSet(ptr->hash, '\n', fch);
 		fch = NULL;
-		ptr->mem += (unsigned)sizeof(FontHash)
+		ptr->mem += (unsigned)sizeof(Hash)
 		            + (unsigned)sizeof(Font) + (unsigned)sizeof(FontChar) * 2
-		            + FontHash_size((FontHash *)ptr->hash) * (unsigned)sizeof(FontHashNode);
+		            + hashSize(ptr->hash) * (unsigned)sizeof(FontHashNode);
 	}
 	new0(fch, FontChar, 1);
 	x1 = x1 / (float)ptr->image->w;
@@ -706,7 +706,7 @@ static bool fontSetGlyph(Font *ptr, const char *line)
 	memcpy(fch->v, ver, sizeof(ver));
 	memcpy(fch->t, tex, sizeof(tex));
 	fch->w = w;
-	FontHash_set((FontHash *)ptr->hash, ch, fch);
+	FontHashSet(ptr->hash, ch, fch);
 	ptr->mem += (unsigned)sizeof(FontChar);
 	if(' ' == ch)
 	{
@@ -714,7 +714,7 @@ static bool fontSetGlyph(Font *ptr, const char *line)
 		fch = NULL;
 		new0(fch, FontChar, 1);
 		fch->w = w * 8;
-		FontHash_set((FontHash *)ptr->hash, '\t', fch);
+		FontHashSet(ptr->hash, '\t', fch);
 		ptr->mem += (unsigned)sizeof(FontChar);
 	}
 	ptr->height = h;
@@ -732,16 +732,16 @@ static bool fontSetKerning(Font *ptr, const char *line)
 	}
 	if(NULL == ptr->kerningHash)
 	{
-		ptr->kerningHash = (void *)KernHash_new_size(64);
-		ptr->mem += (unsigned)sizeof(KernHash) + KernHash_size((KernHash *)ptr->kerningHash) * (unsigned)sizeof(KernHashNode);
+		ptr->kerningHash = (void *)KernHashNewSize(64);
+		ptr->mem += (unsigned)sizeof(Hash) + hashSize(ptr->kerningHash) * (unsigned)sizeof(KernHashNode);
 	}
 	KerningPair kp = {first, second};
-	KernHash_set(ptr->kerningHash, kp, kerning);
+	KernHashSet(ptr->kerningHash, kp, kerning);
 	if(NULL == ptr->hash)
 	{
 		return FALSE;
 	}
-	FontChar *fch = FontHash_get(ptr->hash, first);
+	FontChar *fch = FontHashGet(ptr->hash, first);
 	/* mark that this char has kerning (much faster kerning access) */
 	if(fch)
 	{
@@ -855,15 +855,15 @@ CHEETAH_EXPORT void deleteFont(Font *ptr)
 	}
 	if(NULL != ptr->hash)
 	{
-		FontHash *h = (FontHash *)ptr->hash;
-		HASH_FOREACH(i, h, n)
-		{
-			delete(n->value);
-		}
-		FontHash_destroy(h);
+		//FontHash *h = ptr->hash;
+		//HASH_FOREACH(i, h, n)
+		//{
+			//delete(n->value);
+		//}
+		hashDestroy(ptr->hash);
 	}
 	if(NULL != ptr->kerningHash)
 	{
-		KernHash_destroy((KernHash *)ptr->kerningHash);
+		hashDestroy(ptr->kerningHash);
 	}
 }
