@@ -126,9 +126,11 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);                  \
 #define ERROR_IF_NULL(name) if(unlikely(NULL == (name))) goto error
 #define ERROR_IF_FAIL(name) if(unlikely(!(name))) goto error
 #define RETURN_IF_NULL(name) if(unlikely(NULL == (name))) return
-#define RETURN_VALUE_IF_NULL(name, value) if(unlikely(NULL == (name))) return (value)
 #define RETURN_IF_FAIL(name) if(unlikely(!(name))) return
-#define RETURN_VALUE_FAIL(name, value) if(unlikely(!(name))) return (value)
+#define RETURN_VALUE_IF_NULL(name, value) if(unlikely(NULL == (name))) return (value)
+#define RETURN_VALUE_IF_FAIL(name, value) if(unlikely(!(name))) return (value)
+#define RETURN_NULL_IF_NULL(name) if(unlikely(NULL == (name))) return NULL
+#define RETURN_NULL_IF_FAIL(name) if(unlikely(!(name))) return NULL
 
 bool isInit();
 
