@@ -1,16 +1,30 @@
 /*
-cat *.[hc] | grep -o '^\s*gl[A-Z][a-zA-Z0-9_]*' | awk '{print $1}' | sort -u | xargs -I {} echo "#define {}(...)"
+cat *.[hc] | grep -Eo '^\s*(gl[A-Z]|SDL_)[a-zA-Z0-9_]*' | awk '{print $1}' | sort -u | xargs -I {} echo "#define {}(...)"
 * */
 
-#ifdef PERF_TEST
+#ifndef TEST_H_
+#define TEST_H_
+
+#ifdef TEST_MODE
 
 /* just reset, don't draw actually */
-#undef FLUSH_BUFFER
+
+/*#undef FLUSH_BUFFER
 #define FLUSH_BUFFER() do {                                                    \
     if(vertexCounter) {                                                        \
         vertexCounter = 0;                                                     \
     }                                                                          \
 } while(0)
+*/
+
+//static inline bool alwaysTrue(void)
+//{
+    //return 1;
+//}
+
+//#define cheetahInit(...) alwaysTrue()
+//#define isInit(...) alwaysTrue()
+
 
 #define glActiveTexture_(...)
 #define glAlphaFunc(...)
@@ -26,16 +40,15 @@ cat *.[hc] | grep -o '^\s*gl[A-Z][a-zA-Z0-9_]*' | awk '{print $1}' | sort -u | x
 #define glBufferData_(...)
 #define glBufferSubData_(...)
 #define glCallList(...)
-#define glCheckFramebufferStatus_(...) 1
 #define glClear(...)
 #define glClearColor(...)
 #define glClientActiveTexture_(...)
-#define glColor4f(...)
-#define glColor4ub(...)
+#define glColor4ubv(...)
 #define glColorMask(...)
+#define glColorPointer(...)
 #define glCompileShader_(...)
-#define glCreateProgramObject_(...) 0
-#define glCreateShaderObject_(...) 0
+#define glCreateProgramObject_(...)
+#define glCreateShaderObject_(...)
 #define glDeleteBuffers_(...)
 #define glDeleteFramebuffers_(...)
 #define glDeleteObject_(...)
@@ -63,7 +76,7 @@ cat *.[hc] | grep -o '^\s*gl[A-Z][a-zA-Z0-9_]*' | awk '{print $1}' | sort -u | x
 #define glGetObjectParameteriv_(...)
 #define glGetProgramiv_(...)
 #define glGetShaderiv_(...)
-#define glGetUniformLocation_(...) 0
+#define glGetUniformLocation_(...)
 #define glLinkProgram_(...)
 #define glLoadIdentity(...)
 #define glMapBuffer_(...)
@@ -85,7 +98,6 @@ cat *.[hc] | grep -o '^\s*gl[A-Z][a-zA-Z0-9_]*' | awk '{print $1}' | sort -u | x
 #define glScissor(...)
 #define glShaderSource_(...)
 #define glStencilFunc(...)
-#define glStencilOp(...)
 #define glTexCoordPointer(...)
 #define glTexEnvi(...)
 #define glTexImage2D(...)
@@ -106,6 +118,31 @@ cat *.[hc] | grep -o '^\s*gl[A-Z][a-zA-Z0-9_]*' | awk '{print $1}' | sort -u | x
 #define glVertex2f(...)
 #define glVertexPointer(...)
 #define glViewport(...)
+#define SDL_CreateThread(...)
+#define SDL_Delay(...)
+#define SDL_DestroyWindow(...)
+#define SDL_GetMouseState(...)
+#define SDL_GetWindowSize(...)
+#define SDL_GLContext(...)
+#define SDL_GL_DeleteContext(...)
+#define SDL_GL_SetAttribute(...)
+#define SDL_GL_SetSwapInterval(...)
+#define SDL_GL_SwapWindow(...)
+#define SDL_main(...)
+//#undef SDL_mutexP
+//#define SDL_mutexP(...)
+//#undef SDL_mutexV
+//#define SDL_mutexV(...)
+#define SDL_Quit(...)
+#define SDL_SetModuleHandle(...)
+#define SDL_SetWindowSize(...)
+#define SDL_SetWindowTitle(...)
+#define SDL_strlcat(...)
+#define SDL_strlcpy(...)
+#define SDL_Window(...)
+
 
 
 #endif
+
+#endif /* TEST_H_ */
