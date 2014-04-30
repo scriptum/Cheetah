@@ -43,9 +43,13 @@ IN THE SOFTWARE.
 #define HASH_PROBING (unsigned)(i + (probes))
 #endif
 
+#ifndef unlikely
+#define unlikely(a) (a)
+#endif
+
 typedef struct Hash {
     void          *nodes;                     /* Nodes array */
-    void         (*node_free)(void*, void*);  /* Function to free each node */
+    void         (*node_free)(void*);  /* Function to free each node */
     unsigned       size;                      /* Hash size (nodes array size) */
     unsigned       items;                     /* Number of items that hash stores */
     unsigned       node_size;                 /* Node size */
@@ -63,7 +67,11 @@ static void hashDestroy(Hash *hash)
     if(unlikely(NULL == hash))
         return;
     if(hash->node_free)
-        hashForeach(hash, hash->node_free, NULL);
+    {
+        unsigned i;
+        for(i = 0; i <= hash->size; i++)
+            hash->node_free(hash->nodes + i * hash->node_size);
+    }
     free(hash->nodes);
     free(hash);
 }
@@ -108,9 +116,9 @@ static inline unsigned hashSize(Hash *hash)
 #define HASH_TEMPLATE(hName, keyType, valType, hashFunc, cmpFunc)              \
                                                                                \
 typedef struct __attribute__((packed)) hName##Node {                           \
+    unsigned        exists;                                                    \
     keyType         key;                                                       \
     valType         value;                                                     \
-    bool            exists;                                                    \
 } hName##Node;                                                                 \
                                                                                \
 static Hash *hName##New(void) {                                                \
@@ -126,10 +134,10 @@ static inline bool hName##Set(Hash *hash, keyType key, valType value);         \
 static bool hName##Rehash(Hash *hash) {                                        \
     unsigned i;                                                                \
     if(unlikely(NULL == hash))                                                 \
-        return FALSE;                                                          \
+        return false;                                                          \
     Hash *newhash = hashNewSize((hash->size + 1) * 2, sizeof(hName##Node));    \
     if(unlikely(NULL == hash))                                                 \
-        return FALSE;                                                          \
+        return false;                                                          \
     for(i = 0; i <= hash->size; i++) {                                         \
         hName##Node n = ((hName##Node*)hash->nodes)[i];                        \
         if(n.exists)                                                           \
@@ -139,16 +147,18 @@ static bool hName##Rehash(Hash *hash) {                                        \
     hash->nodes = newhash->nodes;                                              \
     hash->size = newhash->size;                                                \
     free(newhash);                                                             \
-    return TRUE;                                                               \
+    return true;                                                               \
 }                                                                              \
                                                                                \
 static inline hName##Node *hName##GetNode(Hash *hash, keyType key) {           \
-    unsigned i = hashFunc(key) & hash->size;                                   \
+    unsigned hashv = hashFunc(key);                                            \
+    unsigned i = hashv & hash->size;                                           \
     unsigned probes = 0;                                                       \
-    while(((hName##Node*)hash->nodes)[i].exists &&                             \
-           !cmpFunc(((hName##Node*)hash->nodes)[i].key, key)) {                \
+    hName##Node n = ((hName##Node*)hash->nodes)[i];                            \
+    while(n.exists && !(n.exists == (hashv | 1) && cmpFunc(n.key, key))) {     \
         probes++;                                                              \
         i = (HASH_PROBING) & hash->size;                                       \
+        n = ((hName##Node*)hash->nodes)[i];                                    \
     }                                                                          \
     return &(((hName##Node*)hash->nodes)[i]);                                  \
 }                                                                              \
@@ -162,14 +172,14 @@ static inline bool hName##Set(Hash *hash, keyType key, valType value) {        \
     hName##Node *n = hName##GetNode(hash, key);                                \
     n->key   = key;                                                            \
     n->value = value;                                                          \
-    n->exists  = TRUE;                                                         \
+    n->exists  = hashFunc(key) | 1;                                            \
     hash->items++;                                                             \
     /* rehash if space is limited */                                           \
     if(hash->items > hash->size * HASH_REHASH_RATIO) {                         \
         dbg("%s: free space is limited, needs rehash", #hName);                \
         return hName##Rehash(hash);                                            \
     }                                                                          \
-    return TRUE;                                                               \
+    return true;                                                               \
 }
 
 
