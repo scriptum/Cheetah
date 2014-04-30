@@ -74,7 +74,7 @@ static inline float distance(int i, int j, int w, int h)
 	        ((float)j - (float)h / 2 + 0.5f) * ((float)j - (float)h / 2 + 0.5f) / (float)(h * h));
 }
 
-CHEETAH_EXPORT static void generateImageData(ImageData *ptr, int w, int h, const char *imageType, bool alpha)
+static void generateImageData(ImageData *ptr, int w, int h, const char *imageType, bool alpha)
 {
 	int i, j, channels;
 	int32_t c;
@@ -87,14 +87,14 @@ CHEETAH_EXPORT static void generateImageData(ImageData *ptr, int w, int h, const
 		return;
 	}
 
-#define NEW do {                                                       \
-		if(alpha) {                                                    \
-			channels = 4; new(buf, char, w * h * channels);        \
-		}                                                              \
-		else {                                                         \
-			channels = 3; new0(buf, char, w * h * channels + 1);   \
-		}                                                              \
-	} while(0)
+#define NEW do {                                                               \
+    if(alpha) {                                                                \
+        channels = 4; new(buf, char, w * h * channels);                        \
+    }                                                                          \
+    else {                                                                     \
+        channels = 3; new0(buf, char, w * h * channels + 1);                   \
+    }                                                                          \
+} while(0)
 
 	if(strcmp(imageType, "dummy") == 0)
 	{
@@ -111,13 +111,13 @@ CHEETAH_EXPORT static void generateImageData(ImageData *ptr, int w, int h, const
 	}
 
 #define COLOR_LIGHT                                                            \
-	if(channels == 3) {                                                    \
-		c = c | c << 8 | c << 16;                                      \
-		*((int*)(buf + (j * h + i) * channels)) |= c;                  \
-	} else {                                                               \
-		c = 0xffffff | c << 24;                                        \
-		*((int*)(buf + (j * h + i) * channels)) = c;                   \
-	}
+    if(channels == 3) {                                                        \
+        c = c | c << 8 | c << 16;                                              \
+        *((int*)(buf + (j * h + i) * channels)) |= c;                          \
+    } else {                                                                   \
+        c = 0xffffff | c << 24;                                                \
+        *((int*)(buf + (j * h + i) * channels)) = c;                           \
+    }
 
 	else if(strcmp(imageType, "light") == 0)
 	{
