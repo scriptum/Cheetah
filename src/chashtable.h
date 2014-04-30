@@ -85,7 +85,7 @@ static inline void *hashGetNode(Hash *hash, unsigned i)
 
 static inline void *hashGetKey(Hash *hash, unsigned i)
 {
-    char *ptr = ((char *)hash->nodes + (i * hash->info.node_size + hash->info.key_offset));
+    char *ptr = ((char *)hash->nodes + (i * hash->info.node_size /* + hash->info.key_offset */));
     return *((void**)ptr);
 }
 
