@@ -109,8 +109,6 @@ typedef struct Image
 	int		queued;
 } Image;
 
-typedef Image *pImage;
-
 typedef struct ImageData
 {
 	int		w, h, channels;
@@ -226,18 +224,22 @@ typedef struct FontChar
 
 typedef struct Font
 {
+	char		*name;
+	unsigned	_size;
+	bool		_bold;
+	bool		_italic;
 	Image		*image;
 	void		*hash;
 	void		*kerningHash;
-	float		height;
+	float		 height;
 	float		_spacewidth;
 	float		_interval;
 	float		_scale;
-	float		dfGamma;
-	float		dfSharpness;
-	unsigned	mem;
-	bool		scalable;
-	bool		SDF;
+	float		 dfGamma;
+	float		 dfSharpness;
+	unsigned	 mem;
+	bool		 scalable;
+	bool		 SDF;
 	bool		_kerning;
 } Font;
 

@@ -475,10 +475,9 @@ local texturesArchive = {}
 C.fonts = {}
 C.newFont = function(name, scalable)
 	local a, b, c, d, font, img
-	local millis = C.getTicks()
+	-- local millis = C.getTicks()
 	local glyphs = 0
 	local bytes = 0
-	local p = ffi.new('float[8]')
 	local kerning = false
 	local fontFirst
 	for line in io.lines(name) do
@@ -543,8 +542,8 @@ ffi.metatype('Font', {
 		getStringWidth = libcheetah.fontWidth,
 		enableKerning = function(font) font._kerning = true end,
 		disableKerning = function(font) font._kerning = false end,
-		enableDistanceField = libcheetah.fontEnableDistanceField,
-		disableDistanceField = libcheetah.fontDisableDistanceField
+		enableSDF = function(font) font.SDF = true end,
+		disableSDF = function(font) font.SDF = false end,
 	},
 	__gc = libcheetah.deleteFont
 })

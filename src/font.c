@@ -27,6 +27,7 @@ IN THE SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <errno.h>
 #include <SDL.h>
 
 #include "cheetah.h"
@@ -63,6 +64,7 @@ Shader *initShader();
 void newFragmentShader(Shader *ptr, const char *frag);
 void getWindowSize(int *w, int *h);
 void imageBind(Image *image);
+CHEETAH_EXPORT void newImageOpt(Image *ptr, const char *name, const char *options);
 
 static inline unsigned fontHashFunc(unsigned key)
 {
@@ -126,12 +128,12 @@ CHEETAH_INLINE unsigned fontUnicodeToUint(const char *a, unsigned *ii)
 	return c;
 }
 
-CHEETAH_EXPORT void fontEnableDistanceField(Font *f)
+CHEETAH_EXPORT void fontEnableSDF(Font *f)
 {
 	f->SDF = TRUE;
 }
 
-CHEETAH_EXPORT void fontDisableDistanceField(Font *f)
+CHEETAH_EXPORT void fontDisableSDF(Font *f)
 {
 	f->SDF = FALSE;
 }
@@ -147,7 +149,7 @@ CHEETAH_EXPORT float fontWidth(Font *f, const char *str)
 	unsigned	prevChar = 0;
 	while(str[i])
 	{
-		c = fontUnicodeToUint(str, &i) ;
+		c = fontUnicodeToUint(str, &i);
 		switch(c)
 		{
 		case ' ':
@@ -242,7 +244,6 @@ CHEETAH_EXPORT float fontHeight(Font *currentFont, const char *str, float maxw)
 				}
 				width += ch->w;
 			}
-
 			if(unlikely(width > maxw || '\n' == c))
 			{
 				if(0 == last_space || '\n' == c)
@@ -510,26 +511,26 @@ CHEETAH_EXPORT void __attribute__((optimize("-O3"))) fontPrintf(Font *currentFon
 	imageBind(currentFont->image);
 	if(likely(maxw > 0.0f))
 	{
-		float height = currentFont->height * currentFont->_interval;
-		float spacew = currentFont->_spacewidth;
-		float screenH;
-		int sw, sh;
-		float h = 0.0f;
-		unsigned i = 0;
-		unsigned j = 0;
-		bool      end          = FALSE;
-		bool      yOutScreen   = FALSE;
-		FontChar *ch           = NULL;
-		FontChar *fontPrevChar = NULL;
+		float     height       = currentFont->height * currentFont->_interval;
+		float     spacew       = currentFont->_spacewidth;
+		float     h            = 0.0f;
+		float     lastw        = 0.0f;
+		float     width        = 0.0f;
+		unsigned  i            = 0;
+		unsigned  j            = 0;
+		unsigned  c            = 0;
+		unsigned  buf          = 0;
+		unsigned  prevChar     = 0;
 		unsigned  last_space   = 0;
 		int       spaces       = -1;
-		float     lastw        = 0.0f;
+		FontChar *ch           = NULL;
+		FontChar *fontPrevChar = NULL;
+		bool      end          = FALSE;
+		bool      yOutScreen   = FALSE;
+		float     screenH;
+		int sw, sh;
 		getWindowSize(&sw, &sh);
-		unsigned  c            = 0;
 		screenH = sh;
-		float     width        = 0.0f;
-		unsigned  prevChar     = 0;
-		unsigned buf = 0;
 		y = 0.0;
 		while(TRUE)
 		{
@@ -662,7 +663,7 @@ CHEETAH_EXPORT float fontGetInterval(Font *font)
 	return font->_interval;
 }
 
-CHEETAH_EXPORT void fontSetGlyph(Font *ptr, const char *line)
+static bool fontSetGlyph(Font *ptr, const char *line)
 {
 	float cx2 = 0.0;
 	float cy2 = 0.0;
@@ -676,9 +677,9 @@ CHEETAH_EXPORT void fontSetGlyph(Font *ptr, const char *line)
 	float h   = 0.0;
 	unsigned ch = 0;
 	FontChar *fch = NULL;
-	if(sscanf(line, "%11u %10f %10f %10f %10f %10f %10f %10f %10f", &ch, &x1, &y1, &x2, &y2, &cx1, &cy1, &w, &h) == -1)
+	if(sscanf(line, "%11u %10f %10f %10f %10f %10f %10f %10f %10f", &ch, &x1, &y1, &x2, &y2, &cx1, &cy1, &w, &h) != 9)
 	{
-		return;
+		return FALSE;
 	}
 	if(NULL == ptr->hash)
 	{
@@ -717,16 +718,17 @@ CHEETAH_EXPORT void fontSetGlyph(Font *ptr, const char *line)
 		ptr->mem += (unsigned)sizeof(FontChar);
 	}
 	ptr->height = h;
+	return TRUE;
 }
 
-CHEETAH_EXPORT void fontSetKerning(Font *ptr, const char *line)
+static bool fontSetKerning(Font *ptr, const char *line)
 {
 	unsigned	first;
 	unsigned	second;
 	float		kerning;
-	if(sscanf(line, "%10u %10u %10f", &first, &second, &kerning) == -1)
+	if(sscanf(line, "%10u %10u %10f", &first, &second, &kerning) != 3)
 	{
-		return;
+		return FALSE;
 	}
 	if(NULL == ptr->kerningHash)
 	{
@@ -737,7 +739,7 @@ CHEETAH_EXPORT void fontSetKerning(Font *ptr, const char *line)
 	KernHash_set(ptr->kerningHash, kp, kerning);
 	if(NULL == ptr->hash)
 	{
-		return;
+		return FALSE;
 	}
 	FontChar *fch = FontHash_get(ptr->hash, first);
 	/* mark that this char has kerning (much faster kerning access) */
@@ -745,6 +747,103 @@ CHEETAH_EXPORT void fontSetKerning(Font *ptr, const char *line)
 	{
 		fch->kerning = TRUE;
 	}
+	return TRUE;
+}
+
+CHEETAH_EXPORT Font *newFont(const char *filename, bool scalable)
+{
+	Font *currentFont = NULL;
+	FILE *f = NULL;
+	Image *image = NULL;
+	bool kerning = FALSE;
+	char line[256];
+	RETURN_NULL_IF_NULL(filename);
+	errno = 0;
+	f = fopen(filename, "rt");
+	ERROR_IF_NULL(f);
+	while(fgets(line, sizeof(line), f))
+	{
+		char *p;
+		if(currentFont && strncmp(line, "kerning pairs:", strlen("kerning pairs:")) == 0)
+		{
+			currentFont->_kerning = kerning = TRUE;
+			dbgv("Kerning mode");
+			continue;
+		}
+		if(strncmp(line, "textures: ", strlen("textures: ")) == 0)
+		{
+			char *imgfile;
+			imgfile = p = line + strlen("textures: ");
+			while(*p && *p != '\n' && *p != '\r') p++;
+			*p = '\0';
+			dbgv("Texture: %s", imgfile);
+			new0(image, Image, 1);
+			newImageOpt(image, imgfile, scalable ? "instant" : "instant nearest");
+			continue;
+		}
+		if(currentFont && currentFont->image)
+		{
+			if(kerning)
+			{
+				if(fontSetKerning(currentFont, line))
+				{
+					continue;
+				}
+			}
+			else
+			{
+				if(fontSetGlyph(currentFont, line))
+				{
+					continue;
+				}
+			}
+		}
+		p = strstr(line, "pt");
+		if(NULL == p)
+		{
+			p = strstr(line, "px");
+		}
+		if(NULL != p)
+		{
+			char *start, *end;
+			long size;
+			start = p - 1;
+			/* scan digits */
+			while(start > line && isdigit(*start)) start--;
+			size = strtol(start, &end, 10);
+			if(end == p)
+			{
+				/* ok, create new font */
+				Font *font = NULL;
+				new0(font, Font, 1);
+				font->_scale = 1.0f;
+				font->_interval = 1.0f;
+				font->dfGamma = 0.5f;
+				font->dfSharpness = 1.0f;
+				font->image = image;
+				*start = '\0';
+				font->name = strdup(line);
+				font->_size = (unsigned)size;
+				dbgv("Font: '%s' size: %ld", line, size);
+				if(strstr(p + 2, "bold"))
+				{
+					font->_bold = TRUE;
+				}
+				if(strstr(p + 2, "italic"))
+				{
+					font->_italic = TRUE;
+				}
+				/* reset kerning for this font */
+				kerning = FALSE;
+				currentFont = font;
+			}
+		}
+	}
+	return currentFont;
+error:
+	printf("Cannot load file %s (%s)", filename, strerror(errno));
+	free(image);
+	return NULL;
 }
 
 CHEETAH_EXPORT void deleteFont(Font *ptr)
