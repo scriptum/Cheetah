@@ -60,7 +60,8 @@ static void hashForeach(Hash *hash, void (*func)(void*, void*), void *data)
 
 static void hashDestroy(Hash *hash)
 {
-    if(NULL == hash) return;
+    if(unlikely(NULL == hash))
+        return;
     if(hash->node_free)
         hashForeach(hash, hash->node_free, NULL);
     free(hash->nodes);
@@ -70,12 +71,12 @@ static void hashDestroy(Hash *hash)
 static Hash *hashNewSize(unsigned size, unsigned node_size)
 {
     Hash *hash = (Hash*)calloc(1, sizeof(Hash));
-    if(NULL == hash)
+    if(unlikely(NULL == hash))
         goto error;
     hash->size  = size - 1;
     hash->node_size = node_size;
     hash->nodes = calloc(size, node_size);
-    if(NULL == hash->nodes)
+    if(unlikely(NULL == hash->nodes))
         goto error;
     dbg("Hash: created new of size %u, node size: %u", size, node_size);
     return hash;
@@ -90,13 +91,15 @@ static Hash *hashNew(unsigned node_size)
     return hashNewSize(HASH_START_SIZE, node_size);
 }
 
-static inline unsigned hashLength(Hash *hash) {
+static inline unsigned hashLength(Hash *hash)
+{
     if(unlikely(NULL == hash))
         return 0;
     return hash->items;
 }
 
-static inline unsigned hashSize(Hash *hash) {
+static inline unsigned hashSize(Hash *hash)
+{
     if(unlikely(NULL == hash))
         return 0;
     return hash->size + 1;
@@ -122,10 +125,10 @@ static inline bool hName##Set(Hash *hash, keyType key, valType value);         \
                                                                                \
 static bool hName##Rehash(Hash *hash) {                                        \
     unsigned i;                                                                \
-    if(NULL == hash)                                                           \
+    if(unlikely(NULL == hash))                                                 \
         return FALSE;                                                          \
     Hash *newhash = hashNewSize((hash->size + 1) * 2, sizeof(hName##Node));    \
-    if(NULL == newhash)                                                        \
+    if(unlikely(NULL == hash))                                                 \
         return FALSE;                                                          \
     for(i = 0; i <= hash->size; i++) {                                         \
         hName##Node n = ((hName##Node*)hash->nodes)[i];                        \
