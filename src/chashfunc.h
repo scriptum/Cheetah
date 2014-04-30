@@ -29,6 +29,7 @@ IN THE SOFTWARE.
 #ifndef HASHFUNC_H_
 #define HASHFUNC_H_
 
+#include <stdbool.h>
 #include <stdint.h>
 
 static inline uint32_t hash_string_jenkins(const char *key)
@@ -69,12 +70,11 @@ static inline uint32_t hash_uint32(uint32_t hash)
 	return hash;
 }
 
-static inline bool cmp_string(const char *a, const char *b)
+static inline int cmp_string(const char *a, const char *b)
 {
+	/* Assume that string at least has 1 character and '\0'  */
 	if((*(unsigned short *)a != *(unsigned short *)b))
-	{
-		return FALSE;
-	}
+		return 0;
 	return strcmp(a, b) == 0;
 }
 
