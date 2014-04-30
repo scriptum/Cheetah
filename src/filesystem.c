@@ -28,6 +28,7 @@ IN THE SOFTWARE.
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <errno.h>
 
 #include "cheetah.h"
 #include "cmacros.h"
@@ -59,9 +60,9 @@ CHEETAH_EXPORT unsigned char *loadfile(const char *filename, long *length)
 	unsigned char *result = NULL;
 	long size = 0;
 	FILE *f = NULL;
+	errno = 0;
 	f = fopen(filename, "rb");
 	ERROR_IF_NULL(f);
-	fseek(f, 0, SEEK_END);
 	if(fseek(f, 0, SEEK_END) != 0)
 	{
 		goto error;
@@ -88,12 +89,12 @@ CHEETAH_EXPORT unsigned char *loadfile(const char *filename, long *length)
 	fclose(f);
 	return result;
 error:
+	myError("Cannot load file %s (%s)", filename, strerror(errno));
 	if(f)
 	{
 		fclose(f);
 	}
 	delete(result);
-	myError("can't load file %s", filename);
 	return NULL;
 }
 
