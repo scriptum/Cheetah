@@ -132,20 +132,29 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);                  \
 #define RETURN_NULL_IF_NULL(name) if(unlikely(NULL == (name))) return NULL
 #define RETURN_NULL_IF_FAIL(name) if(unlikely(!(name))) return NULL
 
-bool isInit();
-
 #define _NEEDED_INIT_STR "call init function before!"
 
+bool isInit(void);
+
+static inline bool checkinit(void)
+{
+    if(unlikely(!isInit()))
+    {
+        myError(_NEEDED_INIT_STR);
+        return FALSE;
+    }
+    return TRUE;
+}
+
+
 #define NEEDED_INIT do {                                                       \
-    if(unlikely(!isInit())) {                                                  \
-        myError(_NEEDED_INIT_STR);                                             \
+    if(!checkinit()) {                                                         \
         return 0;                                                              \
     }                                                                          \
 } while(0)
 
 #define NEEDED_INIT_VOID do {                                                  \
-    if(unlikely(!isInit())) {                                                  \
-        myError(_NEEDED_INIT_STR);                                             \
+    if(!checkinit()) {                                                         \
         return;                                                                \
     }                                                                          \
 } while(0)
