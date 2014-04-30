@@ -1,7 +1,7 @@
 TARGET := cheetah
 CFLAGS += -pipe -O2 -ftree-vectorize -g -fvisibility=hidden
 
-EXTRA_WARNINGS = -Wall -Wextra -Wno-unused-parameter -Wuninitialized -Wstrict-overflow -Wshadow -Wbad-function-cast 
+EXTRA_WARNINGS = -Wall -Wextra -Wno-unused -Wuninitialized -Wstrict-overflow -Wshadow -Wbad-function-cast 
 #EXTRA_WARNINGS += -Wmissing-include-dirs -Winline -Wdisabled-optimization -Wconversion
 LIBS=../lib/linux64/libSDL2.a ../lib/linux64/libluajit.a
 LDFLAGS += -g -ldl -lm -lrt -lpthread -lGLU -lGL -Wl,--export-dynamic,--gc-sections
@@ -13,6 +13,8 @@ TESTS := $(TESTS_SRC:.c=)
 OBJECTS := $(SOURCES:.c=.o)
 LIBRARY_OBJECTS := $(OBJECTS:SDL_win32_main.o=)
 LIBRARY_OBJECTS := $(LIBRARY_OBJECTS:main.o=)
+LIBRARY_OBJECTS := $(LIBRARY_OBJECTS:image_write.o=)
+TEST_OBJECTS := $(LIBRARY_OBJECTS:.o=_testobj.o)
 HEADERS := $(wildcard *.h)
 
 THIRDPARTY_SOURCES = $(wildcard SOIL/*.c) image_write.c
@@ -32,7 +34,11 @@ $(THIRDPARTY_TARGETS): %.o: %.c $(HEADERS)
 	@echo "Building $<";\
 	$(CC) $(CFLAGS) $(EXTRA_WARNINGS) $(INCLUDES) -o "$@" -c "$<"
 
-tests/% : tests/%.c $(LIBRARY_OBJECTS) $(THIRDPARTY_TARGETS)
+%_testobj.o : %.c $(HEADERS)
+	@echo "Building test object $<";\
+	$(CC) $(CFLAGS) $(EXTRA_WARNINGS) $(INCLUDES) -DTEST_MODE -o "$@" -c "$<"
+
+tests/% : tests/%.c $(TEST_OBJECTS) $(THIRDPARTY_TARGETS)
 	$(CC) $(CFLAGS) $(EXTRA_WARNINGS) $(INCLUDES) $(LDFLAGS) $^ $(LIBS) -o "$@"
 
 $(TARGET).txt:
