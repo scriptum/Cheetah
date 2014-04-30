@@ -38,14 +38,12 @@ IN THE SOFTWARE.
 #endif
 
 #ifndef HASH_REHASH_RATIO
-#define HASH_REHASH_RATIO 3 / 4
+#define HASH_REHASH_RATIO 75
 #endif
 
 #ifndef HASH_PROBING
 #define HASH_PROBING (unsigned)(i + (probes))
 #endif
-
-#define OFFSETOF(type, field) (&(((type *) 0)->field))
 
 #ifndef unlikely
 #define unlikely(a) (a)
@@ -64,6 +62,7 @@ typedef struct Hash {
     void          *nodes;                     /* Nodes array */
     unsigned       size;                      /* Hash size (nodes array size) */
     unsigned       items;                     /* Number of items that hash stores */
+    unsigned       rehash;                    /* Maximum filling before rehash (in precent) */
     HashInfo       info;
 } Hash;
 
@@ -145,6 +144,7 @@ static Hash *hashNewSizeInternal(unsigned size, HashInfo info)
         goto error;
     size = roundpot(size);
     hash->size  = size - 1;
+    hash->rehash = HASH_REHASH_RATIO;
     hash->info = info;
     hash->nodes = calloc(size, info.node_size);
     if(unlikely(NULL == hash->nodes))
@@ -187,6 +187,14 @@ static inline unsigned hashSize(Hash *hash)
     return hash->size + 1;
 }
 
+static inline unsigned hashSetRehash(Hash *hash, unsigned new_rehash_ratio)
+{
+    hash->rehash = new_rehash_ratio;
+    /* rational values */
+    if(hash->rehash > 100) hash->rehash = 100;
+    if(hash->rehash < 50) hash->rehash = 50;
+}
+
 #define HASH_TEMPLATE_FULL(hName, keyType, valType, hashFunc, cmpFunc, freeKey, freeVal)\
                                                                                \
 typedef struct __attribute__((packed)) hName##Node {                           \
@@ -198,11 +206,8 @@ typedef struct __attribute__((packed)) hName##Node {                           \
 static Hash *hName##NewSize(unsigned size) {                                   \
     HashInfo info;                                                             \
     info.node_size = sizeof(hName##Node);                                      \
-    dbg("%s: node size: %u", #hName, info.node_size);                          \
     info.key_offset = offsetof(hName##Node, key);                              \
-    dbg("%s: key offset: %u", #hName, info.key_offset);                        \
     info.val_offset = offsetof(hName##Node, value);                            \
-    dbg("%s: value offset: %u", #hName, info.val_offset);                      \
     info.key_free = freeKey;                                                   \
     info.value_free = freeVal;                                                 \
     info.name = #hName;                                                        \
@@ -211,27 +216,6 @@ static Hash *hName##NewSize(unsigned size) {                                   \
                                                                                \
 static Hash *hName##New(void) {                                                \
     return hName##NewSize(HASH_START_SIZE);                                    \
-}                                                                              \
-                                                                               \
-static inline bool hName##Set(Hash *hash, keyType key, valType value);         \
-                                                                               \
-static bool hName##Rehash(Hash *hash) {                                        \
-    unsigned i;                                                                \
-    if(unlikely(NULL == hash))                                                 \
-        return false;                                                          \
-    Hash *newhash = hName##NewSize((hash->size + 1) * 2);                      \
-    if(unlikely(NULL == newhash))                                              \
-        return false;                                                          \
-    for(i = 0; i <= hash->size; i++) {                                         \
-        hName##Node n = ((hName##Node*)hash->nodes)[i];                        \
-        if(n.exists)                                                           \
-            hName##Set(newhash, n.key, n.value);                               \
-    }                                                                          \
-    free(hash->nodes);                                                         \
-    hash->nodes = newhash->nodes;                                              \
-    hash->size = newhash->size;                                                \
-    free(newhash);                                                             \
-    return true;                                                               \
 }                                                                              \
                                                                                \
 static inline hName##Node *hName##GetNode(Hash *hash, keyType key) {           \
@@ -265,7 +249,7 @@ static inline bool hName##Set(Hash *hash, keyType key, valType value) {        \
     if(!n->exists) hash->items++;                                              \
     n->exists  = hashFunc(key) | 1;                                            \
     /* rehash if space is limited */                                           \
-    if(hash->items > hash->size * HASH_REHASH_RATIO)                           \
+    if(hash->items > hash->size / 100 * hash->rehash)                          \
         return hashRehashInternal(hash, hName##SetCallback);                   \
     return true;                                                               \
 }
