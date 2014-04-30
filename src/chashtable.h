@@ -187,7 +187,7 @@ static inline unsigned hashSize(Hash *hash)
     return hash->size + 1;
 }
 
-static inline unsigned hashSetRehash(Hash *hash, unsigned new_rehash_ratio)
+static inline void hashSetRehash(Hash *hash, unsigned new_rehash_ratio)
 {
     hash->rehash = new_rehash_ratio;
     /* rational values */
@@ -195,7 +195,10 @@ static inline unsigned hashSetRehash(Hash *hash, unsigned new_rehash_ratio)
     if(hash->rehash < 50) hash->rehash = 50;
 }
 
-#define HASH_TEMPLATE_FULL(hName, keyType, valType, hashFunc, cmpFunc, freeKey, freeVal)\
+#define HASH_TEMPLATE_FULL(hName,                                              \
+                           keyType, valType,                                   \
+                           hashFunc, cmpFunc,                                  \
+                           freeKey, freeVal)                                   \
                                                                                \
 typedef struct __attribute__((packed)) hName##Node {                           \
     keyType  key;                                                              \
