@@ -30,7 +30,6 @@ IN THE SOFTWARE.
 #include "cheetah.h"
 #include "render.h"
 #include "cconfig.h"
-#include "cmacros.h"
 #include "cvertex.h"
 #include "crandom.h"
 
