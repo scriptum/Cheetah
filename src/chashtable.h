@@ -56,7 +56,8 @@ typedef struct HashInfo {
     void         (*value_free)(void*);        /* Function to free each value */
     unsigned       node_size;                 /* Node size */
     unsigned       key_offset;                /* Key offset inside node structure */
-    unsigned       val_offset;                /* value offset inside node structure */
+    unsigned       val_offset;                /* Value offset inside node structure */
+    const char    *name;                      /* Hash table name */
 } HashInfo;
 
 typedef struct Hash {
@@ -148,22 +149,22 @@ static Hash *hashNewSizeInternal(unsigned size, HashInfo info)
     hash->nodes = calloc(size, info.node_size);
     if(unlikely(NULL == hash->nodes))
         goto error;
-    dbg("Hash: created new of size %u, node size: %u", size, info.node_size);
+    dbg("%s: created new of size %u, node size: %u", hash->info.name, size, info.node_size);
     return hash;
 error:
-    dbg("Hash: error: cannot allocate memory");
+    dbg("%s: error: cannot allocate memory", hash->info.name);
     hashDestroy(hash);
     return NULL;
 }
 
 static bool hashRehashInternal(Hash *hash, void (*func)(void*, void*))
 {
-    unsigned i;
     if(unlikely(NULL == hash))
         return false;
     Hash *newhash = hashNewSizeInternal((hash->size + 1) * 2, hash->info);
     if(unlikely(NULL == newhash))
         return false;
+    dbg("%s: free space is limited, needs rehash", hash->info.name);
     hashForeach(hash, func, newhash);
     free(hash->nodes);
     hash->nodes = newhash->nodes;
@@ -204,6 +205,7 @@ static Hash *hName##NewSize(unsigned size) {                                   \
     dbg("%s: value offset: %u", #hName, info.val_offset);                      \
     info.key_free = freeKey;                                                   \
     info.value_free = freeVal;                                                 \
+    info.name = #hName;                                                        \
     return hashNewSizeInternal(size, info);                                    \
 }                                                                              \
                                                                                \
@@ -263,10 +265,8 @@ static inline bool hName##Set(Hash *hash, keyType key, valType value) {        \
     if(!n->exists) hash->items++;                                              \
     n->exists  = hashFunc(key) | 1;                                            \
     /* rehash if space is limited */                                           \
-    if(hash->items > hash->size * HASH_REHASH_RATIO) {                         \
-        dbg("%s: free space is limited, needs rehash", #hName);                \
+    if(hash->items > hash->size * HASH_REHASH_RATIO)                           \
         return hashRehashInternal(hash, hName##SetCallback);                   \
-    }                                                                          \
     return true;                                                               \
 }
 
