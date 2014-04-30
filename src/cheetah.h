@@ -27,7 +27,8 @@ IN THE SOFTWARE.
 #define CHEETAH_EXPORT __attribute__((__visibility__("default")))
 #define CHEETAH_INLINE static inline __attribute__((always_inline optimize("-O3")))
 
-typedef unsigned char bool;
+#include <stdbool.h>
+
 unsigned char *loadfile(const char *filename, long *length);
 
 
