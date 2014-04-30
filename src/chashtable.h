@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-Copyright (c) 2013 Pavel Roschin (aka RPG) <rpg89@post.ru>
+Copyright (c) 2014 Pavel Roschin (aka RPG) <rpg89@post.ru>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to
