@@ -30,6 +30,7 @@ IN THE SOFTWARE.
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include "cdebug.h"
 
@@ -43,6 +44,16 @@ IN THE SOFTWARE.
 
 #ifndef HASH_PROBING
 #define HASH_PROBING (unsigned)(i + (probes))
+#endif
+
+#ifdef HASH_OPTIMIZATION
+#define HASH_EXISTS_TYPE unsigned
+#define HASH_EXISTS_CHECK n.exists == (hashv | 1) &&
+#define HASH_EXISTS_ASSIGN |
+#else
+#define HASH_EXISTS_TYPE bool
+#define HASH_EXISTS_CHECK 
+#define HASH_EXISTS_ASSIGN &&
 #endif
 
 #ifndef unlikely
@@ -201,9 +212,9 @@ static inline void hashSetRehash(Hash *hash, unsigned new_rehash_ratio)
                            freeKey, freeVal)                                   \
                                                                                \
 typedef struct __attribute__((packed)) hName##Node {                           \
-    keyType  key;                                                              \
-    valType  value;                                                            \
-    unsigned exists;                                                           \
+    keyType          key;                                                      \
+    valType          value;                                                    \
+    HASH_EXISTS_TYPE exists;                                                   \
 } hName##Node;                                                                 \
                                                                                \
 static Hash *hName##NewSize(unsigned size) {                                   \
@@ -226,7 +237,7 @@ static inline hName##Node *hName##GetNode(Hash *hash, keyType key) {           \
     unsigned i = hashv & hash->size;                                           \
     unsigned probes = 0;                                                       \
     hName##Node n = ((hName##Node*)hash->nodes)[i];                            \
-    while(n.exists && !(n.exists == (hashv | 1) && cmpFunc(n.key, key))) {     \
+    while(n.exists && !(HASH_EXISTS_CHECK cmpFunc(n.key, key))) {              \
         probes++;                                                              \
         i = (HASH_PROBING) & hash->size;                                       \
         n = ((hName##Node*)hash->nodes)[i];                                    \
@@ -250,7 +261,7 @@ static inline bool hName##Set(Hash *hash, keyType key, valType value) {        \
     n->key   = key;                                                            \
     n->value = value;                                                          \
     if(!n->exists) hash->items++;                                              \
-    n->exists  = hashFunc(key) | 1;                                            \
+    n->exists  = hashFunc(key) HASH_EXISTS_ASSIGN 1;                           \
     /* rehash if space is limited */                                           \
     if(hash->items > hash->size / 100 * hash->rehash)                          \
         return hashRehashInternal(hash, hName##SetCallback);                   \
